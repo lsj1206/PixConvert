@@ -1,0 +1,154 @@
+<UserControl x:Class="PixConvert.Views.Controls.FileListControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:models="clr-namespace:PixConvert.Models"
+             mc:Ignorable="d">
+
+    <UserControl.Resources>
+        <!-- 파일 리스트 스타일 -->
+        <SolidColorBrush x:Key="ItemHoverBackground" Color="#E5F3FF"/>
+        <SolidColorBrush x:Key="ItemSelectedBackground" Color="#CCE8FF"/>
+        <SolidColorBrush x:Key="TextSecondary" Color="#666666"/>
+        <SolidColorBrush x:Key="AccentColor" Color="#0078D4"/>
+
+        <!-- ListViewItem 스타일 -->
+        <Style x:Key="FileItemContainerStyle" TargetType="ListViewItem">
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="0,1"/>
+            <Setter Property="BorderThickness" Value="0,0,0,1"/>
+            <Setter Property="Padding" Value="4,6"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <!-- 파일 템플릿 -->
+                    <ControlTemplate TargetType="ListViewItem">
+                        <Border x:Name="bd"
+                                SnapsToDevicePixels="true"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="4">
+                            <GridViewRowPresenter VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                  SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="{StaticResource ItemHoverBackground}"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="{StaticResource ItemSelectedBackground}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid>
+        <ListView x:Name="FileListView"
+                  BorderThickness="0"
+                  Background="Transparent"
+                  SelectionMode="Extended"
+                  ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                  ItemsSource="{Binding Items}"
+                  ItemContainerStyle="{StaticResource FileItemContainerStyle}"
+                  AllowDrop="True"
+                  KeyDown="ListView_KeyDown"
+                  Drop="FileListView_Drop"
+                  DragLeave="FileListView_DragLeave"
+                  PreviewDragOver="FileListView_PreviewDragOver"
+                  PreviewMouseLeftButtonDown="FileListView_PreviewMouseLeftButtonDown"
+                  PreviewMouseLeftButtonUp="FileListView_PreviewMouseLeftButtonUp"
+                  MouseMove="FileListView_MouseMove">
+            <ListView.View>
+                <!-- GridView -->
+                <GridView>
+                    <GridView.ColumnHeaderContainerStyle>
+                        <!-- 헤더 스타일 -->
+                        <Style TargetType="GridViewColumnHeader">
+                            <Setter Property="Background" Value="Transparent"/>
+                            <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
+                            <Setter Property="Padding" Value="10,5"/>
+                            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                            <Setter Property="FontWeight" Value="SemiBold"/>
+                        </Style>
+                    </GridView.ColumnHeaderContainerStyle>
+
+                    <!-- 번호 -->
+                    <GridViewColumn Header="번호" Width="60">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock HorizontalAlignment="Center"
+                                           Foreground="{StaticResource TextSecondary}"
+                                           Text="{Binding AddIndex}" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <!-- 파일명 -->
+                    <GridViewColumn Header="이름" Width="300">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <!-- 아이콘 -->
+                                    <Image Width="16"
+                                           Height="16"
+                                           Margin="0,2,8,0"
+                                           Source="{StaticResource FileIcon}" />
+                                    <TextBlock TextTrimming="CharacterEllipsis"
+                                               Text="{Binding DisplayBaseName}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <!-- 파일 크기 -->
+                    <GridViewColumn Header="크기" Width="80">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Foreground="{StaticResource TextSecondary}"
+                                           Text="{Binding DisplaySize}" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <!-- 경로 -->
+                    <GridViewColumn Header="경로" Width="400">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Foreground="#999999"
+                                           TextTrimming="CharacterEllipsis"
+                                           Text="{Binding Directory}"
+                                           ToolTip="{Binding Path}" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+
+        <!-- 드롭 위치 표시선 -->
+        <Canvas x:Name="DragAdornerCanvas" IsHitTestVisible="False">
+            <Border x:Name="DropIndicator"
+                    HorizontalAlignment="Stretch"
+                    Width="{Binding ActualWidth, ElementName=FileListView}"
+                    Height="1"
+                    CornerRadius="1.5"
+                    Visibility="Collapsed">
+                <Border.Effect>
+                    <DropShadowEffect Color="#0078D4" BlurRadius="4" ShadowDepth="0" Opacity="0.6"/>
+                </Border.Effect>
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
+                        <GradientStop Color="#0078D4" Offset="0" />
+                        <GradientStop Color="#0078D4" Offset="0.85" />
+                        <GradientStop Color="Transparent" Offset="1" />
+                    </LinearGradientBrush>
+                </Border.Background>
+            </Border>
+        </Canvas>
+    </Grid>
+</UserControl>

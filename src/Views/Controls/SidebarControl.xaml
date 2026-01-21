@@ -1,0 +1,99 @@
+<UserControl x:Class="PixConvert.Views.Controls.SidebarControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:ui="http://schemas.modernwpf.com/2019"
+             mc:Ignorable="d">
+
+    <!-- 사이드바 버튼 스타일 정의 -->
+    <UserControl.Resources>
+        <Style x:Key="SidebarButtonStyle" TargetType="Button">
+            <Setter Property="Margin" Value="0,0,0,8" />
+            <Setter Property="Padding" Value="10,6" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource SystemControlBackgroundBaseLowBrush}"/>
+        </Style>
+    </UserControl.Resources>
+
+    <!-- 사이드바 -->
+    <ScrollViewer PanningMode="VerticalOnly"
+                  VerticalScrollBarVisibility="Hidden"
+                  HorizontalScrollBarVisibility="Disabled">
+
+        <Border Padding="12"
+                Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}"
+                CornerRadius="8"
+                BorderBrush="{DynamicResource SystemControlBackgroundBaseMediumBrush}"
+                BorderThickness="1">
+
+            <StackPanel Orientation="Vertical">
+
+                <!-- 파일 추가/삭제 -->
+                <StackPanel Orientation="Vertical">
+                    <Button Content="파일 추가"
+                            Command="{Binding AddFilesCommand}"
+                            Style="{StaticResource SidebarButtonStyle}" />
+                    <Button Content="폴더 추가"
+                            Command="{Binding AddFolderCommand}"
+                            Style="{StaticResource SidebarButtonStyle}" />
+
+                    <Button Content="목록 제거"
+                            Command="{Binding ListClearCommand}"
+                            Style="{StaticResource SidebarButtonStyle}" />
+                </StackPanel>
+
+                <Separator Margin="0,0,0,8" />
+
+                <!-- 정렬 -->
+                <StackPanel Orientation="Vertical">
+                    <TextBlock Margin="0,0,0,4"
+                               FontSize="12"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}"
+                               Text="정렬" />
+                    <ComboBox HorizontalAlignment="Stretch"
+                              Margin="0,0,0,2"
+                              ItemsSource="{Binding SortOptions}"
+                              SelectedItem="{Binding SelectedSortOption}"
+                              DisplayMemberPath="Display" />
+                    <ui:ToggleSwitch IsOn="{Binding IsSortAscending}"
+                                     OnContent="오름차순"
+                                     OffContent="내림차순" />
+                    <Button Content="번호 재정렬"
+                            Command="{Binding ReorderNumberCommand}"
+                            Style="{StaticResource SidebarButtonStyle}" />
+                </StackPanel>
+
+                <Separator Margin="0,0,0,8" />
+
+                <!-- 기타 -->
+                <StackPanel Orientation="Vertical">
+                    <Grid Margin="0">
+                        <CheckBox Content="확장자 표시"
+                                  IsChecked="{Binding ShowExtension}"
+                                  VerticalAlignment="Center"/>
+                        <Image Source="{StaticResource HelpIcon}"
+                               Width="12" Height="12"
+                               HorizontalAlignment="Right"
+                               VerticalAlignment="Center"
+                               ToolTip="파일 목록에 확장자 표시 여부를 설정합니다." />
+                    </Grid>
+                    <Grid Margin="0">
+                        <CheckBox Content="삭제 확인 표시"
+                                  IsChecked="{Binding ConfirmDeletion}"
+                                  VerticalAlignment="Center"/>
+                        <Image Source="{StaticResource HelpIcon}"
+                               Width="12" Height="12"
+                               HorizontalAlignment="Right"
+                               VerticalAlignment="Center"
+                               ToolTip="파일을 제거할 때 확인 창을 띄웁니다." />
+                    </Grid>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+    </ScrollViewer>
+</UserControl>

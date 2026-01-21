@@ -1,0 +1,64 @@
+<Window x:Class="PixConvert.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:controls="clr-namespace:PixConvert.Views.Controls"
+        xmlns:viewModels="clr-namespace:PixConvert.ViewModels"
+        xmlns:ui="http://schemas.modernwpf.com/2019"
+        mc:Ignorable="d"
+        ui:WindowHelper.UseModernWindowStyle="True"
+        WindowStartupLocation="CenterScreen"
+        Width="960"
+        MinWidth="720"
+        Height="600"
+        MinHeight="540"
+        Title="PixConvert">
+
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="36" />  <!-- 헤더 영역 높이 -->
+            <RowDefinition Height="42"/>   <!-- 빈 공간 -->
+            <RowDefinition />              <!-- 메인 콘텐츠 영역 -->
+        </Grid.RowDefinitions>
+
+        <!-- 헤더 섹션 -->
+        <controls:HeaderControl Grid.Row="0" />
+
+
+        <!-- 메인 섹션 -->
+        <Grid Grid.Row="2" Margin="16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="300" />  <!-- 좌측 사이드바 너비 -->
+                <ColumnDefinition Width="*" />    <!-- 우측 파일 목록 영역 -->
+            </Grid.ColumnDefinitions>
+
+            <!-- 좌측 사이드바 -->
+            <controls:SidebarControl Grid.Column="0" Margin="-10,-50,140,-10" />
+
+            <!-- 파일 목록 -->
+            <Border Grid.ColumnSpan="2"
+                    Margin="166,-50,-10,-10"
+                    Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+                    BorderBrush="{DynamicResource SystemControlBackgroundBaseMediumBrush}"
+                    BorderThickness="1">
+                <controls:FileListControl DataContext="{Binding FileList}" />
+            </Border>
+        </Grid>
+
+        <!-- 입력 차단 레이어 (Busy 상태일 때 활성화) -->
+        <Grid Grid.Row="0" Grid.RowSpan="3"
+              Background="#40FFFFFF"
+              Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}"
+              IsHitTestVisible="True"
+              Focusable="True" />
+
+        <!-- 스낵바 알림 레이어 (가장 위에 표시) -->
+        <controls:SnackbarControl Grid.Row="0" Grid.RowSpan="3"
+                                 DataContext="{Binding Snackbar}" />
+    </Grid>
+</Window>

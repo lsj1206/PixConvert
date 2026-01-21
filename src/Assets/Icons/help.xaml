@@ -1,0 +1,65 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <DrawingImage x:Key="HelpIcon">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+
+                <!-- Outer Circle -->
+                <GeometryDrawing Brush="Transparent">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#252525"
+                             Thickness="1.8"
+                             StartLineCap="Round"
+                             EndLineCap="Round"/>
+                    </GeometryDrawing.Pen>
+                    <GeometryDrawing.Geometry>
+                        <EllipseGeometry
+                            Center="12,12"
+                            RadiusX="9.5"
+                            RadiusY="9.5"/>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+
+                <!-- Question mark (main curve + stem) -->
+                <GeometryDrawing Brush="Transparent">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#252525"
+                             Thickness="1.8"
+                             StartLineCap="Round"
+                             EndLineCap="Round"
+                             LineJoin="Round"/>
+                    </GeometryDrawing.Pen>
+                    <GeometryDrawing.Geometry>
+                        <PathGeometry>
+                            <!-- Top curve -->
+                            <PathFigure StartPoint="9,8">
+                                <BezierSegment Point1="9,5.5"
+                                               Point2="15,5.5"
+                                               Point3="15,9"/>
+                                <BezierSegment Point1="15,11"
+                                               Point2="12,11"
+                                               Point3="12,13"/>
+                            </PathFigure>
+                        </PathGeometry>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+
+                <!-- Question mark dot -->
+                <GeometryDrawing>
+                    <GeometryDrawing.Brush>
+                        <SolidColorBrush Color="#252525"/>
+                    </GeometryDrawing.Brush>
+                    <GeometryDrawing.Geometry>
+                        <EllipseGeometry
+                            Center="12,16.5"
+                            RadiusX="0.9"
+                            RadiusY="0.9"/>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+</ResourceDictionary>
