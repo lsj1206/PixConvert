@@ -1,0 +1,93 @@
+## ─────────────────────────────
+## Temp Data
+## ─────────────────────────────
+temp/
+
+## ─────────────────────────────
+## Visual Studio / Build
+## ─────────────────────────────
+bin/
+obj/
+[Bb]uild/
+[Bb]uildOutput/
+*.cache/
+*.db
+*.mdb
+*.opendb
+
+## ─────────────────────────────
+## .NET Core / .NET 10
+## ─────────────────────────────
+*.deps.json
+*.dll
+*.exe
+*.pdb
+*.runtimeconfig.json
+*.xml
+
+# User secrets
+**/secrets.json
+
+# Publish output
+publish/
+AppPackages/
+BundleArtifacts/
+
+## ─────────────────────────────
+## Visual Studio 특유 파일
+## ─────────────────────────────
+.vs/
+.ReSharper*/
+*.DotSettings.user
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+## ─────────────────────────────
+## NuGet
+## ─────────────────────────────
+*.nupkg
+*.snupkg
+*.nuspec
+packages/
+.nuget/
+
+## ─────────────────────────────
+## WPF / XAML Designer
+## ─────────────────────────────
+*.g.cs
+*.g.i.cs
+*.iobj
+*.ipdb
+Generated/
+*.xaml.cs~backup
+
+## Blend 관련 (확실하지 않음)
+*.design*
+*.blend*
+
+## ─────────────────────────────
+## OS 파일
+## ─────────────────────────────
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Mac (혹시 개발 폴더 동기화용)
+.DS_Store
+
+## ─────────────────────────────
+## 로그 / 임시
+## ─────────────────────────────
+*.log
+*.temp
+*.tmp
+
+## ─────────────────────────────
+## Rider / JetBrains
+## ─────────────────────────────
+.idea/
+*.iml
