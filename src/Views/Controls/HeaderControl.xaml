@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:ui="http://schemas.modernwpf.com/2019"
              xmlns:local="clr-namespace:PixConvert"
              mc:Ignorable="d">
 
@@ -17,14 +18,27 @@
                 <ColumnDefinition Width="Auto" />   <!-- 우측: 버전 정보 -->
             </Grid.ColumnDefinitions>
 
-             <!-- 버전 정보 -->
-            <TextBlock Grid.Column="1"
-                       Margin="15,0,0,0"
-                       VerticalAlignment="Center"
-                       FontSize="14"
-                       FontWeight="Normal"
-                       Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
-                       Text="{x:Static local:App.Version}" />
+            <StackPanel Grid.Column="1"
+                        Orientation="Horizontal"
+                        VerticalAlignment="Center"
+                        Margin="0,0,15,0">
+
+                <!-- 언어 선택 -->
+                <ComboBox ItemsSource="{Binding Languages}"
+                          SelectedItem="{Binding SelectedLanguage}"
+                          DisplayMemberPath="Display"
+                          Width="80"
+                          FontSize="10"
+                          VerticalAlignment="Center"
+                          Margin="0,0,12,0" />
+
+                 <!-- 버전 정보 -->
+                <TextBlock VerticalAlignment="Center"
+                           FontSize="14"
+                           FontWeight="Normal"
+                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                           Text="{x:Static local:App.Version}" />
+            </StackPanel>
         </Grid>
     </Border>
 </UserControl>

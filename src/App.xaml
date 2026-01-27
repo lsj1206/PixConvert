@@ -11,8 +11,8 @@
                 <ui:ThemeResources />
                 <ui:XamlControlsResources />
                 <ResourceDictionary Source="Themes/Generic.xaml" />
-                <ResourceDictionary Source="Assets/Icons/file.xaml" />
-                <ResourceDictionary Source="Assets/Icons/help.xaml" />
+                <ResourceDictionary Source="Resources/Icons/file.xaml" />
+                <ResourceDictionary Source="Resources/Icons/help.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

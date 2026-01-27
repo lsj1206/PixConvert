@@ -1,0 +1,103 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!-- List -->
+    <sys:String x:Key="List_Index">Index</sys:String>
+    <sys:String x:Key="List_Name">Name</sys:String>
+    <sys:String x:Key="List_Preview">Preview</sys:String>
+    <sys:String x:Key="List_Size">Size</sys:String>
+    <sys:String x:Key="List_Path">Path</sys:String>
+
+    <!-- Sidebar : Btn -->
+    <sys:String x:Key="Btn_AddFile">Add File</sys:String>
+    <sys:String x:Key="Btn_AddFolder">Add Folder</sys:String>
+    <sys:String x:Key="Btn_ListClear">List Clear</sys:String>
+    <sys:String x:Key="Btn_RenameRule">Rename Rule</sys:String>
+    <sys:String x:Key="Btn_ApplyRename">Apply Rename</sys:String>
+    <sys:String x:Key="Btn_UndoRename">Undo Rename</sys:String>
+    <sys:String x:Key="Btn_ReorderIndex">Reorder Index</sys:String>
+
+    <!-- Sidebar : Sort -->
+    <sys:String x:Key="Sort_Label">Sort</sys:String>
+    <sys:String x:Key="Sort_Asc">Asc</sys:String>
+    <sys:String x:Key="Sort_Desc">Desc</sys:String>
+    <!-- Sort : Dropdown -->
+    <sys:String x:Key="Sort_Index">Index</sys:String>
+    <sys:String x:Key="Sort_NameIndex">Name-Index</sys:String>
+    <sys:String x:Key="Sort_NamePath">Name-Path</sys:String>
+    <sys:String x:Key="Sort_PathIndex">Path-Index</sys:String>
+    <sys:String x:Key="Sort_PathName">Path-Name</sys:String>
+    <sys:String x:Key="Sort_Size">Size</sys:String>
+    <sys:String x:Key="Sort_CreatedDate">Created Date</sys:String>
+    <sys:String x:Key="Sort_ModifiedDate">Modified Date</sys:String>
+
+    <!-- Sidebar : Option -->
+    <sys:String x:Key="Option_ManualEdit">Manual Edit</sys:String>
+    <sys:String x:Key="Option_ShowExt">Show Ext.</sys:String>
+    <sys:String x:Key="Option_ConfirmDeletion">Confirm Delete</sys:String>
+    <!-- Option : Tooltip -->
+    <sys:String x:Key="Tip_ManualEdit" xml:space="preserve">Double-click a file to rename.
+Edits are reset when the rule is changed.</sys:String>
+    <sys:String x:Key="Tip_ShowExt">File ext. ON/OFF</sys:String>
+    <sys:String x:Key="Tip_ConfirmDeletion">File deletion confirmation ON/OFF</sys:String>
+
+    <!-- Snackbar -->
+    <sys:String x:Key="Msg_AddFile">Add {0} file.</sys:String>
+    <sys:String x:Key="Msg_AddFilePartial">Add {1} of {0} file.</sys:String>
+    <sys:String x:Key="Msg_AlreadyExists">Already exists in the list.</sys:String>
+    <sys:String x:Key="Msg_FileAddError">Error adding file: {0}</sys:String>
+    <sys:String x:Key="Msg_MaxItemExceeded">File limit exceeded. Limit: {0:N0}, Current: {1:N0}, Add: {2:N0}</sys:String>
+    <sys:String x:Key="Msg_ReorderIndex">Reordering Index.</sys:String>
+    <sys:String x:Key="Msg_RemoveFile">Remove {0} file from list.</sys:String>
+    <sys:String x:Key="Msg_ClearList">Clearing list.</sys:String>
+    <sys:String x:Key="Msg_NoRuleChanges">No rule changes detected.</sys:String>
+    <sys:String x:Key="Msg_NoChangeHistory">No change history found.</sys:String>
+    <sys:String x:Key="Msg_ApplyingChanges">Applying name changes...</sys:String>
+    <sys:String x:Key="Msg_ApplyingProgress">Applying name changes... ({0:0}%)</sys:String>
+    <sys:String x:Key="Msg_LoadingFile">Loading file...</sys:String>
+    <sys:String x:Key="Msg_LoadingFileProgress">Loading file... ({0:0}%)</sys:String>
+    <sys:String x:Key="Msg_UndoProgress">Undo changes... ({0:0}%)</sys:String>
+
+    <sys:String x:Key="Msg_RenameSuccess">Renamed {0} file.</sys:String>
+    <sys:String x:Key="Msg_UndoSuccess">Undo {0} rename.</sys:String>
+    <sys:String x:Key="Msg_PartialSuccess">Success : {0} Fail : {1}.</sys:String>
+    <sys:String x:Key="Msg_RenameFailure">Fail: {0} errors occurred.</sys:String>
+
+    <sys:String x:Key="Err_PathTooLong">Fail: Name or Path is too long.</sys:String>
+    <sys:String x:Key="Err_FileNotFound">Fail: Original not found.</sys:String>
+    <sys:String x:Key="Err_Unauthorized">Fail: Access denied.</sys:String>
+    <sys:String x:Key="Err_IO">Fail: Invalid name.</sys:String>
+    <sys:String x:Key="Msg_OperationComplete">{0} operation complete.</sys:String>
+
+    <!-- Dialogs -->
+    <sys:String x:Key="Dlg_Yes">Yes</sys:String>
+    <sys:String x:Key="Dlg_No">No</sys:String>
+    <sys:String x:Key="Dlg_Confirm">Confirm</sys:String>
+    <sys:String x:Key="Dlg_Cancel">Cancel</sys:String>
+
+    <sys:String x:Key="Dlg_Title_AddFile">Add File</sys:String>
+    <sys:String x:Key="Dlg_Title_AddFolder">Add Folder</sys:String>
+
+    <sys:String x:Key="Dlg_Title_ReorderIndex">Reorder Index</sys:String>
+    <sys:String x:Key="Dlg_Ask_ReorderIndex" xml:space="preserve">Reindex based on the current order?
+Existing indexes will be reset.</sys:String>
+
+    <sys:String x:Key="Dlg_Title_DeleteConfirm">Confirm Deletion</sys:String>
+    <sys:String x:Key="Dlg_Ask_DeleteSingle">Remove the selected file from the list?</sys:String>
+    <sys:String x:Key="Dlg_Ask_DeleteMulti">Remove {0} files from the list?</sys:String>
+
+    <sys:String x:Key="Dlg_Title_ClearList">Clear List</sys:String>
+    <sys:String x:Key="Dlg_Ask_ClearList">Clear all files from the list?</sys:String>
+
+    <sys:String x:Key="Dlg_Title_ManualRename">Manual Rename</sys:String>
+    <sys:String x:Key="Dlg_Ask_ManualRename">Enter the new file name:</sys:String>
+
+    <sys:String x:Key="Dlg_Title_FolderOption">Folder Addition Options</sys:String>
+    <sys:String x:Key="Dlg_Btn_AddFileInFolder">Add File in Folder</sys:String>
+    <sys:String x:Key="Dlg_Btn_AddFolder">Add Folder</sys:String>
+    <sys:String x:Key="Dlg_Ask_FolderOptionSingle">How would you like to add '{0}'?</sys:String>
+    <sys:String x:Key="Dlg_Ask_FolderOptionMulti">How would you like to add '{0}' and {1} other folders?</sys:String>
+</ResourceDictionary>
+
+

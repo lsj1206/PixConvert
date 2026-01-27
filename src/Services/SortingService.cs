@@ -26,14 +26,14 @@ public class SortingService : ISortingService
         // 1차 정렬: 사용자가 선택한 주 정렬 기준
         switch (option.Type)
         {
-            case SortType.NameNumber:
+            case SortType.NameIndex:
             case SortType.NamePath:
                 // 윈도우 탐색기 방식의 자연스러운 정렬(숫자 인식 등) 적용
                 sortedItems = isAscending
                     ? itemList.OrderBy(x => x.BaseName, _naturalComparer)
                     : itemList.OrderByDescending(x => x.BaseName, _naturalComparer);
                 break;
-            case SortType.PathNumber:
+            case SortType.PathIndex:
             case SortType.PathName:
                 sortedItems = isAscending
                     ? itemList.OrderBy(x => x.Directory, _naturalComparer)
@@ -66,8 +66,8 @@ public class SortingService : ISortingService
         // 2차 정렬: 1차 기준이 같을 때 적용되는 보조 정렬 기준
         switch (option.Type)
         {
-            case SortType.NameNumber:
-            case SortType.PathNumber:
+            case SortType.NameIndex:
+            case SortType.PathIndex:
             case SortType.Size:
             case SortType.CreatedDate:
             case SortType.ModifiedDate:

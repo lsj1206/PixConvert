@@ -78,7 +78,7 @@
                     </GridView.ColumnHeaderContainerStyle>
 
                     <!-- 번호 -->
-                    <GridViewColumn Header="번호" Width="60">
+                    <GridViewColumn Header="{DynamicResource List_Index}" Width="60">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock HorizontalAlignment="Center"
@@ -89,7 +89,7 @@
                     </GridViewColumn>
 
                     <!-- 파일명 -->
-                    <GridViewColumn Header="이름" Width="300">
+                    <GridViewColumn Header="{DynamicResource List_Name}" Width="300">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
@@ -106,7 +106,7 @@
                     </GridViewColumn>
 
                     <!-- 파일 크기 -->
-                    <GridViewColumn Header="크기" Width="80">
+                    <GridViewColumn Header="{DynamicResource List_Size}" Width="80">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Foreground="{StaticResource TextSecondary}"
@@ -116,7 +116,7 @@
                     </GridViewColumn>
 
                     <!-- 경로 -->
-                    <GridViewColumn Header="경로" Width="400">
+                    <GridViewColumn Header="{DynamicResource List_Path}" Width="400">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Foreground="#999999"

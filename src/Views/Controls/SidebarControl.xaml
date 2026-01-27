@@ -34,14 +34,14 @@
 
                 <!-- 파일 추가/삭제 -->
                 <StackPanel Orientation="Vertical">
-                    <Button Content="파일 추가"
+                    <Button Content="{DynamicResource Btn_AddFile}"
                             Command="{Binding AddFilesCommand}"
                             Style="{StaticResource SidebarButtonStyle}" />
-                    <Button Content="폴더 추가"
+                    <Button Content="{DynamicResource Btn_AddFolder}"
                             Command="{Binding AddFolderCommand}"
                             Style="{StaticResource SidebarButtonStyle}" />
 
-                    <Button Content="목록 제거"
+                    <Button Content="{DynamicResource Btn_ListClear}"
                             Command="{Binding ListClearCommand}"
                             Style="{StaticResource SidebarButtonStyle}" />
                 </StackPanel>
@@ -54,16 +54,16 @@
                                FontSize="12"
                                FontWeight="SemiBold"
                                Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}"
-                               Text="정렬" />
+                               Text="{DynamicResource Sort_Label}" />
                     <ComboBox HorizontalAlignment="Stretch"
                               Margin="0,0,0,2"
                               ItemsSource="{Binding SortOptions}"
                               SelectedItem="{Binding SelectedSortOption}"
                               DisplayMemberPath="Display" />
                     <ui:ToggleSwitch IsOn="{Binding IsSortAscending}"
-                                     OnContent="오름차순"
-                                     OffContent="내림차순" />
-                    <Button Content="번호 재정렬"
+                                     OnContent="{DynamicResource Sort_Asc}"
+                                     OffContent="{DynamicResource Sort_Desc}" />
+                    <Button Content="{DynamicResource Btn_ReorderIndex}"
                             Command="{Binding ReorderNumberCommand}"
                             Style="{StaticResource SidebarButtonStyle}" />
                 </StackPanel>
@@ -73,24 +73,24 @@
                 <!-- 기타 -->
                 <StackPanel Orientation="Vertical">
                     <Grid Margin="0">
-                        <CheckBox Content="확장자 표시"
+                        <CheckBox Content="{DynamicResource Option_ShowExt}"
                                   IsChecked="{Binding ShowExtension}"
                                   VerticalAlignment="Center"/>
                         <Image Source="{StaticResource HelpIcon}"
                                Width="12" Height="12"
                                HorizontalAlignment="Right"
                                VerticalAlignment="Center"
-                               ToolTip="파일 목록에 확장자 표시 여부를 설정합니다." />
+                               ToolTip="{DynamicResource Tip_ShowExt}" />
                     </Grid>
                     <Grid Margin="0">
-                        <CheckBox Content="삭제 확인 표시"
+                        <CheckBox Content="{DynamicResource Option_ConfirmDeletion}"
                                   IsChecked="{Binding ConfirmDeletion}"
                                   VerticalAlignment="Center"/>
                         <Image Source="{StaticResource HelpIcon}"
                                Width="12" Height="12"
                                HorizontalAlignment="Right"
                                VerticalAlignment="Center"
-                               ToolTip="파일을 제거할 때 확인 창을 띄웁니다." />
+                               ToolTip="{DynamicResource Tip_ConfirmDeletion}" />
                     </Grid>
                 </StackPanel>
             </StackPanel>
