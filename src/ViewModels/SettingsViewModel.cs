@@ -35,8 +35,8 @@ public partial class SettingsViewModel : ObservableObject
 
     public ObservableCollection<LanguageOption> Languages { get; } =
     [
-        new() { Display = "English", Code = "en-US" },
-        new() { Display = "한국어", Code = "ko-KR" }
+        new() { Display = "EN", Code = "en-US" },
+        new() { Display = "KR", Code = "ko-KR" }
     ];
 
     public ObservableCollection<SortOption> SortOptions { get; } = [];

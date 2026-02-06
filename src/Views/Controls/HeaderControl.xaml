@@ -20,24 +20,68 @@
 
             <StackPanel Grid.Column="1"
                         Orientation="Horizontal"
-                        VerticalAlignment="Center"
-                        Margin="0,0,15,0">
+                        VerticalAlignment="Center">
 
-                <!-- 언어 선택 -->
-                <ComboBox ItemsSource="{Binding Settings.Languages}"
-                          SelectedItem="{Binding Settings.SelectedLanguage}"
-                          DisplayMemberPath="Display"
-                          Width="80"
-                          FontSize="10"
-                          VerticalAlignment="Center"
-                          Margin="0,0,12,0" />
-
-                 <!-- 버전 정보 -->
+                <!-- 버전 정보 -->
                 <TextBlock VerticalAlignment="Center"
                            FontSize="14"
                            FontWeight="Normal"
                            Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
-                           Text="{x:Static local:App.Version}" />
+                           Text="{x:Static local:App.Version}"
+                           Margin="0,0,6,0" />
+
+                <!-- 언어 선택 (Segmented 제어 방식) -->
+                <ListBox ItemsSource="{Binding Settings.Languages}"
+                         SelectedItem="{Binding Settings.SelectedLanguage}"
+                         Background="Transparent"
+                         BorderThickness="0"
+                         VerticalAlignment="Center">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Padding" Value="6,2" />
+                            <Setter Property="FontSize" Value="12" />
+                            <Setter Property="HorizontalContentAlignment" Value="Center" />
+                            <Setter Property="Cursor" Value="Hand" />
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListBoxItem">
+                                        <Border x:Name="bd"
+                                                Background="Transparent"
+                                                BorderBrush="{DynamicResource SystemControlBackgroundBaseMediumLowBrush}"
+                                                BorderThickness="1"
+                                                CornerRadius="2"
+                                                Margin="2,0"
+                                                SnapsToDevicePixels="True">
+                                            <ContentPresenter Margin="{TemplateBinding Padding}"
+                                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                              VerticalAlignment="Center"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="bd" Property="Background" Value="{DynamicResource SystemControlBackgroundBaseLowBrush}"/>
+                                            </Trigger>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter TargetName="bd" Property="Background" Value="{DynamicResource SystemControlHighlightAccentBrush}"/>
+                                                <Setter TargetName="bd" Property="BorderBrush" Value="{DynamicResource SystemControlHighlightAccentBrush}"/>
+                                                <Setter Property="Foreground" Value="White"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Display}" />
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
             </StackPanel>
         </Grid>
     </Border>
