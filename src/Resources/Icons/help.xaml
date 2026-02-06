@@ -4,12 +4,11 @@
     <DrawingImage x:Key="HelpIcon">
         <DrawingImage.Drawing>
             <DrawingGroup>
-
                 <!-- Outer Circle -->
                 <GeometryDrawing Brush="Transparent">
                     <GeometryDrawing.Pen>
-                        <Pen Brush="#252525"
-                             Thickness="1.8"
+                        <Pen Brush="#757575"
+                             Thickness="2"
                              StartLineCap="Round"
                              EndLineCap="Round"/>
                     </GeometryDrawing.Pen>
@@ -21,18 +20,17 @@
                     </GeometryDrawing.Geometry>
                 </GeometryDrawing>
 
-                <!-- Question mark (main curve + stem) -->
+                <!-- Question mark -->
                 <GeometryDrawing Brush="Transparent">
                     <GeometryDrawing.Pen>
-                        <Pen Brush="#252525"
-                             Thickness="1.8"
+                        <Pen Brush="#757575"
+                             Thickness="2"
                              StartLineCap="Round"
                              EndLineCap="Round"
                              LineJoin="Round"/>
                     </GeometryDrawing.Pen>
                     <GeometryDrawing.Geometry>
                         <PathGeometry>
-                            <!-- Top curve -->
                             <PathFigure StartPoint="9,8">
                                 <BezierSegment Point1="9,5.5"
                                                Point2="15,5.5"
@@ -45,19 +43,15 @@
                     </GeometryDrawing.Geometry>
                 </GeometryDrawing>
 
-                <!-- Question mark dot -->
-                <GeometryDrawing>
-                    <GeometryDrawing.Brush>
-                        <SolidColorBrush Color="#252525"/>
-                    </GeometryDrawing.Brush>
+                <!-- Dot -->
+                <GeometryDrawing Brush="#888888">
                     <GeometryDrawing.Geometry>
                         <EllipseGeometry
                             Center="12,16.5"
-                            RadiusX="0.9"
-                            RadiusY="0.9"/>
+                            RadiusX="1"
+                            RadiusY="1"/>
                     </GeometryDrawing.Geometry>
                 </GeometryDrawing>
-
             </DrawingGroup>
         </DrawingImage.Drawing>
     </DrawingImage>
