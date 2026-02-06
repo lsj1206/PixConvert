@@ -65,12 +65,12 @@ public partial class MainViewModel : ObservableObject
         Snackbar = snackbarViewModel;
         Settings = settingsViewModel;
 
-        // 명령 초기화 및 메서드 연결
-        AddFilesCommand = new RelayCommand(AddFiles);
-        AddFolderCommand = new RelayCommand(AddFolder);
-        DeleteFilesCommand = new RelayCommand<System.Collections.IList>(DeleteFiles);
-        ListClearCommand = new AsyncRelayCommand(ListClearAsync);
-        ReorderNumberCommand = new RelayCommand(ReorderNumber);
+        // 명령 초기화 및 메서드 연결 (IsBusy가 아닐 때만 실행 가능)
+        AddFilesCommand = new RelayCommand(AddFiles, () => !IsBusy);
+        AddFolderCommand = new RelayCommand(AddFolder, () => !IsBusy);
+        DeleteFilesCommand = new RelayCommand<System.Collections.IList>(DeleteFiles, _ => !IsBusy);
+        ListClearCommand = new AsyncRelayCommand(ListClearAsync, () => !IsBusy);
+        ReorderNumberCommand = new RelayCommand(ReorderNumber, () => !IsBusy);
 
         // 설정 변경 이벤트 구독
         Settings.PropertyChanged += (s, e) =>
@@ -102,7 +102,11 @@ public partial class MainViewModel : ObservableObject
     }
 
     /// <summary>외부에서 드롭된 파일/폴더 경로 목록을 처리합니다.</summary>
-    public async void DropFiles(string[] paths) => await ProcessFiles(paths);
+    public async void DropFiles(string[] paths)
+    {
+        if (IsBusy) return;
+        await ProcessFiles(paths);
+    }
 
     /// <summary>
     /// 입력받은 경로들을 분석하여 파일을 추출하고, 중복 및 개수 확인 후 목록에 추가합니다.
@@ -149,6 +153,16 @@ public partial class MainViewModel : ObservableObject
         {
             IsBusy = false;
         }
+    }
+
+    /// <summary>IsBusy 상태가 변경될 때 명령의 실행 가능 여부를 다시 확인합니다.</summary>
+    partial void OnIsBusyChanged(bool value)
+    {
+        AddFilesCommand.NotifyCanExecuteChanged();
+        AddFolderCommand.NotifyCanExecuteChanged();
+        DeleteFilesCommand.NotifyCanExecuteChanged();
+        ListClearCommand.NotifyCanExecuteChanged();
+        ReorderNumberCommand.NotifyCanExecuteChanged();
     }
 
     /// <summary>최종 생성된 아이템들을 실제 목록 컬렉션에 삽입합니다.</summary>
