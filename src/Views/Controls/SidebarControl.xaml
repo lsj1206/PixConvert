@@ -57,10 +57,10 @@
                                Text="{DynamicResource Sort_Label}" />
                     <ComboBox HorizontalAlignment="Stretch"
                               Margin="0,0,0,2"
-                              ItemsSource="{Binding SortOptions}"
-                              SelectedItem="{Binding SelectedSortOption}"
+                              ItemsSource="{Binding Settings.SortOptions}"
+                              SelectedItem="{Binding Settings.SelectedSortOption}"
                               DisplayMemberPath="Display" />
-                    <ui:ToggleSwitch IsOn="{Binding IsSortAscending}"
+                    <ui:ToggleSwitch IsOn="{Binding Settings.IsSortAscending}"
                                      OnContent="{DynamicResource Sort_Asc}"
                                      OffContent="{DynamicResource Sort_Desc}" />
                     <Button Content="{DynamicResource Btn_ReorderIndex}"
@@ -74,7 +74,7 @@
                 <StackPanel Orientation="Vertical">
                     <Grid Margin="0">
                         <CheckBox Content="{DynamicResource Option_ShowExt}"
-                                  IsChecked="{Binding ShowExtension}"
+                                  IsChecked="{Binding Settings.ShowExtension}"
                                   VerticalAlignment="Center"/>
                         <Image Source="{StaticResource HelpIcon}"
                                Width="12" Height="12"
@@ -84,7 +84,7 @@
                     </Grid>
                     <Grid Margin="0">
                         <CheckBox Content="{DynamicResource Option_ConfirmDeletion}"
-                                  IsChecked="{Binding ConfirmDeletion}"
+                                  IsChecked="{Binding Settings.ConfirmDeletion}"
                                   VerticalAlignment="Center"/>
                         <Image Source="{StaticResource HelpIcon}"
                                Width="12" Height="12"

@@ -67,7 +67,7 @@ public class FileListViewModel
     /// <param name="sortingService">정렬 엔진 서비스</param>
     /// <param name="option">정렬 기준</param>
     /// <param name="ascending">오름차순 여부</param>
-    public void Sorting(ISortingService sortingService, MainViewModel.SortOption option, bool ascending)
+    public void Sorting(ISortingService sortingService, SortOption option, bool ascending)
     {
         if (Items.Count == 0) return;
 

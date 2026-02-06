@@ -1,7 +1,6 @@
 using System.Linq;
 using System.Collections.Generic;
 using PixConvert.Models;
-using static PixConvert.ViewModels.MainViewModel;
 
 namespace PixConvert.Services;
 

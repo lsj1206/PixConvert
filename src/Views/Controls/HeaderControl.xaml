@@ -24,8 +24,8 @@
                         Margin="0,0,15,0">
 
                 <!-- 언어 선택 -->
-                <ComboBox ItemsSource="{Binding Languages}"
-                          SelectedItem="{Binding SelectedLanguage}"
+                <ComboBox ItemsSource="{Binding Settings.Languages}"
+                          SelectedItem="{Binding Settings.SelectedLanguage}"
                           DisplayMemberPath="Display"
                           Width="80"
                           FontSize="10"

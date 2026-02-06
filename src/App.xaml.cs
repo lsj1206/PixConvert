@@ -44,10 +44,12 @@ public partial class App : Application
         services.AddSingleton<IFileService, FileService>();
         services.AddSingleton<ISortingService, SortingService>();
         services.AddSingleton<ILanguageService, LanguageService>();
+        services.AddSingleton<IFileProcessingService, FileProcessingService>();
 
         // [ViewModels] 화면 상태 관리 뷰모델 등록
         services.AddTransient<MainViewModel>();
         services.AddSingleton<SnackbarViewModel>();
+        services.AddSingleton<SettingsViewModel>();
 
         // [Views] UI 창 등록
         services.AddSingleton<MainWindow>();
