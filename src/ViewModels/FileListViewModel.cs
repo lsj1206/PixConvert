@@ -12,22 +12,25 @@ namespace PixConvert.ViewModels;
 /// </summary>
 public class FileListViewModel
 {
-    /// <summary>화면에 바인딩되는 파일 아이템 컬렉션입니다.</summary>
-    public ObservableCollection<FileItem> Items { get; } = new();
+    private readonly ObservableCollection<FileItem> _items = new();
 
-    // 중복 체크 성능 향상을 위한 경로 집합 (O(1) 검색)
-    private readonly HashSet<string> _pathSet = new(StringComparer.OrdinalIgnoreCase);
+    /// <summary>화면에 바인딩되는 읽기 전용 파일 아이템 컬렉션입니다.</summary>
+    public ReadOnlyObservableCollection<FileItem> Items { get; }
 
     // 다음에 추가될 아이템의 기본 순번
     private int _nextAddIndex = 1;
+
+    public FileListViewModel()
+    {
+        Items = new ReadOnlyObservableCollection<FileItem>(_items);
+    }
 
     /// <summary>
     /// 목록의 모든 데이터를 초기화합니다.
     /// </summary>
     public void Clear()
     {
-        Items.Clear();
-        _pathSet.Clear();
+        _items.Clear();
         _nextAddIndex = 1;
     }
 
@@ -38,11 +41,12 @@ public class FileListViewModel
     /// <returns>추가 성공 시 true, 중복 등으로 실패 시 false를 반환합니다.</returns>
     public bool AddItem(FileItem item)
     {
-        if (_pathSet.Contains(item.Path)) return false;
+        // 10,000개 이하의 데이터에서는 LINQ Any()를 통한 중복 체크만으로도 충분히 빠름
+        if (_items.Any(x => x.Path.Equals(item.Path, StringComparison.OrdinalIgnoreCase)))
+            return false;
 
         item.AddIndex = _nextAddIndex++;
-        Items.Add(item);
-        _pathSet.Add(item.Path);
+        _items.Add(item);
         return true;
     }
 
@@ -69,17 +73,15 @@ public class FileListViewModel
     /// <param name="ascending">오름차순 여부</param>
     public void Sorting(ISortingService sortingService, SortOption option, bool ascending)
     {
-        if (Items.Count == 0) return;
+        if (_items.Count == 0) return;
 
-        var sortedItems = sortingService.Sort(Items, option, ascending).ToList();
+        var sortedItems = sortingService.Sort(_items, option, ascending).ToList();
 
         // UI 갱신을 위해 컬렉션을 재구성합니다.
-        Items.Clear();
-        _pathSet.Clear();
+        _items.Clear();
         foreach (var item in sortedItems)
         {
-            Items.Add(item);
-            _pathSet.Add(item.Path);
+            _items.Add(item);
         }
     }
 
@@ -96,9 +98,8 @@ public class FileListViewModel
         var itemList = itemsToRemove.ToList();
         foreach (var item in itemList)
         {
-            if (Items.Remove(item))
+            if (_items.Remove(item))
             {
-                _pathSet.Remove(item.Path);
                 count++;
             }
         }
@@ -111,7 +112,7 @@ public class FileListViewModel
     public void ReorderIndex()
     {
         int index = 1;
-        foreach (var item in Items)
+        foreach (var item in _items)
         {
             item.AddIndex = index++;
         }
@@ -129,28 +130,28 @@ public class FileListViewModel
         if (itemsToMove == null || itemsToMove.Count == 0) return;
 
         // 이동 대상 근처의 타겟 아이템 확보
-        FileItem? targetItem = (targetIndex >= 0 && targetIndex < Items.Count) ? Items[targetIndex] : null;
+        FileItem? targetItem = (targetIndex >= 0 && targetIndex < _items.Count) ? _items[targetIndex] : null;
 
         // 1. 이동할 대상들만 추출하여 현재 리스트에서 제거
-        var actualMoving = itemsToMove.Where(i => Items.Contains(i)).ToList();
-        foreach (var item in actualMoving) Items.Remove(item);
+        var actualMoving = itemsToMove.Where(i => _items.Contains(i)).ToList();
+        foreach (var item in actualMoving) _items.Remove(item);
 
         // 2. 최종 삽입 위치 결정
         int insertIndex;
-        if (targetItem != null && Items.Contains(targetItem))
+        if (targetItem != null && _items.Contains(targetItem))
         {
-            insertIndex = Items.IndexOf(targetItem);
+            insertIndex = _items.IndexOf(targetItem);
             if (isBottom) insertIndex++;
         }
         else
         {
-            insertIndex = Math.Min(targetIndex, Items.Count);
+            insertIndex = Math.Min(targetIndex, _items.Count);
         }
 
         // 3. 새 위치에 순차적으로 삽입
         for (int i = 0; i < actualMoving.Count; i++)
         {
-            Items.Insert(Math.Min(insertIndex + i, Items.Count), actualMoving[i]);
+            _items.Insert(Math.Min(insertIndex + i, _items.Count), actualMoving[i]);
         }
     }
 }
