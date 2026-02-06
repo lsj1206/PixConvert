@@ -41,6 +41,7 @@ public partial class App : Application
         services.AddSingleton<IWindowService, WindowService>();
         services.AddSingleton<IDialogService, DialogService>();
         services.AddSingleton<ISnackbarService, SnackbarService>();
+        services.AddSingleton<IIconService, IconService>();
         services.AddSingleton<IFileService, FileService>();
         services.AddSingleton<ISortingService, SortingService>();
         services.AddSingleton<ILanguageService, LanguageService>();
