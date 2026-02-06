@@ -1,4 +1,5 @@
 using System;
+using System.Windows.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace PixConvert.Models;
@@ -9,6 +10,10 @@ namespace PixConvert.Models;
 public partial class FileItem : ObservableObject
 {
     private string _path = default!;
+
+    /// <summary>파일 시스템의 실제 아이콘 이미지</summary>
+    [ObservableProperty]
+    private ImageSource? icon;
 
     /// <summary>
     /// 파일의 전체 경로를 가져오거나 설정합니다.

@@ -10,14 +10,17 @@ namespace PixConvert.Services;
 /// </summary>
 public class FileService : IFileService
 {
+    private readonly IIconService _iconService;
+
     // 파일 크기 단위 정의
     private static readonly string[] SizeSuffixes = ["B", "KB", "MB", "GB", "TB"];
 
     /// <summary>
     /// FileService의 새 인스턴스를 초기화합니다.
     /// </summary>
-    public FileService()
+    public FileService(IIconService iconService)
     {
+        _iconService = iconService;
     }
 
     /// <summary>
@@ -37,7 +40,8 @@ public class FileService : IFileService
                 DisplaySize = FormatFileSize(fileInfo.Length),
                 CreatedDate = fileInfo.CreationTime,
                 ModifiedDate = fileInfo.LastWriteTime,
-                AddIndex = null
+                AddIndex = null,
+                Icon = _iconService.GetIcon(path) // 시스템 아이콘 가져오기
             };
         }
         return null;
