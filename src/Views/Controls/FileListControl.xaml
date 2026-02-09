@@ -89,7 +89,7 @@
                     </GridViewColumn>
 
                     <!-- 파일명 -->
-                    <GridViewColumn Header="{DynamicResource List_Name}" Width="300">
+                    <GridViewColumn Header="{DynamicResource List_Name}" Width="250">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
@@ -100,6 +100,16 @@
                                            Source="{Binding Icon}" />
                                     <TextBlock TextTrimming="CharacterEllipsis" Text="{Binding DisplayBaseName}" />
                                 </StackPanel>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <!-- 확장자 -->
+                    <GridViewColumn Header="{DynamicResource List_Extension}" Width="80">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Foreground="{StaticResource TextSecondary}"
+                                           Text="{Binding DisplayExtension}" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

@@ -73,16 +73,6 @@
                 <!-- 기타 -->
                 <StackPanel Orientation="Vertical">
                     <Grid Margin="0">
-                        <CheckBox Content="{DynamicResource Option_ShowExt}"
-                                  IsChecked="{Binding Settings.ShowExtension}"
-                                  VerticalAlignment="Center"/>
-                        <Image Source="{StaticResource HelpIcon}"
-                               Width="12" Height="12"
-                               HorizontalAlignment="Right"
-                               VerticalAlignment="Center"
-                               ToolTip="{DynamicResource Tip_ShowExt}" />
-                    </Grid>
-                    <Grid Margin="0">
                         <CheckBox Content="{DynamicResource Option_ConfirmDeletion}"
                                   IsChecked="{Binding Settings.ConfirmDeletion}"
                                   VerticalAlignment="Center"/>

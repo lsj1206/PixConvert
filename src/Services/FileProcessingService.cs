@@ -21,7 +21,6 @@ public class FileProcessingService : IFileProcessingService
 
     public async Task<FileProcessingResult> ProcessPathsAsync(
         IEnumerable<string> paths,
-        bool showExtension,
         int maxItemCount,
         int currentCount,
         IProgress<FileProcessingProgress>? progress = null)
@@ -66,7 +65,6 @@ public class FileProcessingService : IFileProcessingService
                 var item = _fileService.CreateFileItem(finalPaths[i]);
                 if (item != null)
                 {
-                    item.UpdateDisplay(showExtension);
                     items.Add(item);
                 }
 

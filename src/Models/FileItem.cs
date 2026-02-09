@@ -53,14 +53,15 @@ public partial class FileItem : ObservableObject
     [ObservableProperty]
     private int? addIndex;
 
-    /// <summary>목록 화면에 표시될 파일 이름 (확장자 포함 여부에 따라 변동)</summary>
+    /// <summary>목록 화면에 표시될 파일 이름 (확장자 제외)</summary>
     [ObservableProperty]
     private string displayBaseName = string.Empty;
 
+    /// <summary>목록 화면에 표시될 확장자 (점 제외)</summary>
+    public string DisplayExtension => BaseExtension.TrimStart('.').ToLower();
+
     /// <summary>읽기 쉬운 단위로 변환된 파일 크기 (예: 12 KB)</summary>
     public string DisplaySize { get; set; } = string.Empty;
-
-    private bool _lastShowExtension = false;
 
     /// <summary>
     /// 현재 Path를 기반으로 파일의 세부 구성 정보를 파싱합니다.
@@ -71,16 +72,6 @@ public partial class FileItem : ObservableObject
         BaseName = System.IO.Path.GetFileNameWithoutExtension(_path);
         BaseExtension = System.IO.Path.GetExtension(_path);
 
-        UpdateDisplay(_lastShowExtension);
-    }
-
-    /// <summary>
-    /// 확장자 표시 여부 설정에 따라 화면에 보여줄 파일 이름을 갱신합니다.
-    /// </summary>
-    /// <param name="showExtension">true면 확장자를 포함하고, false면 제외함</param>
-    public void UpdateDisplay(bool showExtension)
-    {
-        _lastShowExtension = showExtension;
-        DisplayBaseName = showExtension ? BaseName + BaseExtension : BaseName;
+        DisplayBaseName = BaseName;
     }
 }

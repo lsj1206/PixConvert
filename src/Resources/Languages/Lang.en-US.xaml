@@ -5,6 +5,7 @@
     <!-- List -->
     <sys:String x:Key="List_Index">Index</sys:String>
     <sys:String x:Key="List_Name">Name</sys:String>
+    <sys:String x:Key="List_Extension">Extension</sys:String>
     <sys:String x:Key="List_Preview">Preview</sys:String>
     <sys:String x:Key="List_Size">Size</sys:String>
     <sys:String x:Key="List_Path">Path</sys:String>
@@ -34,12 +35,10 @@
 
     <!-- Sidebar : Option -->
     <sys:String x:Key="Option_ManualEdit">Manual Edit</sys:String>
-    <sys:String x:Key="Option_ShowExt">Show Ext.</sys:String>
     <sys:String x:Key="Option_ConfirmDeletion">Confirm Delete</sys:String>
     <!-- Option : Tooltip -->
     <sys:String x:Key="Tip_ManualEdit" xml:space="preserve">Double-click a file to rename.
 Edits are reset when the rule is changed.</sys:String>
-    <sys:String x:Key="Tip_ShowExt">File ext. ON/OFF</sys:String>
     <sys:String x:Key="Tip_ConfirmDeletion">File deletion confirmation ON/OFF</sys:String>
 
     <!-- Snackbar -->

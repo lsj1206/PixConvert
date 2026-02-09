@@ -80,10 +80,6 @@ public partial class MainViewModel : ObservableObject
             {
                 SortFiles();
             }
-            else if (e.PropertyName == nameof(SettingsViewModel.ShowExtension))
-            {
-                OnShowExtensionChanged(Settings.ShowExtension);
-            }
         };
     }
 
@@ -127,7 +123,6 @@ public partial class MainViewModel : ObservableObject
             // 서비스 호출하여 파일 처리 수행
             var result = await _fileProcessingService.ProcessPathsAsync(
                 paths,
-                Settings.ShowExtension,
                 MaxItemCount,
                 FileList.Items.Count,
                 progress);
@@ -196,12 +191,6 @@ public partial class MainViewModel : ObservableObject
             FileList.ReorderIndex();
             _snackbarService.Show(GetString("Msg_ReorderIndex"), SnackbarType.Success);
         }
-    }
-
-    /// <summary>확장자 표시 여부가 변경될 때 모든 아이템의 표시 이름을 갱신합니다.</summary>
-    private void OnShowExtensionChanged(bool value)
-    {
-        foreach (var item in FileList.Items) item.UpdateDisplay(value);
     }
 
     /// <summary>선택된 파일들을 목록에서 제거합니다.</summary>

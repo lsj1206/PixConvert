@@ -50,14 +50,12 @@ public interface IFileProcessingService
     /// 파일 및 폴더 경로 목록을 입력받아 재귀적으로 파일을 추출하고 FileItem 목록을 생성합니다.
     /// </summary>
     /// <param name="paths">처리할 파일 또는 폴더 경로 목록</param>
-    /// <param name="showExtension">확장자 표시 여부 (FileItem 초기 상태 설정용)</param>
     /// <param name="maxItemCount">허용되는 최대 파일 개수</param>
     /// <param name="currentCount">현재 목록에 존재하는 파일 개수 (중복 및 수량 제한 확인용)</param>
     /// <param name="progress">진행 상황을 보고하기 위한 IProgress 인터페이스</param>
     /// <returns>처리 통계와 새로 생성된 아이템 목록을 담은 FileProcessingResult</returns>
     Task<FileProcessingResult> ProcessPathsAsync(
         IEnumerable<string> paths,
-        bool showExtension,
         int maxItemCount,
         int currentCount,
         IProgress<FileProcessingProgress>? progress = null);
