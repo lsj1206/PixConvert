@@ -5,7 +5,8 @@
     <!-- List -->
     <sys:String x:Key="List_Index">Index</sys:String>
     <sys:String x:Key="List_Name">Name</sys:String>
-    <sys:String x:Key="List_Extension">Extension</sys:String>
+    <sys:String x:Key="List_ExtensionToPath">Ext.</sys:String>
+    <sys:String x:Key="List_FileSignature">Format</sys:String>
     <sys:String x:Key="List_Preview">Preview</sys:String>
     <sys:String x:Key="List_Size">Size</sys:String>
     <sys:String x:Key="List_Path">Path</sys:String>

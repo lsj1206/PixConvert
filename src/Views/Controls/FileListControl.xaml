@@ -105,11 +105,21 @@
                     </GridViewColumn>
 
                     <!-- 확장자 -->
-                    <GridViewColumn Header="{DynamicResource List_Extension}" Width="80">
+                    <GridViewColumn Header="{DynamicResource List_ExtensionToPath}" Width="62">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Foreground="{StaticResource TextSecondary}"
                                            Text="{Binding DisplayExtension}" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <!-- 파일 시그니처(포맷) -->
+                    <GridViewColumn Header="{DynamicResource List_FileSignature}" Width="68">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Foreground="{StaticResource TextSecondary}"
+                                           Text="{Binding FileSignature}" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

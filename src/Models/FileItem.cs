@@ -60,6 +60,10 @@ public partial class FileItem : ObservableObject
     /// <summary>목록 화면에 표시될 확장자 (점 제외)</summary>
     public string DisplayExtension => BaseExtension.TrimStart('.').ToLower();
 
+    /// <summary>파일 시그니처</summary>
+    [ObservableProperty]
+    private string fileSignature = "-";
+
     /// <summary>읽기 쉬운 단위로 변환된 파일 크기 (예: 12 KB)</summary>
     public string DisplaySize { get; set; } = string.Empty;
 

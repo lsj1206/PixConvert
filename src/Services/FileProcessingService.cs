@@ -47,7 +47,7 @@ public class FileProcessingService : IFileProcessingService
 
         int addCount = finalPaths.Count;
 
-        // 2. 정책 검사: 최대 수량 초가 여부
+        // 2. 정책 검사: 최대 수량 초과 여부
         if (currentCount + addCount > maxItemCount)
         {
             result.IgnoredCount = addCount;
@@ -56,30 +56,28 @@ public class FileProcessingService : IFileProcessingService
 
         if (addCount == 0) return result;
 
-        // 3. FileItem 객체 생성 (병렬 처리 고려 가능하나 안정성을 위해 Task.Run 내부 루프로 처리)
-        var newItems = await Task.Run(() =>
+        // 3. FileItem 객체 생성 및 시그니처 분석 (비동기 루프)
+        var newItems = new List<FileItem>(addCount);
+        for (int i = 0; i < addCount; i++)
         {
-            var items = new List<FileItem>(addCount);
-            for (int i = 0; i < addCount; i++)
+            var item = _fileService.CreateFileItem(finalPaths[i]);
+            if (item != null)
             {
-                var item = _fileService.CreateFileItem(finalPaths[i]);
-                if (item != null)
-                {
-                    items.Add(item);
-                }
-
-                // 진행률 업데이트 (100개 단위 또는 마지막)
-                if (progress != null && (i % 100 == 0 || i == addCount - 1))
-                {
-                    progress.Report(new FileProcessingProgress
-                    {
-                        CurrentIndex = i + 1,
-                        TotalCount = addCount
-                    });
-                }
+                // 실시간 시그니처 분석 및 변수 할당
+                item.FileSignature = await _fileService.AnalyzeSignatureAsync(item.Path);
+                newItems.Add(item);
             }
-            return items;
-        });
+
+            // 진행률 업데이트 (100개 단위 또는 마지막)
+            if (progress != null && (i % 100 == 0 || i == addCount - 1))
+            {
+                progress.Report(new FileProcessingProgress
+                {
+                    CurrentIndex = i + 1,
+                    TotalCount = addCount
+                });
+            }
+        }
 
         result.NewItems = newItems;
         return result;

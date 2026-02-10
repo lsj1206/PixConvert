@@ -5,7 +5,8 @@
     <!-- 리스트 -->
     <sys:String x:Key="List_Index">번호</sys:String>
     <sys:String x:Key="List_Name">이름</sys:String>
-    <sys:String x:Key="List_Extension">확장자</sys:String>
+    <sys:String x:Key="List_ExtensionToPath">확장자</sys:String>
+    <sys:String x:Key="List_FileSignature">포맷</sys:String>
     <sys:String x:Key="List_Preview">미리보기</sys:String>
     <sys:String x:Key="List_Size">크기</sys:String>
     <sys:String x:Key="List_Path">경로</sys:String>
