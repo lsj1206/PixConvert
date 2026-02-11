@@ -13,6 +13,8 @@ namespace PixConvert.ViewModels;
 public class FileListViewModel
 {
     private readonly ObservableCollection<FileItem> _items = new();
+    // 중복 체크용 HashSet (O(1) 탐색, 대소문자 무시)
+    private readonly HashSet<string> _pathSet = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>화면에 바인딩되는 읽기 전용 파일 아이템 컬렉션입니다.</summary>
     public ReadOnlyObservableCollection<FileItem> Items { get; }
@@ -31,6 +33,7 @@ public class FileListViewModel
     public void Clear()
     {
         _items.Clear();
+        _pathSet.Clear();
         _nextAddIndex = 1;
     }
 
@@ -41,8 +44,8 @@ public class FileListViewModel
     /// <returns>추가 성공 시 true, 중복 등으로 실패 시 false를 반환합니다.</returns>
     public bool AddItem(FileItem item)
     {
-        // 10,000개 이하의 데이터에서는 LINQ Any()를 통한 중복 체크만으로도 충분히 빠름
-        if (_items.Any(x => x.Path.Equals(item.Path, StringComparison.OrdinalIgnoreCase)))
+        // HashSet 기반 O(1) 중복 체크 (Add가 false를 반환하면 이미 존재하는 경로)
+        if (!_pathSet.Add(item.Path))
             return false;
 
         item.AddIndex = _nextAddIndex++;
@@ -100,6 +103,7 @@ public class FileListViewModel
         {
             if (_items.Remove(item))
             {
+                _pathSet.Remove(item.Path);
                 count++;
             }
         }

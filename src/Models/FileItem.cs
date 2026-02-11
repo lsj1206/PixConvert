@@ -1,5 +1,5 @@
 using System;
-using System.Windows.Media;
+
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace PixConvert.Models;
@@ -53,9 +53,7 @@ public partial class FileItem : ObservableObject
     [ObservableProperty]
     private string fileSignature = "-";
 
-    /// <summary>파일 시스템의 실제 아이콘 이미지</summary>
-    [ObservableProperty]
-    private ImageSource? icon;
+
 
     /// <summary>목록에 추가된 순번</summary>
     [ObservableProperty]

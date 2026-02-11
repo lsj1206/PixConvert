@@ -10,7 +10,7 @@ namespace PixConvert.Services;
 /// </summary>
 public class FileService : IFileService
 {
-    private readonly IIconService _iconService;
+
 
     // 파일 크기 단위 정의
     private static readonly string[] SizeSuffixes = ["B", "KB", "MB", "GB", "TB"];
@@ -18,10 +18,7 @@ public class FileService : IFileService
     /// <summary>
     /// FileService의 새 인스턴스를 초기화합니다.
     /// </summary>
-    public FileService(IIconService iconService)
-    {
-        _iconService = iconService;
-    }
+
 
     /// <summary>
     /// 지정된 경로를 분석하여 파일의 상세 정보를 담은 FileItem 객체를 생성합니다.
@@ -40,8 +37,7 @@ public class FileService : IFileService
                 DisplaySize = FormatFileSize(fileInfo.Length),
                 CreatedDate = fileInfo.CreationTime,
                 ModifiedDate = fileInfo.LastWriteTime,
-                AddIndex = null,
-                Icon = _iconService.GetIcon(path) // 시스템 아이콘 가져오기
+                AddIndex = null
             };
         }
         return null;
@@ -54,16 +50,11 @@ public class FileService : IFileService
     {
         if (string.IsNullOrEmpty(path)) return "-";
 
-        // 경로 정규화 (시스템 간 호환성 확보)
-        string fullPath = Path.GetFullPath(path);
-
         return await Task.Run(() =>
         {
             try
             {
-                if (!File.Exists(fullPath)) return "-";
-
-                using (var fs = File.OpenRead(fullPath))
+                using (var fs = File.OpenRead(path))
                 {
                     byte[] header = new byte[16];
                     int bytesRead = fs.Read(header, 0, 16);

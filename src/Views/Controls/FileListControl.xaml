@@ -92,14 +92,7 @@
                     <GridViewColumn Header="{DynamicResource List_Name}" Width="250">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <StackPanel Orientation="Horizontal">
-                                    <!-- 아이콘: 시스템에서 추출한 실제 파일 아이콘 바인딩 -->
-                                    <Image Width="16"
-                                           Height="16"
-                                           Margin="0,2,8,0"
-                                           Source="{Binding Icon}" />
-                                    <TextBlock TextTrimming="CharacterEllipsis" Text="{Binding Name}" />
-                                </StackPanel>
+                                <TextBlock TextTrimming="CharacterEllipsis" Text="{Binding Name}" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
