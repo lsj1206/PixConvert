@@ -117,7 +117,7 @@ public partial class MainViewModel : ObservableObject
             // 진행률 보고를 위한 IProgress 정의
             var progress = new Progress<FileProcessingProgress>(p =>
             {
-                _snackbarService.UpdateProgress(string.Format(GetString("Msg_LoadingFileProgress"), p.Percentage));
+                _snackbarService.UpdateProgress(string.Format(GetString("Msg_LoadingFileProgress"), p.CurrentIndex, p.TotalCount));
             });
 
             // 서비스 호출하여 파일 처리 수행

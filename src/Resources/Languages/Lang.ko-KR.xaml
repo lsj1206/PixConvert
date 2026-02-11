@@ -56,7 +56,7 @@
     <sys:String x:Key="Msg_ApplyingChanges">이름 변경 적용 중...</sys:String>
     <sys:String x:Key="Msg_ApplyingProgress">이름 변경 적용 중... ({0:0}%)</sys:String>
     <sys:String x:Key="Msg_LoadingFile">파일 불러오는 중...</sys:String>
-    <sys:String x:Key="Msg_LoadingFileProgress">파일 불러오는 중... ({0:0}%)</sys:String>
+    <sys:String x:Key="Msg_LoadingFileProgress">파일 불러오는 중... ({0}/{1})</sys:String>
     <sys:String x:Key="Msg_UndoingProgress">변경 취소 중... ({0:0}%)</sys:String>
 
     <sys:String x:Key="Msg_RenameSuccess">{0}개의 이름을 변경합니다.</sys:String>

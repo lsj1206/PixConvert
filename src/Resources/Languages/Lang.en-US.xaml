@@ -56,7 +56,7 @@ Edits are reset when the rule is changed.</sys:String>
     <sys:String x:Key="Msg_ApplyingChanges">Applying name changes...</sys:String>
     <sys:String x:Key="Msg_ApplyingProgress">Applying name changes... ({0:0}%)</sys:String>
     <sys:String x:Key="Msg_LoadingFile">Loading file...</sys:String>
-    <sys:String x:Key="Msg_LoadingFileProgress">Loading file... ({0:0}%)</sys:String>
+    <sys:String x:Key="Msg_LoadingFileProgress">Loading file... ({0}/{1})</sys:String>
     <sys:String x:Key="Msg_UndoProgress">Undo changes... ({0:0}%)</sys:String>
 
     <sys:String x:Key="Msg_RenameSuccess">Renamed {0} file.</sys:String>
