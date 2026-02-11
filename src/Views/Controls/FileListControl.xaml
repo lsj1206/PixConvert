@@ -98,7 +98,7 @@
                                            Height="16"
                                            Margin="0,2,8,0"
                                            Source="{Binding Icon}" />
-                                    <TextBlock TextTrimming="CharacterEllipsis" Text="{Binding DisplayBaseName}" />
+                                    <TextBlock TextTrimming="CharacterEllipsis" Text="{Binding Name}" />
                                 </StackPanel>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
@@ -109,7 +109,7 @@
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Foreground="{StaticResource TextSecondary}"
-                                           Text="{Binding DisplayExtension}" />
+                                           Text="{Binding Extension}" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
