@@ -28,9 +28,6 @@ public partial class FileItem : ObservableObject
     /// <summary>파일이 위치한 디렉터리 경로</summary>
     public string Directory { get; private set; } = string.Empty;
 
-    /// <summary>바이트 단위의 파일 크기</summary>
-    public long Size { get; set; }
-
     /// <summary>확장자를 제외한 파일 이름</summary>
     public string Name { get; private set; } = string.Empty;
 
@@ -41,7 +38,20 @@ public partial class FileItem : ObservableObject
     public DateTime? CreatedDate { get; set; }
 
     /// <summary>파일 최종 수정 일시</summary>
-    public DateTime? ModifiedDate { get; set; }
+    [ObservableProperty]
+    private DateTime? modifiedDate;
+
+    /// <summary>바이트 단위의 파일 크기</summary>
+    [ObservableProperty]
+    private long size;
+
+    /// <summary>읽기 쉬운 단위로 변환된 파일 크기</summary>
+    [ObservableProperty]
+    private string displaySize = string.Empty;
+
+    /// <summary>파일 시그니처</summary>
+    [ObservableProperty]
+    private string fileSignature = "-";
 
     /// <summary>파일 시스템의 실제 아이콘 이미지</summary>
     [ObservableProperty]
@@ -50,13 +60,6 @@ public partial class FileItem : ObservableObject
     /// <summary>목록에 추가된 순번</summary>
     [ObservableProperty]
     private int? addIndex;
-
-    /// <summary>파일 시그니처</summary>
-    [ObservableProperty]
-    private string fileSignature = "-";
-
-    /// <summary>읽기 쉬운 단위로 변환된 파일 크기 (예: 12 KB)</summary>
-    public string DisplaySize { get; set; } = string.Empty;
 
     /// <summary>현재 Path를 기반으로 파일의 세부 구성 정보를 파싱합니다.</summary>
     private void ParsePathInfo()
@@ -67,5 +70,10 @@ public partial class FileItem : ObservableObject
         // 점(.)을 제외하고 소문자로 변환하여 저장
         string ext = System.IO.Path.GetExtension(_path);
         Extension = ext.TrimStart('.').ToLower();
+
+        // Path 재설정 시 UI 바인딩 갱신을 위한 알림
+        OnPropertyChanged(nameof(Directory));
+        OnPropertyChanged(nameof(Name));
+        OnPropertyChanged(nameof(Extension));
     }
 }
