@@ -29,54 +29,61 @@ public class FileProcessingService : IFileProcessingService
         var rawPaths = paths.ToList();
         result.TotalPathCount = rawPaths.Count;
 
-        // 1. 파일과 폴더 경로 분리 및 폴더 내 파일 추출
-        var files = rawPaths.Where(File.Exists).ToList();
+        // 1. 폴더 경로 분할 및 리스트 초기화
         var folders = rawPaths.Where(Directory.Exists).ToList();
-        var finalPaths = new List<string>(files);
+        var otherPaths = rawPaths.Where(p => !Directory.Exists(p)).ToList();
+        var newItems = new List<FileItem>();
 
+        // 2. 직접 추가된 파일 처리 (Single Touch: Exists/FileInfo 없이 즉시 스트림 오픈)
+        foreach (var path in otherPaths)
+        {
+            var item = await _fileService.CreateFileItemAsync(path);
+            if (item != null)
+            {
+                newItems.Add(item);
+            }
+        }
+
+        // 3. 폴더 내 파일 처리 (방안 1의 FileInfo 활용 + 시그니처 분석)
         if (folders.Count > 0)
         {
+            var folderFiles = new List<FileInfo>();
             await Task.Run(() =>
             {
                 foreach (var folderPath in folders)
                 {
-                    finalPaths.AddRange(_fileService.GetFilesInFolder(folderPath));
+                    folderFiles.AddRange(_fileService.GetFilesInFolder(folderPath));
                 }
             });
-        }
 
-        int addCount = finalPaths.Count;
-
-        // 2. 정책 검사: 최대 수량 초과 여부
-        if (currentCount + addCount > maxItemCount)
-        {
-            result.IgnoredCount = addCount;
-            return result; // 결과는 비어있고 무시된 개수만 기록
-        }
-
-        if (addCount == 0) return result;
-
-        // 3. FileItem 객체 생성 및 시그니처 분석 (비동기 루프)
-        var newItems = new List<FileItem>(addCount);
-        for (int i = 0; i < addCount; i++)
-        {
-            var item = _fileService.CreateFileItem(finalPaths[i]);
-            if (item != null)
+            int folderFileCount = folderFiles.Count;
+            for (int i = 0; i < folderFileCount; i++)
             {
-                // 실시간 시그니처 분석 및 변수 할당
-                item.FileSignature = await _fileService.AnalyzeSignatureAsync(item.Path);
-                newItems.Add(item);
-            }
-
-            // 진행률 업데이트 (100개 단위 또는 마지막)
-            if (progress != null && (i % 100 == 0 || i == addCount - 1))
-            {
-                progress.Report(new FileProcessingProgress
+                var fileInfo = folderFiles[i];
+                var item = _fileService.CreateFileItem(fileInfo);
+                if (item != null)
                 {
-                    CurrentIndex = i + 1,
-                    TotalCount = addCount
-                });
+                    item.FileSignature = await _fileService.AnalyzeSignatureAsync(item.Path);
+                    newItems.Add(item);
+                }
+
+                // 진행률 업데이트 (폴더 처리 분량에 대해)
+                if (progress != null && (i % 100 == 0 || i == folderFileCount - 1))
+                {
+                    progress.Report(new FileProcessingProgress
+                    {
+                        CurrentIndex = newItems.Count, // 전체 중 현재까지 추가된 수
+                        TotalCount = otherPaths.Count + folderFileCount // 예측 총량
+                    });
+                }
             }
+        }
+
+        // 4. 정책 검사: 최대 수량 초과 여부 (최종 취합 후 판단)
+        if (currentCount + newItems.Count > maxItemCount)
+        {
+            result.IgnoredCount = newItems.Count;
+            return result;
         }
 
         result.NewItems = newItems;

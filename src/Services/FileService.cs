@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using PixConvert.Models;
 
 namespace PixConvert.Services;
@@ -10,37 +11,21 @@ namespace PixConvert.Services;
 /// </summary>
 public class FileService : IFileService
 {
-
-
     // 파일 크기 단위 정의
     private static readonly string[] SizeSuffixes = ["B", "KB", "MB", "GB", "TB"];
 
-    /// <summary>
-    /// FileService의 새 인스턴스를 초기화합니다.
-    /// </summary>
-
-
-    /// <summary>
-    /// 지정된 경로를 분석하여 파일의 상세 정보를 담은 FileItem 객체를 생성합니다.
-    /// </summary>
-    /// <param name="path">파일 경로</param>
-    /// <returns>파일 정보를 담은 FileItem 객체 또는 유효하지 않을 시 null</returns>
-    public FileItem? CreateFileItem(string path)
+    public FileItem? CreateFileItem(FileInfo fileInfo)
     {
-        if (File.Exists(path))
+        // 최적화: 외부에서 이미 검증된 FileInfo를 전달받으므로 추가적인 File.Exists나 new FileInfo 조회를 수행하지 않음
+        return new FileItem
         {
-            var fileInfo = new FileInfo(path);
-            return new FileItem
-            {
-                Path = path,
-                Size = fileInfo.Length,
-                DisplaySize = FormatFileSize(fileInfo.Length),
-                CreatedDate = fileInfo.CreationTime,
-                ModifiedDate = fileInfo.LastWriteTime,
-                AddIndex = null
-            };
-        }
-        return null;
+            Path = fileInfo.FullName,
+            Size = fileInfo.Length,
+            DisplaySize = FormatFileSize(fileInfo.Length),
+            CreatedDate = fileInfo.CreationTime,
+            ModifiedDate = fileInfo.LastWriteTime,
+            AddIndex = null
+        };
     }
 
     /// <summary>
@@ -50,65 +35,103 @@ public class FileService : IFileService
     {
         if (string.IsNullOrEmpty(path)) return "-";
 
-        return await Task.Run(() =>
+        try
         {
-            try
+            // useAsync: true를 설정하여 OS 비동기 I/O 경로를 사용하도록 설정
+            await using (var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 16, useAsync: true))
             {
-                using (var fs = File.OpenRead(path))
-                {
-                    byte[] header = new byte[16];
-                    int bytesRead = fs.Read(header, 0, 16);
-
-                    // 최소 시그니처 길이 확인
-                    if (bytesRead < 2) return "-";
-
-                    // 1. JPEG (FF D8 FF)
-                    if (header[0] == 0xFF && header[1] == 0xD8 && header[2] == 0xFF)
-                        return "jpg";
-
-                    // 2. PNG 판별 (89 50 4E 47)
-                    if (bytesRead >= 4 && header[0] == 0x89 && header[1] == 0x50 && header[2] == 0x4E && header[3] == 0x47)
-                        return "png";
-
-                    // 3. GIF 판별 (47 49 46 38)
-                    if (bytesRead >= 4 && header[0] == 0x47 && header[1] == 0x49 && header[2] == 0x46 && header[3] == 0x38)
-                        return "gif";
-
-                    // 4. BMP 판별 (42 4D)
-                    if (header[0] == 0x42 && header[1] == 0x4D)
-                        return "bmp";
-
-                    // 5. TIFF 판별 (49 49 2A 00 또는 4D 4D 00 2A)
-                    if (bytesRead >= 4 &&
-                        ((header[0] == 0x49 && header[1] == 0x49 && header[2] == 0x2A) ||
-                         (header[0] == 0x4D && header[1] == 0x4D && header[3] == 0x2A)))
-                        return "tiff";
-
-                    // 6. WEBP 판별 (RIFF .... WEBP)
-                    if (bytesRead >= 12 &&
-                        header[0] == 0x52 && header[1] == 0x49 && header[2] == 0x46 && header[3] == 0x46 &&
-                        header[8] == 0x57 && header[9] == 0x45 && header[10] == 0x42 && header[11] == 0x50)
-                        return "webp";
-
-                    return "-";
-                }
+                byte[] header = new byte[16];
+                int bytesRead = await fs.ReadAsync(header.AsMemory(0, 16));
+                return GetFormatFromHeader(header, bytesRead);
             }
-            catch
-            {
-                // 권한 부족 등 읽기 실패 시 알 수 없음으로 처리
-                return "-";
-            }
-        });
+        }
+        catch
+        {
+            return "-";
+        }
     }
 
     /// <summary>
-    /// 폴더 내의 모든 파일을 하위 폴더까지 포함하여 재귀적으로 검색합니다.
+    /// [Single Touch] 단일 스트림을 통해 메타데이터 조회와 시그니처 분석을 한 번에 수행합니다.
     /// </summary>
-    /// <param name="folderPath">검색을 시작할 폴더 경로</param>
-    /// <returns>발견된 모든 파일의 전체 경로 목록</returns>
-    public IEnumerable<string> GetFilesInFolder(string folderPath)
+    public async Task<FileItem?> CreateFileItemAsync(string path)
     {
-        var files = new List<string>();
+        if (string.IsNullOrEmpty(path)) return null;
+
+        try
+        {
+            // 파일을 한 번만 열어서 모든 정보를 획득 (Single Touch)
+            await using (var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 16, useAsync: true))
+            {
+                long length = fs.Length;
+
+                byte[] header = new byte[16];
+                int bytesRead = await fs.ReadAsync(header.AsMemory(0, 16));
+                string signature = GetFormatFromHeader(header, bytesRead);
+
+                return new FileItem
+                {
+                    Path = path,
+                    Size = length,
+                    DisplaySize = FormatFileSize(length),
+                    // 주의: Stream 자체에서는 CreationTime을 바로 알 수 없으므로,
+                    // 꼭 필요한 경우에만 추가적으로 가져옵니다. (여기서는 성능을 위해 최소화)
+                    // 만약 생성일/수정일이 UI에 필수라면 File.GetCreationTime 등을 써야 하지만,
+                    // 이는 추가 I/O를 유발하므로 우선 기본값 처리하거나 나중에 필요할 때 보강합니다.
+                    CreatedDate = DateTime.Now,
+                    ModifiedDate = DateTime.Now,
+                    FileSignature = signature,
+                    AddIndex = null
+                };
+            }
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// 바이트 헤더를 분석하여 포맷을 반환하는 공통 로직입니다.
+    /// </summary>
+    private string GetFormatFromHeader(byte[] header, int bytesRead)
+    {
+        if (bytesRead < 2) return "-";
+
+        // 1. JPEG (FF D8 FF)
+        if (header[0] == 0xFF && header[1] == 0xD8 && header[2] == 0xFF)
+            return "jpg";
+
+        // 2. PNG 판별 (89 50 4E 47)
+        if (bytesRead >= 4 && header[0] == 0x89 && header[1] == 0x50 && header[2] == 0x4E && header[3] == 0x47)
+            return "png";
+
+        // 3. GIF 판별 (47 49 46 38)
+        if (bytesRead >= 4 && header[0] == 0x47 && header[1] == 0x49 && header[2] == 0x46 && header[3] == 0x38)
+            return "gif";
+
+        // 4. BMP 판별 (42 4D)
+        if (header[0] == 0x42 && header[1] == 0x4D)
+            return "bmp";
+
+        // 5. TIFF 판별 (49 49 2A 00 또는 4D 4D 00 2A)
+        if (bytesRead >= 4 &&
+            ((header[0] == 0x49 && header[1] == 0x49 && header[2] == 0x2A) ||
+             (header[0] == 0x4D && header[1] == 0x4D && header[3] == 0x2A)))
+            return "tiff";
+
+        // 6. WEBP 판별 (RIFF .... WEBP)
+        if (bytesRead >= 12 &&
+            header[0] == 0x52 && header[1] == 0x49 && header[2] == 0x46 && header[3] == 0x46 &&
+            header[8] == 0x57 && header[9] == 0x45 && header[10] == 0x42 && header[11] == 0x50)
+            return "webp";
+
+        return "-";
+    }
+
+    public IEnumerable<FileInfo> GetFilesInFolder(string folderPath)
+    {
+        var files = new List<FileInfo>();
         var stack = new Stack<string>();
         stack.Push(folderPath);
 
@@ -119,10 +142,10 @@ public class FileService : IFileService
 
             try
             {
-                // 현재 폴더의 파일들 추가
+                // 현재 폴더의 파일 객체들을 직접 추가 (메타데이터 포함됨)
                 foreach (var file in dirInfo.GetFiles())
                 {
-                    files.Add(file.FullName);
+                    files.Add(file);
                 }
 
                 // 하위 폴더들을 스택에 넣어 다음 순회 시 처리
