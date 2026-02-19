@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Management;
+using System.Threading;
 using System.Threading.Tasks;
 using PixConvert.Models;
 
@@ -34,17 +36,42 @@ public class FileProcessingService : IFileProcessingService
         var otherPaths = rawPaths.Where(p => !Directory.Exists(p)).ToList();
         var newItems = new List<FileItem>();
 
-        // 2. 직접 추가된 파일 처리 (Single Touch: Exists/FileInfo 없이 즉시 스트림 오픈)
-        foreach (var path in otherPaths)
+        // 2. 직접 추가된 파일 처리 (Single Touch + 병렬 시그니처 분석)
+        if (otherPaths.Count > 0)
         {
-            var item = await _fileService.CreateFileItemAsync(path);
-            if (item != null)
-            {
-                newItems.Add(item);
-            }
+            // 적응형 병렬도 결정 (첫 번째 파일 경로 기준)
+            int parallelism = GetOptimalParallelism(otherPaths[0]);
+            var options = new ParallelOptions { MaxDegreeOfParallelism = parallelism };
+
+            // ConcurrentBag 대신 배열 슬롯으로 순서 보존
+            var items = new FileItem?[otherPaths.Count];
+            int processedCount = 0;
+
+            await Parallel.ForEachAsync(
+                Enumerable.Range(0, otherPaths.Count),
+                options,
+                async (i, ct) =>
+                {
+                    // Single Touch: 스트림 하나로 메타데이터 + 시그니처 동시 획득
+                    items[i] = await _fileService.CreateFileItemAsync(otherPaths[i]);
+
+                    // 스레드 안전한 진행률 보고 (100개 단위)
+                    int current = Interlocked.Increment(ref processedCount);
+                    if (progress != null && (current % 100 == 0 || current == otherPaths.Count))
+                    {
+                        progress.Report(new FileProcessingProgress
+                        {
+                            CurrentIndex = current,
+                            TotalCount = otherPaths.Count
+                        });
+                    }
+                });
+
+            // null이 아닌 유효한 항목만 수집
+            newItems.AddRange(items.Where(item => item != null)!);
         }
 
-        // 3. 폴더 내 파일 처리 (방안 1의 FileInfo 활용 + 시그니처 분석)
+        // 3. 폴더 내 파일 처리 (FileInfo 활용 + 병렬 시그니처 분석)
         if (folders.Count > 0)
         {
             var folderFiles = new List<FileInfo>();
@@ -57,29 +84,44 @@ public class FileProcessingService : IFileProcessingService
             });
 
             int folderFileCount = folderFiles.Count;
-            for (int i = 0; i < folderFileCount; i++)
+            if (folderFileCount > 0)
             {
-                var fileInfo = folderFiles[i];
-                var item = _fileService.CreateFileItem(fileInfo);
-                if (item != null)
+                // FileItem 객체를 먼저 일괄 생성 (메타데이터는 FileInfo에서 즉시 획득)
+                var folderItems = new List<FileItem>(folderFileCount);
+                foreach (var fileInfo in folderFiles)
                 {
-                    item.FileSignature = await _fileService.AnalyzeSignatureAsync(item.Path);
-                    newItems.Add(item);
+                    var item = _fileService.CreateFileItem(fileInfo);
+                    if (item != null) folderItems.Add(item);
                 }
 
-                // 진행률 업데이트 (폴더 처리 분량에 대해)
-                if (progress != null && (i % 100 == 0 || i == folderFileCount - 1))
+                // 적응형 병렬도 결정 (폴더 경로 기준)
+                int parallelism = GetOptimalParallelism(folders[0]);
+                var options = new ParallelOptions { MaxDegreeOfParallelism = parallelism };
+                int processedCount = 0;
+                int totalExpected = otherPaths.Count + folderItems.Count;
+
+                // 시그니처 분석만 병렬로 수행 (각 FileItem의 FileSignature 필드를 채움)
+                await Parallel.ForEachAsync(folderItems, options, async (item, ct) =>
                 {
-                    progress.Report(new FileProcessingProgress
+                    item.FileSignature = await _fileService.AnalyzeSignatureAsync(item.Path);
+
+                    // 스레드 안전한 진행률 보고
+                    int current = Interlocked.Increment(ref processedCount);
+                    if (progress != null && (current % 100 == 0 || current == folderItems.Count))
                     {
-                        CurrentIndex = newItems.Count, // 전체 중 현재까지 추가된 수
-                        TotalCount = otherPaths.Count + folderFileCount // 예측 총량
-                    });
-                }
+                        progress.Report(new FileProcessingProgress
+                        {
+                            CurrentIndex = newItems.Count + current,
+                            TotalCount = totalExpected
+                        });
+                    }
+                });
+
+                newItems.AddRange(folderItems);
             }
         }
 
-        // 4. 정책 검사: 최대 수량 초과 여부 (최종 취합 후 판단)
+        // 4. 정책 검사: 최대 수량 초과 여부
         if (currentCount + newItems.Count > maxItemCount)
         {
             result.IgnoredCount = newItems.Count;
@@ -88,5 +130,96 @@ public class FileProcessingService : IFileProcessingService
 
         result.NewItems = newItems;
         return result;
+    }
+
+    /// <summary>
+    /// 파일 경로의 드라이브 유형에 따라 최적의 병렬도를 결정합니다.
+    /// DriveType 1차 분류 → WMI 2차 분류(Fixed 디스크) → Fallback 순으로 판별합니다.
+    /// </summary>
+    private static int GetOptimalParallelism(string samplePath)
+    {
+        try
+        {
+            string root = Path.GetPathRoot(samplePath) ?? "C:\\";
+            var drive = new DriveInfo(root);
+
+            // 네트워크 드라이브: 동시 연결 제한을 고려하여 최소 병렬
+            if (drive.DriveType == DriveType.Network)
+                return 2;
+
+            // 이동식 저장장치(USB 등): 중간 수준 병렬
+            if (drive.DriveType == DriveType.Removable)
+                return 4;
+
+            // 고정 디스크: WMI로 SSD/HDD 판별 시도
+            if (drive.DriveType == DriveType.Fixed)
+            {
+                if (IsSsd(root))
+                    return Environment.ProcessorCount; // SSD: 최대 병렬
+                else
+                    return 4; // HDD: Seek Storm 방지를 위해 제한
+            }
+        }
+        catch { } // 감지 실패 시 안전한 기본값
+        return Math.Min(Environment.ProcessorCount, 8);
+    }
+
+    /// <summary>
+    /// MSFT_PhysicalDisk를 통해 지정된 드라이브가 SSD인지 판별합니다. (Best Effort)
+    /// Win32_DiskDrive의 MediaType은 SSD/HDD를 구분하지 못하므로 Storage WMI를 사용합니다.
+    /// MSFT_PhysicalDisk.MediaType: 3=HDD, 4=SSD
+    /// </summary>
+    private static bool IsSsd(string rootPath)
+    {
+        try
+        {
+            // 1단계: 드라이브 문자 → 디스크 번호 매핑 (Win32_LogicalDisk → Win32_DiskDrive)
+            string driveLetter = rootPath.TrimEnd('\\');
+            int diskNumber = -1;
+
+            using (var searcher = new ManagementObjectSearcher(
+                $"ASSOCIATORS OF {{Win32_LogicalDisk.DeviceID='{driveLetter}'}} WHERE AssocClass=Win32_LogicalDiskToPartition"))
+            {
+                foreach (ManagementObject partition in searcher.Get())
+                {
+                    using var diskSearcher = new ManagementObjectSearcher(
+                        $"ASSOCIATORS OF {{Win32_DiskPartition.DeviceID='{partition["DeviceID"]}'}} WHERE AssocClass=Win32_DiskDriveToDiskPartition");
+
+                    foreach (ManagementObject disk in diskSearcher.Get())
+                    {
+                        // DeviceID 형식: "\\.\PHYSICALDRIVE0" → 숫자만 추출
+                        string deviceId = disk["DeviceID"]?.ToString() ?? "";
+                        string numberStr = new string(deviceId.Where(char.IsDigit).ToArray());
+                        if (int.TryParse(numberStr, out int num))
+                            diskNumber = num;
+                    }
+                }
+            }
+
+            if (diskNumber < 0) return true; // 매핑 실패 시 SSD 간주 (최대 성능)
+
+            // 2단계: 디스크 번호로 MSFT_PhysicalDisk 조회 (Storage WMI namespace)
+            using var physicalSearcher = new ManagementObjectSearcher(
+                @"root\Microsoft\Windows\Storage",
+                $"SELECT MediaType FROM MSFT_PhysicalDisk WHERE DeviceId='{diskNumber}'");
+
+            foreach (ManagementObject physicalDisk in physicalSearcher.Get())
+            {
+                // MediaType: 3 = HDD, 4 = SSD, 5 = SCM
+                var mediaType = physicalDisk["MediaType"];
+                if (mediaType != null && Convert.ToInt32(mediaType) == 4)
+                    return true; // SSD 확인
+                if (mediaType != null && Convert.ToInt32(mediaType) == 3)
+                    return false; // HDD 확인
+            }
+        }
+        catch
+        {
+            // WMI 접근 실패 시 SSD로 간주하여 최대 성능 적용
+            return true;
+        }
+
+        // 판별 불가 시 SSD로 간주 (안전한 쪽으로)
+        return true;
     }
 }

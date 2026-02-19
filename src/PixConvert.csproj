@@ -12,6 +12,7 @@
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.2" />
     <PackageReference Include="ModernWpfUI" Version="0.9.6" />
+    <PackageReference Include="System.Management" Version="10.0.3" />
   </ItemGroup>
 
 </Project>
