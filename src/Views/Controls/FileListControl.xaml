@@ -62,6 +62,8 @@
                   PreviewDragOver="FileListView_PreviewDragOver"
                   PreviewMouseLeftButtonDown="FileListView_PreviewMouseLeftButtonDown"
                   PreviewMouseLeftButtonUp="FileListView_PreviewMouseLeftButtonUp"
+                  VirtualizingPanel.IsVirtualizing="True"
+                  VirtualizingPanel.VirtualizationMode="Recycling"
                   MouseMove="FileListView_MouseMove">
             <ListView.View>
                 <!-- GridView -->
