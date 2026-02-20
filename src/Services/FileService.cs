@@ -22,8 +22,6 @@ public class FileService : IFileService
             Path = fileInfo.FullName,
             Size = fileInfo.Length,
             DisplaySize = FormatFileSize(fileInfo.Length),
-            CreatedDate = fileInfo.CreationTime,
-            ModifiedDate = fileInfo.LastWriteTime,
             AddIndex = null
         };
     }
@@ -74,12 +72,6 @@ public class FileService : IFileService
                     Path = path,
                     Size = length,
                     DisplaySize = FormatFileSize(length),
-                    // 주의: Stream 자체에서는 CreationTime을 바로 알 수 없으므로,
-                    // 꼭 필요한 경우에만 추가적으로 가져옵니다. (여기서는 성능을 위해 최소화)
-                    // 만약 생성일/수정일이 UI에 필수라면 File.GetCreationTime 등을 써야 하지만,
-                    // 이는 추가 I/O를 유발하므로 우선 기본값 처리하거나 나중에 필요할 때 보강합니다.
-                    CreatedDate = DateTime.Now,
-                    ModifiedDate = DateTime.Now,
                     FileSignature = signature,
                     AddIndex = null
                 };

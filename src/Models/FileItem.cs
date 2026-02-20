@@ -33,13 +33,6 @@ public partial class FileItem : ObservableObject
     /// <summary>파일의 확장자 (점 제외, 소문자)</summary>
     public string Extension { get; private set; } = string.Empty;
 
-    /// <summary>파일 생성 일시</summary>
-    public DateTime? CreatedDate { get; set; }
-
-    /// <summary>파일 최종 수정 일시</summary>
-    [ObservableProperty]
-    private DateTime? modifiedDate;
-
     /// <summary>바이트 단위의 파일 크기</summary>
     [ObservableProperty]
     private long size;

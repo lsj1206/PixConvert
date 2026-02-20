@@ -5,7 +5,7 @@ using PixConvert.Models;
 namespace PixConvert.Services;
 
 /// <summary>
-/// 파일 목록을 다양한 조건(이름, 크기, 날짜 등)에 따라 정렬하는 서비스입니다.
+/// 파일 목록을 다양한 조건(이름, 크기 등)에 따라 정렬하는 서비스입니다.
 /// </summary>
 public class SortingService : ISortingService
 {
@@ -43,16 +43,6 @@ public class SortingService : ISortingService
                     ? itemList.OrderBy(x => x.Size)
                     : itemList.OrderByDescending(x => x.Size);
                 break;
-            case SortType.CreatedDate:
-                sortedItems = isAscending
-                    ? itemList.OrderBy(x => x.CreatedDate)
-                    : itemList.OrderByDescending(x => x.CreatedDate);
-                break;
-            case SortType.ModifiedDate:
-                sortedItems = isAscending
-                    ? itemList.OrderBy(x => x.ModifiedDate)
-                    : itemList.OrderByDescending(x => x.ModifiedDate);
-                break;
             case SortType.AddIndex:
             default:
                 // 목록에 추가된 순서(AddIndex)대로 정렬
@@ -68,8 +58,6 @@ public class SortingService : ISortingService
             case SortType.NameIndex:
             case SortType.PathIndex:
             case SortType.Size:
-            case SortType.CreatedDate:
-            case SortType.ModifiedDate:
                 // 대부분의 경우 중복 시 번호(AddIndex) 순으로 정렬하여 일관성 유지
                 sortedItems = isAscending
                     ? sortedItems.ThenBy(x => x.AddIndex)

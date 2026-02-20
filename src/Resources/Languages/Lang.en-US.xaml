@@ -31,8 +31,6 @@
     <sys:String x:Key="Sort_PathIndex">Path-Index</sys:String>
     <sys:String x:Key="Sort_PathName">Path-Name</sys:String>
     <sys:String x:Key="Sort_Size">Size</sys:String>
-    <sys:String x:Key="Sort_CreatedDate">Created Date</sys:String>
-    <sys:String x:Key="Sort_ModifiedDate">Modified Date</sys:String>
 
     <!-- Sidebar : Option -->
     <sys:String x:Key="Option_ManualEdit">Manual Edit</sys:String>

@@ -66,8 +66,6 @@ public partial class SettingsViewModel : ObservableObject
         SortOptions.Add(new SortOption { Display = GetString("Sort_PathIndex"), Type = SortType.PathIndex });
         SortOptions.Add(new SortOption { Display = GetString("Sort_PathName"), Type = SortType.PathName });
         SortOptions.Add(new SortOption { Display = GetString("Sort_Size"), Type = SortType.Size });
-        SortOptions.Add(new SortOption { Display = GetString("Sort_CreatedDate"), Type = SortType.CreatedDate });
-        SortOptions.Add(new SortOption { Display = GetString("Sort_ModifiedDate"), Type = SortType.ModifiedDate });
 
         SelectedSortOption = SortOptions.FirstOrDefault(x => x.Type == currentType) ?? SortOptions[0];
     }

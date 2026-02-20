@@ -19,11 +19,7 @@ public enum SortType
     /// <summary>경로 및 파일 이름</summary>
     PathName,
     /// <summary>파일 크기</summary>
-    Size,
-    /// <summary>파일 생성 날짜</summary>
-    CreatedDate,
-    /// <summary>파일 수정 날짜</summary>
-    ModifiedDate
+    Size
 }
 
 /// <summary>
