@@ -1,5 +1,4 @@
 using System;
-
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace PixConvert.Models;
@@ -53,11 +52,30 @@ public partial class FileItem : ObservableObject
     [ObservableProperty]
     private string fileSignature = "-";
 
-
-
     /// <summary>목록에 추가된 순번</summary>
     [ObservableProperty]
     private int? addIndex;
+
+    /// <summary>확장자 동의어 쌍 테이블 (양방향 등록)</summary>
+    private static readonly HashSet<(string, string)> Synonyms =
+    [
+        ("jpg", "jpeg"),
+        ("jpeg", "jpg"),
+        ("tif", "tiff"),
+        ("tiff", "tif"),
+    ];
+
+    /// <summary>확장자와 시그니처 포맷이 불일치하는지 여부</summary>
+    public bool IsMismatch =>
+        FileSignature != "-" &&
+        !string.Equals(Extension, FileSignature, StringComparison.OrdinalIgnoreCase) &&
+        !Synonyms.Contains((Extension.ToLower(), FileSignature.ToLower()));
+
+    /// <summary>FileSignature 변경 시 IsMismatch 바인딩도 갱신</summary>
+    partial void OnFileSignatureChanged(string value)
+    {
+        OnPropertyChanged(nameof(IsMismatch));
+    }
 
     /// <summary>현재 Path를 기반으로 파일의 세부 구성 정보를 파싱합니다.</summary>
     private void ParsePathInfo()

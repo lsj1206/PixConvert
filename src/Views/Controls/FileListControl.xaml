@@ -111,8 +111,20 @@
                     <GridViewColumn Header="{DynamicResource List_FileSignature}" Width="68">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Foreground="{StaticResource TextSecondary}"
-                                           Text="{Binding FileSignature}" />
+                                <TextBlock Text="{Binding FileSignature}">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <!-- 기본 색상 -->
+                                            <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
+                                            <Style.Triggers>
+                                                <!-- 확장자-포맷 불일치 시 빨간색 표시 -->
+                                                <DataTrigger Binding="{Binding IsMismatch}" Value="True">
+                                                    <Setter Property="Foreground" Value="#FF4444"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
