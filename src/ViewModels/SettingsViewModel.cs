@@ -66,6 +66,8 @@ public partial class SettingsViewModel : ObservableObject
         SortOptions.Add(new SortOption { Display = GetString("Sort_PathIndex"), Type = SortType.PathIndex });
         SortOptions.Add(new SortOption { Display = GetString("Sort_PathName"), Type = SortType.PathName });
         SortOptions.Add(new SortOption { Display = GetString("Sort_Size"), Type = SortType.Size });
+        SortOptions.Add(new SortOption { Display = GetString("List_ExtensionToPath"), Type = SortType.Extension });
+        SortOptions.Add(new SortOption { Display = GetString("List_FileSignature"), Type = SortType.Signature });
 
         SelectedSortOption = SortOptions.FirstOrDefault(x => x.Type == currentType) ?? SortOptions[0];
     }

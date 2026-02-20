@@ -52,6 +52,7 @@
                   BorderThickness="0"
                   Background="Transparent"
                   SelectionMode="Extended"
+                  ScrollViewer.CanContentScroll="True"
                   ScrollViewer.HorizontalScrollBarVisibility="Auto"
                   ItemsSource="{Binding Items}"
                   ItemContainerStyle="{StaticResource FileItemContainerStyle}"
@@ -59,12 +60,15 @@
                   KeyDown="ListView_KeyDown"
                   Drop="FileListView_Drop"
                   DragLeave="FileListView_DragLeave"
+                  MouseMove="FileListView_MouseMove"
+                  GridViewColumnHeader.Click="Header_Click"
                   PreviewDragOver="FileListView_PreviewDragOver"
                   PreviewMouseLeftButtonDown="FileListView_PreviewMouseLeftButtonDown"
                   PreviewMouseLeftButtonUp="FileListView_PreviewMouseLeftButtonUp"
                   VirtualizingPanel.IsVirtualizing="True"
                   VirtualizingPanel.VirtualizationMode="Recycling"
-                  MouseMove="FileListView_MouseMove">
+                  VirtualizingPanel.CacheLength="20,20"
+                  VirtualizingPanel.CacheLengthUnit="Item">
             <ListView.View>
                 <!-- GridView -->
                 <GridView>
@@ -80,7 +84,10 @@
                     </GridView.ColumnHeaderContainerStyle>
 
                     <!-- 번호 -->
-                    <GridViewColumn Header="{DynamicResource List_Index}" Width="60">
+                    <GridViewColumn Width="60">
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader Content="{DynamicResource List_Index}" Tag="AddIndex"/>
+                        </GridViewColumn.Header>
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock HorizontalAlignment="Center"
@@ -91,7 +98,10 @@
                     </GridViewColumn>
 
                     <!-- 파일명 -->
-                    <GridViewColumn Header="{DynamicResource List_Name}" Width="250">
+                    <GridViewColumn Width="250">
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader Content="{DynamicResource List_Name}" Tag="NameIndex"/>
+                        </GridViewColumn.Header>
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock TextTrimming="CharacterEllipsis" Text="{Binding Name}" />
@@ -100,7 +110,10 @@
                     </GridViewColumn>
 
                     <!-- 확장자 -->
-                    <GridViewColumn Header="{DynamicResource List_ExtensionToPath}" Width="62">
+                    <GridViewColumn Width="62">
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader Content="{DynamicResource List_ExtensionToPath}" Tag="Extension"/>
+                        </GridViewColumn.Header>
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Foreground="{StaticResource TextSecondary}"
@@ -110,7 +123,10 @@
                     </GridViewColumn>
 
                     <!-- 파일 시그니처(포맷) -->
-                    <GridViewColumn Header="{DynamicResource List_FileSignature}" Width="68">
+                    <GridViewColumn Width="68">
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader Content="{DynamicResource List_FileSignature}" Tag="Signature"/>
+                        </GridViewColumn.Header>
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding FileSignature}">
@@ -132,7 +148,10 @@
                     </GridViewColumn>
 
                     <!-- 파일 크기 -->
-                    <GridViewColumn Header="{DynamicResource List_Size}" Width="80">
+                    <GridViewColumn Width="80">
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader Content="{DynamicResource List_Size}" Tag="Size"/>
+                        </GridViewColumn.Header>
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Foreground="{StaticResource TextSecondary}"

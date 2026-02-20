@@ -38,6 +38,7 @@ public partial class MainViewModel : ObservableObject
     public IRelayCommand DeleteFilesCommand { get; }
     public IRelayCommand ListClearCommand { get; }
     public IRelayCommand ReorderNumberCommand { get; }
+    public IRelayCommand<SortType> SortByColumnCommand { get; }
 
     private readonly IDialogService _dialogService;
     private readonly ISnackbarService _snackbarService;
@@ -71,6 +72,7 @@ public partial class MainViewModel : ObservableObject
         DeleteFilesCommand = new RelayCommand<System.Collections.IList>(DeleteFiles, _ => !IsBusy);
         ListClearCommand = new AsyncRelayCommand(ListClearAsync, () => !IsBusy);
         ReorderNumberCommand = new RelayCommand(ReorderNumber, () => !IsBusy);
+        SortByColumnCommand = new RelayCommand<SortType>(SortByColumn);
 
         // 설정 변경 이벤트 구독
         Settings.PropertyChanged += (s, e) =>
@@ -219,6 +221,26 @@ public partial class MainViewModel : ObservableObject
         {
             FileList.Clear();
             _snackbarService.Show(GetString("Msg_ClearList"), SnackbarType.Success);
+        }
+    }
+
+    /// <summary>특정 컬럼 헤더 클릭 시 호출되어 정렬을 수행합니다.</summary>
+    private void SortByColumn(SortType type)
+    {
+        if (Settings.SelectedSortOption?.Type == type)
+        {
+            // 동일 컬럼 클릭 시 오름차순/내림차순 토글
+            Settings.IsSortAscending = !Settings.IsSortAscending;
+        }
+        else
+        {
+            // 다른 컬럼 클릭 시 해당 타입으로 정렬 및 오름차순 초기화
+            var option = Settings.SortOptions.FirstOrDefault(x => x.Type == type);
+            if (option != null)
+            {
+                Settings.SelectedSortOption = option;
+                Settings.IsSortAscending = true;
+            }
         }
     }
 

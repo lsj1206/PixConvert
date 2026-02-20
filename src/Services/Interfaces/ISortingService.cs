@@ -19,7 +19,11 @@ public enum SortType
     /// <summary>경로 및 파일 이름</summary>
     PathName,
     /// <summary>파일 크기</summary>
-    Size
+    Size,
+    /// <summary>확장자</summary>
+    Extension,
+    /// <summary>파일 시그니처(포맷)</summary>
+    Signature
 }
 
 /// <summary>

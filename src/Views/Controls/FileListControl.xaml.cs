@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Controls;
 using PixConvert.Models;
+using PixConvert.Services;
 using PixConvert.ViewModels;
 
 namespace PixConvert.Views.Controls;
@@ -286,6 +287,30 @@ public partial class FileListControl : UserControl
                     if (DataContext is FileListViewModel vm)
                     {
                         vm.MoveItems(itemsToMove, targetIndex, isBottom);
+                    }
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// 리스트 뷰 헤더 클릭 시 해당 컬럼을 기준으로 정렬을 수행합니다.
+    /// </summary>
+    private void Header_Click(object sender, RoutedEventArgs e)
+    {
+        if (e.OriginalSource is GridViewColumnHeader header)
+        {
+            // GridViewColumnHeader의 Tag 속성에 정의된 SortType 문자열을 가져옴
+            string? sortTypeName = header.Tag as string;
+            if (!string.IsNullOrEmpty(sortTypeName) &&
+                Enum.TryParse(sortTypeName, out SortType sortType))
+            {
+                if (Window.GetWindow(this)?.DataContext is MainViewModel vm)
+                {
+                    // ViewModel의 정렬 명령 실행
+                    if (vm.SortByColumnCommand.CanExecute(sortType))
+                    {
+                        vm.SortByColumnCommand.Execute(sortType);
                     }
                 }
             }

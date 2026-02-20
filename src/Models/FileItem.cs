@@ -62,7 +62,7 @@ public partial class FileItem : ObservableObject
     public bool IsMismatch =>
         FileSignature != "-" &&
         !string.Equals(Extension, FileSignature, StringComparison.OrdinalIgnoreCase) &&
-        !Synonyms.Contains((Extension.ToLower(), FileSignature.ToLower()));
+        !Synonyms.Contains((Extension, FileSignature));
 
     /// <summary>FileSignature 변경 시 IsMismatch 바인딩도 갱신</summary>
     partial void OnFileSignatureChanged(string value)
