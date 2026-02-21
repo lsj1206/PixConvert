@@ -111,6 +111,12 @@ public partial class FileListControl : UserControl
 
                     if (selectedItems.Count > 0)
                     {
+                        // [데이터 보호] 필터링 중에는 순서 변경을 위한 드래그를 금지함
+                        if (Window.GetWindow(this)?.DataContext is MainViewModel vm && vm.Settings.ShowMismatchOnly)
+                        {
+                            return;
+                        }
+
                         _isPotentialDrag = false;
                         var dragData = new DataObject("InternalMove", selectedItems);
                         DragDrop.DoDragDrop(listViewItem, dragData, DragDropEffects.Move);

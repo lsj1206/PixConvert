@@ -71,7 +71,7 @@ public partial class MainViewModel : ObservableObject
         AddFolderCommand = new RelayCommand(AddFolder, () => !IsBusy);
         DeleteFilesCommand = new RelayCommand<System.Collections.IList>(DeleteFiles, _ => !IsBusy);
         ListClearCommand = new AsyncRelayCommand(ListClearAsync, () => !IsBusy);
-        ReorderNumberCommand = new RelayCommand(ReorderNumber, () => !IsBusy);
+        ReorderNumberCommand = new RelayCommand(ReorderNumber, () => !IsBusy && !Settings.ShowMismatchOnly);
         SortByColumnCommand = new RelayCommand<SortType>(SortByColumn);
 
         // 설정 변경 이벤트 구독
@@ -85,6 +85,7 @@ public partial class MainViewModel : ObservableObject
             else if (e.PropertyName == nameof(SettingsViewModel.ShowMismatchOnly))
             {
                 ApplyFilter();
+                ReorderNumberCommand.NotifyCanExecuteChanged();
             }
         };
     }
