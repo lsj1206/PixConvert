@@ -32,6 +32,12 @@ public partial class MainViewModel : ObservableObject
 
     [ObservableProperty] private bool isBusy = false;
 
+    /// <summary>목록의 전체 파일 수</summary>
+    public int TotalCount => FileList.Items.Count;
+
+    /// <summary>미지원(시그니처 미판별) 파일 수</summary>
+    public int UnsupportedCount => FileList.Items.Count(x => x.FileSignature == "-");
+
     // 명령 정의
     public IRelayCommand AddFilesCommand { get; }
     public IRelayCommand AddFolderCommand { get; }
@@ -87,6 +93,13 @@ public partial class MainViewModel : ObservableObject
                 ApplyFilter();
                 ReorderNumberCommand.NotifyCanExecuteChanged();
             }
+        };
+
+        // 파일 목록 변경 감지하여 통계 정보 갱신
+        ((System.Collections.Specialized.INotifyCollectionChanged)FileList.Items).CollectionChanged += (s, e) =>
+        {
+            OnPropertyChanged(nameof(TotalCount));
+            OnPropertyChanged(nameof(UnsupportedCount));
         };
     }
 

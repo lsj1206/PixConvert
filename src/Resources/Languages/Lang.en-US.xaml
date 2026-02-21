@@ -11,6 +11,10 @@
     <sys:String x:Key="List_Size">Size</sys:String>
     <sys:String x:Key="List_Path">Path</sys:String>
 
+    <!-- Sidebar : Dashboard -->
+    <sys:String x:Key="Status_Total">Total File</sys:String>
+    <sys:String x:Key="Status_Unknown">Unknown File</sys:String>
+
     <!-- Sidebar : Btn -->
     <sys:String x:Key="Btn_AddFile">Add File</sys:String>
     <sys:String x:Key="Btn_AddFolder">Add Folder</sys:String>

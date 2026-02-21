@@ -11,6 +11,10 @@
     <sys:String x:Key="List_Size">크기</sys:String>
     <sys:String x:Key="List_Path">경로</sys:String>
 
+    <!-- Sidebar : Dashboard -->
+    <sys:String x:Key="Status_Total">파일 합계</sys:String>
+    <sys:String x:Key="Status_Unknown">미지원 파일</sys:String>
+
     <!-- 사이드바 : 버튼 -->
     <sys:String x:Key="Btn_AddFile">파일 추가</sys:String>
     <sys:String x:Key="Btn_AddFolder">폴더 추가</sys:String>
