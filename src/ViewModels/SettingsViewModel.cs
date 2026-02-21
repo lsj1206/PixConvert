@@ -44,6 +44,7 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty] private LanguageOption selectedLanguage;
     [ObservableProperty] private SortOption selectedSortOption;
     [ObservableProperty] private bool isSortAscending = true;
+    [ObservableProperty] private bool showMismatchOnly = false;
     [ObservableProperty] private bool confirmDeletion = true;
 
     partial void OnSelectedLanguageChanged(LanguageOption value)

@@ -35,10 +35,12 @@
     <!-- Sidebar : Option -->
     <sys:String x:Key="Option_ManualEdit">Manual Edit</sys:String>
     <sys:String x:Key="Option_ConfirmDeletion">Confirm Delete</sys:String>
+    <sys:String x:Key="Option_MismatchOnly">Diff Only</sys:String>
     <!-- Option : Tooltip -->
     <sys:String x:Key="Tip_ManualEdit" xml:space="preserve">Double-click a file to rename.
 Edits are reset when the rule is changed.</sys:String>
     <sys:String x:Key="Tip_ConfirmDeletion">File deletion confirmation ON/OFF</sys:String>
+    <sys:String x:Key="Tip_MismatchOnly">Show only files where extension and format signature differ.</sys:String>
 
     <!-- Snackbar -->
     <sys:String x:Key="Msg_AddFile">Add {0} file.</sys:String>

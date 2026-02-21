@@ -63,6 +63,11 @@
                     <ui:ToggleSwitch IsOn="{Binding Settings.IsSortAscending}"
                                      OnContent="{DynamicResource Sort_Asc}"
                                      OffContent="{DynamicResource Sort_Desc}" />
+                    <ui:ToggleSwitch IsOn="{Binding Settings.ShowMismatchOnly}"
+                                     OnContent="{DynamicResource Option_MismatchOnly}"
+                                     OffContent="{DynamicResource Option_MismatchOnly}"
+                                     ToolTip="{DynamicResource Tip_MismatchOnly}"
+                                     Margin="0,0,0,4"/>
                     <Button Content="{DynamicResource Btn_ReorderIndex}"
                             Command="{Binding ReorderNumberCommand}"
                             Style="{StaticResource SidebarButtonStyle}" />

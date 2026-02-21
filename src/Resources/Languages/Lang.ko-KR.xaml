@@ -35,10 +35,12 @@
     <!-- 사이드바 : 옵션 -->
     <sys:String x:Key="Option_ManualEdit">개별 변경 모드</sys:String>
     <sys:String x:Key="Option_ConfirmDeletion">삭제 확인 표시</sys:String>
+    <sys:String x:Key="Option_MismatchOnly">불일치 필터</sys:String>
     <!-- 옵션 : 툴팁 -->
     <sys:String x:Key="Tip_ManualEdit" xml:space="preserve">파일을 더블 클릭하면 이름 개별 수정이 가능합니다.
 규칙 변경 시 수정 사항은 초기화됩니다.</sys:String>
     <sys:String x:Key="Tip_ConfirmDeletion">파일 삭제 확인 창을 ON/OFF 합니다.</sys:String>
+    <sys:String x:Key="Tip_MismatchOnly">확장자와 포맷 시그니처가 다른 파일만 필터링합니다.</sys:String>
 
     <!-- 스낵바 -->
     <sys:String x:Key="Msg_AddFile">{0}개를 추가합니다.</sys:String>

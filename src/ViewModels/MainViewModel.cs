@@ -82,6 +82,10 @@ public partial class MainViewModel : ObservableObject
             {
                 SortFiles();
             }
+            else if (e.PropertyName == nameof(SettingsViewModel.ShowMismatchOnly))
+            {
+                ApplyFilter();
+            }
         };
     }
 
@@ -249,6 +253,24 @@ public partial class MainViewModel : ObservableObject
     {
         if (Settings.SelectedSortOption == null) return;
         FileList.Sorting(_sortingService, Settings.SelectedSortOption, Settings.IsSortAscending);
+
+        // 정렬 후 필터 상태 유지를 위해 필터 다시 적용
+        ApplyFilter();
+    }
+
+    /// <summary>불일치 필터 활성화 여부에 따라 목록 노출 항목을 필터링합니다.</summary>
+    private void ApplyFilter()
+    {
+        var view = System.Windows.Data.CollectionViewSource.GetDefaultView(FileList.Items);
+        if (Settings.ShowMismatchOnly)
+        {
+            view.Filter = item => item is FileItem fileItem && fileItem.IsMismatch;
+        }
+        else
+        {
+            view.Filter = null;
+        }
+        view.Refresh();
     }
 
     private string GetString(string key)
