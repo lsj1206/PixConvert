@@ -41,7 +41,7 @@
 Edits are reset when the rule is changed.</sys:String>
     <sys:String x:Key="Tip_ConfirmDeletion">File deletion confirmation ON/OFF</sys:String>
     <sys:String x:Key="Tip_MismatchOnly">Show only files where extension and format signature differ.</sys:String>
-    <sys:String x:Key="Tip_FilteredNoReorder">Ordering and reindexing are disabled during filtering.</sys:String>
+    <sys:String x:Key="Tip_FilteredNoReorder">Disabled during Diff Only.</sys:String>
 
     <!-- Snackbar -->
     <sys:String x:Key="Msg_AddFile">Add {0} file.</sys:String>
