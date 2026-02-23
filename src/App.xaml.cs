@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Windows;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 using ModernWpf;
 using PixConvert.Services;
 using PixConvert.ViewModels;
@@ -22,11 +25,69 @@ public partial class App : Application
     public IServiceProvider Services { get; }
 
     /// <summary>
-    /// App 인스턴스를 초기화하고 서비스 구성을 시작합니다.
+    /// App 인스턴스를 초기화하고 로거 및 서비스 구성을 시작합니다.
     /// </summary>
     public App()
     {
+        // 기본 로그 저장 위치: 실행 파일(또는 배포 시) 하위의 logs 폴더
+        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+        string logFilePath = System.IO.Path.Combine(baseDir, "logs", "pixconvert_log_.txt");
+
+#if DEBUG
+        // 개발 환경(DEBUG)에서는 src와 동일한 레벨(프로젝트 최상위)의 logs 폴더로 지정
+        var dir = new System.IO.DirectoryInfo(baseDir);
+        while (dir != null && dir.Name != "src")
+        {
+            dir = dir.Parent;
+        }
+        if (dir?.Parent != null)
+        {
+            logFilePath = System.IO.Path.Combine(dir.Parent.FullName, "logs", "pixconvert_log_.txt");
+        }
+#endif
+
+        // 1. Serilog 전역 로거 구성 (DI 조립 전 발생하는 치명적 에러 캐치용)
+        Log.Logger = new LoggerConfiguration()
+            .MinimumLevel.Information()
+            .WriteTo.Async(a => a.File(logFilePath,
+                rollingInterval: RollingInterval.Day,
+                retainedFileCountLimit: 7))
+            .CreateLogger();
+
+        Log.Information("=== PixConvert 애플리케이션 시작 ===");
+
+        // 2. 글로벌 예외 방어벽 구축
+        SetupGlobalExceptionHandling();
+
+        // 3. 서비스 구성
         Services = ConfigureServices();
+    }
+
+    /// <summary>
+    /// 처리되지 않은 모든 전역 예외를 잡아 로깅하고 앱의 강제 종료를 방어합니다.
+    /// </summary>
+    private void SetupGlobalExceptionHandling()
+    {
+        // UI 스레드 예외
+        this.DispatcherUnhandledException += (s, e) =>
+        {
+            Log.Fatal(e.Exception, "[UI Thread] 처리되지 않은 예외 발생");
+            e.Handled = true; // 강제 종료 방지
+        };
+
+        // Task 백그라운드 스레드 예외
+        TaskScheduler.UnobservedTaskException += (s, e) =>
+        {
+            Log.Fatal(e.Exception, "[Background Task] 처리되지 않은 예외 발생");
+            e.SetObserved();
+        };
+
+        // 기타 AppDomain 예외
+        AppDomain.CurrentDomain.UnhandledException += (s, e) =>
+        {
+            if (e.ExceptionObject is Exception ex)
+                Log.Fatal(ex, "[AppDomain] 런타임 환경 치명적 예외 발생");
+        };
     }
 
     /// <summary>
@@ -36,6 +97,12 @@ public partial class App : Application
     private static IServiceProvider ConfigureServices()
     {
         var services = new ServiceCollection();
+
+        // [Logging] Serilog DI 등록
+        services.AddLogging(loggingBuilder =>
+        {
+            loggingBuilder.AddSerilog(dispose: true);
+        });
 
         // [Services] 싱글톤 서비스 등록
         services.AddSingleton<IWindowService, WindowService>();
@@ -76,11 +143,17 @@ public partial class App : Application
         }
         catch (Exception ex)
         {
-            // 실행 중 예기치 못한 오류 발생 시 오류 내용을 알리고 종료
-            MessageBox.Show($"애플리케이션 시작 중 오류가 발생했습니다:\n{ex.Message}\n\n상세 정보:\n{ex.StackTrace}",
+            Log.Fatal(ex, "메인 윈도우 초기화 중 치명적 오류 발생");
+            MessageBox.Show($"애플리케이션 시작 중 오류가 발생했습니다:\n{ex.Message}",
                             "시작 오류", MessageBoxButton.OK, MessageBoxImage.Error);
             Shutdown();
         }
+    }
 
+    protected override void OnExit(ExitEventArgs e)
+    {
+        Log.Information("=== PixConvert 애플리케이션 정상 종료 ===");
+        Log.CloseAndFlush();
+        base.OnExit(e);
     }
 }

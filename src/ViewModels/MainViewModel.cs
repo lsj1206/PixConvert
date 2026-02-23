@@ -1,16 +1,17 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Windows;
+using System.Globalization;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Microsoft.Win32;
+using Microsoft.Extensions.Logging;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Microsoft.Win32;
-using System.Windows;
-using System.Globalization;
-using PixConvert.Services;
 using PixConvert.Models;
+using PixConvert.Services;
 
 namespace PixConvert.ViewModels;
 
@@ -51,11 +52,13 @@ public partial class MainViewModel : ObservableObject
     private readonly ISortingService _sortingService;
     private readonly ILanguageService _languageService;
     private readonly IFileProcessingService _fileProcessingService;
+    private readonly ILogger<MainViewModel> _logger;
 
     /// <summary>
     /// MainViewModel의 새 인스턴스를 초기화하며 필요한 서비스를 주입받습니다.
     /// </summary>
     public MainViewModel(
+        ILogger<MainViewModel> logger,
         IDialogService dialogService,
         ISnackbarService snackbarService,
         ISortingService sortingService,
@@ -64,6 +67,7 @@ public partial class MainViewModel : ObservableObject
         SnackbarViewModel snackbarViewModel,
         SettingsViewModel settingsViewModel)
     {
+        _logger = logger;
         _dialogService = dialogService;
         _snackbarService = snackbarService;
         _sortingService = sortingService;
@@ -132,6 +136,9 @@ public partial class MainViewModel : ObservableObject
         IsBusy = true;
         try
         {
+            var pathList = paths.ToList();
+            _logger.LogInformation("[MainViewModel] 파일 추가 프로세스 시작. 입력된 경로 수: {Count}", pathList.Count);
+
             _snackbarService.ShowProgress(GetString("Msg_LoadingFile"));
 
             // 진행률 보고를 위한 IProgress 정의
@@ -150,10 +157,14 @@ public partial class MainViewModel : ObservableObject
             // 정책 위반(최대 수량 초과) 처리
             if (result.SuccessCount == 0 && result.IgnoredCount > 0)
             {
+                _logger.LogWarning("[MainViewModel] 최대 허용 파일 개수 초과로 추가가 취소되었습니다. (무시됨: {IgnoredCount})", result.IgnoredCount);
+
                 var msg = string.Format(GetString("Msg_MaxItemExceeded"), MaxItemCount, FileList.Items.Count, result.IgnoredCount);
                 _snackbarService.Show(msg, Services.SnackbarType.Error);
                 return;
             }
+
+            _logger.LogInformation("[MainViewModel] 프로세스 완료. 성공: {SuccessCount}, 무시: {IgnoredCount}", result.SuccessCount, result.IgnoredCount);
 
             if (result.SuccessCount > 0)
             {
@@ -227,6 +238,8 @@ public partial class MainViewModel : ObservableObject
             if (!await _dialogService.ShowConfirmationAsync(message, GetString("Dlg_Title_DeleteConfirm"))) return;
         }
 
+        _logger.LogInformation("[MainViewModel] 선택된 항목 삭제 요청. 삭제 개수: {Count}", count);
+
         FileList.RemoveItems(itemsToDelete);
         _snackbarService.Show(string.Format(GetString("Msg_RemoveFile"), count), SnackbarType.Warning);
     }
@@ -237,6 +250,7 @@ public partial class MainViewModel : ObservableObject
         if (FileList.Items.Count == 0) return;
         if (await _dialogService.ShowConfirmationAsync(GetString("Dlg_Ask_ClearList"), GetString("Dlg_Title_ClearList")))
         {
+            _logger.LogInformation("[MainViewModel] 리스트 초기화 승인됨. 모든 항목 제거 완료.");
             FileList.Clear();
             _snackbarService.Show(GetString("Msg_ClearList"), SnackbarType.Success);
         }
