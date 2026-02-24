@@ -152,31 +152,6 @@
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
-                    <!-- 파일 크기 -->
-                    <GridViewColumn Width="80">
-                        <GridViewColumn.Header>
-                            <GridViewColumnHeader Content="{DynamicResource List_Size}" Tag="Size"/>
-                        </GridViewColumn.Header>
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Foreground="{StaticResource TextSecondary}"
-                                           Text="{Binding DisplaySize}" />
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-
-                    <!-- 경로 -->
-                    <GridViewColumn Header="{DynamicResource List_Path}" Width="300">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Foreground="#999999"
-                                           TextTrimming="CharacterEllipsis"
-                                           Text="{Binding Directory}"
-                                           ToolTip="{Binding Path}" />
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-
                     <!-- 상태 -->
                     <GridViewColumn Width="90">
                         <GridViewColumn.Header>
@@ -240,6 +215,33 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
+
+                    <!-- 파일 크기 -->
+                    <GridViewColumn Width="80">
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader Content="{DynamicResource List_Size}" Tag="Size"/>
+                        </GridViewColumn.Header>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Foreground="{StaticResource TextSecondary}"
+                                           Text="{Binding DisplaySize}" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <!-- 경로 -->
+                    <GridViewColumn Header="{DynamicResource List_Path}" Width="300">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Foreground="#999999"
+                                           TextTrimming="CharacterEllipsis"
+                                           Text="{Binding Directory}"
+                                           ToolTip="{Binding Path}" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+
                 </GridView>
             </ListView.View>
         </ListView>
