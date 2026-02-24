@@ -5,6 +5,7 @@ using System.Linq;
 using System.Management;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using PixConvert.Models;
 
 namespace PixConvert.Services;
@@ -15,11 +16,17 @@ namespace PixConvert.Services;
 public class FileProcessingService : IFileProcessingService
 {
     private readonly IFileService _fileService;
+    private readonly ILogger<FileProcessingService> _logger;
+    private readonly ILanguageService _languageService;
 
-    public FileProcessingService(IFileService fileService)
+    public FileProcessingService(IFileService fileService, ILogger<FileProcessingService> logger, ILanguageService languageService)
     {
         _fileService = fileService;
+        _logger = logger;
+        _languageService = languageService;
     }
+
+    private string GetString(string key) => _languageService.GetString(key);
 
     public async Task<FileProcessingResult> ProcessPathsAsync(
         IEnumerable<string> paths,
@@ -136,29 +143,36 @@ public class FileProcessingService : IFileProcessingService
     /// 파일 경로의 드라이브 유형에 따라 최적의 병렬도를 결정합니다.
     /// DriveType 1차 분류 → WMI 2차 분류(Fixed 디스크) → Fallback 순으로 판별합니다.
     /// </summary>
-    private static int GetOptimalParallelism(string samplePath)
+    private int GetOptimalParallelism(string samplePath)
     {
         try
         {
             string root = Path.GetPathRoot(samplePath) ?? "C:\\";
             var drive = new DriveInfo(root);
 
+            int parallelism;
+
             // 네트워크 드라이브: 동시 연결 제한을 고려하여 최소 병렬
             if (drive.DriveType == DriveType.Network)
-                return 2;
-
+                parallelism = 2;
             // 이동식 저장장치(USB 등): 중간 수준 병렬
-            if (drive.DriveType == DriveType.Removable)
-                return 4;
-
+            else if (drive.DriveType == DriveType.Removable)
+                parallelism = 4;
             // 고정 디스크: WMI로 SSD/HDD 판별 시도
-            if (drive.DriveType == DriveType.Fixed)
+            else if (drive.DriveType == DriveType.Fixed)
             {
                 if (IsSsd(root))
-                    return Environment.ProcessorCount; // SSD: 최대 병렬
+                    parallelism = Environment.ProcessorCount; // SSD: 최대 병렬
                 else
-                    return 4; // HDD: Seek Storm 방지를 위해 제한
+                    parallelism = 4; // HDD: Seek Storm 방지를 위해 제한
             }
+            else
+            {
+                parallelism = Math.Min(Environment.ProcessorCount, 8);
+            }
+
+            _logger.LogInformation(GetString("Log_Process_Parallelism"), drive.DriveType, parallelism);
+            return parallelism;
         }
         catch { } // 감지 실패 시 안전한 기본값
         return Math.Min(Environment.ProcessorCount, 8);
@@ -169,12 +183,13 @@ public class FileProcessingService : IFileProcessingService
     /// Win32_DiskDrive의 MediaType은 SSD/HDD를 구분하지 못하므로 Storage WMI를 사용합니다.
     /// MSFT_PhysicalDisk.MediaType: 3=HDD, 4=SSD
     /// </summary>
-    private static bool IsSsd(string rootPath)
+    private bool IsSsd(string rootPath)
     {
         try
         {
             // 1단계: 드라이브 문자 → 디스크 번호 매핑 (Win32_LogicalDisk → Win32_DiskDrive)
             string driveLetter = rootPath.TrimEnd('\\');
+            _logger.LogInformation(GetString("Log_Process_WmiDiskNumber"), driveLetter);
             int diskNumber = -1;
 
             using (var searcher = new ManagementObjectSearcher(
@@ -208,9 +223,15 @@ public class FileProcessingService : IFileProcessingService
                 // MediaType: 3 = HDD, 4 = SSD, 5 = SCM
                 var mediaType = physicalDisk["MediaType"];
                 if (mediaType != null && Convert.ToInt32(mediaType) == 4)
+                {
+                    _logger.LogInformation(GetString("Log_Process_WmiSsdCheck"), diskNumber, true);
                     return true; // SSD 확인
+                }
                 if (mediaType != null && Convert.ToInt32(mediaType) == 3)
+                {
+                    _logger.LogInformation(GetString("Log_Process_WmiSsdCheck"), diskNumber, false);
                     return false; // HDD 확인
+                }
             }
         }
         catch

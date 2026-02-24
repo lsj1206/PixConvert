@@ -137,7 +137,7 @@ public partial class MainViewModel : ObservableObject
         try
         {
             var pathList = paths.ToList();
-            _logger.LogInformation("[MainViewModel] 파일 추가 프로세스 시작. 입력된 경로 수: {Count}", pathList.Count);
+            _logger.LogInformation(GetString("Log_Main_ProcessStart"), pathList.Count);
 
             _snackbarService.ShowProgress(GetString("Msg_LoadingFile"));
 
@@ -157,14 +157,14 @@ public partial class MainViewModel : ObservableObject
             // 정책 위반(최대 수량 초과) 처리
             if (result.SuccessCount == 0 && result.IgnoredCount > 0)
             {
-                _logger.LogWarning("[MainViewModel] 최대 허용 파일 개수 초과로 추가가 취소되었습니다. (무시됨: {IgnoredCount})", result.IgnoredCount);
+                _logger.LogWarning(GetString("Log_Main_MaxExceeded"), result.IgnoredCount);
 
                 var msg = string.Format(GetString("Msg_MaxItemExceeded"), MaxItemCount, FileList.Items.Count, result.IgnoredCount);
                 _snackbarService.Show(msg, Services.SnackbarType.Error);
                 return;
             }
 
-            _logger.LogInformation("[MainViewModel] 프로세스 완료. 성공: {SuccessCount}, 무시: {IgnoredCount}", result.SuccessCount, result.IgnoredCount);
+            _logger.LogInformation(GetString("Log_Main_ProcessComplete"), result.SuccessCount, result.IgnoredCount);
 
             if (result.SuccessCount > 0)
             {
@@ -238,7 +238,7 @@ public partial class MainViewModel : ObservableObject
             if (!await _dialogService.ShowConfirmationAsync(message, GetString("Dlg_Title_DeleteConfirm"))) return;
         }
 
-        _logger.LogInformation("[MainViewModel] 선택된 항목 삭제 요청. 삭제 개수: {Count}", count);
+        _logger.LogInformation(GetString("Log_Main_DeleteRequest"), count);
 
         FileList.RemoveItems(itemsToDelete);
         _snackbarService.Show(string.Format(GetString("Msg_RemoveFile"), count), SnackbarType.Warning);
@@ -250,7 +250,7 @@ public partial class MainViewModel : ObservableObject
         if (FileList.Items.Count == 0) return;
         if (await _dialogService.ShowConfirmationAsync(GetString("Dlg_Ask_ClearList"), GetString("Dlg_Title_ClearList")))
         {
-            _logger.LogInformation("[MainViewModel] 리스트 초기화 승인됨. 모든 항목 제거 완료.");
+            _logger.LogInformation(GetString("Log_Main_ClearList"));
             FileList.Clear();
             _snackbarService.Show(GetString("Msg_ClearList"), SnackbarType.Success);
         }

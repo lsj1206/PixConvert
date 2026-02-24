@@ -54,8 +54,6 @@ public partial class App : Application
                 retainedFileCountLimit: 7))
             .CreateLogger();
 
-        Log.Information("=== PixConvert 애플리케이션 시작 ===");
-
         // 2. 글로벌 예외 방어벽 구축
         SetupGlobalExceptionHandling();
 
@@ -71,14 +69,14 @@ public partial class App : Application
         // UI 스레드 예외
         this.DispatcherUnhandledException += (s, e) =>
         {
-            Log.Fatal(e.Exception, "[UI Thread] 처리되지 않은 예외 발생");
+            Log.Fatal(e.Exception, GetLogString("Log_UI_UnhandledException"));
             e.Handled = true; // 강제 종료 방지
         };
 
         // Task 백그라운드 스레드 예외
         TaskScheduler.UnobservedTaskException += (s, e) =>
         {
-            Log.Fatal(e.Exception, "[Background Task] 처리되지 않은 예외 발생");
+            Log.Fatal(e.Exception, GetLogString("Log_Background_UnhandledException"));
             e.SetObserved();
         };
 
@@ -86,7 +84,7 @@ public partial class App : Application
         AppDomain.CurrentDomain.UnhandledException += (s, e) =>
         {
             if (e.ExceptionObject is Exception ex)
-                Log.Fatal(ex, "[AppDomain] 런타임 환경 치명적 예외 발생");
+                Log.Fatal(ex, GetLogString("Log_AppDomain_UnhandledException"));
         };
     }
 
@@ -133,6 +131,8 @@ public partial class App : Application
         {
             base.OnStartup(e);
 
+            Log.Information(GetLogString("Log_App_Start"));
+
             // ModernWpf 테마를 Light(밝게) 모드로 설정
             ThemeManager.Current.ApplicationTheme = ApplicationTheme.Light;
 
@@ -143,7 +143,7 @@ public partial class App : Application
         }
         catch (Exception ex)
         {
-            Log.Fatal(ex, "메인 윈도우 초기화 중 치명적 오류 발생");
+            Log.Fatal(ex, GetLogString("Log_App_FatalInit"));
             MessageBox.Show($"애플리케이션 시작 중 오류가 발생했습니다:\n{ex.Message}",
                             "시작 오류", MessageBoxButton.OK, MessageBoxImage.Error);
             Shutdown();
@@ -152,8 +152,26 @@ public partial class App : Application
 
     protected override void OnExit(ExitEventArgs e)
     {
-        Log.Information("=== PixConvert 애플리케이션 정상 종료 ===");
+        Log.Information(GetLogString("Log_App_End"));
         Log.CloseAndFlush();
         base.OnExit(e);
+    }
+
+    /// <summary>
+    /// 안전하게 리소스에서 로그 텍스트를 파싱하여 반환합니다.
+    /// 초기화 전이거나 오류 발생 시 키 문자열 자체를 반환합니다.
+    /// </summary>
+    private static string GetLogString(string key)
+    {
+        try
+        {
+            if (Current != null)
+            {
+                var val = Current.TryFindResource(key);
+                if (val != null) return val.ToString() ?? key;
+            }
+        }
+        catch { }
+        return key;
     }
 }

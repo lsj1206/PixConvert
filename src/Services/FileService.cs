@@ -16,11 +16,15 @@ public class FileService : IFileService
     private static readonly string[] SizeSuffixes = ["B", "KB", "MB", "GB", "TB"];
 
     private readonly ILogger<FileService> _logger;
+    private readonly ILanguageService _languageService;
 
-    public FileService(ILogger<FileService> logger)
+    public FileService(ILogger<FileService> logger, ILanguageService languageService)
     {
         _logger = logger;
+        _languageService = languageService;
     }
+
+    private string GetString(string key) => _languageService.GetString(key);
 
     public FileItem? CreateFileItem(FileInfo fileInfo)
     {
@@ -53,7 +57,7 @@ public class FileService : IFileService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "[FileService] 시그니처 분석 실패. 파일: {Path}", path);
+            _logger.LogError(ex, GetString("Log_File_SignatureFail"), path);
             return "-";
         }
     }
@@ -88,7 +92,7 @@ public class FileService : IFileService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "[FileService] 단일 스트림 메타데이터 접근 실패. 파일: {Path}", path);
+            _logger.LogError(ex, GetString("Log_File_MetaFail"), path);
             return null;
         }
     }
@@ -159,11 +163,11 @@ public class FileService : IFileService
             catch (UnauthorizedAccessException ex)
             {
                 // 접근 권한이 없는 폴더는 로그만 남기고 무시하여 전체 과정이 터지는 것을 방지합니다.
-                _logger.LogWarning(ex, "[FileService] 폴더 접근 권한 없음 무시됨: {DirPath}", currentDir);
+                _logger.LogWarning(ex, GetString("Log_File_FolderAccessFail"), currentDir);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "[FileService] 폴더 순회 중 예기치 않은 오류 발생: {DirPath}", currentDir);
+                _logger.LogError(ex, GetString("Log_File_FolderTraverseFail"), currentDir);
             }
         }
         return files;

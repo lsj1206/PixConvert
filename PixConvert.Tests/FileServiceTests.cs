@@ -19,7 +19,7 @@ public class FileServiceTests : IDisposable
     // 로깅(Serilog) 기능을 흉내 내기 위한 "가짜 로거" 객체입니다.
     // 만약 진짜 로거를 넣으면 테스트할 때마다 쓸데없는 로그 파일이 하드에 쌓이기 때문에 이렇게 가짜 대역을 씁니다.
     private readonly Mock<ILogger<FileService>> _mockLogger;
-
+    private readonly Mock<ILanguageService> _mockLanguage;
     // 테스트 파일이 만들어질 임시 쓰레기통 폴더 경로입니다.
     private readonly string _tempDirectory;
 
@@ -27,9 +27,13 @@ public class FileServiceTests : IDisposable
     {
         // 1. Mock(대역) 배우를 캐스팅합니다.
         _mockLogger = new Mock<ILogger<FileService>>();
+        _mockLanguage = new Mock<ILanguageService>();
 
-        // 2. 대역 배우(Logger)를 넣어서, 오로지 "FileService"만 순수하게 테스트되도록 환경을 격리합니다.
-        _fileService = new FileService(_mockLogger.Object);
+        // 언어 서비스가 문자열 키를 받으면 그대로 반환하도록 세팅 (로그 템플릿 검증 유지)
+        _mockLanguage.Setup(x => x.GetString(It.IsAny<string>())).Returns((string key) => key);
+
+        // 2. 대역 배우(Logger, LanguageService)를 넣어서, 오로지 "FileService"만 순수하게 테스트되도록 환경을 격리합니다.
+        _fileService = new FileService(_mockLogger.Object, _mockLanguage.Object);
 
         // 3. 테스트끼리 파일이 엉키지 않게 무작위(Guid) 이름의 임시 폴더를 C드라이브 Temp 영역에 생성합니다.
         _tempDirectory = Path.Combine(Path.GetTempPath(), "PixConvertTests_" + Guid.NewGuid().ToString("N"));

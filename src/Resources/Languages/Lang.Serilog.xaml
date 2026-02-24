@@ -1,0 +1,31 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <!-- App.xaml.cs -->
+    <system:String x:Key="Log_App_Start">=== PixConvert 애플리케이션 시작 ===</system:String>
+    <system:String x:Key="Log_App_End">=== PixConvert 애플리케이션 정상 종료 ===</system:String>
+    <system:String x:Key="Log_UI_UnhandledException">[UI Thread] 처리되지 않은 예외 발생</system:String>
+    <system:String x:Key="Log_Background_UnhandledException">[Background Task] 처리되지 않은 예외 발생</system:String>
+    <system:String x:Key="Log_AppDomain_UnhandledException">[AppDomain] 런타임 환경 치명적 예외 발생</system:String>
+    <system:String x:Key="Log_App_FatalInit">메인 윈도우 초기화 중 치명적 오류 발생</system:String>
+
+    <!-- MainViewModel.cs -->
+    <system:String x:Key="Log_Main_ProcessStart">[MainViewModel] 파일 추가 프로세스 시작. 입력된 경로 수: {Count}</system:String>
+    <system:String x:Key="Log_Main_MaxExceeded">[MainViewModel] 최대 허용 파일 개수 초과로 추가가 취소되었습니다. (무시됨: {IgnoredCount})</system:String>
+    <system:String x:Key="Log_Main_ProcessComplete">[MainViewModel] 프로세스 완료. 성공: {SuccessCount}, 무시: {IgnoredCount}</system:String>
+    <system:String x:Key="Log_Main_DeleteRequest">[MainViewModel] 선택된 항목 삭제 요청. 삭제 개수: {Count}</system:String>
+    <system:String x:Key="Log_Main_ClearList">[MainViewModel] 리스트 초기화 승인됨. 모든 항목 제거 완료.</system:String>
+
+    <!-- FileService.cs -->
+    <system:String x:Key="Log_File_SignatureFail">[FileService] 시그니처 분석 실패. 파일: {Path}</system:String>
+    <system:String x:Key="Log_File_MetaFail">[FileService] 단일 스트림 메타데이터 접근 실패. 파일: {Path}</system:String>
+    <system:String x:Key="Log_File_FolderAccessFail">[FileService] 폴더 접근 권한 없음 무시됨: {DirPath}</system:String>
+    <system:String x:Key="Log_File_FolderTraverseFail">[FileService] 폴더 순회 중 예기치 않은 오류 발생: {DirPath}</system:String>
+
+    <!-- FileProcessingService.cs -->
+    <system:String x:Key="Log_Process_WmiDiskNumber">[FileProcessingService] WMI 물리 디스크 번호 매핑 시도. 드라이브: {DriveLetter}</system:String>
+    <system:String x:Key="Log_Process_WmiSsdCheck">[FileProcessingService] WMI 물리 디스크 유형 조회 완료. 디스크: {DiskNumber}, SSD 판단여부: {IsSsd}</system:String>
+    <system:String x:Key="Log_Process_Parallelism">[FileProcessingService] 파일 처리용 스레드 수 최종 결정. 유형: {DriveType}, 병렬도(MaxDegree): {Parallelism}</system:String>
+
+</ResourceDictionary>

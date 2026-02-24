@@ -28,9 +28,9 @@ public class LanguageService : ILanguageService
             var app = Application.Current;
             if (app == null) return;
 
-            // 기존 언어 리소스 제거
+            // 기존 언어 리소스 제거 (Serilog 글로벌 리소스는 제외)
             var oldDict = app.Resources.MergedDictionaries
-                .FirstOrDefault(d => d.Source?.OriginalString?.Contains("Lang.") == true);
+                .FirstOrDefault(d => d.Source?.OriginalString?.Contains("Lang.") == true && d.Source?.OriginalString?.Contains("Lang.Serilog") != true);
 
             if (oldDict != null)
             {

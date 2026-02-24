@@ -12,6 +12,7 @@
                 <ui:XamlControlsResources />
                 <ResourceDictionary Source="Themes/Generic.xaml" />
                 <ResourceDictionary Source="Resources/Icons/help.xaml" />
+                <ResourceDictionary Source="Resources/Languages/Lang.Serilog.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>
