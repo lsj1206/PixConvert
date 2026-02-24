@@ -26,6 +26,9 @@
     <!-- FileProcessingService.cs -->
     <system:String x:Key="Log_Process_WmiDiskNumber">[FileProcessingService] WMI 물리 디스크 번호 매핑 시도. 드라이브: {DriveLetter}</system:String>
     <system:String x:Key="Log_Process_WmiSsdCheck">[FileProcessingService] WMI 물리 디스크 유형 조회 완료. 디스크: {DiskNumber}, SSD 판단여부: {IsSsd}</system:String>
+    <system:String x:Key="Log_Process_WmiFail">[FileProcessingService] WMI 디스크 매핑 실패. 드라이브({DriveLetter})를 식별할 수 없어 HDD(안전)로 간주합니다.</system:String>
+    <system:String x:Key="Log_Process_WmiException">[FileProcessingService] WMI 디스크 조회 중 예외 발생. 경로({RootPath})를 판단할 수 없어 HDD(안전)로 간주합니다.</system:String>
+    <system:String x:Key="Log_Process_WmiUnknown">[FileProcessingService] WMI 디스크 유형을 특정할 수 없습니다. 디스크({DiskNumber})를 HDD(안전)로 간주합니다.</system:String>
     <system:String x:Key="Log_Process_Parallelism">[FileProcessingService] 파일 처리용 스레드 수 최종 결정. 유형: {DriveType}, 병렬도(MaxDegree): {Parallelism}</system:String>
 
 </ResourceDictionary>

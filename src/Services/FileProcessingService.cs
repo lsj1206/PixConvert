@@ -185,12 +185,12 @@ public class FileProcessingService : IFileProcessingService
     /// </summary>
     private bool IsSsd(string rootPath)
     {
+        int diskNumber = -1;
         try
         {
             // 1단계: 드라이브 문자 → 디스크 번호 매핑 (Win32_LogicalDisk → Win32_DiskDrive)
             string driveLetter = rootPath.TrimEnd('\\');
             _logger.LogInformation(GetString("Log_Process_WmiDiskNumber"), driveLetter);
-            int diskNumber = -1;
 
             using (var searcher = new ManagementObjectSearcher(
                 $"ASSOCIATORS OF {{Win32_LogicalDisk.DeviceID='{driveLetter}'}} WHERE AssocClass=Win32_LogicalDiskToPartition"))
@@ -211,7 +211,11 @@ public class FileProcessingService : IFileProcessingService
                 }
             }
 
-            if (diskNumber < 0) return true; // 매핑 실패 시 SSD 간주 (최대 성능)
+            if (diskNumber < 0)
+            {
+                _logger.LogWarning(GetString("Log_Process_WmiFail"), driveLetter);
+                return false; // 매핑 실패 시 HDD 간주 (Seek Storm 방지)
+            }
 
             // 2단계: 디스크 번호로 MSFT_PhysicalDisk 조회 (Storage WMI namespace)
             using var physicalSearcher = new ManagementObjectSearcher(
@@ -234,13 +238,15 @@ public class FileProcessingService : IFileProcessingService
                 }
             }
         }
-        catch
+        catch (Exception ex)
         {
-            // WMI 접근 실패 시 SSD로 간주하여 최대 성능 적용
-            return true;
+            // WMI 접근 실패 시 HDD로 간주하여 Seek Storm 억제
+            _logger.LogWarning(ex, GetString("Log_Process_WmiException"), rootPath);
+            return false;
         }
 
-        // 판별 불가 시 SSD로 간주 (안전한 쪽으로)
-        return true;
+        // 판별 불가(결과 없음) 시 HDD로 간주 (안전한 쪽으로)
+        _logger.LogWarning(GetString("Log_Process_WmiUnknown"), diskNumber);
+        return false;
     }
 }
