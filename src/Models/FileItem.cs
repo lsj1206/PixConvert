@@ -4,6 +4,28 @@ using CommunityToolkit.Mvvm.ComponentModel;
 namespace PixConvert.Models;
 
 /// <summary>
+/// 파일 변환 작업의 각 단계를 정의하는 상태 열거형입니다.
+/// </summary>
+public enum FileConvertStatus
+{
+    /// <summary>변환 전 대기 상태</summary>
+    Pending,
+
+    /// <summary>현재 변환이 진행 중인 상태</summary>
+    Processing,
+
+    /// <summary>변환이 성공적으로 완료된 상태</summary>
+    Success,
+
+    /// <summary>변환 도중 오류가 발생한 상태</summary>
+    Error,
+
+    /// <summary>변환을 지원하지 않는 파일(시그니처 미판별 등)</summary>
+    Unsupported
+}
+
+
+/// <summary>
 /// 파일 목록에 표시되는 개별 파일의 정보와 상태를 담는 데이터 모델 클래스입니다.
 /// </summary>
 public partial class FileItem : ObservableObject
@@ -49,6 +71,14 @@ public partial class FileItem : ObservableObject
     [ObservableProperty]
     private int? addIndex;
 
+    /// <summary>현재 파일의 변환 상태</summary>
+    [ObservableProperty]
+    private FileConvertStatus status = FileConvertStatus.Pending;
+
+    /// <summary>변환 진행률 (0~100)</summary>
+    [ObservableProperty]
+    private double progress = 0;
+
     /// <summary>확장자 동의어 쌍 테이블 (양방향 등록)</summary>
     private static readonly HashSet<(string, string)> Synonyms =
     [
@@ -64,10 +94,20 @@ public partial class FileItem : ObservableObject
         !string.Equals(Extension, FileSignature, StringComparison.OrdinalIgnoreCase) &&
         !Synonyms.Contains((Extension, FileSignature.ToLower()));
 
-    /// <summary>FileSignature 변경 시 IsMismatch 바인딩도 갱신</summary>
+    /// <summary>FileSignature 변경 시 IsMismatch 및 상태 갱신</summary>
     partial void OnFileSignatureChanged(string value)
     {
         OnPropertyChanged(nameof(IsMismatch));
+
+        // 시그니처가 없으면 미지원 상태로 설정
+        if (value == "-")
+        {
+            Status = FileConvertStatus.Unsupported;
+        }
+        else if (Status == FileConvertStatus.Unsupported)
+        {
+            Status = FileConvertStatus.Pending;
+        }
     }
 
     /// <summary>현재 Path를 기반으로 파일의 세부 구성 정보를 파싱합니다.</summary>

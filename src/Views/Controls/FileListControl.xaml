@@ -4,9 +4,14 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:models="clr-namespace:PixConvert.Models"
+             xmlns:converters="clr-namespace:PixConvert.Converters"
              mc:Ignorable="d">
 
     <UserControl.Resources>
+        <!-- 컨버터 -->
+        <converters:StatusToTextConverter x:Key="StatusToTextConverter"/>
+        <converters:ProgressToGridWidthConverter x:Key="ProgressToGridWidthConverter"/>
+
         <!-- 파일 리스트 스타일 -->
         <SolidColorBrush x:Key="ItemHoverBackground" Color="#E5F3FF"/>
         <SolidColorBrush x:Key="ItemSelectedBackground" Color="#CCE8FF"/>
@@ -161,13 +166,77 @@
                     </GridViewColumn>
 
                     <!-- 경로 -->
-                    <GridViewColumn Header="{DynamicResource List_Path}" Width="400">
+                    <GridViewColumn Header="{DynamicResource List_Path}" Width="300">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Foreground="#999999"
                                            TextTrimming="CharacterEllipsis"
                                            Text="{Binding Directory}"
                                            ToolTip="{Binding Path}" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <!-- 상태 -->
+                    <GridViewColumn Width="90">
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader Content="{DynamicResource List_Status}" Tag="Status"/>
+                        </GridViewColumn.Header>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Grid Margin="-6,0" x:Name="StatusGrid">
+                                    <!-- 배경 게이지 (배터리 효과) -->
+                                    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="{Binding Progress, Converter={StaticResource ProgressToGridWidthConverter}}"/>
+                                            <ColumnDefinition Width="{Binding Progress, Converter={StaticResource ProgressToGridWidthConverter}, ConverterParameter=Invert}">
+                                                <ColumnDefinition.Style>
+                                                    <Style TargetType="ColumnDefinition">
+                                                        <Setter Property="Width" Value="*"/>
+                                                        <Style.Triggers>
+                                                            <!-- 진행률이 100이면 오른쪽 공간을 0으로 -->
+                                                            <DataTrigger Binding="{Binding Progress}" Value="100">
+                                                                <Setter Property="Width" Value="0"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </ColumnDefinition.Style>
+                                            </ColumnDefinition>
+                                        </Grid.ColumnDefinitions>
+
+                                        <Border Grid.Column="0" x:Name="ProgressBorder" Background="#1A4CAF50"/>
+                                    </Grid>
+
+                                    <!-- 텍스트 -->
+                                    <TextBlock x:Name="StatusLabel"
+                                               Text="{Binding Status, Converter={StaticResource StatusToTextConverter}}"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"
+                                               FontSize="11"
+                                               FontWeight="SemiBold"
+                                               Foreground="{StaticResource TextSecondary}"/>
+                                </Grid>
+                                <DataTemplate.Triggers>
+                                    <!-- Processing: 보더 불투명도 조절 -->
+                                    <DataTrigger Binding="{Binding Status}" Value="Processing">
+                                        <Setter TargetName="ProgressBorder" Property="Background" Value="#334CAF50"/>
+                                        <Setter TargetName="StatusLabel" Property="Foreground" Value="#2E7D32"/>
+                                    </DataTrigger>
+                                    <!-- Success: 진한 초록색 배경 유지 -->
+                                    <DataTrigger Binding="{Binding Status}" Value="Success">
+                                        <Setter TargetName="ProgressBorder" Property="Background" Value="#4D4CAF50"/>
+                                        <Setter TargetName="StatusLabel" Property="Foreground" Value="#1B5E20"/>
+                                    </DataTrigger>
+                                    <!-- Error: 노란색/주황색 배경 -->
+                                    <DataTrigger Binding="{Binding Status}" Value="Error">
+                                        <Setter TargetName="ProgressBorder" Property="Background" Value="#4DFFC107"/>
+                                        <Setter TargetName="StatusLabel" Property="Foreground" Value="#F57F17"/>
+                                    </DataTrigger>
+                                    <!-- Unsupported: 회색 -->
+                                    <DataTrigger Binding="{Binding Status}" Value="Unsupported">
+                                        <Setter TargetName="StatusLabel" Property="Foreground" Value="#9E9E9E"/>
+                                    </DataTrigger>
+                                </DataTemplate.Triggers>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

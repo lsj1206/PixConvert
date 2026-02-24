@@ -46,6 +46,8 @@ public partial class MainViewModel : ObservableObject
     public IRelayCommand ListClearCommand { get; }
     public IRelayCommand ReorderNumberCommand { get; }
     public IRelayCommand<SortType> SortByColumnCommand { get; }
+    public IRelayCommand OpenConvertSettingCommand { get; }
+    public IRelayCommand ConvertFilesCommand { get; }
 
     private readonly IDialogService _dialogService;
     private readonly ISnackbarService _snackbarService;
@@ -81,8 +83,10 @@ public partial class MainViewModel : ObservableObject
         AddFolderCommand = new RelayCommand(AddFolder, () => !IsBusy);
         DeleteFilesCommand = new RelayCommand<System.Collections.IList>(DeleteFiles, _ => !IsBusy);
         ListClearCommand = new AsyncRelayCommand(ListClearAsync, () => !IsBusy);
-        ReorderNumberCommand = new RelayCommand(ReorderNumber, () => !IsBusy && !Settings.ShowMismatchOnly);
+        ReorderNumberCommand = new RelayCommand(ReorderNumber);
         SortByColumnCommand = new RelayCommand<SortType>(SortByColumn);
+        OpenConvertSettingCommand = new RelayCommand(OpenConvertSetting);
+        ConvertFilesCommand = new AsyncRelayCommand(ConvertFilesAsync);
 
         // 설정 변경 이벤트 구독
         Settings.PropertyChanged += (s, e) =>
@@ -253,6 +257,45 @@ public partial class MainViewModel : ObservableObject
             _logger.LogInformation(GetString("Log_Main_ClearList"));
             FileList.Clear();
             _snackbarService.Show(GetString("Msg_ClearList"), SnackbarType.Success);
+        }
+    }
+
+    private void OpenConvertSetting()
+    {
+        // TODO: Option A (ContentDialog) 구현 예정
+    }
+
+    private async Task ConvertFilesAsync()
+    {
+        if (FileList.Items.Count == 0) return;
+
+        IsBusy = true;
+        try
+        {
+            foreach (var item in FileList.Items)
+            {
+                if (item.Status == FileConvertStatus.Unsupported) continue;
+
+                item.Status = FileConvertStatus.Processing;
+                item.Progress = 0;
+
+                // 시뮬레이션: 점진적으로 증가
+                for (int i = 0; i <= 100; i += 20)
+                {
+                    item.Progress = i;
+                    await Task.Delay(100);
+                }
+
+                item.Status = FileConvertStatus.Success;
+            }
+        }
+        catch
+        {
+            // 오류 시뮬레이션 (첫 번째 아이템에서 발생할 수도 있음)
+        }
+        finally
+        {
+            IsBusy = false;
         }
     }
 

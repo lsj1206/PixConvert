@@ -13,6 +13,7 @@
     <sys:String x:Key="List_Preview">미리보기</sys:String>
     <sys:String x:Key="List_Size">크기</sys:String>
     <sys:String x:Key="List_Path">경로</sys:String>
+    <sys:String x:Key="List_Status">상태</sys:String>
 
     <!-- Sidebar : Dashboard -->
     <sys:String x:Key="Status_Total">파일 합계</sys:String>
@@ -26,6 +27,8 @@
     <sys:String x:Key="Btn_ApplyRename">변경 적용</sys:String>
     <sys:String x:Key="Btn_UndoRename">변경 취소</sys:String>
     <sys:String x:Key="Btn_ReorderIndex">번호 재정렬</sys:String>
+    <sys:String x:Key="Btn_ConvertSetting">변환 설정</sys:String>
+    <sys:String x:Key="Btn_Convert">변환</sys:String>
 
     <!-- 사이드바 : 정렬 -->
     <sys:String x:Key="Sort_Label">정렬</sys:String>
@@ -109,4 +112,11 @@
     <sys:String x:Key="Dlg_Btn_AddFolder">폴더 추가</sys:String>
     <sys:String x:Key="Dlg_Ask_FolderOptionSingle">'{0}'폴더를 어떻게 추가하시겠습니까?</sys:String>
     <sys:String x:Key="Dlg_Ask_FolderOptionMulti">'{0}'폴더 외 {1}개의 폴더를 어떻게 추가하시겠습니까?</sys:String>
+
+    <!-- 상태 -->
+    <sys:String x:Key="Status_Pending">대기</sys:String>
+    <sys:String x:Key="Status_Processing">변환 중</sys:String>
+    <sys:String x:Key="Status_Success">완료</sys:String>
+    <sys:String x:Key="Status_Error">실패</sys:String>
+    <sys:String x:Key="Status_Unsupported">미지원</sys:String>
 </ResourceDictionary>

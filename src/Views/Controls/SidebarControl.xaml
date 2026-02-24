@@ -77,6 +77,17 @@
                     <Button Content="{DynamicResource Btn_ListClear}"
                             Command="{Binding ListClearCommand}"
                             Style="{StaticResource SidebarButtonStyle}" />
+
+                    <Separator Margin="0,0,0,8" />
+
+                    <!-- 변환 설정 및 변환 -->
+                    <Button Content="{DynamicResource Btn_ConvertSetting}"
+                            Command="{Binding OpenConvertSettingCommand}"
+                            Style="{StaticResource SidebarButtonStyle}" />
+                    <Button Content="{DynamicResource Btn_Convert}"
+                            Command="{Binding ConvertFilesCommand}"
+                            Foreground="{DynamicResource SystemControlForegroundAccentBrush}"
+                            Style="{StaticResource SidebarButtonStyle}" />
                 </StackPanel>
 
                 <Separator Margin="0,0,0,8" />

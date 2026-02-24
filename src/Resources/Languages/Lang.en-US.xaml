@@ -13,6 +13,7 @@
     <sys:String x:Key="List_Preview">Preview</sys:String>
     <sys:String x:Key="List_Size">Size</sys:String>
     <sys:String x:Key="List_Path">Path</sys:String>
+    <sys:String x:Key="List_Status">Status</sys:String>
 
     <!-- Sidebar : Dashboard -->
     <sys:String x:Key="Status_Total">Total File</sys:String>
@@ -26,6 +27,8 @@
     <sys:String x:Key="Btn_ApplyRename">Apply Rename</sys:String>
     <sys:String x:Key="Btn_UndoRename">Undo Rename</sys:String>
     <sys:String x:Key="Btn_ReorderIndex">Reorder Index</sys:String>
+    <sys:String x:Key="Btn_ConvertSetting">Convert Setting</sys:String>
+    <sys:String x:Key="Btn_Convert">Convert</sys:String>
 
     <!-- Sidebar : Sort -->
     <sys:String x:Key="Sort_Label">Sort</sys:String>
@@ -109,6 +112,13 @@ Existing indexes will be reset.</sys:String>
     <sys:String x:Key="Dlg_Btn_AddFolder">Add Folder</sys:String>
     <sys:String x:Key="Dlg_Ask_FolderOptionSingle">How would you like to add '{0}'?</sys:String>
     <sys:String x:Key="Dlg_Ask_FolderOptionMulti">How would you like to add '{0}' and {1} other folders?</sys:String>
+
+    <!-- Status -->
+    <sys:String x:Key="Status_Pending">Ready</sys:String>
+    <sys:String x:Key="Status_Processing">Processing</sys:String>
+    <sys:String x:Key="Status_Success">Success</sys:String>
+    <sys:String x:Key="Status_Error">Error</sys:String>
+    <sys:String x:Key="Status_Unsupported">N/A</sys:String>
 </ResourceDictionary>
 
 
