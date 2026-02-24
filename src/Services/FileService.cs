@@ -106,31 +106,31 @@ public class FileService : IFileService
 
         // 1. JPEG (FF D8 FF)
         if (header[0] == 0xFF && header[1] == 0xD8 && header[2] == 0xFF)
-            return "jpg";
+            return "JPEG";
 
         // 2. PNG 판별 (89 50 4E 47)
         if (bytesRead >= 4 && header[0] == 0x89 && header[1] == 0x50 && header[2] == 0x4E && header[3] == 0x47)
-            return "png";
+            return "PNG";
 
         // 3. GIF 판별 (47 49 46 38)
         if (bytesRead >= 4 && header[0] == 0x47 && header[1] == 0x49 && header[2] == 0x46 && header[3] == 0x38)
-            return "gif";
+            return "GIF";
 
         // 4. BMP 판별 (42 4D)
         if (header[0] == 0x42 && header[1] == 0x4D)
-            return "bmp";
+            return "BMP";
 
         // 5. TIFF 판별 (49 49 2A 00 또는 4D 4D 00 2A)
         if (bytesRead >= 4 &&
             ((header[0] == 0x49 && header[1] == 0x49 && header[2] == 0x2A) ||
              (header[0] == 0x4D && header[1] == 0x4D && header[3] == 0x2A)))
-            return "tiff";
+            return "TIFF";
 
-        // 6. WEBP 판별 (RIFF .... WEBP)
+        // 6. WebP 판별 (RIFF .... WebP)
         if (bytesRead >= 12 &&
             header[0] == 0x52 && header[1] == 0x49 && header[2] == 0x46 && header[3] == 0x46 &&
             header[8] == 0x57 && header[9] == 0x45 && header[10] == 0x42 && header[11] == 0x50)
-            return "webp";
+            return "WebP";
 
         return "-";
     }

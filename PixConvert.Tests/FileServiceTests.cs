@@ -54,8 +54,8 @@ public class FileServiceTests : IDisposable
         string result = await _fileService.AnalyzeSignatureAsync(fakePngPath);
 
         // Assert (검증)
-        // 파일의 '이름'이 아니라 '바이트 헤더'를 읽었으므로 반드시 "jpg"가 나와야 합니다.
-        Assert.Equal("jpg", result);
+        // 파일의 '이름'이 아니라 '바이트 헤더'를 읽었으므로 반드시 "JPEG"가 나와야 합니다.
+        Assert.Equal("JPEG", result);
     }
 
     [Fact]
@@ -70,7 +70,7 @@ public class FileServiceTests : IDisposable
         string result = await _fileService.AnalyzeSignatureAsync(fakeJpgPath);
 
         // Assert (검증)
-        Assert.Equal("png", result);
+        Assert.Equal("PNG", result);
     }
 
     [Fact]
