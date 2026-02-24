@@ -2,6 +2,9 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
+    <!-- App/Window Common -->
+    <sys:String x:Key="App_Title">PixConvert</sys:String>
+
     <!-- List -->
     <sys:String x:Key="List_Index">Index</sys:String>
     <sys:String x:Key="List_Name">Name</sys:String>
@@ -58,6 +61,7 @@ Edits are reset when the rule is changed.</sys:String>
     <sys:String x:Key="Msg_ClearList">Clearing list.</sys:String>
     <sys:String x:Key="Msg_NoRuleChanges">No rule changes detected.</sys:String>
     <sys:String x:Key="Msg_NoChangeHistory">No change history found.</sys:String>
+    <sys:String x:Key="Msg_Error_Occurred">An error occurred: {0}</sys:String>
     <sys:String x:Key="Msg_ApplyingChanges">Applying name changes...</sys:String>
     <sys:String x:Key="Msg_ApplyingProgress">Applying name changes... ({0:0}%)</sys:String>
     <sys:String x:Key="Msg_LoadingFile">Loading file...</sys:String>
@@ -80,6 +84,8 @@ Edits are reset when the rule is changed.</sys:String>
     <sys:String x:Key="Dlg_No">No</sys:String>
     <sys:String x:Key="Dlg_Confirm">Confirm</sys:String>
     <sys:String x:Key="Dlg_Cancel">Cancel</sys:String>
+    <sys:String x:Key="Err_Fatal_Init">An error occurred while starting the application:\n{0}</sys:String>
+    <sys:String x:Key="Err_Fatal_Title">Startup Error</sys:String>
 
     <sys:String x:Key="Dlg_Title_AddFile">Add File</sys:String>
     <sys:String x:Key="Dlg_Title_AddFolder">Add Folder</sys:String>

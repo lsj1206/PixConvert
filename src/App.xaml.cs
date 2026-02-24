@@ -144,8 +144,8 @@ public partial class App : Application
         catch (Exception ex)
         {
             Log.Fatal(ex, GetLogString("Log_App_FatalInit"));
-            MessageBox.Show($"애플리케이션 시작 중 오류가 발생했습니다:\n{ex.Message}",
-                            "시작 오류", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show(string.Format(GetLogString("Err_Fatal_Init"), ex.Message),
+                            GetLogString("Err_Fatal_Title"), MessageBoxButton.OK, MessageBoxImage.Error);
             Shutdown();
         }
     }

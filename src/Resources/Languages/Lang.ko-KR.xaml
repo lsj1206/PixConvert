@@ -2,6 +2,9 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
+    <!-- 앱/윈도우 공통 -->
+    <sys:String x:Key="App_Title">PixConvert</sys:String>
+
     <!-- 리스트 -->
     <sys:String x:Key="List_Index">번호</sys:String>
     <sys:String x:Key="List_Name">이름</sys:String>
@@ -58,6 +61,7 @@
     <sys:String x:Key="Msg_ClearList">목록을 전부 제거합니다.</sys:String>
     <sys:String x:Key="Msg_NoRuleChanges">규칙 변경 사항이 없습니다.</sys:String>
     <sys:String x:Key="Msg_NoChangeHistory">이름이 변경된 기록이 없습니다.</sys:String>
+    <sys:String x:Key="Msg_Error_Occurred">작업 중 오류 발생: {0}</sys:String>
     <sys:String x:Key="Msg_ApplyingChanges">이름 변경 적용 중...</sys:String>
     <sys:String x:Key="Msg_ApplyingProgress">이름 변경 적용 중... ({0:0}%)</sys:String>
     <sys:String x:Key="Msg_LoadingFile">파일 불러오는 중...</sys:String>
@@ -80,6 +84,8 @@
     <sys:String x:Key="Dlg_No">아니오</sys:String>
     <sys:String x:Key="Dlg_Confirm">확인</sys:String>
     <sys:String x:Key="Dlg_Cancel">취소</sys:String>
+    <sys:String x:Key="Err_Fatal_Init">애플리케이션 시작 중 오류가 발생했습니다:\n{0}</sys:String>
+    <sys:String x:Key="Err_Fatal_Title">시작 오류</sys:String>
 
     <sys:String x:Key="Dlg_Title_AddFile">파일 추가</sys:String>
     <sys:String x:Key="Dlg_Title_AddFolder">폴더 추가</sys:String>

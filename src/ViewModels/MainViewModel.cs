@@ -173,7 +173,7 @@ public partial class MainViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            _snackbarService.Show($"작업 중 오류 발생: {ex.Message}", Services.SnackbarType.Error);
+            _snackbarService.Show(string.Format(GetString("Msg_Error_Occurred"), ex.Message), Services.SnackbarType.Error);
         }
         finally
         {
