@@ -42,13 +42,13 @@ public partial class MainViewModel : ObservableObject
     /// 하위 뷰모델로 이동된 명령들을 상위에서도 참조할 수 있도록 브릿지(Bridge) 명령 정의 가능
     /// 또는 View에서 직접 하위 VM의 명령에 바인딩함.
     /// <summary>선택된 파일들을 목록에서 제거하는 명령</summary>
-    public IRelayCommand DeleteFilesCommand { get; }
+    public IAsyncRelayCommand DeleteFilesCommand { get; }
 
     /// <summary>파일 목록을 비우는 명령</summary>
     public IRelayCommand ListClearCommand { get; }
 
     /// <summary>목록의 순번을 현재 정렬 기준으로 재설정하는 명령</summary>
-    public IRelayCommand ReorderNumberCommand { get; }
+    public IAsyncRelayCommand ReorderNumberCommand { get; }
 
     /// <summary>특정 컬럼 클릭 시 해당 컬럼 기준으로 정렬을 수행하는 명령</summary>
     public IRelayCommand<SortType> SortByColumnCommand { get; }
@@ -90,9 +90,9 @@ public partial class MainViewModel : ObservableObject
             val => IsBusy = val);
 
         // 목록 조작 명령 초기화 (목록 데이터 직접 핸들링)
-        DeleteFilesCommand = new RelayCommand<System.Collections.IList>(DeleteFiles, _ => !IsBusy);
+        DeleteFilesCommand = new AsyncRelayCommand<System.Collections.IList>(DeleteFilesAsync, _ => !IsBusy);
         ListClearCommand = new AsyncRelayCommand(ListClearAsync, () => !IsBusy);
-        ReorderNumberCommand = new RelayCommand(ReorderNumber, () => !IsBusy && !Settings.ShowMismatchOnly);
+        ReorderNumberCommand = new AsyncRelayCommand(ReorderNumberAsync, () => !IsBusy && !Settings.ShowMismatchOnly);
         SortByColumnCommand = new RelayCommand<SortType>(SortByColumn);
 
         // 언어 변경 시 설정 옵션의 텍스트들을 갱신하기 위한 연동
@@ -139,7 +139,7 @@ public partial class MainViewModel : ObservableObject
     /// 설정에 따라 삭제 확인 대화상자를 표시할 수 있습니다.
     /// </summary>
     /// <param name="items">제거할 아이템 목록 (IList 타입)</param>
-    private async void DeleteFiles(System.Collections.IList? items)
+    private async Task DeleteFilesAsync(System.Collections.IList? items)
     {
         if (items == null || items.Count == 0) return;
 
@@ -175,7 +175,7 @@ public partial class MainViewModel : ObservableObject
     /// <summary>
     /// 현재 목록의 표시 순서에 따라 파일의 인덱스(순번)를 다시 부여합니다.
     /// </summary>
-    private async void ReorderNumber()
+    private async Task ReorderNumberAsync()
     {
         if (FileList.Items.Count == 0) return;
 

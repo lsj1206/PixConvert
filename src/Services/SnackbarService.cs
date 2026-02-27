@@ -28,14 +28,14 @@ public class SnackbarService : ISnackbarService
     /// </summary>
     public async void Show(string message, SnackbarType type = SnackbarType.Info, int durationMs = 3000)
     {
-        // 1. 새로운 세션 시작 및 이전 작업 취소
-        long sessionId = Interlocked.Increment(ref _currentSessionId);
-        _sessionCts?.Cancel();
-        _sessionCts = new CancellationTokenSource();
-        var cts = _sessionCts.Token;
-
         try
         {
+            // 1. 새로운 세션 시작 및 이전 작업 취소
+            long sessionId = Interlocked.Increment(ref _currentSessionId);
+            _sessionCts?.Cancel();
+            _sessionCts = new CancellationTokenSource();
+            var cts = _sessionCts.Token;
+
             // 2. UI 상태를 원자적으로(Atomically) 변경
             await Application.Current.Dispatcher.InvokeAsync(async () =>
             {
@@ -73,6 +73,10 @@ public class SnackbarService : ISnackbarService
             }
         }
         catch (OperationCanceledException) { /* 신규 알림에 밀려남 */ }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Snackbar_Show_Error: {ex.Message}");
+        }
     }
 
     /// <summary>
@@ -80,18 +84,25 @@ public class SnackbarService : ISnackbarService
     /// </summary>
     public async void ShowProgress(string message)
     {
-        // 세션을 갱신하여 이전의 모든 비동기 업데이트 무효화
-        Interlocked.Increment(ref _currentSessionId);
-        _sessionCts?.Cancel();
-        _sessionCts = null; // 진행률은 명시적 종료까지 계속 유지됨
-
-        await Application.Current.Dispatcher.InvokeAsync(() =>
+        try
         {
-            _viewModel.Message = message;
-            _viewModel.Type = SnackbarType.Info;
-            _viewModel.IsVisible = true;
-            _viewModel.IsAnimating = true;
-        });
+            // 세션을 갱신하여 이전의 모든 비동기 업데이트 무효화
+            Interlocked.Increment(ref _currentSessionId);
+            _sessionCts?.Cancel();
+            _sessionCts = null; // 진행률은 명시적 종료까지 계속 유지됨
+
+            await Application.Current.Dispatcher.InvokeAsync(() =>
+            {
+                _viewModel.Message = message;
+                _viewModel.Type = SnackbarType.Info;
+                _viewModel.IsVisible = true;
+                _viewModel.IsAnimating = true;
+            });
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Snackbar_ShowProgress_Error: {ex.Message}");
+        }
     }
 
     /// <summary>

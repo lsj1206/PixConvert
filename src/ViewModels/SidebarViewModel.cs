@@ -34,9 +34,9 @@ public partial class SidebarViewModel : ObservableObject
     private readonly Action<bool> _isBusySetter;
 
     /// <summary>파일들을 개별적으로 선택하여 목록에 추가하는 명령</summary>
-    public IRelayCommand AddFilesCommand { get; }
+    public IAsyncRelayCommand AddFilesCommand { get; }
     /// <summary>폴더를 선택하여 내부의 파일들을 목록에 추가하는 명령</summary>
-    public IRelayCommand AddFolderCommand { get; }
+    public IAsyncRelayCommand AddFolderCommand { get; }
     /// <summary>변환 설정 대화상자를 여는 명령</summary>
     public IRelayCommand OpenConvertSettingCommand { get; }
     /// <summary>목록에 있는 파일들의 변환 작업을 시작하는 비동기 명령</summary>
@@ -69,8 +69,8 @@ public partial class SidebarViewModel : ObservableObject
         _isBusySetter = isBusySetter;
 
         // 명령 초기화: Busy 상태에 따른 실행 가능 여부 설정
-        AddFilesCommand = new RelayCommand(AddFiles, () => !IsBusy);
-        AddFolderCommand = new RelayCommand(AddFolder, () => !IsBusy);
+        AddFilesCommand = new AsyncRelayCommand(AddFilesAsync, () => !IsBusy);
+        AddFolderCommand = new AsyncRelayCommand(AddFolderAsync, () => !IsBusy);
         OpenConvertSettingCommand = new RelayCommand(OpenConvertSetting);
         ConvertFilesCommand = new AsyncRelayCommand(ConvertFilesAsync, () => !IsBusy);
 
@@ -103,7 +103,7 @@ public partial class SidebarViewModel : ObservableObject
     /// <summary>
     /// 파일 열기 대화상자를 통해 사용자가 선택한 파일들을 목록에 추가합니다.
     /// </summary>
-    private async void AddFiles()
+    private async Task AddFilesAsync()
     {
         var dialog = new OpenFileDialog { Multiselect = true, Title = GetString("Dlg_Title_AddFile") };
         if (dialog.ShowDialog() == true) await ProcessFiles(dialog.FileNames);
@@ -112,7 +112,7 @@ public partial class SidebarViewModel : ObservableObject
     /// <summary>
     /// 폴더 선택 대화상자를 통해 사용자가 선택한 폴더 내의 파일들을 목록에 추가합니다.
     /// </summary>
-    private async void AddFolder()
+    private async Task AddFolderAsync()
     {
         var dialog = new OpenFolderDialog { Multiselect = true, Title = GetString("Dlg_Title_AddFolder") };
         if (dialog.ShowDialog() == true) await ProcessFiles(dialog.FolderNames);
