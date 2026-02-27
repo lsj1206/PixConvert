@@ -15,7 +15,7 @@
     <sys:String x:Key="List_Path">Path</sys:String>
     <sys:String x:Key="List_Status">Status</sys:String>
 
-    <!-- Sidebar : Dashboard -->
+    <!-- Header : Dashboard -->
     <sys:String x:Key="Status_Total">Total File</sys:String>
     <sys:String x:Key="Status_Unknown">Unknown File</sys:String>
 
@@ -34,7 +34,7 @@
     <sys:String x:Key="Sort_Label">Sort</sys:String>
     <sys:String x:Key="Sort_Asc">Asc</sys:String>
     <sys:String x:Key="Sort_Desc">Desc</sys:String>
-    <!-- Sort : Dropdown -->
+    <!-- Sort : Sort Dropdown -->
     <sys:String x:Key="Sort_Index">Index</sys:String>
     <sys:String x:Key="Sort_NameIndex">Name-Index</sys:String>
     <sys:String x:Key="Sort_NamePath">Name-Path</sys:String>
@@ -83,12 +83,12 @@ Edits are reset when the rule is changed.</sys:String>
     <sys:String x:Key="Msg_OperationComplete">{0} operation complete.</sys:String>
 
     <!-- Dialogs -->
+    <sys:String x:Key="Err_Fatal_Title">Startup Error</sys:String>
+    <sys:String x:Key="Err_Fatal_Init">An error occurred while starting the application:\n{0}</sys:String>
     <sys:String x:Key="Dlg_Yes">Yes</sys:String>
     <sys:String x:Key="Dlg_No">No</sys:String>
     <sys:String x:Key="Dlg_Confirm">Confirm</sys:String>
     <sys:String x:Key="Dlg_Cancel">Cancel</sys:String>
-    <sys:String x:Key="Err_Fatal_Init">An error occurred while starting the application:\n{0}</sys:String>
-    <sys:String x:Key="Err_Fatal_Title">Startup Error</sys:String>
 
     <sys:String x:Key="Dlg_Title_AddFile">Add File</sys:String>
     <sys:String x:Key="Dlg_Title_AddFolder">Add Folder</sys:String>
