@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using PixConvert.Models;
 using PixConvert.Services;
 
@@ -10,7 +11,7 @@ namespace PixConvert.ViewModels;
 /// <summary>
 /// 파일 목록 데이터의 관리와 조작(추가, 삭제, 정렬, 이동 등)을 담당하는 뷰모델입니다.
 /// </summary>
-public class FileListViewModel
+public class FileListViewModel : ObservableObject
 {
     private readonly ObservableCollection<FileItem> _items = new();
     // 중복 체크용 HashSet (O(1) 탐색, 대소문자 무시)
@@ -19,12 +20,25 @@ public class FileListViewModel
     /// <summary>화면에 바인딩되는 읽기 전용 파일 아이템 컬렉션입니다.</summary>
     public ReadOnlyObservableCollection<FileItem> Items { get; }
 
+    /// <summary>목록의 전체 파일 수</summary>
+    public int TotalCount => Items.Count;
+
+    /// <summary>미지원(시그니처 미판별) 파일 수</summary>
+    public int UnsupportedCount => Items.Count(x => x.FileSignature == "-");
+
     // 다음에 추가될 아이템의 기본 순번
     private int _nextAddIndex = 1;
 
     public FileListViewModel()
     {
         Items = new ReadOnlyObservableCollection<FileItem>(_items);
+
+        // 컬렉션 변경 시 통계 갱신 및 UI 알림
+        _items.CollectionChanged += (s, e) =>
+        {
+            OnPropertyChanged(nameof(TotalCount));
+            OnPropertyChanged(nameof(UnsupportedCount));
+        };
     }
 
     /// <summary>

@@ -31,14 +31,14 @@
                 BorderThickness="1">
 
             <StackPanel Orientation="Vertical">
-                
+
                 <!-- 파일 추가/삭제 -->
                 <StackPanel Orientation="Vertical">
                     <Button Content="{DynamicResource Btn_AddFile}"
-                            Command="{Binding AddFilesCommand}"
+                            Command="{Binding Sidebar.AddFilesCommand}"
                             Style="{StaticResource SidebarButtonStyle}" />
                     <Button Content="{DynamicResource Btn_AddFolder}"
-                            Command="{Binding AddFolderCommand}"
+                            Command="{Binding Sidebar.AddFolderCommand}"
                             Style="{StaticResource SidebarButtonStyle}" />
 
                     <Button Content="{DynamicResource Btn_ListClear}"
@@ -49,10 +49,10 @@
 
                     <!-- 변환 설정 및 변환 -->
                     <Button Content="{DynamicResource Btn_ConvertSetting}"
-                            Command="{Binding OpenConvertSettingCommand}"
+                            Command="{Binding Sidebar.OpenConvertSettingCommand}"
                             Style="{StaticResource SidebarButtonStyle}" />
                     <Button Content="{DynamicResource Btn_Convert}"
-                            Command="{Binding ConvertFilesCommand}"
+                            Command="{Binding Sidebar.ConvertFilesCommand}"
                             Foreground="{DynamicResource SystemControlForegroundAccentBrush}"
                             Style="{StaticResource SidebarButtonStyle}" />
                 </StackPanel>

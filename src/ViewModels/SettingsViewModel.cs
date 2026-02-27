@@ -17,10 +17,6 @@ public partial class SettingsViewModel : ObservableObject
     {
         _languageService = languageService;
 
-        // 초기 언어 설정
-        var systemLang = _languageService.GetSystemLanguage();
-        SelectedLanguage = Languages.FirstOrDefault(l => l.Code == systemLang) ?? Languages[0];
-
         // 정렬 옵션 초기화
         UpdateSortOptions();
         SelectedSortOption = SortOptions[0];
@@ -33,28 +29,13 @@ public partial class SettingsViewModel : ObservableObject
     }
 
 
-    public ObservableCollection<LanguageOption> Languages { get; } =
-    [
-        new() { Display = "EN", Code = "en-US" },
-        new() { Display = "KR", Code = "ko-KR" }
-    ];
-
     public ObservableCollection<SortOption> SortOptions { get; } = [];
 
-    [ObservableProperty] private LanguageOption selectedLanguage;
     [ObservableProperty] private SortOption selectedSortOption;
     [ObservableProperty] private bool isSortAscending = true;
     [ObservableProperty] private bool showMismatchOnly = false;
     [ObservableProperty] private bool confirmDeletion = true;
 
-    partial void OnSelectedLanguageChanged(LanguageOption value)
-    {
-        if (value != null)
-        {
-            _languageService.ChangeLanguage(value.Code);
-            UpdateSortOptions();
-        }
-    }
 
     public void UpdateSortOptions()
     {

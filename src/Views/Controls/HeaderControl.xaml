@@ -32,7 +32,7 @@
                                Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
                                VerticalAlignment="Center"
                                Margin="0,0,8,0"/>
-                    <TextBlock Text="{Binding TotalCount}"
+                    <TextBlock Text="{Binding Header.TotalCount}"
                                FontSize="12"
                                FontWeight="SemiBold"
                                Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}"
@@ -46,7 +46,7 @@
                                Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
                                VerticalAlignment="Center"
                                Margin="0,0,8,0"/>
-                    <TextBlock Text="{Binding UnsupportedCount}"
+                    <TextBlock Text="{Binding Header.UnsupportedCount}"
                                FontSize="12"
                                FontWeight="SemiBold"
                                Foreground="#FF5555"
@@ -74,8 +74,8 @@
                            Margin="0,0,4,0" />
 
                 <!-- 언어 선택 (Segmented 제어 방식) -->
-                <ListBox ItemsSource="{Binding Settings.Languages}"
-                         SelectedItem="{Binding Settings.SelectedLanguage}"
+                <ListBox ItemsSource="{Binding Header.Languages}"
+                         SelectedItem="{Binding Header.SelectedLanguage}"
                          Margin="0,0,-4,0"
                          Background="Transparent"
                          BorderThickness="0"
