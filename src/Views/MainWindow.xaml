@@ -21,8 +21,8 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="36" />  <!-- 헤더 영역 높이 -->
-            <RowDefinition Height="42"/>   <!-- 빈 공간 -->
+            <RowDefinition Height="40" />  <!-- 헤더 영역 높이 -->
+            <RowDefinition Height="38"/>   <!-- 빈 공간 -->
             <RowDefinition />              <!-- 메인 콘텐츠 영역 -->
         </Grid.RowDefinitions>
 
