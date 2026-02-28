@@ -114,7 +114,7 @@ public partial class App : Application
         // [ViewModels] 화면 상태 관리 뷰모델 등록
         services.AddTransient<MainViewModel>();
         services.AddSingleton<SnackbarViewModel>();
-        services.AddSingleton<SettingsViewModel>();
+        services.AddSingleton<FileListViewModel>();
 
         // [Views] UI 창 등록
         services.AddSingleton<MainWindow>();

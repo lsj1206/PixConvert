@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.Extensions.Logging;
 using PixConvert.Models;
 using PixConvert.Services;
 
@@ -11,7 +11,7 @@ namespace PixConvert.ViewModels;
 /// <summary>
 /// 파일 목록 데이터의 관리와 조작(추가, 삭제, 정렬, 이동 등)을 담당하는 뷰모델입니다.
 /// </summary>
-public class FileListViewModel : ObservableObject
+public class FileListViewModel : ViewModelBase
 {
     private readonly ObservableCollection<FileItem> _items = new();
     // 중복 체크용 HashSet (O(1) 탐색, 대소문자 무시)
@@ -29,7 +29,8 @@ public class FileListViewModel : ObservableObject
     // 다음에 추가될 아이템의 기본 순번
     private int _nextAddIndex = 1;
 
-    public FileListViewModel()
+    public FileListViewModel(ILanguageService languageService, ILogger<FileListViewModel> logger)
+        : base(languageService, logger)
     {
         Items = new ReadOnlyObservableCollection<FileItem>(_items);
 

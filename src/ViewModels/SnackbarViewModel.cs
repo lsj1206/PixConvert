@@ -1,4 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.Extensions.Logging;
+using PixConvert.Models;
 using PixConvert.Services;
 
 namespace PixConvert.ViewModels;
@@ -6,8 +8,12 @@ namespace PixConvert.ViewModels;
 /// <summary>
 /// 화면 상단에 표시되는 알림(스낵바)의 상태 데이터를 관리하는 뷰모델입니다.
 /// </summary>
-public partial class SnackbarViewModel : ObservableObject
+public partial class SnackbarViewModel : ViewModelBase
 {
+    public SnackbarViewModel(ILanguageService languageService, ILogger<SnackbarViewModel> logger)
+        : base(languageService, logger)
+    {
+    }
     /// <summary>표시할 메시지 내용</summary>
     [ObservableProperty]
     private string message = string.Empty;

@@ -112,7 +112,7 @@ public partial class FileListControl : UserControl
                     if (selectedItems.Count > 0)
                     {
                         // [데이터 보호] 필터링 중에는 순서 변경을 위한 드래그를 금지함
-                        if (Window.GetWindow(this)?.DataContext is MainViewModel vm && vm.Settings.ShowMismatchOnly)
+                        if (Window.GetWindow(this)?.DataContext is MainViewModel vm && vm.Sidebar.ShowMismatchOnly)
                         {
                             return;
                         }

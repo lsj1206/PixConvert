@@ -1,4 +1,4 @@
-using System;
+using System.Collections.ObjectModel;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,24 +14,29 @@ namespace PixConvert.ViewModels;
 /// <summary>
 /// 좌측 사이드바의 액션(파일 추가, 변환, 설정 오픈 등)을 관리하는 뷰모델입니다.
 /// </summary>
-public partial class SidebarViewModel : ObservableObject
+public partial class SidebarViewModel : ViewModelBase
 {
     private const int MaxItemCount = 10000;
 
-    private readonly ILogger<SidebarViewModel> _logger;
     private readonly IDialogService _dialogService;
     private readonly ISnackbarService _snackbarService;
-    private readonly ILanguageService _languageService;
     private readonly IFileProcessingService _fileProcessingService;
     private readonly ISortingService _sortingService;
 
     // 타 뷰모델 참조
     private readonly FileListViewModel _fileList;
-    private readonly SettingsViewModel _settings;
 
-    // 부모 상태 제어용 델리게이트
-    private readonly Func<AppStatus> _isStatusChecker;
-    private readonly Action<AppStatus> _isStatusSetter;
+    /// <summary>지원되는 정렬 컬럼 및 옵션 목록</summary>
+    public ObservableCollection<SortOption> SortOptions { get; } = [];
+
+    /// <summary>현재 선택된 정렬 기준</summary>
+    [ObservableProperty] private SortOption _selectedSortOption;
+
+    /// <summary>오름차순/내림차순 정렬 여부</summary>
+    [ObservableProperty] private bool _isSortAscending = true;
+
+    /// <summary>확장자-시그니처 불일치 파일만 필터링하여 보여줄지 여부</summary>
+    [ObservableProperty] private bool _showMismatchOnly = false;
 
     /// <summary>파일들을 개별적으로 선택하여 목록에 추가하는 명령</summary>
     public IAsyncRelayCommand AddFilesCommand { get; }
@@ -52,42 +57,37 @@ public partial class SidebarViewModel : ObservableObject
         ILanguageService languageService,
         IFileProcessingService fileProcessingService,
         ISortingService sortingService,
-        FileListViewModel fileList,
-        SettingsViewModel settings,
-        Func<AppStatus> isStatusChecker,
-        Action<AppStatus> isStatusSetter)
+        FileListViewModel fileList)
+        : base(languageService, logger)
     {
-        _logger = logger;
         _dialogService = dialogService;
         _snackbarService = snackbarService;
-        _languageService = languageService;
         _fileProcessingService = fileProcessingService;
         _sortingService = sortingService;
         _fileList = fileList;
-        _settings = settings;
-        _isStatusChecker = isStatusChecker;
-        _isStatusSetter = isStatusSetter;
+
+        // 정렬 옵션 초기화
+        UpdateSortOptions();
+        SelectedSortOption = SortOptions[0];
 
         // 명령 초기화: Busy 상태에 따른 실행 가능 여부 설정
-        AddFilesCommand = new AsyncRelayCommand(AddFilesAsync, () => _isStatusChecker() == AppStatus.Idle);
-        AddFolderCommand = new AsyncRelayCommand(AddFolderAsync, () => _isStatusChecker() == AppStatus.Idle);
+        AddFilesCommand = new AsyncRelayCommand(AddFilesAsync, () => CurrentStatus == AppStatus.Idle);
+        AddFolderCommand = new AsyncRelayCommand(AddFolderAsync, () => CurrentStatus == AppStatus.Idle);
         OpenConvertSettingCommand = new RelayCommand(OpenConvertSetting);
-        ConvertFilesCommand = new AsyncRelayCommand(ConvertFilesAsync, () => _isStatusChecker() == AppStatus.Idle);
+        ConvertFilesCommand = new AsyncRelayCommand(ConvertFilesAsync, () => CurrentStatus == AppStatus.Idle);
 
-        // 설정(Settings) 변경 감지: 정렬 옵션이나 필터 옵션 변경 시 즉시 목록에 반영
-        _settings.PropertyChanged += (s, e) =>
-        {
-            if (e.PropertyName == nameof(SettingsViewModel.SelectedSortOption) ||
-                e.PropertyName == nameof(SettingsViewModel.IsSortAscending))
-            {
-                SortFiles();
-            }
-            else if (e.PropertyName == nameof(SettingsViewModel.ShowMismatchOnly))
-            {
-                ApplyFilter();
-            }
-        };
     }
+
+    /// <summary>상태 변경 시 사이드바 명령들의 실행 가능 여부를 자동으로 갱신합니다.</summary>
+    protected override void OnStatusChanged(AppStatus newStatus)
+    {
+        NotifyCommandsStateChanged();
+    }
+
+    /// <summary>필터 또는 정렬 값이 변경될 때 UI를 갱신합니다.</summary>
+    partial void OnSelectedSortOptionChanged(SortOption value) => SortFiles();
+    partial void OnIsSortAscendingChanged(bool value) => SortFiles();
+    partial void OnShowMismatchOnlyChanged(bool value) => ApplyFilter();
 
     /// <summary>외부 상태 변경에 따라 사이드바 명령들의 실행 가능 여부를 강제로 갱신합니다.</summary>
     public void NotifyCommandsStateChanged()
@@ -121,7 +121,7 @@ public partial class SidebarViewModel : ObservableObject
     /// <param name="paths">추가할 파일 또는 폴더의 절대 경로 컬렉션</param>
     public async Task ProcessFiles(IEnumerable<string> paths)
     {
-        _isStatusSetter(AppStatus.FileAdd);
+        RequestStatus(AppStatus.FileAdd);
         try
         {
             var pathList = paths.ToList();
@@ -161,7 +161,7 @@ public partial class SidebarViewModel : ObservableObject
         }
         finally
         {
-            _isStatusSetter(AppStatus.Idle);
+            RequestStatus(AppStatus.Idle);
         }
     }
 
@@ -200,7 +200,7 @@ public partial class SidebarViewModel : ObservableObject
     {
         if (_fileList.Items.Count == 0) return;
 
-        _isStatusSetter(AppStatus.Converting); // 애플리케이션을 변환 중 상태로 전환
+        RequestStatus(AppStatus.Converting); // 애플리케이션을 변환 중 상태로 전환
         try
         {
             foreach (var item in _fileList.Items)
@@ -223,7 +223,7 @@ public partial class SidebarViewModel : ObservableObject
         }
         finally
         {
-            _isStatusSetter(AppStatus.Idle); // 작업 완료 후 대기 상태로 복구
+            RequestStatus(AppStatus.Idle); // 작업 완료 후 대기 상태로 복구
         }
     }
 
@@ -232,8 +232,8 @@ public partial class SidebarViewModel : ObservableObject
     /// </summary>
     private void SortFiles()
     {
-        if (_settings.SelectedSortOption == null) return;
-        _fileList.Sorting(_sortingService, _settings.SelectedSortOption, _settings.IsSortAscending);
+        if (SelectedSortOption == null) return;
+        _fileList.Sorting(_sortingService, SelectedSortOption, IsSortAscending);
         ApplyFilter();
     }
 
@@ -243,7 +243,7 @@ public partial class SidebarViewModel : ObservableObject
     private void ApplyFilter()
     {
         var view = System.Windows.Data.CollectionViewSource.GetDefaultView(_fileList.Items);
-        if (_settings.ShowMismatchOnly)
+        if (ShowMismatchOnly)
         {
             view.Filter = item => item is FileItem fileItem && fileItem.IsMismatch;
         }
@@ -254,6 +254,25 @@ public partial class SidebarViewModel : ObservableObject
         view.Refresh();
     }
 
-    /// <summary>지정된 키에 해당하는 로컬라이징 문자열을 가져옵니다.</summary>
-    private string GetString(string key) => _languageService.GetString(key);
+    /// <summary>
+    /// 현재 언어 설정에 맞게 정렬 옵션의 표시 텍스트를 최신화합니다.
+    /// </summary>
+    public void UpdateSortOptions()
+    {
+        var currentType = SelectedSortOption?.Type ?? SortType.AddIndex;
+
+        SortOptions.Clear();
+        SortOptions.Add(new SortOption { Display = GetString("Sort_Index"), Type = SortType.AddIndex });
+        SortOptions.Add(new SortOption { Display = GetString("Sort_NameIndex"), Type = SortType.NameIndex });
+        SortOptions.Add(new SortOption { Display = GetString("Sort_NamePath"), Type = SortType.NamePath });
+        SortOptions.Add(new SortOption { Display = GetString("Sort_PathIndex"), Type = SortType.PathIndex });
+        SortOptions.Add(new SortOption { Display = GetString("Sort_PathName"), Type = SortType.PathName });
+        SortOptions.Add(new SortOption { Display = GetString("Sort_Size"), Type = SortType.Size });
+        SortOptions.Add(new SortOption { Display = GetString("List_ExtensionToPath"), Type = SortType.Extension });
+        SortOptions.Add(new SortOption { Display = GetString("List_FileSignature"), Type = SortType.Signature });
+
+        // 기존에 선택되어 있던 타입을 유지하거나 기본값(순번)으로 설정
+        SelectedSortOption = SortOptions.FirstOrDefault(x => x.Type == currentType) ?? SortOptions[0];
+    }
+
 }

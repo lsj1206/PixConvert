@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging;
 using PixConvert.Models;
 using PixConvert.Services;
 
@@ -13,21 +14,16 @@ namespace PixConvert.ViewModels;
 /// <summary>
 /// 애플리케이션의 메인 쉘(Shell) 역할을 하며, 하위 기능별 뷰모델들을 관리하고 조정하는 최상위 뷰모델입니다.
 /// </summary>
-public partial class MainViewModel : ObservableObject
+public partial class MainViewModel : ViewModelBase, IRecipient<AppStatusRequestMessage>
 {
-    private readonly ILanguageService _languageService;
     private readonly IDialogService _dialogService;
     private readonly ISnackbarService _snackbarService;
-    private readonly ILogger<MainViewModel> _logger;
 
     /// <summary>하단 알림(스낵바) 제어를 위한 뷰모델</summary>
     public SnackbarViewModel Snackbar { get; }
 
     /// <summary>파일 목록 데이터 도메인 관리 뷰모델</summary>
-    public FileListViewModel FileList { get; } = new();
-
-    /// <summary>환경 설정 및 공유 상태 관리를 위한 뷰모델</summary>
-    public SettingsViewModel Settings { get; }
+    public FileListViewModel FileList { get; }
 
     /// <summary>좌측 사이드바 액션 관리 뷰모델</summary>
     public SidebarViewModel Sidebar { get; }
@@ -35,12 +31,11 @@ public partial class MainViewModel : ObservableObject
     /// <summary>상단 헤더 정보 및 언어 설정 관리 뷰모델</summary>
     public HeaderViewModel Header { get; }
 
-    /// <summary>애플리케이션의 현재 상세 작업 상태 (장기 작업/단기 작업 구분)</summary>
-    [ObservableProperty]
-    private AppStatus _currentStatus = AppStatus.Idle;
+
+    /// <summary>목록에서 아이템 삭제 시 확인 대화상자를 표시할지 여부</summary>
+    [ObservableProperty] private bool _confirmDeletion = true;
 
     /// 하위 뷰모델로 이동된 명령들을 상위에서도 참조할 수 있도록 브릿지(Bridge) 명령 정의 가능
-    /// 또는 View에서 직접 하위 VM의 명령에 바인딩함.
     /// <summary>선택된 파일들을 목록에서 제거하는 명령</summary>
     public IAsyncRelayCommand DeleteFilesCommand { get; }
 
@@ -64,35 +59,35 @@ public partial class MainViewModel : ObservableObject
         ISortingService sortingService,
         IFileProcessingService fileProcessingService,
         ILogger<SidebarViewModel> sidebarLogger,
+        ILogger<HeaderViewModel> headerLogger,
         SnackbarViewModel snackbarViewModel,
-        SettingsViewModel settingsViewModel)
+        FileListViewModel fileListViewModel)
+        : base(languageService, logger)
     {
-        _logger = logger;
         _dialogService = dialogService;
         _snackbarService = snackbarService;
-        _languageService = languageService;
+        FileList = fileListViewModel;
 
         Snackbar = snackbarViewModel;
-        Settings = settingsViewModel;
 
         // 하위 뷰모델 초기화 (기능별 역할 분담)
-        Header = new HeaderViewModel(languageService, FileList);
+        Header = new HeaderViewModel(languageService, headerLogger, FileList);
         Sidebar = new SidebarViewModel(
             sidebarLogger,
-            dialogService,
-            snackbarService,
+            _dialogService,
+            _snackbarService,
             languageService,
             fileProcessingService,
             sortingService,
-            FileList,
-            Settings,
-            () => CurrentStatus,
-            val => CurrentStatus = val);
+            FileList);
+
+        // 다른 VM의 상태 변경 요청을 수신 등록
+        WeakReferenceMessenger.Default.Register<AppStatusRequestMessage>(this);
 
         // 목록 조작 명령 초기화 (목록 데이터 직접 핸들링)
         DeleteFilesCommand = new AsyncRelayCommand<System.Collections.IList>(DeleteFilesAsync, _ => CurrentStatus == AppStatus.Idle);
         ListClearCommand = new AsyncRelayCommand(ListClearAsync, () => CurrentStatus == AppStatus.Idle);
-        ReorderNumberCommand = new AsyncRelayCommand(ReorderNumberAsync, () => CurrentStatus == AppStatus.Idle && !Settings.ShowMismatchOnly);
+        ReorderNumberCommand = new AsyncRelayCommand(ReorderNumberAsync, () => CurrentStatus == AppStatus.Idle && !Sidebar.ShowMismatchOnly);
         SortByColumnCommand = new RelayCommand<SortType>(SortByColumn);
 
         // 언어 변경 시 설정 옵션의 텍스트들을 갱신하기 위한 연동
@@ -100,27 +95,36 @@ public partial class MainViewModel : ObservableObject
         {
             if (e.PropertyName == nameof(HeaderViewModel.SelectedLanguage))
             {
-                Settings.UpdateSortOptions();
+                Sidebar.UpdateSortOptions();
             }
         };
 
         // 설정 값 변경에 따라 명령의 실행 가능 여부(CanExecute) 동적으로 갱신
-        Settings.PropertyChanged += (s, e) =>
+        Sidebar.PropertyChanged += (s, e) =>
         {
-            if (e.PropertyName == nameof(SettingsViewModel.ShowMismatchOnly))
+            if (e.PropertyName == nameof(SidebarViewModel.ShowMismatchOnly))
             {
                 ReorderNumberCommand.NotifyCanExecuteChanged();
             }
         };
     }
 
-    /// <summary>상태 변경 시 UI 알림 및 관련 명령들의 실행 가능 여부를 갱신합니다.</summary>
-    partial void OnCurrentStatusChanged(AppStatus value)
+    /// <summary>상태 변경 시 UI 알림 및 관련 명령들의 실행 가능 여부를 갱신하며, 앱 전체에 변경 사항을 방송합니다.</summary>
+    protected override void OnStatusChanged(AppStatus newStatus)
     {
+        // 모든 뷰모델에게 상태 변경을 알림 (동기화)
+        WeakReferenceMessenger.Default.Send(new AppStatusChangedMessage(newStatus));
+
         Sidebar.NotifyCommandsStateChanged();
         DeleteFilesCommand.NotifyCanExecuteChanged();
         ListClearCommand.NotifyCanExecuteChanged();
         ReorderNumberCommand.NotifyCanExecuteChanged();
+    }
+
+    /// <summary>다른 뷰모델들로부터의 상태 변경 요청을 처리합니다.</summary>
+    public void Receive(AppStatusRequestMessage message)
+    {
+        CurrentStatus = message.NewStatus;
     }
 
     /// <summary>탐색기 드롭 이벤트 처리용 브릿지 메서드</summary>
@@ -150,7 +154,7 @@ public partial class MainViewModel : ObservableObject
         int count = itemsToDelete.Count;
 
         // 삭제 전 사용자 확인 (설정 활성화 시)
-        if (Settings.ConfirmDeletion)
+        if (ConfirmDeletion)
         {
             string message = count == 1 ? GetString("Dlg_Ask_DeleteSingle") : string.Format(GetString("Dlg_Ask_DeleteMulti"), count);
             if (!await _dialogService.ShowConfirmationAsync(message, GetString("Dlg_Title_DeleteConfirm"))) return;
@@ -218,22 +222,20 @@ public partial class MainViewModel : ObservableObject
     private void SortByColumn(SortType type)
     {
         // 동일한 컬럼 클릭 시 오름차순/내림차순 토글
-        if (Settings.SelectedSortOption?.Type == type)
-            Settings.IsSortAscending = !Settings.IsSortAscending;
+        if (Sidebar.SelectedSortOption?.Type == type)
+            Sidebar.IsSortAscending = !Sidebar.IsSortAscending;
         else
         {
             // 새로운 컬럼 클릭 시 해당 기준으로 정렬 설정
-            var option = Settings.SortOptions.FirstOrDefault(x => x.Type == type);
+            var option = Sidebar.SortOptions.FirstOrDefault(x => x.Type == type);
             if (option != null)
             {
-                Settings.SelectedSortOption = option;
-                Settings.IsSortAscending = true;
+                Sidebar.SelectedSortOption = option;
+                Sidebar.IsSortAscending = true;
             }
         }
     }
 
     #endregion
 
-    /// <summary>지정된 키에 해당하는 로컬라이징 문자열을 언어 서비스에서 가져옵니다.</summary>
-    private string GetString(string key) => _languageService.GetString(key);
 }
