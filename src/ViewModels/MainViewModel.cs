@@ -35,9 +35,9 @@ public partial class MainViewModel : ObservableObject
     /// <summary>상단 헤더 정보 및 언어 설정 관리 뷰모델</summary>
     public HeaderViewModel Header { get; }
 
-    /// <summary>애플리케이션이 현재 작업 중(파일 처리, 변환 등)인지 여부</summary>
+    /// <summary>애플리케이션의 현재 상세 작업 상태 (장기 작업/단기 작업 구분)</summary>
     [ObservableProperty]
-    private bool isBusy = false;
+    private AppStatus _currentStatus = AppStatus.Idle;
 
     /// 하위 뷰모델로 이동된 명령들을 상위에서도 참조할 수 있도록 브릿지(Bridge) 명령 정의 가능
     /// 또는 View에서 직접 하위 VM의 명령에 바인딩함.
@@ -86,13 +86,13 @@ public partial class MainViewModel : ObservableObject
             sortingService,
             FileList,
             Settings,
-            () => IsBusy,
-            val => IsBusy = val);
+            () => CurrentStatus,
+            val => CurrentStatus = val);
 
         // 목록 조작 명령 초기화 (목록 데이터 직접 핸들링)
-        DeleteFilesCommand = new AsyncRelayCommand<System.Collections.IList>(DeleteFilesAsync, _ => !IsBusy);
-        ListClearCommand = new AsyncRelayCommand(ListClearAsync, () => !IsBusy);
-        ReorderNumberCommand = new AsyncRelayCommand(ReorderNumberAsync, () => !IsBusy && !Settings.ShowMismatchOnly);
+        DeleteFilesCommand = new AsyncRelayCommand<System.Collections.IList>(DeleteFilesAsync, _ => CurrentStatus == AppStatus.Idle);
+        ListClearCommand = new AsyncRelayCommand(ListClearAsync, () => CurrentStatus == AppStatus.Idle);
+        ReorderNumberCommand = new AsyncRelayCommand(ReorderNumberAsync, () => CurrentStatus == AppStatus.Idle && !Settings.ShowMismatchOnly);
         SortByColumnCommand = new RelayCommand<SortType>(SortByColumn);
 
         // 언어 변경 시 설정 옵션의 텍스트들을 갱신하기 위한 연동
@@ -114,8 +114,8 @@ public partial class MainViewModel : ObservableObject
         };
     }
 
-    /// <summary>Busy 상태 변경 시 하위 뷰모델 및 명령들의 상태를 동기화합니다.</summary>
-    partial void OnIsBusyChanged(bool value)
+    /// <summary>상태 변경 시 UI 알림 및 관련 명령들의 실행 가능 여부를 갱신합니다.</summary>
+    partial void OnCurrentStatusChanged(AppStatus value)
     {
         Sidebar.NotifyCommandsStateChanged();
         DeleteFilesCommand.NotifyCanExecuteChanged();
@@ -143,7 +143,10 @@ public partial class MainViewModel : ObservableObject
     {
         if (items == null || items.Count == 0) return;
 
-        var itemsToDelete = items.Cast<FileItem>().ToList();
+        CurrentStatus = AppStatus.Processing;
+        try
+        {
+            var itemsToDelete = items.Cast<FileItem>().ToList();
         int count = itemsToDelete.Count;
 
         // 삭제 전 사용자 확인 (설정 활성화 시)
@@ -155,6 +158,11 @@ public partial class MainViewModel : ObservableObject
 
         FileList.RemoveItems(itemsToDelete);
         _snackbarService.Show(string.Format(GetString("Msg_RemoveFile"), count), SnackbarType.Warning);
+        }
+        finally
+        {
+            CurrentStatus = AppStatus.Idle;
+        }
     }
 
     /// <summary>
@@ -167,8 +175,16 @@ public partial class MainViewModel : ObservableObject
         // 전체 삭제 전 사용자 확인
         if (await _dialogService.ShowConfirmationAsync(GetString("Dlg_Ask_ClearList"), GetString("Dlg_Title_ClearList")))
         {
-            FileList.Clear();
-            _snackbarService.Show(GetString("Msg_ClearList"), SnackbarType.Success);
+            CurrentStatus = AppStatus.Processing;
+            try
+            {
+                FileList.Clear();
+                _snackbarService.Show(GetString("Msg_ClearList"), SnackbarType.Success);
+            }
+            finally
+            {
+                CurrentStatus = AppStatus.Idle;
+            }
         }
     }
 
@@ -182,8 +198,16 @@ public partial class MainViewModel : ObservableObject
         // 재정렬 전 사용자 확인
         if (await _dialogService.ShowConfirmationAsync(GetString("Dlg_Ask_ReorderIndex"), GetString("Dlg_Title_ReorderIndex")))
         {
-            FileList.ReorderIndex();
-            _snackbarService.Show(GetString("Msg_ReorderIndex"), SnackbarType.Success);
+            CurrentStatus = AppStatus.Processing;
+            try
+            {
+                FileList.ReorderIndex();
+                _snackbarService.Show(GetString("Msg_ReorderIndex"), SnackbarType.Success);
+            }
+            finally
+            {
+                CurrentStatus = AppStatus.Idle;
+            }
         }
     }
 

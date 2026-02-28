@@ -50,10 +50,10 @@
             </Border>
         </Grid>
 
-        <!-- 입력 차단 레이어 (Busy 상태일 때 활성화) -->
+        <!-- 입력 차단 레이어 (AppStatus가 Idle이 아닐 때 활성화) -->
         <Grid Grid.Row="0" Grid.RowSpan="3"
               Background="#40FFFFFF"
-              Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}"
+              Visibility="{Binding CurrentStatus, Converter={StaticResource AppStatusToVisibilityConverter}}"
               IsHitTestVisible="True"
               Focusable="True" />
 

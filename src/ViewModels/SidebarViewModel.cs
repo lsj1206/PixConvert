@@ -30,8 +30,8 @@ public partial class SidebarViewModel : ObservableObject
     private readonly SettingsViewModel _settings;
 
     // 부모 상태 제어용 델리게이트
-    private readonly Func<bool> _isBusyChecker;
-    private readonly Action<bool> _isBusySetter;
+    private readonly Func<AppStatus> _isStatusChecker;
+    private readonly Action<AppStatus> _isStatusSetter;
 
     /// <summary>파일들을 개별적으로 선택하여 목록에 추가하는 명령</summary>
     public IAsyncRelayCommand AddFilesCommand { get; }
@@ -54,8 +54,8 @@ public partial class SidebarViewModel : ObservableObject
         ISortingService sortingService,
         FileListViewModel fileList,
         SettingsViewModel settings,
-        Func<bool> isBusyChecker,
-        Action<bool> isBusySetter)
+        Func<AppStatus> isStatusChecker,
+        Action<AppStatus> isStatusSetter)
     {
         _logger = logger;
         _dialogService = dialogService;
@@ -65,14 +65,14 @@ public partial class SidebarViewModel : ObservableObject
         _sortingService = sortingService;
         _fileList = fileList;
         _settings = settings;
-        _isBusyChecker = isBusyChecker;
-        _isBusySetter = isBusySetter;
+        _isStatusChecker = isStatusChecker;
+        _isStatusSetter = isStatusSetter;
 
         // 명령 초기화: Busy 상태에 따른 실행 가능 여부 설정
-        AddFilesCommand = new AsyncRelayCommand(AddFilesAsync, () => !IsBusy);
-        AddFolderCommand = new AsyncRelayCommand(AddFolderAsync, () => !IsBusy);
+        AddFilesCommand = new AsyncRelayCommand(AddFilesAsync, () => _isStatusChecker() == AppStatus.Idle);
+        AddFolderCommand = new AsyncRelayCommand(AddFolderAsync, () => _isStatusChecker() == AppStatus.Idle);
         OpenConvertSettingCommand = new RelayCommand(OpenConvertSetting);
-        ConvertFilesCommand = new AsyncRelayCommand(ConvertFilesAsync, () => !IsBusy);
+        ConvertFilesCommand = new AsyncRelayCommand(ConvertFilesAsync, () => _isStatusChecker() == AppStatus.Idle);
 
         // 설정(Settings) 변경 감지: 정렬 옵션이나 필터 옵션 변경 시 즉시 목록에 반영
         _settings.PropertyChanged += (s, e) =>
@@ -88,9 +88,6 @@ public partial class SidebarViewModel : ObservableObject
             }
         };
     }
-
-    /// <summary>부모 뷰모델의 Busy 여부를 확인합니다.</summary>
-    private bool IsBusy => _isBusyChecker();
 
     /// <summary>외부 상태 변경에 따라 사이드바 명령들의 실행 가능 여부를 강제로 갱신합니다.</summary>
     public void NotifyCommandsStateChanged()
@@ -124,7 +121,7 @@ public partial class SidebarViewModel : ObservableObject
     /// <param name="paths">추가할 파일 또는 폴더의 절대 경로 컬렉션</param>
     public async Task ProcessFiles(IEnumerable<string> paths)
     {
-        _isBusySetter(true);
+        _isStatusSetter(AppStatus.FileAdd);
         try
         {
             var pathList = paths.ToList();
@@ -164,7 +161,7 @@ public partial class SidebarViewModel : ObservableObject
         }
         finally
         {
-            _isBusySetter(false);
+            _isStatusSetter(AppStatus.Idle);
         }
     }
 
@@ -203,7 +200,7 @@ public partial class SidebarViewModel : ObservableObject
     {
         if (_fileList.Items.Count == 0) return;
 
-        _isBusySetter(true); // 애플리케이션을 Busy 상태로 전환
+        _isStatusSetter(AppStatus.Converting); // 애플리케이션을 변환 중 상태로 전환
         try
         {
             foreach (var item in _fileList.Items)
@@ -226,7 +223,7 @@ public partial class SidebarViewModel : ObservableObject
         }
         finally
         {
-            _isBusySetter(false); // 작업 완료 후 Busy 상태 해제
+            _isStatusSetter(AppStatus.Idle); // 작업 완료 후 대기 상태로 복구
         }
     }
 
