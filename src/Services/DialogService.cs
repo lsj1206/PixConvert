@@ -42,4 +42,26 @@ public class DialogService : IDialogService
         var result = await dialog.ShowAsync();
         return result == ContentDialogResult.Primary;
     }
+
+    /// <summary>
+    /// 커스텀 UI 요소를 본문으로 하는 다이얼로그를 표시합니다.
+    /// </summary>
+    public async Task<bool> ShowCustomDialogAsync(object content, string title, string? primaryText = null, string? closeText = null)
+    {
+        var window = Application.Current.MainWindow;
+        if (window == null) return false;
+
+        var dialog = new ContentDialog
+        {
+            Title = title,
+            Content = content,
+            PrimaryButtonText = primaryText,
+            CloseButtonText = closeText ?? _languageService.GetString("Dlg_Close"),
+            DefaultButton = ContentDialogButton.Primary,
+            Owner = window
+        };
+
+        var result = await dialog.ShowAsync();
+        return result == ContentDialogResult.Primary;
+    }
 }

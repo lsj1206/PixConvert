@@ -42,6 +42,11 @@
     <sys:String x:Key="Sort_PathName">경로-이름</sys:String>
     <sys:String x:Key="Sort_Size">크기</sys:String>
 
+    <!-- 변환 설정 -->
+    <sys:String x:Key="Setting_TargetFormat">변환 포맷</sys:String>
+    <sys:String x:Key="Setting_Quality">변환 품질</sys:String>
+    <sys:String x:Key="Setting_Overwrite">원본 파일 덮어쓰기</sys:String>
+
     <!-- 사이드바 : 옵션 -->
     <sys:String x:Key="Option_ManualEdit">개별 변경 모드</sys:String>
     <sys:String x:Key="Option_ConfirmDeletion">삭제 확인 표시</sys:String>

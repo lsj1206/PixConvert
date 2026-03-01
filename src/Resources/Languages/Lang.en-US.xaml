@@ -42,6 +42,11 @@
     <sys:String x:Key="Sort_PathName">Path-Name</sys:String>
     <sys:String x:Key="Sort_Size">Size</sys:String>
 
+    <!-- Conversion Settings -->
+    <sys:String x:Key="Setting_TargetFormat">Target Format</sys:String>
+    <sys:String x:Key="Setting_Quality">Conversion Quality</sys:String>
+    <sys:String x:Key="Setting_Overwrite">Overwrite original files</sys:String>
+
     <!-- Sidebar : Option -->
     <sys:String x:Key="Option_ManualEdit">Manual Edit</sys:String>
     <sys:String x:Key="Option_ConfirmDeletion">Confirm Delete</sys:String>

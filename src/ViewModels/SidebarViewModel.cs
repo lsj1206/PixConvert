@@ -43,7 +43,7 @@ public partial class SidebarViewModel : ViewModelBase
     /// <summary>폴더를 선택하여 내부의 파일들을 목록에 추가하는 명령</summary>
     public IAsyncRelayCommand AddFolderCommand { get; }
     /// <summary>변환 설정 대화상자를 여는 명령</summary>
-    public IRelayCommand OpenConvertSettingCommand { get; }
+    public IAsyncRelayCommand OpenConvertSettingCommand { get; }
     /// <summary>목록에 있는 파일들의 변환 작업을 시작하는 비동기 명령</summary>
     public IAsyncRelayCommand ConvertFilesCommand { get; }
 
@@ -73,7 +73,7 @@ public partial class SidebarViewModel : ViewModelBase
         // 명령 초기화: Busy 상태에 따른 실행 가능 여부 설정
         AddFilesCommand = new AsyncRelayCommand(AddFilesAsync, () => CurrentStatus == AppStatus.Idle);
         AddFolderCommand = new AsyncRelayCommand(AddFolderAsync, () => CurrentStatus == AppStatus.Idle);
-        OpenConvertSettingCommand = new RelayCommand(OpenConvertSetting);
+        OpenConvertSettingCommand = new AsyncRelayCommand(OpenConvertSettingAsync, () => CurrentStatus == AppStatus.Idle);
         ConvertFilesCommand = new AsyncRelayCommand(ConvertFilesAsync, () => CurrentStatus == AppStatus.Idle);
 
     }
@@ -94,6 +94,7 @@ public partial class SidebarViewModel : ViewModelBase
     {
         AddFilesCommand.NotifyCanExecuteChanged();
         AddFolderCommand.NotifyCanExecuteChanged();
+        OpenConvertSettingCommand.NotifyCanExecuteChanged();
         ConvertFilesCommand.NotifyCanExecuteChanged();
     }
 
@@ -185,11 +186,29 @@ public partial class SidebarViewModel : ViewModelBase
     }
 
     /// <summary>
-    /// 변환 설정 대화상자를 엽니다. (현재 미구현)
+    /// 변환 설정 대화상자를 엽니다.
     /// </summary>
-    private void OpenConvertSetting()
+    private async Task OpenConvertSettingAsync()
     {
-        // TODO: ContentDialog 구현 예정
+        // 뷰모델 인스턴스화 (간단한 DI 바이패스)
+        var vm = new ConvertSettingViewModel(_languageService, Microsoft.Extensions.Logging.Abstractions.NullLogger<ConvertSettingViewModel>.Instance);
+
+        // 뷰 생성 및 DataContext 맵핑
+        var view = new PixConvert.Views.Controls.ConvertSettingDialog { DataContext = vm };
+
+        // 다이얼로그 호출
+        bool isSaved = await _dialogService.ShowCustomDialogAsync(
+            content: view,
+            title: GetString("Btn_ConvertSetting"),
+            primaryText: GetString("Dlg_Confirm"), // TODO: '저장' 버튼용 리소스로 대체 가능
+            closeText: GetString("Dlg_Cancel")
+        );
+
+        if (isSaved)
+        {
+            // TODO: 저장된 설정을 어딘가에 보관하거나 사용할 수 있습니다.
+            // _snackbarService.Show("설정이 저장되었습니다.", SnackbarType.Success);
+        }
     }
 
     /// <summary>
