@@ -44,7 +44,7 @@ public struct FileProcessingProgress
 /// <summary>
 /// 입력된 경로들을 분석하여 유효한 파일 목록을 추출하고 처리하는 서비스 인터페이스입니다.
 /// </summary>
-public interface IFileProcessingService
+public interface IFileAnalyzerService
 {
     /// <summary>
     /// 파일 및 폴더 경로 목록을 입력받아 재귀적으로 파일을 추출하고 FileItem 목록을 생성합니다.

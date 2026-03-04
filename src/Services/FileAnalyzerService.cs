@@ -11,17 +11,17 @@ using PixConvert.Models;
 namespace PixConvert.Services;
 
 /// <summary>
-/// IFileProcessingService의 상세 구현 클래스입니다.
+/// IFileAnalyzerService의 상세 구현 클래스입니다.
 /// </summary>
-public class FileProcessingService : IFileProcessingService
+public class FileAnalyzerService : IFileAnalyzerService
 {
-    private readonly IFileService _fileService;
-    private readonly ILogger<FileProcessingService> _logger;
+    private readonly IFileScannerService _fileScannerService;
+    private readonly ILogger<FileAnalyzerService> _logger;
     private readonly ILanguageService _languageService;
 
-    public FileProcessingService(IFileService fileService, ILogger<FileProcessingService> logger, ILanguageService languageService)
+    public FileAnalyzerService(IFileScannerService fileScannerService, ILogger<FileAnalyzerService> logger, ILanguageService languageService)
     {
-        _fileService = fileService;
+        _fileScannerService = fileScannerService;
         _logger = logger;
         _languageService = languageService;
     }
@@ -60,7 +60,7 @@ public class FileProcessingService : IFileProcessingService
                 async (i, ct) =>
                 {
                     // Single Touch: 스트림 하나로 메타데이터 + 시그니처 동시 획득
-                    items[i] = await _fileService.CreateFileItemAsync(otherPaths[i]);
+                    items[i] = await _fileScannerService.CreateFileItemAsync(otherPaths[i]);
 
                     // 스레드 안전한 진행률 보고 (100개 단위)
                     int current = Interlocked.Increment(ref processedCount);
@@ -86,7 +86,7 @@ public class FileProcessingService : IFileProcessingService
             {
                 foreach (var folderPath in folders)
                 {
-                    folderFiles.AddRange(_fileService.GetFilesInFolder(folderPath));
+                    folderFiles.AddRange(_fileScannerService.GetFilesInFolder(folderPath));
                 }
             });
 
@@ -97,7 +97,7 @@ public class FileProcessingService : IFileProcessingService
                 var folderItems = new List<FileItem>(folderFileCount);
                 foreach (var fileInfo in folderFiles)
                 {
-                    var item = _fileService.CreateFileItem(fileInfo);
+                    var item = _fileScannerService.CreateFileItem(fileInfo);
                     if (item != null) folderItems.Add(item);
                 }
 
@@ -110,7 +110,7 @@ public class FileProcessingService : IFileProcessingService
                 // 시그니처 분석만 병렬로 수행 (각 FileItem의 FileSignature 필드를 채움)
                 await Parallel.ForEachAsync(folderItems, options, async (item, ct) =>
                 {
-                    item.FileSignature = await _fileService.AnalyzeSignatureAsync(item.Path);
+                    item.FileSignature = await _fileScannerService.AnalyzeSignatureAsync(item.Path);
 
                     // 스레드 안전한 진행률 보고
                     int current = Interlocked.Increment(ref processedCount);

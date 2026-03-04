@@ -10,15 +10,15 @@ namespace PixConvert.Services;
 /// <summary>
 /// 파일 시스템 조작을 담당하는 서비스 클래스입니다.
 /// </summary>
-public class FileService : IFileService
+public class FileScannerService : IFileScannerService
 {
     // 파일 크기 단위 정의
     private static readonly string[] SizeSuffixes = ["B", "KB", "MB", "GB", "TB"];
 
-    private readonly ILogger<FileService> _logger;
+    private readonly ILogger<FileScannerService> _logger;
     private readonly ILanguageService _languageService;
 
-    public FileService(ILogger<FileService> logger, ILanguageService languageService)
+    public FileScannerService(ILogger<FileScannerService> logger, ILanguageService languageService)
     {
         _logger = logger;
         _languageService = languageService;

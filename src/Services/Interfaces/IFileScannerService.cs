@@ -8,7 +8,7 @@ namespace PixConvert.Services;
 /// <summary>
 /// 파일 시스템의 실제 조작(읽기 등)을 담당하는 서비스의 인터페이스입니다.
 /// </summary>
-public interface IFileService
+public interface IFileScannerService
 {
     /// <summary>
     /// FileInfo 객체를 기반으로 목록에 표시할 FileItem 객체를 생성합니다.

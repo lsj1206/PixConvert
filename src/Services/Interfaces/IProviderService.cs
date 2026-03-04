@@ -7,7 +7,7 @@ namespace PixConvert.Services.Interfaces;
 /// <summary>
 /// 이미지 변환을 수행하는 각 엔진(Provider)의 공통 인터페이스입니다.
 /// </summary>
-public interface IFileConversionService
+public interface IProviderService
 {
     /// <summary>
     /// 지정된 설정에 따라 파일을 변환합니다.

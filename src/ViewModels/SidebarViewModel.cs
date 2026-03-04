@@ -20,7 +20,7 @@ public partial class SidebarViewModel : ViewModelBase
 
     private readonly IDialogService _dialogService;
     private readonly ISnackbarService _snackbarService;
-    private readonly IFileProcessingService _fileProcessingService;
+    private readonly IFileAnalyzerService _fileAnalyzerService;
     private readonly ISortingService _sortingService;
 
     // 타 뷰모델 참조
@@ -55,14 +55,14 @@ public partial class SidebarViewModel : ViewModelBase
         IDialogService dialogService,
         ISnackbarService snackbarService,
         ILanguageService languageService,
-        IFileProcessingService fileProcessingService,
+        IFileAnalyzerService fileAnalyzerService,
         ISortingService sortingService,
         FileListViewModel fileList)
         : base(languageService, logger)
     {
         _dialogService = dialogService;
         _snackbarService = snackbarService;
-        _fileProcessingService = fileProcessingService;
+        _fileAnalyzerService = fileAnalyzerService;
         _sortingService = sortingService;
         _fileList = fileList;
 
@@ -136,7 +136,7 @@ public partial class SidebarViewModel : ViewModelBase
             });
 
             // 서비스 엔진을 통해 파일 스캔 및 데이터 객체 생성
-            var result = await _fileProcessingService.ProcessPathsAsync(
+            var result = await _fileAnalyzerService.ProcessPathsAsync(
                 paths,
                 MaxItemCount,
                 _fileList.Items.Count,

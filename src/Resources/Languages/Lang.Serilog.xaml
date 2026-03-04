@@ -17,18 +17,18 @@
     <system:String x:Key="Log_Main_DeleteRequest">[MainViewModel] 선택된 항목 삭제 요청. 삭제 개수: {Count}</system:String>
     <system:String x:Key="Log_Main_ClearList">[MainViewModel] 리스트 초기화 승인됨. 모든 항목 제거 완료.</system:String>
 
-    <!-- FileService.cs -->
-    <system:String x:Key="Log_File_SignatureFail">[FileService] 시그니처 분석 실패. 파일: {Path}</system:String>
-    <system:String x:Key="Log_File_MetaFail">[FileService] 단일 스트림 메타데이터 접근 실패. 파일: {Path}</system:String>
-    <system:String x:Key="Log_File_FolderAccessFail">[FileService] 폴더 접근 권한 없음 무시됨: {DirPath}</system:String>
-    <system:String x:Key="Log_File_FolderTraverseFail">[FileService] 폴더 순회 중 예기치 않은 오류 발생: {DirPath}</system:String>
+    <!-- FileScannerService.cs -->
+    <system:String x:Key="Log_File_SignatureFail">[FileScannerService] 시그니처 분석 실패. 파일: {Path}</system:String>
+    <system:String x:Key="Log_File_MetaFail">[FileScannerService] 단일 스트림 메타데이터 접근 실패. 파일: {Path}</system:String>
+    <system:String x:Key="Log_File_FolderAccessFail">[FileScannerService] 폴더 접근 권한 없음 무시됨: {DirPath}</system:String>
+    <system:String x:Key="Log_File_FolderTraverseFail">[FileScannerService] 폴더 순회 중 예기치 않은 오류 발생: {DirPath}</system:String>
 
-    <!-- FileProcessingService.cs -->
-    <system:String x:Key="Log_Process_WmiDiskNumber">[FileProcessingService] WMI 물리 디스크 번호 매핑 시도. 드라이브: {DriveLetter}</system:String>
-    <system:String x:Key="Log_Process_WmiSsdCheck">[FileProcessingService] WMI 물리 디스크 유형 조회 완료. 디스크: {DiskNumber}, SSD 판단여부: {IsSsd}</system:String>
-    <system:String x:Key="Log_Process_WmiFail">[FileProcessingService] WMI 디스크 매핑 실패. 드라이브({DriveLetter})를 식별할 수 없어 HDD(안전)로 간주합니다.</system:String>
-    <system:String x:Key="Log_Process_WmiException">[FileProcessingService] WMI 디스크 조회 중 예외 발생. 경로({RootPath})를 판단할 수 없어 HDD(안전)로 간주합니다.</system:String>
-    <system:String x:Key="Log_Process_WmiUnknown">[FileProcessingService] WMI 디스크 유형을 특정할 수 없습니다. 디스크({DiskNumber})를 HDD(안전)로 간주합니다.</system:String>
-    <system:String x:Key="Log_Process_Parallelism">[FileProcessingService] 파일 처리용 스레드 수 최종 결정. 유형: {DriveType}, 병렬도(MaxDegree): {Parallelism}</system:String>
+    <!-- FileAnalyzerService.cs -->
+    <system:String x:Key="Log_Process_WmiDiskNumber">[FileAnalyzerService] WMI 물리 디스크 번호 매핑 시도. 드라이브: {DriveLetter}</system:String>
+    <system:String x:Key="Log_Process_WmiSsdCheck">[FileAnalyzerService] WMI 물리 디스크 유형 조회 완료. 디스크: {DiskNumber}, SSD 판단여부: {IsSsd}</system:String>
+    <system:String x:Key="Log_Process_WmiFail">[FileAnalyzerService] WMI 디스크 매핑 실패. 드라이브({DriveLetter})를 식별할 수 없어 HDD(안전)로 간주합니다.</system:String>
+    <system:String x:Key="Log_Process_WmiException">[FileAnalyzerService] WMI 디스크 조회 중 예외 발생. 경로({RootPath})를 판단할 수 없어 HDD(안전)로 간주합니다.</system:String>
+    <system:String x:Key="Log_Process_WmiUnknown">[FileAnalyzerService] WMI 디스크 유형을 특정할 수 없습니다. 디스크({DiskNumber})를 HDD(안전)로 간주합니다.</system:String>
+    <system:String x:Key="Log_Process_Parallelism">[FileAnalyzerService] 파일 처리용 스레드 수 최종 결정. 유형: {DriveType}, 병렬도(MaxDegree): {Parallelism}</system:String>
 
 </ResourceDictionary>

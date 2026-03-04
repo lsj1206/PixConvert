@@ -9,7 +9,7 @@ namespace PixConvert.Converters;
 /// <summary>
 /// FileConvertStatus 열거형 값을 지역화된 리소스 문자열로 변환합니다.
 /// </summary>
-public class StatusToTextConverter : IValueConverter
+public class FileStatusConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {

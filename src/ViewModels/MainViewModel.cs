@@ -57,7 +57,7 @@ public partial class MainViewModel : ViewModelBase, IRecipient<AppStatusRequestM
         ISnackbarService snackbarService,
         ILanguageService languageService,
         ISortingService sortingService,
-        IFileProcessingService fileProcessingService,
+        IFileAnalyzerService fileAnalyzerService,
         ILogger<SidebarViewModel> sidebarLogger,
         ILogger<HeaderViewModel> headerLogger,
         SnackbarViewModel snackbarViewModel,
@@ -77,7 +77,7 @@ public partial class MainViewModel : ViewModelBase, IRecipient<AppStatusRequestM
             _dialogService,
             _snackbarService,
             languageService,
-            fileProcessingService,
+            fileAnalyzerService,
             sortingService,
             FileList);
 

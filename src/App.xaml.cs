@@ -108,15 +108,15 @@ public partial class App : Application
         services.AddSingleton<IWindowService, WindowService>();
         services.AddSingleton<IDialogService, DialogService>();
         services.AddSingleton<ISnackbarService, SnackbarService>();
-        services.AddSingleton<IFileService, FileService>();
+        services.AddSingleton<IFileScannerService, FileScannerService>();
         services.AddSingleton<ISortingService, SortingService>();
         services.AddSingleton<ILanguageService, LanguageService>();
-        services.AddSingleton<IFileProcessingService, FileProcessingService>();
+        services.AddSingleton<IFileAnalyzerService, FileAnalyzerService>();
 
         // [Conversion Engine] 변환 엔진 관련 서비스 등록
-        services.AddSingleton<SkiaConversionProvider>();
-        services.AddSingleton<NetVipsConversionProvider>();
-        services.AddSingleton<ConversionProviderFactory>();
+        services.AddSingleton<SkiaSharpProvider>();
+        services.AddSingleton<NetVipsProvider>();
+        services.AddSingleton<EngineSelector>();
 
         // [ViewModels] 화면 상태 관리 뷰모델 등록
         services.AddTransient<MainViewModel>();

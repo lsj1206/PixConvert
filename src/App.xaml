@@ -16,7 +16,7 @@
             </ResourceDictionary.MergedDictionaries>
             <converters:AppStatusToVisibilityConverter x:Key="AppStatusToVisibilityConverter" />
             <converters:AppStatusToInverseBooleanConverter x:Key="AppStatusToInverseBooleanConverter" />
-            <converters:StatusToTextConverter x:Key="StatusToTextConverter" />
+            <converters:FileStatusConverter x:Key="FileStatusConverter" />
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         </ResourceDictionary>
     </Application.Resources>

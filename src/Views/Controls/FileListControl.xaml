@@ -9,7 +9,7 @@
 
     <UserControl.Resources>
         <!-- 컨버터 -->
-        <converters:StatusToTextConverter x:Key="StatusToTextConverter"/>
+        <converters:FileStatusConverter x:Key="FileStatusConverter"/>
 
         <!-- 파일 리스트 스타일 -->
         <SolidColorBrush x:Key="ItemHoverBackground" Color="#E5F3FF"/>
@@ -171,7 +171,7 @@
 
                                     <!-- 텍스트 -->
                                     <TextBlock x:Name="StatusLabel"
-                                               Text="{Binding Status, Converter={StaticResource StatusToTextConverter}}"
+                                               Text="{Binding Status, Converter={StaticResource FileStatusConverter}}"
                                                HorizontalAlignment="Center"
                                                VerticalAlignment="Center"
                                                FontSize="11"
