@@ -6,6 +6,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using ModernWpf;
 using PixConvert.Services;
+using PixConvert.Services.Providers;
+using PixConvert.Services.Interfaces;
 using PixConvert.ViewModels;
 
 namespace PixConvert;
@@ -111,6 +113,11 @@ public partial class App : Application
         services.AddSingleton<ILanguageService, LanguageService>();
         services.AddSingleton<IFileProcessingService, FileProcessingService>();
 
+        // [Conversion Engine] 변환 엔진 관련 서비스 등록
+        services.AddSingleton<SkiaConversionProvider>();
+        services.AddSingleton<NetVipsConversionProvider>();
+        services.AddSingleton<ConversionProviderFactory>();
+
         // [ViewModels] 화면 상태 관리 뷰모델 등록
         services.AddTransient<MainViewModel>();
         services.AddSingleton<SnackbarViewModel>();
@@ -153,6 +160,14 @@ public partial class App : Application
     protected override void OnExit(ExitEventArgs e)
     {
         Log.Information(GetLogString("Log_App_End"));
+
+        try
+        {
+            // NetVips 네이티브 자원 명시적 해제
+            NetVips.NetVips.Shutdown();
+        }
+        catch { }
+
         Log.CloseAndFlush();
         base.OnExit(e);
     }
