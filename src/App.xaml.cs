@@ -108,6 +108,7 @@ public partial class App : Application
         services.AddSingleton<IWindowService, WindowService>();
         services.AddSingleton<IDialogService, DialogService>();
         services.AddSingleton<ISnackbarService, SnackbarService>();
+        services.AddSingleton<IAppConfigService, AppConfigService>();
         services.AddSingleton<IFileScannerService, FileScannerService>();
         services.AddSingleton<ISortingService, SortingService>();
         services.AddSingleton<ILanguageService, LanguageService>();
@@ -122,6 +123,8 @@ public partial class App : Application
         services.AddTransient<MainViewModel>();
         services.AddSingleton<SnackbarViewModel>();
         services.AddSingleton<FileListViewModel>();
+        services.AddSingleton<SidebarViewModel>();
+        services.AddTransient<ConvertSettingViewModel>(); // 다이얼로그용
 
         // [Views] UI 창 등록
         services.AddSingleton<MainWindow>();

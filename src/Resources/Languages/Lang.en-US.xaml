@@ -45,7 +45,41 @@
     <!-- Conversion Settings -->
     <sys:String x:Key="Setting_TargetFormat">Target Format</sys:String>
     <sys:String x:Key="Setting_Quality">Conversion Quality</sys:String>
-    <sys:String x:Key="Setting_Overwrite">Overwrite original files</sys:String>
+    <sys:String x:Key="Setting_KeepExif">Preserve Metadata (EXIF)</sys:String>
+    <sys:String x:Key="Setting_BackgroundColor">Background Color (Transparency)</sys:String>
+
+    <!-- Preset Related -->
+    <sys:String x:Key="Setting_PresetSelect">Preset Selection</sys:String>
+    <sys:String x:Key="Setting_PresetList">Select Preset</sys:String>
+    <sys:String x:Key="Setting_PresetName">Rename</sys:String>
+    <sys:String x:Key="Btn_PresetApply">Apply</sys:String>
+    <sys:String x:Key="Btn_PresetCreate">Create Preset</sys:String>
+    <sys:String x:Key="Btn_PresetCopy">Copy Preset</sys:String>
+    <sys:String x:Key="Btn_PresetDelete">Delete Preset</sys:String>
+    <sys:String x:Key="Setting_GroupStandard">Standard Image Format</sys:String>
+    <sys:String x:Key="Setting_GroupAnimation">Animation Image Format</sys:String>
+    <sys:String x:Key="Setting_OtherOptions">Other Options</sys:String>
+
+    <!-- Background Color and Browse -->
+    <sys:String x:Key="Bg_White">White</sys:String>
+    <sys:String x:Key="Bg_Black">Black</sys:String>
+    <sys:String x:Key="Bg_Custom">Custom (HEX)</sys:String>
+    <sys:String x:Key="Btn_Browse">Browse...</sys:String>
+
+    <!-- Options (Overwrite, Path, CPU) -->
+    <sys:String x:Key="Setting_OverwritePolicy">Duplicate File Policy</sys:String>
+    <sys:String x:Key="Setting_Overwrite_Overwrite">Overwrite</sys:String>
+    <sys:String x:Key="Setting_Overwrite_Suffix">Add Suffix (Recommend)</sys:String>
+    <sys:String x:Key="Setting_Overwrite_Skip">Skip</sys:String>
+    <sys:String x:Key="Setting_OutputPath">Output Path Options</sys:String>
+    <sys:String x:Key="Setting_OutputDir_Sub">Create Subfolder (PixConvert_...)</sys:String>
+    <sys:String x:Key="Setting_OutputDir_Same">Same as Original Folder</sys:String>
+    <sys:String x:Key="Setting_OutputDir_Custom">Custom Path</sys:String>
+    <sys:String x:Key="Setting_CpuUsage">CPU Workload (Performance)</sys:String>
+    <sys:String x:Key="Setting_Cpu_Max">Maximum (All Cores)</sys:String>
+    <sys:String x:Key="Setting_Cpu_Optimal">Optimal (70~80% Rec.)</sys:String>
+    <sys:String x:Key="Setting_Cpu_Half">Half (50% Usage)</sys:String>
+    <sys:String x:Key="Setting_Cpu_Min">Minimum (Background)</sys:String>
 
     <!-- Sidebar : Option -->
     <sys:String x:Key="Option_ManualEdit">Manual Edit</sys:String>

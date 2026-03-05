@@ -17,6 +17,8 @@
             <converters:AppStatusToVisibilityConverter x:Key="AppStatusToVisibilityConverter" />
             <converters:AppStatusToInverseBooleanConverter x:Key="AppStatusToInverseBooleanConverter" />
             <converters:FileStatusConverter x:Key="FileStatusConverter" />
+            <converters:UpperCaseConverter x:Key="UpperCaseConverter" />
+            <converters:EnumToBoolConverter x:Key="EnumToBoolConverter" />
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         </ResourceDictionary>
     </Application.Resources>

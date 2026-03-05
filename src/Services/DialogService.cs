@@ -51,6 +51,16 @@ public class DialogService : IDialogService
         var window = Application.Current.MainWindow;
         if (window == null) return false;
 
+        // ContentDialog의 기본 폭 제약으로 인해 내부 UserControl 폭이 잘리는 문제를 방지한다.
+        double minWidth = 0;
+        if (content is FrameworkElement fe)
+        {
+            if (!double.IsNaN(fe.Width) && fe.Width > 0)
+                minWidth = fe.Width;
+            else if (fe.MinWidth > 0)
+                minWidth = fe.MinWidth;
+        }
+
         var dialog = new ContentDialog
         {
             Title = title,
@@ -60,6 +70,16 @@ public class DialogService : IDialogService
             DefaultButton = ContentDialogButton.Primary,
             Owner = window
         };
+        if (minWidth > 0)
+        {
+            // ContentDialog 템플릿의 기본 폭 제한을 우회하기 위해 실폭을 고정한다.
+            double targetWidth = minWidth + 50; // 600 + 25*2 기준
+            dialog.Resources["ContentDialogMaxWidth"] = targetWidth;
+            dialog.Resources["ContentDialogMinWidth"] = targetWidth;
+            dialog.MinWidth = targetWidth;
+            dialog.Width = targetWidth;
+            dialog.MaxWidth = targetWidth;
+        }
 
         var result = await dialog.ShowAsync();
         return result == ContentDialogResult.Primary;

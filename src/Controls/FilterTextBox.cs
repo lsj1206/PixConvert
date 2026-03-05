@@ -14,6 +14,7 @@ public enum Filter
     InvalidSpecial, // Windows 파일명에 사용불가능한 특수 문자 (< > : " / \ | ? *)
     Digits, // 숫자 (0-9)
     Alpha, // 영문자 (대소문자)
+    HexColor // HEX 색상 코드 (#0-9A-Fa-f)
 }
 
 public enum FilterMode
@@ -213,6 +214,7 @@ public class FilterTextBox : TextBox
             Filter.InvalidSpecial => "<>:\"/\\|?*",
             Filter.Digits => "0123456789",
             Filter.Alpha => "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
+            Filter.HexColor => "#0123456789ABCDEFabcdef",
             _ => null
         };
     }

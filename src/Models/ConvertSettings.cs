@@ -5,20 +5,51 @@ namespace PixConvert.Models;
 /// </summary>
 public class ConvertSettings
 {
-    /// <summary>변환하고자 하는 대상 확장자 (점 제외)</summary>
-    public string TargetExtension { get; set; } = "png";
-
     /// <summary>이미지 품질 (1~100)</summary>
     public int Quality { get; set; } = 85;
 
-    /// <summary>동일한 이름의 파일이 존재할 경우 덮어쓰기 여부</summary>
-    public bool Overwrite { get; set; } = false;
+    /// <summary>동일한 이름의 파일이 존재할 경우 처리 방침</summary>
+    public OverwritePolicy OverwriteSide { get; set; } = OverwritePolicy.Suffix;
 
     /// <summary>EXIF 메타데이터 보존 여부</summary>
     public bool KeepExif { get; set; } = false;
 
-    /// <summary>투명 비트맵 배경 채우기 색상 (예: #FFFFFF)</summary>
-    public string BackgroundColor { get; set; } = "#FFFFFF";
+    /// <summary>투명 비트맵 배경 채우기 방식</summary>
+    public BackgroundColorOption BgColorOption { get; set; } = BackgroundColorOption.White;
 
-    // TODO: 기획서에 명시된 출력 경로 옵션, CPU 점유율 등은 Step 2에서 구체화
+    /// <summary>사용자 지정 배경 색상 (예: #FFFFFF)</summary>
+    public string CustomBackgroundColor { get; set; } = "#FFFFFF";
+
+    // --- 신규 설계 반영 (포맷 유형별 매핑) ---
+
+    // 1. 일반 이미지 (Standard: JPEG, PNG, BMP, WEBP, AVIF)
+    public List<string> StandardSourceFormats { get; set; } = ["jpeg", "png", "bmp", "webp", "avif"];
+    public string StandardTargetFormat { get; set; } = "JPEG";
+
+    // 2. 애니메이션 이미지 (Animation: GIF, WebP-Ani)
+    public List<string> AnimationSourceFormats { get; set; } = ["gif", "webp"];
+    public string AnimationTargetFormat { get; set; } = "GIF";
+
+    // --- 출력 및 성능 옵션 (Step 2 상세화) ---
+
+    /// <summary>출력 경로 설정 방식</summary>
+    public OutputPathType OutputType { get; set; } = OutputPathType.SubFolder;
+
+    /// <summary>사용자 지정 출력 경로</summary>
+    public string CustomOutputPath { get; set; } = string.Empty;
+
+    /// <summary>CPU 작업 부하 옵션</summary>
+    public CpuUsageOption CpuUsage { get; set; } = CpuUsageOption.Optimal;
 }
+
+/// <summary>출력 경로 결정 방식</summary>
+public enum OutputPathType { SubFolder, SameFolder, Custom }
+
+/// <summary>배경색 결정 방식</summary>
+public enum BackgroundColorOption { White, Black, Custom }
+
+/// <summary>CPU 점유율 정책</summary>
+public enum CpuUsageOption { Max, Optimal, Half, Minimum }
+
+/// <summary>중복 파일 처리 방침</summary>
+public enum OverwritePolicy { Overwrite, Suffix, Skip }

@@ -4,29 +4,206 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:ui="http://schemas.modernwpf.com/2019"
-             mc:Ignorable="d" MinWidth="350">
+             xmlns:local="clr-namespace:PixConvert.Views.Controls"
+             xmlns:ctrls="clr-namespace:PixConvert.Controls"
+             xmlns:vm="clr-namespace:PixConvert.ViewModels"
+             mc:Ignorable="d"
+             MinWidth="600"
+             Width="600">
 
-    <StackPanel Orientation="Vertical" Margin="0,10,0,0">
-        <!-- 대상 포맷 지정 -->
-        <TextBlock Text="{DynamicResource Setting_TargetFormat}" FontWeight="SemiBold" Margin="0,0,0,8"/>
-        <ComboBox ItemsSource="{Binding SupportedExtensions}"
-                  SelectedItem="{Binding TargetExtension}"
-                  HorizontalAlignment="Stretch" Margin="0,0,0,16"/>
+    <UserControl.Resources>
+        <Style x:Key="FormatTagStyle" TargetType="ToggleButton" BasedOn="{StaticResource {x:Type ToggleButton}}">
+            <Setter Property="Margin" Value="0,0,8,8"/>
+            <Setter Property="Padding" Value="10,4"/>
+            <Setter Property="ui:ControlHelper.CornerRadius" Value="4"/>
+        </Style>
+    </UserControl.Resources>
 
-        <!-- 품질 조절 -->
-        <TextBlock Text="{DynamicResource Setting_Quality}" FontWeight="SemiBold" Margin="0,0,0,8"/>
-        <Grid Margin="0,0,0,16">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <Slider Value="{Binding Quality}" Minimum="1" Maximum="100"
-                    SmallChange="1" LargeChange="10" IsSnapToTickEnabled="True" TickFrequency="1"
-                    VerticalAlignment="Center" Margin="0,0,12,0"/>
-            <TextBlock Grid.Column="1" Text="{Binding Quality}" VerticalAlignment="Center" Width="30" TextAlignment="Right"/>
-        </Grid>
+    <Grid>
+        <ScrollViewer VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled"
+                      MaxHeight="600">
+            <StackPanel Orientation="Vertical" Margin="25,14,25,14">
 
-        <!-- 덮어쓰기 옵션 -->
-        <CheckBox Content="{DynamicResource Setting_Overwrite}" IsChecked="{Binding Overwrite}"/>
-    </StackPanel>
+                <!-- 1. 프리셋 지정 영역 -->
+                <Grid Margin="0,0,0,8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*" />
+                        <ColumnDefinition Width="2.6*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <ComboBox ItemsSource="{Binding Presets}"
+                              SelectedItem="{Binding SelectedPreset}"
+                              DisplayMemberPath="Name"
+                              HorizontalAlignment="Stretch" Margin="0,0,8,0"
+                              ui:ControlHelper.Header="{DynamicResource Setting_PresetList}" />
+
+                    <ctrls:FilterTextBox Text="{Binding PresetNameEdit, UpdateSourceTrigger=PropertyChanged}"
+                                         Filter="None"
+                                         ui:ControlHelper.Header="{DynamicResource Setting_PresetName}"
+                                         Grid.Column="1" Margin="0,0,8,0" />
+
+                    <Button Content="{DynamicResource Btn_PresetApply}"
+                            Command="{Binding RenamePresetCommand}"
+                            VerticalAlignment="Bottom"
+                            Grid.Column="2" />
+                </Grid>
+
+                <WrapPanel Margin="0,0,0,16">
+                    <Button Content="{DynamicResource Btn_PresetCreate}" Command="{Binding CreatePresetCommand}" Margin="0,0,8,0" />
+                    <Button Content="{DynamicResource Btn_PresetCopy}" Command="{Binding CopyPresetCommand}" Margin="0,0,8,0" />
+                    <Button Content="{DynamicResource Btn_PresetDelete}" Command="{Binding RemovePresetCommand}" Foreground="{DynamicResource SystemControlErrorTextForegroundBrush}" />
+                </WrapPanel>
+
+                <Separator Margin="0,0,0,16" />
+
+                <!-- 2. 일반 이미지 변환 포맷 -->
+                <TextBlock Text="{DynamicResource Setting_GroupStandard}" FontWeight="SemiBold" Margin="0,0,0,8" />
+                <Grid Margin="0,0,0,16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <ItemsControl ItemsSource="{Binding StandardSourceTags}" Grid.Column="0">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel Orientation="Horizontal"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <ToggleButton Content="{Binding Format, Converter={StaticResource UpperCaseConverter}}"
+                                              IsChecked="{Binding IsSelected}"
+                                              Style="{StaticResource FormatTagStyle}"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <ui:FontIcon Glyph="&#xE72A;" Margin="8,0,16,8" VerticalAlignment="Center" FontSize="16" Grid.Column="1" />
+
+                    <ComboBox ItemsSource="{Binding SupportedStandardTargets}"
+                              SelectedItem="{Binding StandardTargetFormat}"
+                              Width="150" VerticalAlignment="Center" Margin="0,0,0,8" Grid.Column="2"/>
+                </Grid>
+
+                <!-- 3. 애니메이션 이미지 변환 포맷 -->
+                <TextBlock Text="{DynamicResource Setting_GroupAnimation}" FontWeight="SemiBold" Margin="0,0,0,8" />
+                <Grid Margin="0,0,0,16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <ItemsControl ItemsSource="{Binding AnimationSourceTags}" Grid.Column="0">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <ToggleButton Content="{Binding Format, Converter={StaticResource UpperCaseConverter}}"
+                                              IsChecked="{Binding IsSelected}"
+                                              Style="{StaticResource FormatTagStyle}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <ui:FontIcon Glyph="&#xE72A;" Margin="8,0,16,8" VerticalAlignment="Center" FontSize="16" Grid.Column="1" />
+
+                    <ComboBox ItemsSource="{Binding SupportedAnimationTargets}"
+                              SelectedItem="{Binding AnimationTargetFormat}"
+                              Width="150" VerticalAlignment="Center" Margin="0,0,0,8" Grid.Column="2" />
+                </Grid>
+
+                <Separator Margin="0,0,0,16" />
+
+                <!-- 5. 옵션 영역 -->
+                <TextBlock Text="{DynamicResource Setting_OtherOptions}" FontWeight="SemiBold" Margin="0,0,0,12" />
+
+                <StackPanel Margin="0,0,0,16" HorizontalAlignment="Left">
+                    <TextBlock Text="{DynamicResource Setting_Quality}" Margin="0,0,0,4" />
+                    <Grid Width="420">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Slider Value="{Binding Quality}" Minimum="1" Maximum="100" Margin="0,0,12,0" />
+                        <TextBlock Grid.Column="1" Text="{Binding Quality}" Width="30" TextAlignment="Right" VerticalAlignment="Center" />
+                    </Grid>
+                </StackPanel>
+
+                <!-- 투명도(배경색) 제어 -->
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                    <TextBlock Text="{DynamicResource Setting_BackgroundColor}" VerticalAlignment="Center" Margin="0,0,12,0" />
+                    <ComboBox SelectedItem="{Binding BgColorOption}" Width="180" Margin="0,0,12,0" VerticalAlignment="Center">
+                        <ComboBoxItem Content="{DynamicResource Bg_White}" Tag="White" IsSelected="{Binding BgColorOption, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=White}" />
+                        <ComboBoxItem Content="{DynamicResource Bg_Black}" Tag="Black" IsSelected="{Binding BgColorOption, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Black}" />
+                        <ComboBoxItem Content="{DynamicResource Bg_Custom}" Tag="Custom" IsSelected="{Binding BgColorOption, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Custom}" />
+                    </ComboBox>
+
+                    <ctrls:FilterTextBox Text="{Binding CustomBackgroundColor, UpdateSourceTrigger=PropertyChanged}"
+                                         Filter="HexColor"
+                                         Width="120" VerticalAlignment="Center"
+                                         IsEnabled="{Binding BgColorOption, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Custom}" />
+                </StackPanel>
+
+                <CheckBox Content="{DynamicResource Setting_KeepExif}" IsChecked="{Binding KeepExif}" Margin="0,0,0,16" />
+
+                <!-- 중복 파일 처리 방침 -->
+                <TextBlock Text="{DynamicResource Setting_OverwritePolicy}" Margin="0,0,0,4" />
+                <WrapPanel Margin="0,0,0,16">
+                    <RadioButton Content="{DynamicResource Setting_Overwrite_Suffix}" GroupName="OverwriteGroup" IsChecked="{Binding OverwriteSide, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Suffix}" Margin="0,0,16,0" />
+                    <RadioButton Content="{DynamicResource Setting_Overwrite_Skip}" GroupName="OverwriteGroup" IsChecked="{Binding OverwriteSide, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Skip}" Margin="0,0,16,0" />
+                    <RadioButton Content="{DynamicResource Setting_Overwrite_Overwrite}" GroupName="OverwriteGroup" IsChecked="{Binding OverwriteSide, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Overwrite}" />
+                </WrapPanel>
+
+                <!-- 출력 경로 제어 -->
+                <TextBlock Text="{DynamicResource Setting_OutputPath}" Margin="0,0,0,4" />
+                <StackPanel Margin="0,0,0,16">
+                    <RadioButton Content="{DynamicResource Setting_OutputDir_Sub}" GroupName="OutputGroup" IsChecked="{Binding OutputType, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=SubFolder}" Margin="0,0,0,8" />
+                    <RadioButton Content="{DynamicResource Setting_OutputDir_Same}" GroupName="OutputGroup" IsChecked="{Binding OutputType, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=SameFolder}" Margin="0,0,0,8" />
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <RadioButton Content="{DynamicResource Setting_OutputDir_Custom}"
+                                     GroupName="OutputGroup"
+                                     IsChecked="{Binding OutputType, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Custom}"
+                                     VerticalAlignment="Center"
+                                     Margin="0,0,8,0" />
+                        <TextBox Grid.Column="1"
+                                 Text="{Binding CustomOutputPath, Mode=TwoWay}"
+                                 IsReadOnly="True"
+                                 VerticalAlignment="Center"
+                                 Margin="0,0,8,0"
+                                 MinWidth="220"
+                                 IsEnabled="{Binding OutputType, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Custom}" />
+                        <Button Grid.Column="2"
+                                Content="{DynamicResource Btn_Browse}"
+                                Command="{Binding ChangeOutputPathCommand}"
+                                VerticalAlignment="Center"
+                                IsEnabled="{Binding OutputType, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Custom}" />
+                    </Grid>
+                </StackPanel>
+
+                <!-- CPU 제어 -->
+                <TextBlock Text="{DynamicResource Setting_CpuUsage}" Margin="0,0,0,4" />
+                <ComboBox SelectedItem="{Binding CpuUsage}" Width="240" HorizontalAlignment="Left" Margin="0,0,0,16">
+                    <ComboBoxItem Content="{DynamicResource Setting_Cpu_Max}" Tag="Max" IsSelected="{Binding CpuUsage, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Max}" />
+                    <ComboBoxItem Content="{DynamicResource Setting_Cpu_Optimal}" Tag="Optimal" IsSelected="{Binding CpuUsage, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Optimal}" />
+                    <ComboBoxItem Content="{DynamicResource Setting_Cpu_Half}" Tag="Half" IsSelected="{Binding CpuUsage, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Half}" />
+                    <ComboBoxItem Content="{DynamicResource Setting_Cpu_Min}" Tag="Minimum" IsSelected="{Binding CpuUsage, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Minimum}" />
+                </ComboBox>
+
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
 </UserControl>

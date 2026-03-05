@@ -8,6 +8,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
 using PixConvert.Models;
 using PixConvert.Services;
+using PixConvert.Services.Interfaces;
 
 namespace PixConvert.ViewModels;
 
@@ -53,13 +54,11 @@ public partial class MainViewModel : ViewModelBase, IRecipient<AppStatusRequestM
     /// </summary>
     public MainViewModel(
         ILogger<MainViewModel> logger,
+        ILanguageService languageService,
         IDialogService dialogService,
         ISnackbarService snackbarService,
-        ILanguageService languageService,
-        ISortingService sortingService,
-        IFileAnalyzerService fileAnalyzerService,
-        ILogger<SidebarViewModel> sidebarLogger,
         ILogger<HeaderViewModel> headerLogger,
+        SidebarViewModel sidebarViewModel,
         SnackbarViewModel snackbarViewModel,
         FileListViewModel fileListViewModel)
         : base(languageService, logger)
@@ -72,14 +71,7 @@ public partial class MainViewModel : ViewModelBase, IRecipient<AppStatusRequestM
 
         // 하위 뷰모델 초기화 (기능별 역할 분담)
         Header = new HeaderViewModel(languageService, headerLogger, FileList);
-        Sidebar = new SidebarViewModel(
-            sidebarLogger,
-            _dialogService,
-            _snackbarService,
-            languageService,
-            fileAnalyzerService,
-            sortingService,
-            FileList);
+        Sidebar = sidebarViewModel;
 
         // 다른 VM의 상태 변경 요청을 수신 등록
         WeakReferenceMessenger.Default.Register<AppStatusRequestMessage>(this);

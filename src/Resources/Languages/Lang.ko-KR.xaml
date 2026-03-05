@@ -42,10 +42,44 @@
     <sys:String x:Key="Sort_PathName">경로-이름</sys:String>
     <sys:String x:Key="Sort_Size">크기</sys:String>
 
-    <!-- 변환 설정 -->
+    <!-- 변환 설정 기본 -->
     <sys:String x:Key="Setting_TargetFormat">변환 포맷</sys:String>
     <sys:String x:Key="Setting_Quality">변환 품질</sys:String>
-    <sys:String x:Key="Setting_Overwrite">원본 파일 덮어쓰기</sys:String>
+    <sys:String x:Key="Setting_KeepExif">메타데이터(EXIF) 보존</sys:String>
+    <sys:String x:Key="Setting_BackgroundColor">배경 색상 (투명 이미지용)</sys:String>
+
+    <!-- 프리셋 관련 -->
+    <sys:String x:Key="Setting_PresetSelect">프리셋 지정</sys:String>
+    <sys:String x:Key="Setting_PresetList">프리셋 선택</sys:String>
+    <sys:String x:Key="Setting_PresetName">이름 변경</sys:String>
+    <sys:String x:Key="Btn_PresetApply">적용</sys:String>
+    <sys:String x:Key="Btn_PresetCreate">프리셋 생성</sys:String>
+    <sys:String x:Key="Btn_PresetCopy">프리셋 복사</sys:String>
+    <sys:String x:Key="Btn_PresetDelete">프리셋 삭제</sys:String>
+    <sys:String x:Key="Setting_GroupStandard">일반 이미지 변환 포맷</sys:String>
+    <sys:String x:Key="Setting_GroupAnimation">애니메이션 이미지 변환 포맷</sys:String>
+    <sys:String x:Key="Setting_OtherOptions">기타 옵션</sys:String>
+
+    <!-- 배경색 및 파일 선택 -->
+    <sys:String x:Key="Bg_White">흰색</sys:String>
+    <sys:String x:Key="Bg_Black">검은색</sys:String>
+    <sys:String x:Key="Bg_Custom">사용자 지정 (HEX)</sys:String>
+    <sys:String x:Key="Btn_Browse">찾기...</sys:String>
+
+    <!-- 옵션 (덮어쓰기, 경로, CPU) -->
+    <sys:String x:Key="Setting_OverwritePolicy">중복 파일 처리</sys:String>
+    <sys:String x:Key="Setting_Overwrite_Overwrite">덮어쓰기</sys:String>
+    <sys:String x:Key="Setting_Overwrite_Suffix">접미사 추가 (추천)</sys:String>
+    <sys:String x:Key="Setting_Overwrite_Skip">건너뛰기</sys:String>
+    <sys:String x:Key="Setting_OutputPath">출력 경로 옵션</sys:String>
+    <sys:String x:Key="Setting_OutputDir_Sub">하위 폴더 생성 (PixConvert_...)</sys:String>
+    <sys:String x:Key="Setting_OutputDir_Same">원본 파일과 동일 위치</sys:String>
+    <sys:String x:Key="Setting_OutputDir_Custom">사용자 지정 경로</sys:String>
+    <sys:String x:Key="Setting_CpuUsage">CPU 작업 부하 (성능 제어)</sys:String>
+    <sys:String x:Key="Setting_Cpu_Max">최대 (모든 코어 사용)</sys:String>
+    <sys:String x:Key="Setting_Cpu_Optimal">최적 (70~80% 권장)</sys:String>
+    <sys:String x:Key="Setting_Cpu_Half">절반 (50% 사용)</sys:String>
+    <sys:String x:Key="Setting_Cpu_Min">최소 (백그라운드용)</sys:String>
 
     <!-- 사이드바 : 옵션 -->
     <sys:String x:Key="Option_ManualEdit">개별 변경 모드</sys:String>

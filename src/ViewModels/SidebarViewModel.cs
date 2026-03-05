@@ -8,6 +8,7 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using PixConvert.Models;
 using PixConvert.Services;
+using PixConvert.Services.Interfaces;
 
 namespace PixConvert.ViewModels;
 
@@ -22,6 +23,8 @@ public partial class SidebarViewModel : ViewModelBase
     private readonly ISnackbarService _snackbarService;
     private readonly IFileAnalyzerService _fileAnalyzerService;
     private readonly ISortingService _sortingService;
+    private readonly IAppConfigService _configService;
+    private readonly ILoggerFactory _loggerFactory;
 
     // 타 뷰모델 참조
     private readonly FileListViewModel _fileList;
@@ -57,6 +60,8 @@ public partial class SidebarViewModel : ViewModelBase
         ILanguageService languageService,
         IFileAnalyzerService fileAnalyzerService,
         ISortingService sortingService,
+        IAppConfigService configService,
+        ILoggerFactory loggerFactory,
         FileListViewModel fileList)
         : base(languageService, logger)
     {
@@ -64,6 +69,8 @@ public partial class SidebarViewModel : ViewModelBase
         _snackbarService = snackbarService;
         _fileAnalyzerService = fileAnalyzerService;
         _sortingService = sortingService;
+        _configService = configService;
+        _loggerFactory = loggerFactory;
         _fileList = fileList;
 
         // 정렬 옵션 초기화
@@ -186,29 +193,33 @@ public partial class SidebarViewModel : ViewModelBase
     }
 
     /// <summary>
-    /// 변환 설정 대화상자를 엽니다.
+    /// 변환 설정 다이얼로그를 표시하며, 사용자가 설정을 변경하고 확인을 누르면 설정을 동기화합니다.
     /// </summary>
     private async Task OpenConvertSettingAsync()
     {
-        // 뷰모델 인스턴스화 (간단한 DI 바이패스)
-        var vm = new ConvertSettingViewModel(_languageService, Microsoft.Extensions.Logging.Abstractions.NullLogger<ConvertSettingViewModel>.Instance);
+        // 1. 설정 창을 열 때 로컬 파일에서 설정을 새로 로드
+        await _configService.LoadAsync();
 
-        // 뷰 생성 및 DataContext 맵핑
+        // 2. 뷰모델 인스턴스화 (DI를 통해 필요한 서비스 주입)
+        var vm = new ConvertSettingViewModel(_languageService, _loggerFactory.CreateLogger<ConvertSettingViewModel>(), _configService);
+
+        // 3. 뷰 생성 및 DataContext 맵핑
         var view = new PixConvert.Views.Controls.ConvertSettingDialog { DataContext = vm };
 
-        // 다이얼로그 호출
         bool isSaved = await _dialogService.ShowCustomDialogAsync(
-            content: view,
-            title: GetString("Btn_ConvertSetting"),
-            primaryText: GetString("Dlg_Confirm"), // TODO: '저장' 버튼용 리소스로 대체 가능
-            closeText: GetString("Dlg_Cancel")
-        );
+            view,
+            GetString("Btn_ConvertSetting"),
+            GetString("Dlg_Confirm"),
+            GetString("Dlg_Cancel"));
 
+        // 4. 창이 닫히면(Implicit Save) 또는 명시적으로 저장
         if (isSaved)
         {
-            // TODO: 저장된 설정을 어딘가에 보관하거나 사용할 수 있습니다.
-            // _snackbarService.Show("설정이 저장되었습니다.", SnackbarType.Success);
+            vm.SyncToSettings();
         }
+
+        // 설정창이 종료될 때 자동 저장
+        await _configService.SaveAsync();
     }
 
     /// <summary>
