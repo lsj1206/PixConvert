@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -81,15 +80,6 @@ public partial class MainViewModel : ViewModelBase, IRecipient<AppStatusRequestM
         ListClearCommand = new AsyncRelayCommand(ListClearAsync, () => CurrentStatus == AppStatus.Idle);
         ReorderNumberCommand = new AsyncRelayCommand(ReorderNumberAsync, () => CurrentStatus == AppStatus.Idle && !Sidebar.ShowMismatchOnly);
         SortByColumnCommand = new RelayCommand<SortType>(SortByColumn);
-
-        // 언어 변경 시 설정 옵션의 텍스트들을 갱신하기 위한 연동
-        Header.PropertyChanged += (s, e) =>
-        {
-            if (e.PropertyName == nameof(HeaderViewModel.SelectedLanguage))
-            {
-                Sidebar.UpdateSortOptions();
-            }
-        };
 
         // 설정 값 변경에 따라 명령의 실행 가능 여부(CanExecute) 동적으로 갱신
         Sidebar.PropertyChanged += (s, e) =>
@@ -214,17 +204,13 @@ public partial class MainViewModel : ViewModelBase, IRecipient<AppStatusRequestM
     private void SortByColumn(SortType type)
     {
         // 동일한 컬럼 클릭 시 오름차순/내림차순 토글
-        if (Sidebar.SelectedSortOption?.Type == type)
+        if (Sidebar.SelectedSortType == type)
             Sidebar.IsSortAscending = !Sidebar.IsSortAscending;
         else
         {
             // 새로운 컬럼 클릭 시 해당 기준으로 정렬 설정
-            var option = Sidebar.SortOptions.FirstOrDefault(x => x.Type == type);
-            if (option != null)
-            {
-                Sidebar.SelectedSortOption = option;
-                Sidebar.IsSortAscending = true;
-            }
+            Sidebar.SelectedSortType = type;
+            Sidebar.IsSortAscending = true;
         }
     }
 

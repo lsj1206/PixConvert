@@ -87,13 +87,13 @@ public class FileListViewModel : ViewModelBase
     /// 주어진 정렬 서비스와 옵션에 따라 목록의 순서를 다시 배치합니다.
     /// </summary>
     /// <param name="sortingService">정렬 엔진 서비스</param>
-    /// <param name="option">정렬 기준</param>
+    /// <param name="sortType">정렬 기준</param>
     /// <param name="ascending">오름차순 여부</param>
-    public void Sorting(ISortingService sortingService, SortOption option, bool ascending)
+    public void Sorting(ISortingService sortingService, SortType sortType, bool ascending)
     {
         if (_items.Count == 0) return;
 
-        var sortedItems = sortingService.Sort(_items, option, ascending).ToList();
+        var sortedItems = sortingService.Sort(_items, sortType, ascending).ToList();
 
         // UI 갱신을 위해 컬렉션을 재구성합니다.
         _items.Clear();

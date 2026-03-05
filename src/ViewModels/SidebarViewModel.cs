@@ -1,6 +1,4 @@
-using System.Collections.ObjectModel;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
@@ -29,11 +27,8 @@ public partial class SidebarViewModel : ViewModelBase
     // 타 뷰모델 참조
     private readonly FileListViewModel _fileList;
 
-    /// <summary>지원되는 정렬 컬럼 및 옵션 목록</summary>
-    public ObservableCollection<SortOption> SortOptions { get; } = [];
-
     /// <summary>현재 선택된 정렬 기준</summary>
-    [ObservableProperty] private SortOption _selectedSortOption;
+    [ObservableProperty] private SortType _selectedSortType = SortType.AddIndex;
 
     /// <summary>오름차순/내림차순 정렬 여부</summary>
     [ObservableProperty] private bool _isSortAscending = true;
@@ -73,10 +68,6 @@ public partial class SidebarViewModel : ViewModelBase
         _loggerFactory = loggerFactory;
         _fileList = fileList;
 
-        // 정렬 옵션 초기화
-        UpdateSortOptions();
-        SelectedSortOption = SortOptions[0];
-
         // 명령 초기화: Busy 상태에 따른 실행 가능 여부 설정
         AddFilesCommand = new AsyncRelayCommand(AddFilesAsync, () => CurrentStatus == AppStatus.Idle);
         AddFolderCommand = new AsyncRelayCommand(AddFolderAsync, () => CurrentStatus == AppStatus.Idle);
@@ -92,7 +83,7 @@ public partial class SidebarViewModel : ViewModelBase
     }
 
     /// <summary>필터 또는 정렬 값이 변경될 때 UI를 갱신합니다.</summary>
-    partial void OnSelectedSortOptionChanged(SortOption value) => SortFiles();
+    partial void OnSelectedSortTypeChanged(SortType value) => SortFiles();
     partial void OnIsSortAscendingChanged(bool value) => SortFiles();
     partial void OnShowMismatchOnlyChanged(bool value) => ApplyFilter();
 
@@ -262,8 +253,7 @@ public partial class SidebarViewModel : ViewModelBase
     /// </summary>
     private void SortFiles()
     {
-        if (SelectedSortOption == null) return;
-        _fileList.Sorting(_sortingService, SelectedSortOption, IsSortAscending);
+        _fileList.Sorting(_sortingService, SelectedSortType, IsSortAscending);
         ApplyFilter();
     }
 
@@ -282,27 +272,6 @@ public partial class SidebarViewModel : ViewModelBase
             view.Filter = null;
         }
         view.Refresh();
-    }
-
-    /// <summary>
-    /// 현재 언어 설정에 맞게 정렬 옵션의 표시 텍스트를 최신화합니다.
-    /// </summary>
-    public void UpdateSortOptions()
-    {
-        var currentType = SelectedSortOption?.Type ?? SortType.AddIndex;
-
-        SortOptions.Clear();
-        SortOptions.Add(new SortOption { Display = GetString("Sort_Index"), Type = SortType.AddIndex });
-        SortOptions.Add(new SortOption { Display = GetString("Sort_NameIndex"), Type = SortType.NameIndex });
-        SortOptions.Add(new SortOption { Display = GetString("Sort_NamePath"), Type = SortType.NamePath });
-        SortOptions.Add(new SortOption { Display = GetString("Sort_PathIndex"), Type = SortType.PathIndex });
-        SortOptions.Add(new SortOption { Display = GetString("Sort_PathName"), Type = SortType.PathName });
-        SortOptions.Add(new SortOption { Display = GetString("Sort_Size"), Type = SortType.Size });
-        SortOptions.Add(new SortOption { Display = GetString("Sort_Extension"), Type = SortType.Extension });
-        SortOptions.Add(new SortOption { Display = GetString("Sort_Signature"), Type = SortType.Signature });
-
-        // 기존에 선택되어 있던 타입을 유지하거나 기본값(순번)으로 설정
-        SelectedSortOption = SortOptions.FirstOrDefault(x => x.Type == currentType) ?? SortOptions[0];
     }
 
 }

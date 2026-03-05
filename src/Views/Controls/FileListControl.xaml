@@ -217,7 +217,10 @@
                     </GridViewColumn>
 
                     <!-- 경로 -->
-                    <GridViewColumn Header="{DynamicResource List_Path}" Width="300">
+                    <GridViewColumn Width="300">
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader Content="{DynamicResource List_Path}" Tag="PathIndex"/>
+                        </GridViewColumn.Header>
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Foreground="#999999"

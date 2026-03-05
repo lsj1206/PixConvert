@@ -15,7 +15,7 @@ public class SortingService : ISortingService
     /// <summary>
     /// 지정된 정렬 옵션과 방향에 따라 파일 목록을 정렬합니다.
     /// </summary>
-    public IEnumerable<FileItem> Sort(IEnumerable<FileItem> items, SortOption option, bool isAscending)
+    public IEnumerable<FileItem> Sort(IEnumerable<FileItem> items, SortType sortType, bool isAscending)
     {
         var itemList = items.ToList();
         if (itemList.Count == 0) return itemList;
@@ -23,7 +23,7 @@ public class SortingService : ISortingService
         IOrderedEnumerable<FileItem> sortedItems;
 
         // 1차 정렬: 사용자가 선택한 주 정렬 기준
-        switch (option.Type)
+        switch (sortType)
         {
             case SortType.NameIndex:
             case SortType.NamePath:
@@ -63,7 +63,7 @@ public class SortingService : ISortingService
         }
 
         // 2차 정렬: 1차 기준이 같을 때 적용되는 보조 정렬 기준
-        switch (option.Type)
+        switch (sortType)
         {
             case SortType.NameIndex:
             case SortType.PathIndex:

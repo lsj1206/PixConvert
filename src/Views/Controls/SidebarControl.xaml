@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:services="clr-namespace:PixConvert.Services"
              xmlns:ui="http://schemas.modernwpf.com/2019"
              mc:Ignorable="d">
 
@@ -68,9 +69,17 @@
                                Text="{DynamicResource Sort_Label}" />
                     <ComboBox HorizontalAlignment="Stretch"
                               Margin="0,0,0,2"
-                              ItemsSource="{Binding Sidebar.SortOptions}"
-                              SelectedItem="{Binding Sidebar.SelectedSortOption}"
-                              DisplayMemberPath="Display" />
+                              SelectedValuePath="Tag"
+                              SelectedValue="{Binding Sidebar.SelectedSortType, Mode=TwoWay}">
+                        <ComboBoxItem Content="{DynamicResource Sort_Index}" Tag="{x:Static services:SortType.AddIndex}" />
+                        <ComboBoxItem Content="{DynamicResource Sort_NameIndex}" Tag="{x:Static services:SortType.NameIndex}" />
+                        <ComboBoxItem Content="{DynamicResource Sort_NamePath}" Tag="{x:Static services:SortType.NamePath}" />
+                        <ComboBoxItem Content="{DynamicResource Sort_PathIndex}" Tag="{x:Static services:SortType.PathIndex}" />
+                        <ComboBoxItem Content="{DynamicResource Sort_PathName}" Tag="{x:Static services:SortType.PathName}" />
+                        <ComboBoxItem Content="{DynamicResource Sort_Size}" Tag="{x:Static services:SortType.Size}" />
+                        <ComboBoxItem Content="{DynamicResource Sort_Extension}" Tag="{x:Static services:SortType.Extension}" />
+                        <ComboBoxItem Content="{DynamicResource Sort_Signature}" Tag="{x:Static services:SortType.Signature}" />
+                    </ComboBox>
                     <ui:ToggleSwitch IsOn="{Binding Sidebar.IsSortAscending}"
                                      OnContent="{DynamicResource Sort_Asc}"
                                      OffContent="{DynamicResource Sort_Desc}" />
