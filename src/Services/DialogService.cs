@@ -51,16 +51,6 @@ public class DialogService : IDialogService
         var window = Application.Current.MainWindow;
         if (window == null) return false;
 
-        // ContentDialog의 기본 폭 제약으로 인해 내부 UserControl 폭이 잘리는 문제를 방지한다.
-        double minWidth = 0;
-        if (content is FrameworkElement fe)
-        {
-            if (!double.IsNaN(fe.Width) && fe.Width > 0)
-                minWidth = fe.Width;
-            else if (fe.MinWidth > 0)
-                minWidth = fe.MinWidth;
-        }
-
         var dialog = new ContentDialog
         {
             Title = title,
@@ -70,18 +60,30 @@ public class DialogService : IDialogService
             DefaultButton = ContentDialogButton.Primary,
             Owner = window
         };
-        if (minWidth > 0)
+
+        var contentWidth = GetPreferredContentWidth(content);
+        if (contentWidth > 0)
         {
-            // ContentDialog 템플릿의 기본 폭 제한을 우회하기 위해 실폭을 고정한다.
-            double targetWidth = minWidth + 50; // 600 + 25*2 기준
-            dialog.Resources["ContentDialogMaxWidth"] = targetWidth;
-            dialog.Resources["ContentDialogMinWidth"] = targetWidth;
-            dialog.MinWidth = targetWidth;
-            dialog.Width = targetWidth;
-            dialog.MaxWidth = targetWidth;
+            ApplyFixedDialogWidth(dialog, contentWidth + 50); // 600 + 25*2 기준
         }
 
         var result = await dialog.ShowAsync();
         return result == ContentDialogResult.Primary;
+    }
+
+    private static double GetPreferredContentWidth(object content)
+    {
+        if (content is not FrameworkElement fe) return 0;
+        if (!double.IsNaN(fe.Width) && fe.Width > 0) return fe.Width;
+        return fe.MinWidth > 0 ? fe.MinWidth : 0;
+    }
+
+    private static void ApplyFixedDialogWidth(ContentDialog dialog, double width)
+    {
+        // ContentDialog 템플릿의 기본 폭 제한을 우회하기 위해 폭을 고정한다.
+        dialog.Resources["ContentDialogMaxWidth"] = width;
+        dialog.Resources["ContentDialogMinWidth"] = width;
+        dialog.Width = width;
+        dialog.MaxWidth = width;
     }
 }

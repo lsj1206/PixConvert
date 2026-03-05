@@ -4,9 +4,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:ui="http://schemas.modernwpf.com/2019"
-             xmlns:local="clr-namespace:PixConvert.Views.Controls"
              xmlns:ctrls="clr-namespace:PixConvert.Controls"
-             xmlns:vm="clr-namespace:PixConvert.ViewModels"
              mc:Ignorable="d"
              MinWidth="600"
              Width="600">
