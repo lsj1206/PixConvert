@@ -8,12 +8,11 @@
     <!-- 리스트 -->
     <sys:String x:Key="List_Index">번호</sys:String>
     <sys:String x:Key="List_Name">이름</sys:String>
-    <sys:String x:Key="List_ExtensionToPath">확장자</sys:String>
-    <sys:String x:Key="List_FileSignature">포맷</sys:String>
-    <sys:String x:Key="List_Preview">미리보기</sys:String>
+    <sys:String x:Key="List_Extension">확장자</sys:String>
+    <sys:String x:Key="List_Signature">포맷</sys:String>
+    <sys:String x:Key="List_Status">상태</sys:String>
     <sys:String x:Key="List_Size">크기</sys:String>
     <sys:String x:Key="List_Path">경로</sys:String>
-    <sys:String x:Key="List_Status">상태</sys:String>
 
     <!-- 헤더 : 대시보드 -->
     <sys:String x:Key="Status_Total">파일 합계</sys:String>
@@ -41,6 +40,8 @@
     <sys:String x:Key="Sort_PathIndex">경로-번호</sys:String>
     <sys:String x:Key="Sort_PathName">경로-이름</sys:String>
     <sys:String x:Key="Sort_Size">크기</sys:String>
+    <sys:String x:Key="Sort_Extension">확장자</sys:String>
+    <sys:String x:Key="Sort_Signature">포맷</sys:String>
 
     <!-- 변환 설정 기본 -->
     <sys:String x:Key="Setting_TargetFormat">변환 포맷</sys:String>

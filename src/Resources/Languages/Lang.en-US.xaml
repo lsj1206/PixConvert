@@ -8,12 +8,11 @@
     <!-- List -->
     <sys:String x:Key="List_Index">Index</sys:String>
     <sys:String x:Key="List_Name">Name</sys:String>
-    <sys:String x:Key="List_ExtensionToPath">Ext.</sys:String>
-    <sys:String x:Key="List_FileSignature">Format</sys:String>
-    <sys:String x:Key="List_Preview">Preview</sys:String>
+    <sys:String x:Key="List_Extension">Ext.</sys:String>
+    <sys:String x:Key="List_Signature">Format</sys:String>
+    <sys:String x:Key="List_Status">Status</sys:String>
     <sys:String x:Key="List_Size">Size</sys:String>
     <sys:String x:Key="List_Path">Path</sys:String>
-    <sys:String x:Key="List_Status">Status</sys:String>
 
     <!-- Header : Dashboard -->
     <sys:String x:Key="Status_Total">Total File</sys:String>
@@ -41,6 +40,8 @@
     <sys:String x:Key="Sort_PathIndex">Path-Index</sys:String>
     <sys:String x:Key="Sort_PathName">Path-Name</sys:String>
     <sys:String x:Key="Sort_Size">Size</sys:String>
+    <sys:String x:Key="Sort_Extension">Ext.</sys:String>
+    <sys:String x:Key="Sort_Signature">Format</sys:String>
 
     <!-- Conversion Settings -->
     <sys:String x:Key="Setting_TargetFormat">Target Format</sys:String>

@@ -116,7 +116,7 @@
                     <!-- 확장자 -->
                     <GridViewColumn Width="62">
                         <GridViewColumn.Header>
-                            <GridViewColumnHeader Content="{DynamicResource List_ExtensionToPath}" Tag="Extension"/>
+                            <GridViewColumnHeader Content="{DynamicResource List_Extension}" Tag="Extension"/>
                         </GridViewColumn.Header>
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
@@ -129,7 +129,7 @@
                     <!-- 파일 시그니처(포맷) -->
                     <GridViewColumn Width="68">
                         <GridViewColumn.Header>
-                            <GridViewColumnHeader Content="{DynamicResource List_FileSignature}" Tag="Signature"/>
+                            <GridViewColumnHeader Content="{DynamicResource List_Signature}" Tag="Signature"/>
                         </GridViewColumn.Header>
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
