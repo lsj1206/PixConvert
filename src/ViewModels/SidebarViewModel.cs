@@ -21,7 +21,7 @@ public partial class SidebarViewModel : ViewModelBase
     private readonly ISnackbarService _snackbarService;
     private readonly IFileAnalyzerService _fileAnalyzerService;
     private readonly ISortingService _sortingService;
-    private readonly IAppConfigService _configService;
+    private readonly IPresetService _presetService;
     private readonly ILoggerFactory _loggerFactory;
 
     // 타 뷰모델 참조
@@ -55,7 +55,7 @@ public partial class SidebarViewModel : ViewModelBase
         ILanguageService languageService,
         IFileAnalyzerService fileAnalyzerService,
         ISortingService sortingService,
-        IAppConfigService configService,
+        IPresetService presetService,
         ILoggerFactory loggerFactory,
         FileListViewModel fileList)
         : base(languageService, logger)
@@ -64,7 +64,7 @@ public partial class SidebarViewModel : ViewModelBase
         _snackbarService = snackbarService;
         _fileAnalyzerService = fileAnalyzerService;
         _sortingService = sortingService;
-        _configService = configService;
+        _presetService = presetService;
         _loggerFactory = loggerFactory;
         _fileList = fileList;
 
@@ -189,10 +189,10 @@ public partial class SidebarViewModel : ViewModelBase
     private async Task OpenConvertSettingAsync()
     {
         // 1. 설정 창을 열 때 로컬 파일에서 설정을 새로 로드
-        await _configService.LoadAsync();
+        await _presetService.LoadAsync();
 
         // 2. 뷰모델 인스턴스화 (DI를 통해 필요한 서비스 주입)
-        var vm = new ConvertSettingViewModel(_languageService, _loggerFactory.CreateLogger<ConvertSettingViewModel>(), _configService);
+        var vm = new ConvertSettingViewModel(_languageService, _loggerFactory.CreateLogger<ConvertSettingViewModel>(), _presetService);
 
         // 3. 뷰 생성 및 DataContext 맵핑
         var view = new PixConvert.Views.Controls.ConvertSettingDialog { DataContext = vm };
@@ -210,7 +210,7 @@ public partial class SidebarViewModel : ViewModelBase
         }
 
         // 설정창이 종료될 때 자동 저장
-        await _configService.SaveAsync();
+        await _presetService.SaveAsync();
     }
 
     /// <summary>
@@ -220,6 +220,23 @@ public partial class SidebarViewModel : ViewModelBase
     private async Task ConvertFilesAsync()
     {
         if (_fileList.Items.Count == 0) return;
+
+        // 변환 전 확인창 띄우기
+        var availableCount = _fileList.Items.Count - _fileList.UnsupportedCount;
+        if (availableCount <= 0) return;
+
+        bool isConfirmed = await _dialogService.ShowConfirmationAsync(
+            string.Format(GetString("Dlg_Ask_Convert"), availableCount),
+            GetString("Dlg_Title_Convert"));
+
+        if (!isConfirmed) return;
+
+        // 변환 전 설정 값 검증
+        if (!_presetService.ValidPresetData(out string errorKey))
+        {
+            _snackbarService.Show(GetString(errorKey), SnackbarType.Error);
+            return;
+        }
 
         RequestStatus(AppStatus.Converting); // 애플리케이션을 변환 중 상태로 전환
         try

@@ -15,12 +15,12 @@ namespace PixConvert.ViewModels;
 /// </summary>
 public partial class ConvertSettingViewModel : ViewModelBase
 {
-    private readonly IAppConfigService _configService;
+    private readonly IPresetService _presetService;
 
     // --- 프리셋 관리 속성 ---
 
     /// <summary>사용 가능한 프리셋 목록 (드롭다운 바인딩용)</summary>
-    public ObservableCollection<ConvertPreset> Presets => new(_configService.Config.Presets);
+    public ObservableCollection<ConvertPreset> Presets => new(_presetService.Config.Presets);
 
     /// <summary>현재 선택된 프리셋</summary>
     [ObservableProperty]
@@ -67,10 +67,10 @@ public partial class ConvertSettingViewModel : ViewModelBase
     public ConvertSettingViewModel(
         ILanguageService languageService,
         ILogger<ConvertSettingViewModel> logger,
-        IAppConfigService configService)
+        IPresetService presetService)
         : base(languageService, logger)
     {
-        _configService = configService;
+        _presetService = presetService;
 
         // 태그 초기화
         InitializeTags();
@@ -83,7 +83,7 @@ public partial class ConvertSettingViewModel : ViewModelBase
         ChangeOutputPathCommand = new RelayCommand(ChangeOutputPath);
 
         // 초기 프리셋 설정
-        var lastPreset = Presets.FirstOrDefault(p => p.Name == _configService.Config.LastSelectedPresetName) ?? Presets.FirstOrDefault();
+        var lastPreset = Presets.FirstOrDefault(p => p.Name == _presetService.Config.LastSelectedPresetName) ?? Presets.FirstOrDefault();
         SelectedPreset = lastPreset;
     }
 
@@ -100,7 +100,7 @@ public partial class ConvertSettingViewModel : ViewModelBase
     {
         if (value == null) return;
 
-        _configService.Config.LastSelectedPresetName = value.Name;
+        _presetService.Config.LastSelectedPresetName = value.Name;
         PresetNameEdit = value.Name;
         LoadFromSettings(value.Settings);
 
@@ -155,7 +155,7 @@ public partial class ConvertSettingViewModel : ViewModelBase
     private void CreatePreset()
     {
         string newName = $"Preset_{Presets.Count + 1}";
-        _configService.AddPreset(newName, new ConvertSettings());
+        _presetService.AddPreset(newName, new ConvertSettings());
         OnPropertyChanged(nameof(Presets));
         SelectedPreset = Presets.LastOrDefault();
     }
@@ -164,7 +164,7 @@ public partial class ConvertSettingViewModel : ViewModelBase
     {
         if (SelectedPreset == null) return;
         string newName = $"{SelectedPreset.Name}_Copy";
-        _configService.CopyPreset(SelectedPreset.Name, newName);
+        _presetService.CopyPreset(SelectedPreset.Name, newName);
         OnPropertyChanged(nameof(Presets));
         SelectedPreset = Presets.FirstOrDefault(p => p.Name == newName);
     }
@@ -172,7 +172,7 @@ public partial class ConvertSettingViewModel : ViewModelBase
     private void RemovePreset()
     {
         if (SelectedPreset == null) return;
-        _configService.RemovePreset(SelectedPreset.Name);
+        _presetService.RemovePreset(SelectedPreset.Name);
         OnPropertyChanged(nameof(Presets));
         SelectedPreset = Presets.FirstOrDefault();
     }
@@ -181,7 +181,7 @@ public partial class ConvertSettingViewModel : ViewModelBase
     {
         if (SelectedPreset == null || string.IsNullOrWhiteSpace(PresetNameEdit)) return;
         string oldName = SelectedPreset.Name;
-        _configService.RenamePreset(oldName, PresetNameEdit);
+        _presetService.RenamePreset(oldName, PresetNameEdit);
         OnPropertyChanged(nameof(Presets));
         SelectedPreset = Presets.FirstOrDefault(p => p.Name == PresetNameEdit);
     }

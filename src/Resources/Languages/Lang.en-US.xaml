@@ -153,6 +153,11 @@ Existing indexes will be reset.</sys:String>
     <sys:String x:Key="Dlg_Ask_FolderOptionSingle">How would you like to add '{0}'?</sys:String>
     <sys:String x:Key="Dlg_Ask_FolderOptionMulti">How would you like to add '{0}' and {1} other folders?</sys:String>
 
+    <!-- Convert Confirmation & Error-->
+    <sys:String x:Key="Dlg_Title_Convert">Confirm Conversion</sys:String>
+    <sys:String x:Key="Dlg_Ask_Convert">Are you sure you want to convert {0} files?</sys:String>
+    <sys:String x:Key="Msg_Error_ConfigInvalid">There is a problem with the conversion settings. Please reconfigure them.</sys:String>
+
     <!-- Status -->
     <sys:String x:Key="Status_Pending">Ready</sys:String>
     <sys:String x:Key="Status_Processing">Processing</sys:String>

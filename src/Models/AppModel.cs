@@ -60,7 +60,7 @@ public partial class ConvertPreset : ObservableObject
 /// <summary>
 /// settings.json 파일에 저장될 전체 설정 구조입니다.
 /// </summary>
-public class AppConfig
+public class PresetConfig
 {
     /// <summary>마지막으로 사용된 프리셋의 이름 (또는 현재 상태)</summary>
     public string LastSelectedPresetName { get; set; } = string.Empty;
@@ -68,3 +68,4 @@ public class AppConfig
     /// <summary>사용자가 정의한 프리셋 목록</summary>
     public List<ConvertPreset> Presets { get; set; } = new();
 }
+

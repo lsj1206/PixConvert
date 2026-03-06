@@ -153,6 +153,11 @@
     <sys:String x:Key="Dlg_Ask_FolderOptionSingle">'{0}'폴더를 어떻게 추가하시겠습니까?</sys:String>
     <sys:String x:Key="Dlg_Ask_FolderOptionMulti">'{0}'폴더 외 {1}개의 폴더를 어떻게 추가하시겠습니까?</sys:String>
 
+    <!-- Convert Confirmation & Error-->
+    <sys:String x:Key="Dlg_Title_Convert">변환 확인</sys:String>
+    <sys:String x:Key="Dlg_Ask_Convert">총 {0}개의 파일을 변환하시겠습니까?</sys:String>
+    <sys:String x:Key="Msg_Error_ConfigInvalid">변환 설정에 문제가 있습니다. 다시 설정해주세요.</sys:String>
+
     <!-- 상태 -->
     <sys:String x:Key="Status_Pending">대기</sys:String>
     <sys:String x:Key="Status_Processing">변환 중</sys:String>

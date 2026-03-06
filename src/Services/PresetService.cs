@@ -13,14 +13,14 @@ namespace PixConvert.Services;
 /// <summary>
 /// JSON 파일을 사용하여 사용자 설정 및 변환 프리셋을 관리하는 서비스 구현체입니다.
 /// </summary>
-public class AppConfigService : IAppConfigService
+public class PresetService : IPresetService
 {
-    private readonly ILogger<AppConfigService> _logger;
+    private readonly ILogger<PresetService> _logger;
     private readonly string _configPath;
 
-    public AppConfig Config { get; private set; } = new();
+    public PresetConfig Config { get; private set; } = new();
 
-    public AppConfigService(ILogger<AppConfigService> logger)
+    public PresetService(ILogger<PresetService> logger)
     {
         _logger = logger;
 
@@ -31,7 +31,7 @@ public class AppConfigService : IAppConfigService
         if (!Directory.Exists(folder))
             Directory.CreateDirectory(folder);
 
-        _configPath = Path.Combine(folder, "settings.json");
+        _configPath = Path.Combine(folder, "presets.json");
     }
 
     /// <summary>
@@ -49,7 +49,7 @@ public class AppConfigService : IAppConfigService
             }
 
             string json = await File.ReadAllTextAsync(_configPath);
-            var loaded = JsonSerializer.Deserialize<AppConfig>(json);
+            var loaded = JsonSerializer.Deserialize<PresetConfig>(json);
 
             if (loaded == null)
             {
@@ -59,6 +59,11 @@ public class AppConfigService : IAppConfigService
             else
             {
                 Config = loaded;
+                if (!ValidPresetFile())
+                {
+                    _logger.LogWarning("설정 파일 구조가 일부 손상되어 복구되었습니다.");
+                    _ = SaveAsync(); // 복구된 설정 비동기 저장
+                }
                 _logger.LogInformation("설정 파일 로드 완료.");
             }
         }
@@ -85,6 +90,72 @@ public class AppConfigService : IAppConfigService
         {
             _logger.LogError(ex, "설정 저장 중 오류 발생.");
         }
+    }
+
+
+    public bool ValidPresetFile()
+    {
+        bool isModified = false;
+        if (Config.Presets == null)
+        {
+            Config.Presets = new();
+            isModified = true;
+        }
+
+        if (Config.Presets.Count == 0)
+        {
+            Config.Presets.Add(new ConvertPreset { Name = "Preset_1", Settings = new ConvertSettings() });
+            Config.LastSelectedPresetName = "Preset_1";
+            isModified = true;
+        }
+
+        if (!Config.Presets.Any(p => p.Name == Config.LastSelectedPresetName))
+        {
+            Config.LastSelectedPresetName = Config.Presets.First().Name;
+            isModified = true;
+        }
+
+        return !isModified;
+    }
+
+    public bool ValidPresetData(out string errorMessageKey)
+    {
+        var currentPreset = Config.Presets.FirstOrDefault(p => p.Name == Config.LastSelectedPresetName);
+        var settings = currentPreset?.Settings;
+
+        if (settings == null)
+        {
+            errorMessageKey = "Msg_Error_ConfigInvalid";
+            return false;
+        }
+
+        if (settings.Quality < 1 || settings.Quality > 100)
+        {
+            errorMessageKey = "Msg_Error_ConfigInvalid";
+            return false;
+        }
+
+        var allowedStandard = new[] { "JPEG", "PNG", "BMP", "WEBP", "AVIF" };
+        var allowedAnimation = new[] { "GIF", "WEBP" };
+
+        if (string.IsNullOrEmpty(settings.StandardTargetFormat) || !allowedStandard.Contains(settings.StandardTargetFormat, StringComparer.OrdinalIgnoreCase) ||
+            string.IsNullOrEmpty(settings.AnimationTargetFormat) || !allowedAnimation.Contains(settings.AnimationTargetFormat, StringComparer.OrdinalIgnoreCase))
+        {
+            errorMessageKey = "Msg_Error_ConfigInvalid";
+            return false;
+        }
+
+        if (!Enum.IsDefined(typeof(CpuUsageOption), settings.CpuUsage) ||
+            !Enum.IsDefined(typeof(OutputPathType), settings.OutputType) ||
+            !Enum.IsDefined(typeof(BackgroundColorOption), settings.BgColorOption) ||
+            !Enum.IsDefined(typeof(OverwritePolicy), settings.OverwriteSide))
+        {
+            errorMessageKey = "Msg_Error_ConfigInvalid";
+            return false;
+        }
+
+        errorMessageKey = string.Empty;
+        return true;
     }
 
     public void AddPreset(string name, ConvertSettings settings)
@@ -127,9 +198,9 @@ public class AppConfigService : IAppConfigService
         }
     }
 
-    private AppConfig CreateDefaultConfig()
+    private PresetConfig CreateDefaultConfig()
     {
-        var config = new AppConfig();
+        var config = new PresetConfig();
         // 기본 프리셋 하나 추가
         config.Presets.Add(new ConvertPreset { Name = "Preset_1", Settings = new ConvertSettings() });
         config.LastSelectedPresetName = "Preset_1";

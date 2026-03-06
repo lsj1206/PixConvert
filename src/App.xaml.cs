@@ -106,9 +106,9 @@ public partial class App : Application
 
         // [Services] 싱글톤 서비스 등록
         services.AddSingleton<IWindowService, WindowService>();
+        services.AddSingleton<IPresetService, PresetService>();
         services.AddSingleton<IDialogService, DialogService>();
         services.AddSingleton<ISnackbarService, SnackbarService>();
-        services.AddSingleton<IAppConfigService, AppConfigService>();
         services.AddSingleton<IFileScannerService, FileScannerService>();
         services.AddSingleton<ISortingService, SortingService>();
         services.AddSingleton<ILanguageService, LanguageService>();
