@@ -10,12 +10,9 @@
     <system:String x:Key="Log_AppDomain_UnhandledException">[AppDomain] 런타임 환경 치명적 예외 발생</system:String>
     <system:String x:Key="Log_App_FatalInit">메인 윈도우 초기화 중 치명적 오류 발생</system:String>
 
-    <!-- MainViewModel.cs -->
-    <system:String x:Key="Log_Main_ProcessStart">[MainViewModel] 파일 추가 프로세스 시작. 입력된 경로 수: {Count}</system:String>
-    <system:String x:Key="Log_Main_MaxExceeded">[MainViewModel] 최대 허용 파일 개수 초과로 추가가 취소되었습니다. (무시됨: {IgnoredCount})</system:String>
-    <system:String x:Key="Log_Main_ProcessComplete">[MainViewModel] 프로세스 완료. 성공: {SuccessCount}, 무시: {IgnoredCount}</system:String>
-    <system:String x:Key="Log_Main_DeleteRequest">[MainViewModel] 선택된 항목 삭제 요청. 삭제 개수: {Count}</system:String>
-    <system:String x:Key="Log_Main_ClearList">[MainViewModel] 리스트 초기화 승인됨. 모든 항목 제거 완료.</system:String>
+    <!-- SidebarViewModel.cs -->
+    <system:String x:Key="Log_Sidebar_ProcessStart">[SidebarViewModel] 파일 추가 프로세스 시작. 입력된 경로 수: {Count}</system:String>
+    <system:String x:Key="Log_Sidebar_ProcessError">[SidebarViewModel] 파일 추가 프로세스 중 예외 발생</system:String>
 
     <!-- FileScannerService.cs -->
     <system:String x:Key="Log_File_SignatureFail">[FileScannerService] 시그니처 분석 실패. 파일: {Path}</system:String>

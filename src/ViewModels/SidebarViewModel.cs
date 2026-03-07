@@ -124,7 +124,7 @@ public partial class SidebarViewModel : ViewModelBase
         try
         {
             var pathList = paths.ToList();
-            _logger.LogInformation(GetString("Log_Main_ProcessStart"), pathList.Count);
+            _logger.LogInformation(GetString("Log_Sidebar_ProcessStart"), pathList.Count);
             _snackbarService.ShowProgress(GetString("Msg_LoadingFile"));
 
             // 진행률 보고를 위한 콜백 설정
@@ -156,6 +156,8 @@ public partial class SidebarViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
+            // 운영 로그 파일에 구조화 로그를 남기고, 사용자에게도 스낵바로 피드백 제공
+            _logger.LogError(ex, GetString("Log_Sidebar_ProcessError"));
             _snackbarService.Show(string.Format(GetString("Msg_Error_Occurred"), ex.Message), SnackbarType.Error);
         }
         finally
