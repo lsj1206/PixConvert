@@ -40,7 +40,7 @@ public class SortingServiceTests
         // 2. Act (실행)
         // 실제로 우리가 테스트하고자 하는 핵심 로직(함수)을 실행하는 단계입니다.
         // 이름 기준(NameIndex), 오름차순(true)으로 정렬하라고 명령합니다.
-        var sortedList = _sortingService.Sort(list, new SortOption { Type = SortType.NameIndex }, true).ToList();
+        var sortedList = _sortingService.Sort(list, SortType.NameIndex, true).ToList();
 
         // 3. Assert (검증)
         // 로직의 실행 결과가 우리가 예상한 것과 정확히 일치하는지 단언(Assert)하는 단계입니다.
@@ -64,7 +64,7 @@ public class SortingServiceTests
 
         // Act (실행)
         // 크기 기준(Size), 오름차순=false (즉, 내림차순)으로 정렬을 요청합니다.
-        var sortedList = _sortingService.Sort(list, new SortOption { Type = SortType.Size }, false).ToList();
+        var sortedList = _sortingService.Sort(list, SortType.Size, false).ToList();
 
         // Assert (검증)
         // 내림차순이므로 용량이 가장 큰 500이 0번 인덱스, 가장 작은 50이 2번 인덱스여야 합니다.
@@ -86,7 +86,7 @@ public class SortingServiceTests
 
         // Act (실행)
         // 우리가 분석한 실제 파일 포맷(시그니처) 기준으로 오름차순(A-Z) 정렬합니다.
-        var sortedList = _sortingService.Sort(list, new SortOption { Type = SortType.Signature }, true).ToList();
+        var sortedList = _sortingService.Sort(list, SortType.Signature, true).ToList();
 
         // Assert (검증)
         // 알파벳 순서에 따라 b(bmp) -> j(jpg) -> p(png) 순으로 잘 묶였는지 확인합니다.
