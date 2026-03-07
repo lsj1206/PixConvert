@@ -79,13 +79,14 @@ public partial class FileItem : ObservableObject
     [ObservableProperty]
     private double progress = 0;
 
-    /// <summary>확장자 동의어 쌍 테이블 (양방향 등록)</summary>
+    /// <summary>
+    /// 확장자 동의어 쌍 테이블 (양방향 등록).
+    /// </summary>
     private static readonly HashSet<(string, string)> Synonyms =
     [
+        // jpg와 jpeg는 동일 포맷의 다른 표기
         ("jpg", "jpeg"),
         ("jpeg", "jpg"),
-        ("tif", "tiff"),
-        ("tiff", "tif"),
     ];
 
     /// <summary>확장자와 시그니처 포맷이 불일치하는지 여부</summary>

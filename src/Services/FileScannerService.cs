@@ -99,8 +99,9 @@ public class FileScannerService : IFileScannerService
 
     /// <summary>
     /// 바이트 헤더를 분석하여 포맷을 반환하는 공통 로직입니다.
+    /// 지원 포맷: JPEG, PNG, BMP, WEBP, AVIF, GIF
     /// </summary>
-    private string GetFormatFromHeader(byte[] header, int bytesRead)
+    private static string GetFormatFromHeader(byte[] header, int bytesRead)
     {
         if (bytesRead < 2) return "-";
 
@@ -120,17 +121,22 @@ public class FileScannerService : IFileScannerService
         if (header[0] == 0x42 && header[1] == 0x4D)
             return "BMP";
 
-        // 5. TIFF 판별 (49 49 2A 00 또는 4D 4D 00 2A)
-        if (bytesRead >= 4 &&
-            ((header[0] == 0x49 && header[1] == 0x49 && header[2] == 0x2A) ||
-             (header[0] == 0x4D && header[1] == 0x4D && header[3] == 0x2A)))
-            return "TIFF";
-
-        // 6. WebP 판별 (RIFF .... WebP)
+        // 5. WebP 판별 (RIFF....WebP)
+        //    바이트 0-3: RIFF (52 49 46 46)
+        //    바이트 8-11: WEBP (57 45 42 50)
         if (bytesRead >= 12 &&
             header[0] == 0x52 && header[1] == 0x49 && header[2] == 0x46 && header[3] == 0x46 &&
             header[8] == 0x57 && header[9] == 0x45 && header[10] == 0x42 && header[11] == 0x50)
-            return "WebP";
+            return "WEBP";
+
+        // 6. AVIF 판별 (ISO Base Media File Format 기반)
+        //    바이트 4-7: ftyp (66 74 79 70)
+        //    바이트 8-11: avif (61 76 69 66) 또는 avis (61 76 69 73, Sequence)
+        if (bytesRead >= 12 &&
+            header[4] == 0x66 && header[5] == 0x74 && header[6] == 0x79 && header[7] == 0x70 &&
+            header[8] == 0x61 && header[9] == 0x76 && header[10] == 0x69 &&
+            (header[11] == 0x66 || header[11] == 0x73))
+            return "AVIF";
 
         return "-";
     }
