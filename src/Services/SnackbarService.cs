@@ -2,6 +2,7 @@ using System;
 using System.Windows;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using PixConvert.ViewModels;
 
 namespace PixConvert.Services;
@@ -12,15 +13,19 @@ namespace PixConvert.Services;
 public class SnackbarService : ISnackbarService
 {
     private readonly SnackbarViewModel _viewModel;
+    private readonly ILogger<SnackbarService> _logger;
+    private readonly ILanguageService _languageService;
     private long _currentSessionId; // 현재 활성화된 알림 세션 번호
     private CancellationTokenSource? _sessionCts;
 
     // 애니메이션 지속 시간 (XAML Storyboard 시간과 조율)
     private const int AnimationGap = 50;
 
-    public SnackbarService(SnackbarViewModel viewModel)
+    public SnackbarService(SnackbarViewModel viewModel, ILogger<SnackbarService> logger, ILanguageService languageService)
     {
         _viewModel = viewModel;
+        _logger = logger;
+        _languageService = languageService;
     }
 
     /// <summary>
@@ -75,7 +80,7 @@ public class SnackbarService : ISnackbarService
         catch (OperationCanceledException) { /* 신규 알림에 밀려남 */ }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Snackbar_Show_Error: {ex.Message}");
+            _logger.LogError(ex, _languageService.GetString("Log_Snackbar_ShowError"));
         }
     }
 
@@ -101,7 +106,7 @@ public class SnackbarService : ISnackbarService
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Snackbar_ShowProgress_Error: {ex.Message}");
+            _logger.LogError(ex, _languageService.GetString("Log_Snackbar_ShowProgressError"));
         }
     }
 

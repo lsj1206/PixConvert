@@ -53,4 +53,8 @@
     <system:String x:Key="Log_Preset_InvalidEnum">[PresetService] 열거형(Enum) 설정 값 중 지원하지 않는 값이 포함되어 있습니다.</system:String>
     <system:String x:Key="Log_Preset_DataValid">[PresetService] 현재 프리셋 데이터 검증 완료 (이상 없음).</system:String>
 
+    <!-- SnackbarService.cs -->
+    <system:String x:Key="Log_Snackbar_ShowError">[SnackbarService] Show 처리 중 예외 발생</system:String>
+    <system:String x:Key="Log_Snackbar_ShowProgressError">[SnackbarService] ShowProgress 처리 중 예외 발생</system:String>
+
 </ResourceDictionary>
