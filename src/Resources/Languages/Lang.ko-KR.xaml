@@ -164,4 +164,8 @@
     <sys:String x:Key="Status_Success">완료</sys:String>
     <sys:String x:Key="Status_Error">실패</sys:String>
     <sys:String x:Key="Status_Unsupported">미지원</sys:String>
+    <!-- Preset Snackbar -->
+    <sys:String x:Key="Msg_Preset_SaveSuccess">설정 저장이 완료되었습니다</sys:String>
+    <sys:String x:Key="Msg_Preset_SaveError">설정 저장을 실패했습니다</sys:String>
+
 </ResourceDictionary>

@@ -164,6 +164,10 @@ Existing indexes will be reset.</sys:String>
     <sys:String x:Key="Status_Success">Success</sys:String>
     <sys:String x:Key="Status_Error">Error</sys:String>
     <sys:String x:Key="Status_Unsupported">N/A</sys:String>
+    <!-- Preset Snackbar -->
+    <sys:String x:Key="Msg_Preset_SaveSuccess">Settings saved successfully</sys:String>
+    <sys:String x:Key="Msg_Preset_SaveError">Failed to save settings</sys:String>
+
 </ResourceDictionary>
 
 

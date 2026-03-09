@@ -1,3 +1,4 @@
+using PixConvert.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 using Moq;
 using PixConvert.Models;
@@ -24,6 +25,7 @@ public class PresetServiceTests
 {
     private readonly Mock<ILogger<PresetService>> _loggerMock;
     private readonly Mock<ILanguageService> _languageMock;
+    private readonly Mock<ISnackbarService> _snackbarMock;
 
     // 테스트 대상(SUT)
     private readonly PresetService _presetService;
@@ -32,6 +34,7 @@ public class PresetServiceTests
     {
         _loggerMock = new Mock<ILogger<PresetService>>();
         _languageMock = new Mock<ILanguageService>();
+        _snackbarMock = new Mock<ISnackbarService>();
 
         // GetString()이 키 문자열을 그대로 반환하게 설정.
         // 실제 로그 메시지를 검증하지 않아도 로직 흐름 검증에 영향을 주지 않습니다.
@@ -39,7 +42,7 @@ public class PresetServiceTests
 
         // PresetService는 생성 시 내부적으로 설정 파일 경로를 결정합니다.
         // 파일 I/O 없이도 ValidPreset* 메서드와 CRUD 메서드는 테스트 가능합니다.
-        _presetService = new PresetService(_loggerMock.Object, _languageMock.Object);
+        _presetService = new PresetService(_loggerMock.Object, _languageMock.Object, _snackbarMock.Object);
     }
 
     // ─────────────────────────────────────────────────

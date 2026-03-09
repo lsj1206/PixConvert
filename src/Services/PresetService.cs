@@ -21,11 +21,13 @@ public class PresetService : IPresetService
     public PresetConfig Config { get; private set; } = new();
 
     private readonly ILanguageService _languageService;
+    private readonly ISnackbarService _snackbarService;
 
-    public PresetService(ILogger<PresetService> logger, ILanguageService languageService)
+    public PresetService(ILogger<PresetService> logger, ILanguageService languageService, ISnackbarService snackbarService)
     {
         _logger = logger;
         _languageService = languageService;
+        _snackbarService = snackbarService;
 
         // %AppData%/PixConvert/settings.json 경로 설정
         string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
@@ -86,10 +88,12 @@ public class PresetService : IPresetService
             string json = JsonSerializer.Serialize(Config, options);
             await File.WriteAllTextAsync(_configPath, json);
             _logger.LogInformation(_languageService.GetString("Log_Preset_FileSaveSuccess"));
+            _snackbarService.Show(_languageService.GetString("Msg_Preset_SaveSuccess"), SnackbarType.Success);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, _languageService.GetString("Log_Preset_FileSaveError"));
+            _snackbarService.Show(_languageService.GetString("Msg_Preset_SaveError"), SnackbarType.Error);
         }
     }
 
