@@ -87,6 +87,9 @@ public partial class ConvertSettingViewModel : ViewModelBase
         SelectedPreset = lastPreset;
     }
 
+    /// <summary>
+    /// 변환 대상 원본 포맷(태그)들의 초기 리스트를 구성합니다.
+    /// </summary>
     private void InitializeTags()
     {
         string[] standard = ["jpeg", "png", "bmp", "webp", "avif"];
@@ -96,6 +99,11 @@ public partial class ConvertSettingViewModel : ViewModelBase
         foreach (var f in animation) AnimationSourceTags.Add(new FormatTagViewModel(f));
     }
 
+    /// <summary>
+    /// 선택된 프리셋이 변경될 때 자동으로 호출되는 콜백(ObservableProperty 기능)입니다.
+    /// 바뀐 프리셋의 설정값들을 뷰모델(UI) 상태에 로드합니다.
+    /// </summary>
+    /// <param name="value">새롭게 선택된 프리셋 객체</param>
     partial void OnSelectedPresetChanged(ConvertPreset? value)
     {
         if (value == null) return;
@@ -110,6 +118,9 @@ public partial class ConvertSettingViewModel : ViewModelBase
         RenamePresetCommand.NotifyCanExecuteChanged();
     }
 
+    /// <summary>
+    /// 인자로 받은 프리셋 설정 모델(ConvertSettings)의 값을 읽어와 현재 뷰모델의 바인딩 속성들에 채워넣습니다.
+    /// </summary>
     private void LoadFromSettings(ConvertSettings s)
     {
         StandardTargetFormat = s.StandardTargetFormat ?? "JPEG";
@@ -152,6 +163,9 @@ public partial class ConvertSettingViewModel : ViewModelBase
         s.AnimationSourceFormats = AnimationSourceTags.Where(t => t.IsSelected).Select(t => t.Format).ToList();
     }
 
+    /// <summary>
+    /// 빈 설정을 가진 새로운 프리셋을 생성하여 리스트 마지막에 추가합니다.
+    /// </summary>
     private void CreatePreset()
     {
         string newName = $"Preset_{Presets.Count + 1}";
@@ -160,6 +174,9 @@ public partial class ConvertSettingViewModel : ViewModelBase
         SelectedPreset = Presets.LastOrDefault();
     }
 
+    /// <summary>
+    /// 현재 선택된 프리셋의 설정을 그대로 복제하여 새로운 이름으로 추가합니다.
+    /// </summary>
     private void CopyPreset()
     {
         if (SelectedPreset == null) return;
@@ -169,6 +186,9 @@ public partial class ConvertSettingViewModel : ViewModelBase
         SelectedPreset = Presets.FirstOrDefault(p => p.Name == newName);
     }
 
+    /// <summary>
+    /// 현재 선택된 프리셋을 삭제합니다. 최소 1개는 남도록 CanExecute에서 제어합니다.
+    /// </summary>
     private void RemovePreset()
     {
         if (SelectedPreset == null) return;
@@ -177,6 +197,9 @@ public partial class ConvertSettingViewModel : ViewModelBase
         SelectedPreset = Presets.FirstOrDefault();
     }
 
+    /// <summary>
+    /// 현재 선택된 프리셋의 이름을 텍스트박스(PresetNameEdit)에 입력된 새 이름으로 변경합니다.
+    /// </summary>
     private void RenamePreset()
     {
         if (SelectedPreset == null || string.IsNullOrWhiteSpace(PresetNameEdit)) return;
@@ -186,6 +209,9 @@ public partial class ConvertSettingViewModel : ViewModelBase
         SelectedPreset = Presets.FirstOrDefault(p => p.Name == PresetNameEdit);
     }
 
+    /// <summary>
+    /// 변환 결과물이 저장될 커스텀 출력 폴더 경로를 윈도우 다이얼로그를 통해 지정합니다.
+    /// </summary>
     private void ChangeOutputPath()
     {
         var dialog = new Microsoft.Win32.OpenFolderDialog

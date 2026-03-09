@@ -23,11 +23,19 @@ public class ConvertSettings
     // --- 신규 설계 반영 (포맷 유형별 매핑) ---
 
     // 1. 일반 이미지 (Standard: JPEG, PNG, BMP, WEBP, AVIF)
+
+    /// <summary>일반 이미지로 취급할 원본 포맷 목록</summary>
     public List<string> StandardSourceFormats { get; set; } = ["jpeg", "png", "bmp", "webp", "avif"];
+
+    /// <summary>일반 이미지를 변환할 목표 확장자 (예: JPEG)</summary>
     public string StandardTargetFormat { get; set; } = "JPEG";
 
     // 2. 애니메이션 이미지 (Animation: GIF, WebP-Ani)
+
+    /// <summary>애니메이션(움짤)으로 취급할 원본 포맷 목록</summary>
     public List<string> AnimationSourceFormats { get; set; } = ["gif", "webp"];
+
+    /// <summary>애니메이션(움짤)을 변환할 목표 확장자 (예: GIF)</summary>
     public string AnimationTargetFormat { get; set; } = "GIF";
 
     // --- 출력 및 성능 옵션 (Step 2 상세화) ---
