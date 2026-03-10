@@ -31,86 +31,211 @@
                 BorderBrush="{DynamicResource SystemControlBackgroundBaseMediumBrush}"
                 BorderThickness="1">
 
-            <StackPanel Orientation="Vertical">
+            <ContentControl Content="{Binding}">
+                <ContentControl.Style>
+                    <Style TargetType="ContentControl">
+                        <Setter Property="ContentTemplate">
+                            <Setter.Value>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Vertical">
 
-                <!-- 파일 추가/삭제 -->
-                <StackPanel Orientation="Vertical">
-                    <Button Content="{DynamicResource Btn_AddFile}"
-                            Command="{Binding Sidebar.AddFilesCommand}"
-                            Style="{StaticResource SidebarButtonStyle}" />
-                    <Button Content="{DynamicResource Btn_AddFolder}"
-                            Command="{Binding Sidebar.AddFolderCommand}"
-                            Style="{StaticResource SidebarButtonStyle}" />
+                                        <!-- 파일 추가/삭제 -->
+                                        <StackPanel Orientation="Vertical">
+                                            <Button Content="{DynamicResource Btn_AddFile}"
+                                                    Command="{Binding Sidebar.AddFilesCommand}"
+                                                    Style="{StaticResource SidebarButtonStyle}" />
+                                            <Button Content="{DynamicResource Btn_AddFolder}"
+                                                    Command="{Binding Sidebar.AddFolderCommand}"
+                                                    Style="{StaticResource SidebarButtonStyle}" />
 
-                    <Button Content="{DynamicResource Btn_ListClear}"
-                            Command="{Binding ListClearCommand}"
-                            Style="{StaticResource SidebarButtonStyle}" />
+                                            <Separator Margin="0,0,0,8" />
 
-                    <Separator Margin="0,0,0,8" />
+                                            <!-- 변환 설정 및 변환 -->
+                                            <Button Content="{DynamicResource Btn_ConvertSetting}"
+                                                    Command="{Binding Sidebar.OpenConvertSettingCommand}"
+                                                    Style="{StaticResource SidebarButtonStyle}" />
+                                            <Button Content="{DynamicResource Btn_Convert}"
+                                                    Command="{Binding Sidebar.ConvertFilesCommand}"
+                                                    Foreground="{DynamicResource SystemControlForegroundAccentBrush}"
+                                                    Style="{StaticResource SidebarButtonStyle}" />
+                                        </StackPanel>
 
-                    <!-- 변환 설정 및 변환 -->
-                    <Button Content="{DynamicResource Btn_ConvertSetting}"
-                            Command="{Binding Sidebar.OpenConvertSettingCommand}"
-                            Style="{StaticResource SidebarButtonStyle}" />
-                    <Button Content="{DynamicResource Btn_Convert}"
-                            Command="{Binding Sidebar.ConvertFilesCommand}"
-                            Foreground="{DynamicResource SystemControlForegroundAccentBrush}"
-                            Style="{StaticResource SidebarButtonStyle}" />
-                </StackPanel>
+                                        <Separator Margin="0,0,0,8" />
 
-                <Separator Margin="0,0,0,8" />
+                                        <!-- 정렬 및 설정 -->
+                                        <StackPanel Orientation="Vertical">
+                                            <Button Content="{DynamicResource Btn_ListManager}"
+                                                    Command="{Binding Sidebar.EnterListManagerCommand}"
+                                                    Style="{StaticResource SidebarButtonStyle}" />
 
-                <!-- 정렬 -->
-                <StackPanel Orientation="Vertical">
-                    <TextBlock Margin="0,0,0,4"
-                               FontSize="12"
-                               FontWeight="SemiBold"
-                               Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}"
-                               Text="{DynamicResource Sort_Label}" />
-                    <ComboBox HorizontalAlignment="Stretch"
-                              Margin="0,0,0,2"
-                              SelectedValuePath="Tag"
-                              SelectedValue="{Binding Sidebar.SelectedSortType, Mode=TwoWay}">
-                        <ComboBoxItem Content="{DynamicResource Sort_Index}" Tag="{x:Static services:SortType.AddIndex}" />
-                        <ComboBoxItem Content="{DynamicResource Sort_NameIndex}" Tag="{x:Static services:SortType.NameIndex}" />
-                        <ComboBoxItem Content="{DynamicResource Sort_NamePath}" Tag="{x:Static services:SortType.NamePath}" />
-                        <ComboBoxItem Content="{DynamicResource Sort_PathIndex}" Tag="{x:Static services:SortType.PathIndex}" />
-                        <ComboBoxItem Content="{DynamicResource Sort_PathName}" Tag="{x:Static services:SortType.PathName}" />
-                        <ComboBoxItem Content="{DynamicResource Sort_Size}" Tag="{x:Static services:SortType.Size}" />
-                        <ComboBoxItem Content="{DynamicResource Sort_Extension}" Tag="{x:Static services:SortType.Extension}" />
-                        <ComboBoxItem Content="{DynamicResource Sort_Signature}" Tag="{x:Static services:SortType.Signature}" />
-                    </ComboBox>
-                    <ui:ToggleSwitch IsOn="{Binding Sidebar.IsSortAscending}"
-                                     OnContent="{DynamicResource Sort_Asc}"
-                                     OffContent="{DynamicResource Sort_Desc}" />
-                    <ui:ToggleSwitch IsOn="{Binding Sidebar.ShowMismatchOnly}"
-                                     OnContent="{DynamicResource Option_MismatchOnly}"
-                                     OffContent="{DynamicResource Option_MismatchOnly}"
-                                     ToolTip="{DynamicResource Tip_MismatchOnly}"
-                                     Margin="0,0,0,4"/>
-                    <Button Content="{DynamicResource Btn_ReorderIndex}"
-                            Command="{Binding ReorderNumberCommand}"
-                            ToolTip="{DynamicResource Tip_FilteredNoReorder}"
-                            ToolTipService.ShowOnDisabled="True"
-                            Style="{StaticResource SidebarButtonStyle}" />
-                </StackPanel>
+                                            <TextBlock Margin="0,0,0,4"
+                                                       FontSize="12"
+                                                       FontWeight="SemiBold"
+                                                       Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}"
+                                                       Text="{DynamicResource Sort_Label}" />
+                                            <ComboBox HorizontalAlignment="Stretch"
+                                                      Margin="0,0,0,2"
+                                                      SelectedValuePath="Tag"
+                                                      SelectedValue="{Binding Sidebar.SelectedSortType, Mode=TwoWay}">
+                                                <ComboBoxItem Content="{DynamicResource Sort_Index}" Tag="{x:Static services:SortType.AddIndex}" />
+                                                <ComboBoxItem Content="{DynamicResource Sort_NameIndex}" Tag="{x:Static services:SortType.NameIndex}" />
+                                                <ComboBoxItem Content="{DynamicResource Sort_NamePath}" Tag="{x:Static services:SortType.NamePath}" />
+                                                <ComboBoxItem Content="{DynamicResource Sort_PathIndex}" Tag="{x:Static services:SortType.PathIndex}" />
+                                                <ComboBoxItem Content="{DynamicResource Sort_PathName}" Tag="{x:Static services:SortType.PathName}" />
+                                                <ComboBoxItem Content="{DynamicResource Sort_Size}" Tag="{x:Static services:SortType.Size}" />
+                                                <ComboBoxItem Content="{DynamicResource Sort_Extension}" Tag="{x:Static services:SortType.Extension}" />
+                                                <ComboBoxItem Content="{DynamicResource Sort_Signature}" Tag="{x:Static services:SortType.Signature}" />
+                                            </ComboBox>
+                                            <ui:ToggleSwitch IsOn="{Binding Sidebar.IsSortAscending}"
+                                                             OnContent="{DynamicResource Sort_Asc}"
+                                                             OffContent="{DynamicResource Sort_Desc}" />
+                                            <ui:ToggleSwitch IsOn="{Binding Sidebar.ShowMismatchOnly}"
+                                                             OnContent="{DynamicResource Option_MismatchOnly}"
+                                                             OffContent="{DynamicResource Option_MismatchOnly}"
+                                                             ToolTip="{DynamicResource Tip_MismatchOnly}"
+                                                             Margin="0,0,0,4"/>
+                                            <Button Content="{DynamicResource Btn_ReorderIndex}"
+                                                    Command="{Binding ReorderNumberCommand}"
+                                                    ToolTip="{DynamicResource Tip_FilteredNoReorder}"
+                                                    ToolTipService.ShowOnDisabled="True"
+                                                    Style="{StaticResource SidebarButtonStyle}" />
+                                        </StackPanel>
 
-                <Separator Margin="0,0,0,8" />
+                                        <Separator Margin="0,0,0,8" />
 
-                <!-- 기타 -->
-                <StackPanel Orientation="Vertical">
-                    <Grid Margin="0">
-                        <CheckBox Content="{DynamicResource Option_ConfirmDeletion}"
-                                  IsChecked="{Binding ConfirmDeletion}"
-                                  VerticalAlignment="Center"/>
-                        <Image Source="{StaticResource HelpIcon}"
-                               Width="12" Height="12"
-                               HorizontalAlignment="Right"
-                               VerticalAlignment="Center"
-                               ToolTip="{DynamicResource Tip_ConfirmDeletion}" />
-                    </Grid>
-                </StackPanel>
-            </StackPanel>
+                                        <!-- 기타 -->
+                                        <StackPanel Orientation="Vertical">
+                                            <Grid Margin="0">
+                                                <CheckBox Content="{DynamicResource Option_ConfirmDeletion}"
+                                                          IsChecked="{Binding ConfirmDeletion}"
+                                                          VerticalAlignment="Center"/>
+                                                <Image Source="{StaticResource HelpIcon}"
+                                                       Width="12" Height="12"
+                                                       HorizontalAlignment="Right"
+                                                       VerticalAlignment="Center"
+                                                       ToolTip="{DynamicResource Tip_ConfirmDeletion}" />
+                                            </Grid>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding CurrentStatus}" Value="Converting">
+                                <Setter Property="ContentTemplate">
+                                    <Setter.Value>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Vertical" Margin="4">
+                                                <TextBlock Text="{DynamicResource Status_Processing}" FontSize="14" FontWeight="SemiBold" Foreground="{DynamicResource SystemControlForegroundAccentBrush}" Margin="0,0,0,16" />
+
+                                                <TextBlock Text="{Binding Header.CurrentFileName}" ToolTip="{Binding Header.CurrentFileName}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" Margin="0,0,0,8" />
+                                                <ProgressBar Minimum="0" Maximum="100" Value="{Binding Sidebar.ConvertProgressPercent}" Height="6" Margin="0,0,0,8" />
+
+                                                <Grid Margin="0,0,0,24">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <TextBlock Grid.Column="0">
+                                                        <Run Text="{Binding Header.ProcessedCount}" FontWeight="SemiBold" Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+                                                        <Run Text="/" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                                                        <Run Text="{Binding Header.TotalConvertCount}" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                                                    </TextBlock>
+
+                                                    <TextBlock Grid.Column="1" Foreground="#FF5555">
+                                                        <TextBlock.Style>
+                                                            <Style TargetType="TextBlock">
+                                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding Header.HasFailures}" Value="True">
+                                                                        <Setter Property="Visibility" Value="Visible" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBlock.Style>
+                                                        <Run Text="{DynamicResource Status_Error}" />
+                                                        <Run Text=" " />
+                                                        <Run Text="{Binding Header.FailCount}" FontWeight="SemiBold" />
+                                                    </TextBlock>
+                                                </Grid>
+
+                                                <!-- Step 4 취소 버튼 예비 -->
+                                                <!-- <Button Content="{DynamicResource Btn_Cancel}" Style="{StaticResource SidebarButtonStyle}" Foreground="#FF5555" /> -->
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </DataTrigger>
+                            <!-- 목록 설정 모드: 사이드바를 전용 편집 패널로 교체 -->
+                            <DataTrigger Binding="{Binding CurrentStatus}" Value="ListManager">
+                                <Setter Property="ContentTemplate">
+                                    <Setter.Value>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Vertical">
+                                                <!-- 나가기 버튼 (최상단) -->
+                                                <Button Content="{DynamicResource Btn_Back}"
+                                                        Command="{Binding Sidebar.ExitListManagerCommand}"
+                                                        Style="{StaticResource SidebarButtonStyle}"
+                                                        Margin="0,0,0,12" />
+
+                                                <!-- 헤더 타이틀 -->
+                                                <TextBlock Text="{DynamicResource ListManager_Title}" FontSize="14" FontWeight="SemiBold" Foreground="{DynamicResource SystemControlForegroundAccentBrush}" Margin="0,0,0,12" />
+
+                                                <!-- 확장자 선택 안내 -->
+                                                <TextBlock Text="{DynamicResource ListManager_Desc}" FontSize="11" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" Margin="0,0,0,8" TextWrapping="Wrap" />
+
+                                                <!-- 포맷별 확장자 태그 (다중 선택) -->
+                                                <ItemsControl ItemsSource="{Binding Sidebar.ExtensionTags}" Margin="0,0,0,8">
+                                                    <ItemsControl.ItemsPanel>
+                                                        <ItemsPanelTemplate>
+                                                            <WrapPanel Orientation="Horizontal" />
+                                                        </ItemsPanelTemplate>
+                                                    </ItemsControl.ItemsPanel>
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <ToggleButton Content="{Binding Format}"
+                                                                          IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                          Margin="0,0,4,4"
+                                                                          Padding="8,3"
+                                                                          FontSize="11" />
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+
+                                                <Separator Margin="0,4,0,8" />
+
+                                                <!-- 미지원 파일 체크박스 -->
+                                                <CheckBox Content="{DynamicResource ListManager_Unsupported}"
+                                                          IsChecked="{Binding Sidebar.RemoveUnsupported, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                          FontWeight="SemiBold"
+                                                          Foreground="#FF5555"
+                                                          Margin="0,0,0,8" />
+
+                                                <!-- 적용 버튼 -->
+                                                <Button Content="{DynamicResource Btn_RemoveSelected}"
+                                                        Command="{Binding Sidebar.RemoveSelectedCommand}"
+                                                        Style="{StaticResource SidebarButtonStyle}"
+                                                        Margin="0,0,0,4" />
+
+                                                <Separator Margin="0,4,0,8" />
+
+                                                <!-- 목록 전부 제거 -->
+                                                <Button Content="{DynamicResource Btn_ListClear}"
+                                                        Command="{Binding Sidebar.RemoveAllListCommand}"
+                                                        Foreground="#FF5555"
+                                                        Style="{StaticResource SidebarButtonStyle}"
+                                                        Margin="0,0,0,8" />
+
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ContentControl.Style>
+            </ContentControl>
         </Border>
     </ScrollViewer>
 </UserControl>

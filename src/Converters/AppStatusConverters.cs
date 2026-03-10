@@ -15,7 +15,9 @@ public class AppStatusToVisibilityConverter : IValueConverter
     {
         if (value is AppStatus status)
         {
-            return status != AppStatus.Idle ? Visibility.Visible : Visibility.Collapsed;
+            return (status == AppStatus.Converting || status == AppStatus.Processing)
+                ? Visibility.Visible
+                : Visibility.Collapsed;
         }
         return Visibility.Collapsed;
     }

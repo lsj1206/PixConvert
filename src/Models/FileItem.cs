@@ -73,7 +73,7 @@ public partial class FileItem : ObservableObject
 
     /// <summary>현재 파일의 변환 상태</summary>
     [ObservableProperty]
-    private FileConvertStatus status = FileConvertStatus.Pending;
+    private FileConvertStatus status = FileConvertStatus.Unsupported;
 
     /// <summary>변환 진행률 (0~100)</summary>
     [ObservableProperty]

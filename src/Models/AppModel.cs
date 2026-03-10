@@ -15,7 +15,9 @@ public enum AppStatus
     /// <summary>파일 변환 진행 중</summary>
     Converting,
     /// <summary>일반적인 짧은 처리 중 (삭제, 비우기, 순번 재정렬 등)</summary>
-    Processing
+    Processing,
+    /// <summary>목록 설정 모드 (사이드바 전환 후 확장자/미지원 파일 제거 편집 상태)</summary>
+    ListManager
 }
 
 /// <summary>
@@ -44,6 +46,18 @@ public class AppStatusRequestMessage : RequestMessage<AppStatus>
 public class AppStatusChangedMessage : ValueChangedMessage<AppStatus>
 {
     public AppStatusChangedMessage(AppStatus status) : base(status) { }
+}
+
+/// <summary>
+/// 변환 주기 중 파일 진행 상태(현재 처리 중 파일명, 전체 퍼센트 등)를 전달하는 메시지입니다.
+/// </summary>
+public class ConvertProgressMessage
+{
+    public string FileName { get; init; } = string.Empty;
+    public int ProcessedCount { get; init; }
+    public int TotalCount { get; init; }
+    public int FailCount { get; init; }
+    public string PresetName { get; init; } = string.Empty;
 }
 
 /// <summary>

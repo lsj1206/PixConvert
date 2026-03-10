@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging;
 using PixConvert.Models;
 using PixConvert.Services;
 using PixConvert.Services.Interfaces;
@@ -33,8 +34,11 @@ public partial class SidebarViewModel : ViewModelBase
     /// <summary>오름차순/내림차순 정렬 여부</summary>
     [ObservableProperty] private bool _isSortAscending = true;
 
-    /// <summary>확장자-시그니처 불일치 파일만 필터링하여 보여줄지 여부</summary>
+    /// <summary>필터 적용 기준: 불일치 파일들만 표시할지 여부</summary>
     [ObservableProperty] private bool _showMismatchOnly = false;
+
+    /// <summary>현재 변환 작업의 전체 진행률(0~100)을 나타냅니다.</summary>
+    [ObservableProperty] private int _convertProgressPercent;
 
     /// <summary>파일들을 개별적으로 선택하여 목록에 추가하는 명령</summary>
     public IAsyncRelayCommand AddFilesCommand { get; }
@@ -42,8 +46,24 @@ public partial class SidebarViewModel : ViewModelBase
     public IAsyncRelayCommand AddFolderCommand { get; }
     /// <summary>변환 설정 대화상자를 여는 명령</summary>
     public IAsyncRelayCommand OpenConvertSettingCommand { get; }
-    /// <summary>목록에 있는 파일들의 변환 작업을 시작하는 비동기 명령</summary>
+    /// <summary>목록에 추가된 파일들을 실제 변환 엔진을 통해 처리하는 명령</summary>
     public IAsyncRelayCommand ConvertFilesCommand { get; }
+
+    /// <summary>릪이 설정 모드에서 선택준인 확장자 태그 목록</summary>
+    public System.Collections.ObjectModel.ObservableCollection<FormatTagViewModel> ExtensionTags { get; } = new();
+
+    /// <summary>릪이 설정 모드에서 미지원 파일 제거 여부</summary>
+    [ObservableProperty] private bool _removeUnsupported;
+
+
+    /// <summary>목록 관리 모드 진입 명령</summary>
+    public IRelayCommand EnterListManagerCommand { get; }
+    /// <summary>목록 관리 모드 이탈 명령</summary>
+    public IRelayCommand ExitListManagerCommand { get; }
+    /// <summary>선택된 확장자 + 미지원 파일 일괄 제거</summary>
+    public IRelayCommand RemoveSelectedCommand { get; }
+    /// <summary>목록 전부 제거 (확인 후 실행)</summary>
+    public IAsyncRelayCommand RemoveAllListCommand { get; }
 
     /// <summary>
     /// SidebarViewModel의 새 인스턴스를 초기화하며 필요한 서비스와 상태 제어 델리게이트를 주입받습니다.
@@ -74,6 +94,10 @@ public partial class SidebarViewModel : ViewModelBase
         OpenConvertSettingCommand = new AsyncRelayCommand(OpenConvertSettingAsync, () => CurrentStatus == AppStatus.Idle);
         ConvertFilesCommand = new AsyncRelayCommand(ConvertFilesAsync, () => CurrentStatus == AppStatus.Idle);
 
+        EnterListManagerCommand = new RelayCommand(EnterListManager, () => CurrentStatus == AppStatus.Idle);
+        ExitListManagerCommand = new RelayCommand(ExitListManager, () => CurrentStatus == AppStatus.ListManager);
+        RemoveSelectedCommand = new RelayCommand(RemoveSelected, () => CurrentStatus == AppStatus.ListManager);
+        RemoveAllListCommand = new AsyncRelayCommand(RemoveAllListAsync, () => CurrentStatus == AppStatus.ListManager);
     }
 
     /// <summary>상태 변경 시 사이드바 명령들의 실행 가능 여부를 자동으로 갱신합니다.</summary>
@@ -94,12 +118,92 @@ public partial class SidebarViewModel : ViewModelBase
         AddFolderCommand.NotifyCanExecuteChanged();
         OpenConvertSettingCommand.NotifyCanExecuteChanged();
         ConvertFilesCommand.NotifyCanExecuteChanged();
+
+        EnterListManagerCommand.NotifyCanExecuteChanged();
+        ExitListManagerCommand.NotifyCanExecuteChanged();
+        RemoveSelectedCommand.NotifyCanExecuteChanged();
+        RemoveAllListCommand.NotifyCanExecuteChanged();
+    }
+
+    /// <summary>목록 설정 모드로 진입합니다. 현재 파일 목록에서 확장자를 불러와 태그를 초기화합니다.</summary>
+    private void EnterListManager()
+    {
+        // 확장자 태그 초기화: 현재 파일 목록에 존재하는 고유 확장자 수집
+        ExtensionTags.Clear();
+        RemoveUnsupported = false;
+
+        var extensions = _fileList.Items
+            .Where(i => i.Status != FileConvertStatus.Unsupported && !string.IsNullOrEmpty(i.Extension))
+            .Select(i => i.Extension)
+            .Distinct()
+            .OrderBy(e => e);
+
+        foreach (var ext in extensions)
+            ExtensionTags.Add(new FormatTagViewModel(ext));
+
+        RequestStatus(AppStatus.ListManager);
+    }
+
+    /// <summary>목록 설정 모드에서 이탈하여 Idle 상태로 복귀합니다.</summary>
+    private void ExitListManager() => RequestStatus(AppStatus.Idle);
+
+    /// <summary>선택된 확장자 태그 및 미지원 파일 체크 결과를 일괄 제거합니다.</summary>
+    private void RemoveSelected()
+    {
+        var extsToRemove = ExtensionTags
+            .Where(t => t.IsSelected)
+            .Select(t => t.Format)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        var itemsToRemove = _fileList.Items.Where(i =>
+            (RemoveUnsupported && i.Status == FileConvertStatus.Unsupported) ||
+            (!string.IsNullOrEmpty(i.Extension) && extsToRemove.Contains(i.Extension))
+        ).ToList();
+
+        if (itemsToRemove.Count > 0)
+        {
+            _fileList.RemoveItems(itemsToRemove);
+            _snackbarService.Show(string.Format(GetString("Msg_RemoveFile"), itemsToRemove.Count), SnackbarType.Success);
+        }
+
+        // 제거 후 태그 재초기화 (삭제된 파일의 확장자 태그 정리)
+        ExtensionTags.Clear();
+        RemoveUnsupported = false;
+
+        var extensions = _fileList.Items
+            .Where(i => i.Status != FileConvertStatus.Unsupported && !string.IsNullOrEmpty(i.Extension))
+            .Select(i => i.Extension)
+            .Distinct()
+            .OrderBy(e => e);
+
+        foreach (var ext in extensions)
+            ExtensionTags.Add(new FormatTagViewModel(ext));
+    }
+
+    /// <summary>사용자 확인 후 목록 전체를 비웁니다.</summary>
+    private async Task RemoveAllListAsync()
+    {
+        if (_fileList.Items.Count == 0) return;
+
+        bool confirmed = await _dialogService.ShowConfirmationAsync(
+            GetString("Dlg_Ask_ClearList"),
+            GetString("Dlg_Title_ClearList"));
+
+        if (confirmed)
+        {
+            _fileList.Clear();
+            // 목록이 비워지면 태그도 초기화
+            ExtensionTags.Clear();
+            RemoveUnsupported = false;
+            _snackbarService.Show(GetString("Msg_ClearList"), SnackbarType.Success);
+        }
     }
 
     /// <summary>
     /// 파일 열기 대화상자를 통해 사용자가 선택한 파일들을 목록에 추가합니다.
     /// </summary>
     private async Task AddFilesAsync()
+
     {
         var dialog = new OpenFileDialog { Multiselect = true, Title = GetString("Dlg_Title_AddFile") };
         if (dialog.ShowDialog() == true) await ProcessFiles(dialog.FileNames);
@@ -243,6 +347,11 @@ public partial class SidebarViewModel : ViewModelBase
         RequestStatus(AppStatus.Converting); // 애플리케이션을 변환 중 상태로 전환
         try
         {
+            int processedCount = 0;
+            int totalConvertCount = _fileList.Items.Count(item => item.Status != FileConvertStatus.Unsupported);
+            int failCount = 0;
+            string presetName = _presetService.Config.LastSelectedPresetName ?? string.Empty;
+
             foreach (var item in _fileList.Items)
             {
                 // 미지원 파일은 건너뜀
@@ -251,18 +360,35 @@ public partial class SidebarViewModel : ViewModelBase
                 item.Status = FileConvertStatus.Processing;
                 item.Progress = 0;
 
+                WeakReferenceMessenger.Default.Send(new ConvertProgressMessage
+                {
+                    FileName = System.IO.Path.GetFileName(item.Path),
+                    ProcessedCount = processedCount,
+                    TotalCount = totalConvertCount,
+                    FailCount = failCount,
+                    PresetName = presetName
+                });
+
                 // 시뮬레이션: 실제 변환 로직이 들어갈 자리
                 for (int i = 0; i <= 100; i += 20)
                 {
                     item.Progress = i;
+
+                    // 전체 진행률 갱신
+                    double totalProg = (processedCount + (i / 100.0)) / totalConvertCount * 100.0;
+                    ConvertProgressPercent = (int)totalProg;
+
                     await Task.Delay(100);
                 }
 
                 item.Status = FileConvertStatus.Success;
+                processedCount++;
+                ConvertProgressPercent = (int)((double)processedCount / totalConvertCount * 100.0);
             }
         }
         finally
         {
+            ConvertProgressPercent = 0;
             RequestStatus(AppStatus.Idle); // 작업 완료 후 대기 상태로 복구
         }
     }

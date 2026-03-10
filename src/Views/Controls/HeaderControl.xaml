@@ -61,6 +61,57 @@
                     Margin="0,4"
                     Background="{DynamicResource SystemControlDisabledBaseMediumLowBrush}" />
 
+            <!-- 중앙: 변환 진행 상태 표시 -->
+            <StackPanel Grid.Column="1"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+
+                <StackPanel.Style>
+                    <Style TargetType="StackPanel">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Header.CurrentStatus}" Value="Converting">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+
+                <TextBlock Text="{DynamicResource Status_Processing}" FontWeight="SemiBold" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding Header.CurrentFileName}" MaxWidth="200" TextTrimming="CharacterEllipsis" ToolTip="{Binding Header.CurrentFileName}" FontWeight="SemiBold" Margin="0,0,16,0" VerticalAlignment="Center"/>
+
+                <!-- 진행률 -->
+                <TextBlock Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" Margin="0,0,4,0" VerticalAlignment="Center">
+                    <Run Text="{Binding Header.ProcessedCount}" Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}" FontWeight="SemiBold"/>
+                    <Run Text="/" />
+                    <Run Text="{Binding Header.TotalConvertCount}" />
+                </TextBlock>
+
+                <!-- 실패 -->
+                <TextBlock Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" Margin="16,0,4,0" VerticalAlignment="Center">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Header.HasFailures}" Value="True">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                    <Run Text="{DynamicResource Status_Error}" />
+                    <Run Text=" " />
+                    <Run Text="{Binding Header.FailCount}" Foreground="#FF5555" FontWeight="SemiBold"/>
+                </TextBlock>
+
+                <Border Width="1" Height="14" Background="{DynamicResource SystemControlDisabledBaseMediumLowBrush}" Margin="16,0"/>
+
+                <!-- 프리셋명 -->
+                <ui:FontIcon Glyph="&#xE713;" FontSize="12" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding Header.ActivePresetName}" FontSize="12" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" VerticalAlignment="Center"/>
+            </StackPanel>
+
             <StackPanel Grid.Column="2"
                         Orientation="Horizontal"
                         VerticalAlignment="Center">

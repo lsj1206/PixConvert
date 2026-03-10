@@ -43,13 +43,28 @@ public partial class ConvertSettingViewModel : ViewModelBase
     [ObservableProperty] private string _customOutputPath = string.Empty;
     [ObservableProperty] private CpuUsageOption _cpuUsage = CpuUsageOption.Optimal;
 
-    /// <summary>이미지 소스 포맷 태그 (선택 상태 관리용)</summary>
-    public ObservableCollection<FormatTagViewModel> StandardSourceTags { get; } = new();
-    public ObservableCollection<FormatTagViewModel> AnimationSourceTags { get; } = new();
+    partial void OnStandardTargetFormatChanged(string value) => OnPropertyChanged(nameof(IsLossyFormat));
+    partial void OnAnimationTargetFormatChanged(string value) => OnPropertyChanged(nameof(IsLossyFormat));
 
-    // --- 지원 목록 ---
-    public string[] SupportedStandardTargets { get; } = ["JPEG", "PNG", "BMP", "WEBP", "AVIF"];
-    public string[] SupportedAnimationTargets { get; } = ["GIF", "WEBP"];
+    /// <summary>
+    /// 현재 선택된 포맷 중 하나라도 손실 압축(Quality 적용) 포맷인지 여부를 반환합니다.
+    /// UI의 Quality 슬라이더 활성화 여부를 결정합니다.
+    /// </summary>
+    public bool IsLossyFormat
+    {
+        get
+        {
+            string std = StandardTargetFormat?.ToUpperInvariant() ?? "";
+            string ani = AnimationTargetFormat?.ToUpperInvariant() ?? "";
+            bool stdLossy = std is "JPEG" or "WEBP" or "AVIF";
+            bool aniLossy = ani is "WEBP";
+            return stdLossy || aniLossy;
+        }
+    }
+
+    /// <summary>목표 포맷 태그 (단일 선택 UI용)</summary>
+    public ObservableCollection<FormatTagViewModel> StandardTargetTags { get; } = new();
+    public ObservableCollection<FormatTagViewModel> AnimationTargetTags { get; } = new();
 
     // Enum 목록 바인딩용
     public BackgroundColorOption[] BgColorOptions { get; } = (BackgroundColorOption[])System.Enum.GetValues(typeof(BackgroundColorOption));
@@ -88,15 +103,46 @@ public partial class ConvertSettingViewModel : ViewModelBase
     }
 
     /// <summary>
-    /// 변환 대상 원본 포맷(태그)들의 초기 리스트를 구성합니다.
+    /// 변환 대상 목표 포맷들의 초기 리스트를 구성합니다.
     /// </summary>
     private void InitializeTags()
     {
-        string[] standard = ["jpeg", "png", "bmp", "webp", "avif"];
-        string[] animation = ["gif", "webp"]; // webp-ani
+        string[] standardTargets = ["JPEG", "PNG", "BMP", "WEBP", "AVIF"];
+        string[] animationTargets = ["GIF", "WEBP"];
 
-        foreach (var f in standard) StandardSourceTags.Add(new FormatTagViewModel(f));
-        foreach (var f in animation) AnimationSourceTags.Add(new FormatTagViewModel(f));
+        foreach (var f in standardTargets)
+        {
+            var tag = new FormatTagViewModel(f);
+            tag.PropertyChanged += (s, e) =>
+            {
+                if (e.PropertyName == nameof(FormatTagViewModel.IsSelected) && tag.IsSelected)
+                {
+                    // 하나가 선택되면 나머지는 선택 해제
+                    foreach (var other in StandardTargetTags.Where(t => t != tag))
+                        other.IsSelected = false;
+
+                    StandardTargetFormat = tag.Format;
+                }
+            };
+            StandardTargetTags.Add(tag);
+        }
+
+        foreach (var f in animationTargets)
+        {
+            var tag = new FormatTagViewModel(f);
+            tag.PropertyChanged += (s, e) =>
+            {
+                if (e.PropertyName == nameof(FormatTagViewModel.IsSelected) && tag.IsSelected)
+                {
+                    // 하나가 선택되면 나머지는 선택 해제
+                    foreach (var other in AnimationTargetTags.Where(t => t != tag))
+                        other.IsSelected = false;
+
+                    AnimationTargetFormat = tag.Format;
+                }
+            };
+            AnimationTargetTags.Add(tag);
+        }
     }
 
     /// <summary>
@@ -134,12 +180,9 @@ public partial class ConvertSettingViewModel : ViewModelBase
         CustomOutputPath = s.CustomOutputPath ?? string.Empty;
         CpuUsage = s.CpuUsage;
 
-        // 태그 업데이트
-        var stdFormats = s.StandardSourceFormats ?? ["jpeg", "png", "bmp", "webp", "avif"];
-        var aniFormats = s.AnimationSourceFormats ?? ["gif", "webp"];
-
-        foreach (var tag in StandardSourceTags) tag.IsSelected = stdFormats.Contains(tag.Format);
-        foreach (var tag in AnimationSourceTags) tag.IsSelected = aniFormats.Contains(tag.Format);
+        // 태그 선택 상태 동기화
+        foreach (var tag in StandardTargetTags) tag.IsSelected = (tag.Format == StandardTargetFormat);
+        foreach (var tag in AnimationTargetTags) tag.IsSelected = (tag.Format == AnimationTargetFormat);
     }
 
     /// <summary>UI의 변경사항을 현재 선택된 프리셋의 Settings 객체에 반영합니다.</summary>
@@ -158,9 +201,6 @@ public partial class ConvertSettingViewModel : ViewModelBase
         s.OutputType = OutputType;
         s.CustomOutputPath = CustomOutputPath;
         s.CpuUsage = CpuUsage;
-
-        s.StandardSourceFormats = StandardSourceTags.Where(t => t.IsSelected).Select(t => t.Format).ToList();
-        s.AnimationSourceFormats = AnimationSourceTags.Where(t => t.IsSelected).Select(t => t.Format).ToList();
     }
 
     /// <summary>

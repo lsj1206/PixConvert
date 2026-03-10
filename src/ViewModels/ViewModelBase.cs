@@ -18,10 +18,6 @@ public abstract partial class ViewModelBase : ObservableObject, IRecipient<AppSt
     [ObservableProperty]
     private AppStatus _currentStatus = AppStatus.Idle;
 
-    /// <summary>
-    /// 현재 앱이 작업 중인지 여부를 반환합니다.
-    /// </summary>
-    public bool IsBusy => CurrentStatus != AppStatus.Idle;
 
     protected ViewModelBase(ILanguageService languageService, ILogger logger)
     {
@@ -38,9 +34,14 @@ public abstract partial class ViewModelBase : ObservableObject, IRecipient<AppSt
     public void Receive(AppStatusChangedMessage message)
     {
         CurrentStatus = message.Value;
-        OnPropertyChanged(nameof(IsBusy));
-        // 명령들의 CanExecute 상태를 자동으로 갱신하도록 유도 (필요 시 하위에서 오버라이드 가능)
-        OnStatusChanged(message.Value);
+    }
+
+    /// <summary>
+    /// CurrentStatus 값이 변경될 때 자동으로 호출되는 CommunityToolkit MVVM 부분 메서드입니다.
+    /// </summary>
+    partial void OnCurrentStatusChanged(AppStatus value)
+    {
+        OnStatusChanged(value);
     }
 
     /// <summary>

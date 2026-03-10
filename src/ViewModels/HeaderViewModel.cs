@@ -4,6 +4,8 @@ using Microsoft.Extensions.Logging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using PixConvert.Models;
 using PixConvert.Services;
+using CommunityToolkit.Mvvm.Messaging;
+using CommunityToolkit.Mvvm.Messaging.Messages;
 
 namespace PixConvert.ViewModels;
 
@@ -36,6 +38,18 @@ public partial class HeaderViewModel : ViewModelBase
             else if (e.PropertyName == nameof(FileListViewModel.UnsupportedCount))
                 OnPropertyChanged(nameof(UnsupportedCount));
         };
+
+        // 메시지 구독 (AppStatusChangedMessage는 ViewModelBase에서 이미 등록됨)
+
+        WeakReferenceMessenger.Default.Register<ConvertProgressMessage>(this, (r, m) =>
+        {
+            CurrentFileName = m.FileName;
+            ProcessedCount = m.ProcessedCount;
+            TotalConvertCount = m.TotalCount;
+            FailCount = m.FailCount;
+            ActivePresetName = m.PresetName;
+            OnPropertyChanged(nameof(HasFailures));
+        });
     }
 
     /// <summary>애플리케이션에서 지원하는 언어 목록</summary>
@@ -53,6 +67,16 @@ public partial class HeaderViewModel : ViewModelBase
 
     /// <summary>미지원(시그니처 미판별) 파일 수 (FileList 위임)</summary>
     public int UnsupportedCount => _fileList.UnsupportedCount;
+
+    // --- 변환 진행 상태 관리 속성 ---
+
+    [ObservableProperty] private string _currentFileName = string.Empty;
+    [ObservableProperty] private string _activePresetName = string.Empty;
+    [ObservableProperty] private int _processedCount;
+    [ObservableProperty] private int _totalConvertCount;
+    [ObservableProperty] private int _failCount;
+
+    public bool HasFailures => FailCount > 0;
 
     /// <summary>언어 선택 변경 시 호출되어 실제 애플리케이션의 언어를 변경합니다.</summary>
     partial void OnSelectedLanguageChanged(LanguageOption value)

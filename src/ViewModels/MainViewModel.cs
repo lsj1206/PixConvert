@@ -39,9 +39,6 @@ public partial class MainViewModel : ViewModelBase, IRecipient<AppStatusRequestM
     /// <summary>선택된 파일들을 목록에서 제거하는 명령</summary>
     public IAsyncRelayCommand DeleteFilesCommand { get; }
 
-    /// <summary>파일 목록을 비우는 명령</summary>
-    public IRelayCommand ListClearCommand { get; }
-
     /// <summary>목록의 순번을 현재 정렬 기준으로 재설정하는 명령</summary>
     public IAsyncRelayCommand ReorderNumberCommand { get; }
 
@@ -77,7 +74,6 @@ public partial class MainViewModel : ViewModelBase, IRecipient<AppStatusRequestM
 
         // 목록 조작 명령 초기화 (목록 데이터 직접 핸들링)
         DeleteFilesCommand = new AsyncRelayCommand<System.Collections.IList>(DeleteFilesAsync, _ => CurrentStatus == AppStatus.Idle);
-        ListClearCommand = new AsyncRelayCommand(ListClearAsync, () => CurrentStatus == AppStatus.Idle);
         ReorderNumberCommand = new AsyncRelayCommand(ReorderNumberAsync, () => CurrentStatus == AppStatus.Idle && !Sidebar.ShowMismatchOnly);
         SortByColumnCommand = new RelayCommand<SortType>(SortByColumn);
 
@@ -99,7 +95,6 @@ public partial class MainViewModel : ViewModelBase, IRecipient<AppStatusRequestM
 
         Sidebar.NotifyCommandsStateChanged();
         DeleteFilesCommand.NotifyCanExecuteChanged();
-        ListClearCommand.NotifyCanExecuteChanged();
         ReorderNumberCommand.NotifyCanExecuteChanged();
     }
 
@@ -148,29 +143,6 @@ public partial class MainViewModel : ViewModelBase, IRecipient<AppStatusRequestM
         finally
         {
             CurrentStatus = AppStatus.Idle;
-        }
-    }
-
-    /// <summary>
-    /// 파일 목록의 모든 항목을 비동기적으로 제거합니다.
-    /// </summary>
-    private async Task ListClearAsync()
-    {
-        if (FileList.Items.Count == 0) return;
-
-        // 전체 삭제 전 사용자 확인
-        if (await _dialogService.ShowConfirmationAsync(GetString("Dlg_Ask_ClearList"), GetString("Dlg_Title_ClearList")))
-        {
-            CurrentStatus = AppStatus.Processing;
-            try
-            {
-                FileList.Clear();
-                _snackbarService.Show(GetString("Msg_ClearList"), SnackbarType.Success);
-            }
-            finally
-            {
-                CurrentStatus = AppStatus.Idle;
-            }
         }
     }
 

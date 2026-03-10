@@ -58,72 +58,44 @@
 
                 <!-- 2. 일반 이미지 변환 포맷 -->
                 <TextBlock Text="{DynamicResource Setting_GroupStandard}" FontWeight="SemiBold" Margin="0,0,0,8" />
-                <Grid Margin="0,0,0,16">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-
-                    <ItemsControl ItemsSource="{Binding StandardSourceTags}" Grid.Column="0">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <WrapPanel Orientation="Horizontal"/>
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <ToggleButton Content="{Binding Format, Converter={StaticResource UpperCaseConverter}}"
-                                              IsChecked="{Binding IsSelected}"
-                                              Style="{StaticResource FormatTagStyle}"/>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-
-                    <ui:FontIcon Glyph="&#xE72A;" Margin="8,0,16,8" VerticalAlignment="Center" FontSize="16" Grid.Column="1" />
-
-                    <ComboBox ItemsSource="{Binding SupportedStandardTargets}"
-                              SelectedItem="{Binding StandardTargetFormat}"
-                              Width="150" VerticalAlignment="Center" Margin="0,0,0,8" Grid.Column="2"/>
-                </Grid>
+                <ItemsControl ItemsSource="{Binding StandardTargetTags}" Margin="0,0,0,16">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <ToggleButton Content="{Binding Format, Converter={StaticResource UpperCaseConverter}}"
+                                          IsChecked="{Binding IsSelected}"
+                                          Style="{StaticResource FormatTagStyle}"/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
 
                 <!-- 3. 애니메이션 이미지 변환 포맷 -->
                 <TextBlock Text="{DynamicResource Setting_GroupAnimation}" FontWeight="SemiBold" Margin="0,0,0,8" />
-                <Grid Margin="0,0,0,16">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-
-                    <ItemsControl ItemsSource="{Binding AnimationSourceTags}" Grid.Column="0">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <WrapPanel Orientation="Horizontal" />
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <ToggleButton Content="{Binding Format, Converter={StaticResource UpperCaseConverter}}"
-                                              IsChecked="{Binding IsSelected}"
-                                              Style="{StaticResource FormatTagStyle}" />
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-
-                    <ui:FontIcon Glyph="&#xE72A;" Margin="8,0,16,8" VerticalAlignment="Center" FontSize="16" Grid.Column="1" />
-
-                    <ComboBox ItemsSource="{Binding SupportedAnimationTargets}"
-                              SelectedItem="{Binding AnimationTargetFormat}"
-                              Width="150" VerticalAlignment="Center" Margin="0,0,0,8" Grid.Column="2" />
-                </Grid>
+                <ItemsControl ItemsSource="{Binding AnimationTargetTags}" Margin="0,0,0,16">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <ToggleButton Content="{Binding Format, Converter={StaticResource UpperCaseConverter}}"
+                                          IsChecked="{Binding IsSelected}"
+                                          Style="{StaticResource FormatTagStyle}" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
 
                 <Separator Margin="0,0,0,16" />
 
                 <!-- 5. 옵션 영역 -->
                 <TextBlock Text="{DynamicResource Setting_OtherOptions}" FontWeight="SemiBold" Margin="0,0,0,12" />
 
-                <StackPanel Margin="0,0,0,16" HorizontalAlignment="Left">
+                <StackPanel Margin="0,0,0,16" HorizontalAlignment="Left" IsEnabled="{Binding IsLossyFormat}">
                     <TextBlock Text="{DynamicResource Setting_Quality}" Margin="0,0,0,4" />
                     <Grid Width="420">
                         <Grid.ColumnDefinitions>

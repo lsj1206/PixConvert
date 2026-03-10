@@ -21,13 +21,20 @@
     <!-- Sidebar : Btn -->
     <sys:String x:Key="Btn_AddFile">Add File</sys:String>
     <sys:String x:Key="Btn_AddFolder">Add Folder</sys:String>
-    <sys:String x:Key="Btn_ListClear">List Clear</sys:String>
+    <sys:String x:Key="Btn_ListClear">Remove All List</sys:String>
+    <sys:String x:Key="Btn_ListManager">List Manager</sys:String>
     <sys:String x:Key="Btn_RenameRule">Rename Rule</sys:String>
     <sys:String x:Key="Btn_ApplyRename">Apply Rename</sys:String>
     <sys:String x:Key="Btn_UndoRename">Undo Rename</sys:String>
     <sys:String x:Key="Btn_ReorderIndex">Reorder Index</sys:String>
     <sys:String x:Key="Btn_ConvertSetting">Convert Setting</sys:String>
     <sys:String x:Key="Btn_Convert">Convert</sys:String>
+    <!-- List Manager Sidebar -->
+    <sys:String x:Key="Btn_Back">Back</sys:String>
+    <sys:String x:Key="ListManager_Title">List Manager</sys:String>
+    <sys:String x:Key="ListManager_Desc">Select Ext. to remove</sys:String>
+    <sys:String x:Key="ListManager_Unsupported">Unsupported Files</sys:String>
+    <sys:String x:Key="Btn_RemoveSelected">Remove Selected</sys:String>
 
     <!-- Sidebar : Sort -->
     <sys:String x:Key="Sort_Label">Sort</sys:String>
@@ -54,7 +61,7 @@
     <sys:String x:Key="Setting_PresetList">Select Preset</sys:String>
     <sys:String x:Key="Setting_PresetName">Rename</sys:String>
     <sys:String x:Key="Btn_PresetApply">Apply</sys:String>
-    <sys:String x:Key="Btn_PresetCreate">Create Preset</sys:String>
+    <sys:String x:Key="Btn_PresetCreate">Add Preset</sys:String>
     <sys:String x:Key="Btn_PresetCopy">Copy Preset</sys:String>
     <sys:String x:Key="Btn_PresetDelete">Delete Preset</sys:String>
     <sys:String x:Key="Setting_GroupStandard">Standard Image Format</sys:String>
