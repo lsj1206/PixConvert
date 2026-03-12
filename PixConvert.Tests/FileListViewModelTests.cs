@@ -62,6 +62,10 @@ public class FileListViewModelTests
         Assert.Equal(2, item2.AddIndex);
         // Assert: 컬렉션 전체 수가 2개인지 최종 확인
         Assert.Equal(2, _vm.Items.Count);
+
+        // Assert: PathSet에도 동일한 경로가 존재하는지 확인 (v4 추가)
+        Assert.Contains("C:\\file1.jpg", _vm.PathSet);
+        Assert.Contains("C:\\file2.jpg", _vm.PathSet);
     }
 
     /// <summary>
