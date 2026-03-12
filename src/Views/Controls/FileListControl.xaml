@@ -154,7 +154,7 @@
                     <!-- 상태 -->
                     <GridViewColumn Width="90">
                         <GridViewColumn.Header>
-                            <GridViewColumnHeader Content="{DynamicResource List_Status}" Tag="Status"/>
+                            <GridViewColumnHeader Content="{DynamicResource List_Status}" IsHitTestVisible="False"/>
                         </GridViewColumn.Header>
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
