@@ -132,14 +132,14 @@ public partial class SidebarViewModel : ViewModelBase
         ExtensionTags.Clear();
         RemoveUnsupported = false;
 
-        var extensions = _fileList.Items
-            .Where(i => i.Status != FileConvertStatus.Unsupported && !string.IsNullOrEmpty(i.Extension))
-            .Select(i => i.Extension)
+        var signatures = _fileList.Items
+            .Where(i => i.Status != FileConvertStatus.Unsupported && i.FileSignature != "-")
+            .Select(i => i.FileSignature)
             .Distinct()
-            .OrderBy(e => e);
+            .OrderBy(s => s);
 
-        foreach (var ext in extensions)
-            ExtensionTags.Add(new FormatTagViewModel(ext));
+        foreach (var sig in signatures)
+            ExtensionTags.Add(new FormatTagViewModel(sig));
 
         RequestStatus(AppStatus.ListManager);
     }
@@ -157,7 +157,7 @@ public partial class SidebarViewModel : ViewModelBase
 
         var itemsToRemove = _fileList.Items.Where(i =>
             (RemoveUnsupported && i.Status == FileConvertStatus.Unsupported) ||
-            (!string.IsNullOrEmpty(i.Extension) && extsToRemove.Contains(i.Extension))
+            (i.FileSignature != "-" && extsToRemove.Contains(i.FileSignature))
         ).ToList();
 
         if (itemsToRemove.Count > 0)
@@ -170,14 +170,14 @@ public partial class SidebarViewModel : ViewModelBase
         ExtensionTags.Clear();
         RemoveUnsupported = false;
 
-        var extensions = _fileList.Items
-            .Where(i => i.Status != FileConvertStatus.Unsupported && !string.IsNullOrEmpty(i.Extension))
-            .Select(i => i.Extension)
+        var signatures = _fileList.Items
+            .Where(i => i.Status != FileConvertStatus.Unsupported && i.FileSignature != "-")
+            .Select(i => i.FileSignature)
             .Distinct()
-            .OrderBy(e => e);
+            .OrderBy(s => s);
 
-        foreach (var ext in extensions)
-            ExtensionTags.Add(new FormatTagViewModel(ext));
+        foreach (var sig in signatures)
+            ExtensionTags.Add(new FormatTagViewModel(sig));
     }
 
     /// <summary>사용자 확인 후 목록 전체를 비웁니다.</summary>
