@@ -18,24 +18,12 @@ public class FileScannerService : IFileScannerService
     private readonly ILogger<FileScannerService> _logger;
     private readonly ILanguageService _languageService;
 
+    private string GetString(string key) => _languageService.GetString(key);
+
     public FileScannerService(ILogger<FileScannerService> logger, ILanguageService languageService)
     {
         _logger = logger;
         _languageService = languageService;
-    }
-
-    private string GetString(string key) => _languageService.GetString(key);
-
-    public FileItem? CreateFileItem(FileInfo fileInfo)
-    {
-        // 최적화: 외부에서 이미 검증된 FileInfo를 전달받으므로 추가적인 File.Exists나 new FileInfo 조회를 수행하지 않음
-        return new FileItem
-        {
-            Path = fileInfo.FullName,
-            Size = fileInfo.Length,
-            DisplaySize = FormatFileSize(fileInfo.Length),
-            AddIndex = null
-        };
     }
 
     /// <summary>
@@ -143,40 +131,61 @@ public class FileScannerService : IFileScannerService
 
     public IEnumerable<FileInfo> GetFilesInFolder(string folderPath)
     {
-        var files = new List<FileInfo>();
+        // 10만 개 이상의 파일이 있어도 List에 담지 않고 하나씩 반환하기 위해 yield return 사용
         var stack = new Stack<string>();
         stack.Push(folderPath);
 
         while (stack.Count > 0)
         {
             var currentDir = stack.Pop();
-            var dirInfo = new DirectoryInfo(currentDir);
+            DirectoryInfo dirInfo;
 
             try
             {
-                // 현재 폴더의 파일 객체들을 직접 추가 (메타데이터 포함됨)
-                foreach (var file in dirInfo.GetFiles())
-                {
-                    files.Add(file);
-                }
+                dirInfo = new DirectoryInfo(currentDir);
+                if (!dirInfo.Exists) continue;
+            }
+            catch { continue; }
 
-                // 하위 폴더들을 스택에 넣어 다음 순회 시 처리
-                foreach (var dir in dirInfo.GetDirectories())
-                {
-                    stack.Push(dir.FullName);
-                }
+            // 1. 현재 폴더의 파일 목록 가져오기 (try-catch 외부에서 yield 하기 위해 분리)
+            FileInfo[]? files = null;
+            try
+            {
+                files = dirInfo.GetFiles();
             }
             catch (UnauthorizedAccessException ex)
             {
-                // 접근 권한이 없는 폴더는 로그만 남기고 무시하여 전체 과정이 터지는 것을 방지합니다.
                 _logger.LogWarning(ex, GetString("Log_File_FolderAccessFail"), currentDir);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, GetString("Log_File_FolderTraverseFail"), currentDir);
             }
+
+            if (files != null)
+            {
+                foreach (var file in files)
+                {
+                    yield return file;
+                }
+            }
+
+            // 2. 하위 폴더 목록 가져오기
+            DirectoryInfo[]? subDirs = null;
+            try
+            {
+                subDirs = dirInfo.GetDirectories();
+            }
+            catch { /* 하위 폴더 접근 실패 시 해당 경로는 건너뜀 */ }
+
+            if (subDirs != null)
+            {
+                foreach (var dir in subDirs)
+                {
+                    stack.Push(dir.FullName);
+                }
+            }
         }
-        return files;
     }
 
     /// <summary>

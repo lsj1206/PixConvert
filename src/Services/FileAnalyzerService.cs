@@ -5,6 +5,7 @@ using System.Linq;
 using System.Management;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using PixConvert.Models;
 
@@ -32,110 +33,150 @@ public class FileAnalyzerService : IFileAnalyzerService
         IEnumerable<string> paths,
         int maxItemCount,
         int currentCount,
+        IReadOnlySet<string>? existingPaths = null,
         IProgress<FileProcessingProgress>? progress = null)
     {
         var result = new FileProcessingResult();
+        var sw = Stopwatch.StartNew();
         var rawPaths = paths.ToList();
         result.TotalPathCount = rawPaths.Count;
 
-        // 1. 폴더 경로 분할 및 리스트 초기화
+        // 1. 기존 파일 집합 (중복 체크용 HashSet 재사용)
+        var existingSet = existingPaths ?? (IReadOnlySet<string>)new HashSet<string>();
+
+        // 2. FileCapacity 초기화 (실제 추가 가능한 물리적 공간)
+        int fileCapacity = maxItemCount - currentCount;
+        if (fileCapacity <= 0)
+        {
+            result.IgnoredCount = rawPaths.Count;
+            _logger.LogWarning(GetString("Log_Process_LimitReached"), maxItemCount, rawPaths.Count);
+            return result;
+        }
+
+        // 2. 통합 진입점 유지: 입력 경로를 파일과 폴더로 분류
         var folders = rawPaths.Where(Directory.Exists).ToList();
         var otherPaths = rawPaths.Where(p => !Directory.Exists(p)).ToList();
         var newItems = new List<FileItem>();
 
-        // 2. 직접 추가된 파일 처리 (Single Touch + 병렬 시그니처 분석)
+        // 3. 1단계: 직접 선택된 파일 우선 처리
         if (otherPaths.Count > 0)
         {
-            // 적응형 병렬도 결정 (첫 번째 파일 경로 기준)
-            int parallelism = GetOptimalParallelism(otherPaths[0]);
-            var options = new ParallelOptions { MaxDegreeOfParallelism = parallelism };
+            // 중복 파일 분리 (중복 파일은 한도를 소모하지 않음)
+            var duplicates = otherPaths.Where(p => existingSet.Contains(p)).ToList();
+            var uniqueToProcess = otherPaths.Where(p => !existingSet.Contains(p)).ToList();
 
-            // ConcurrentBag 대신 배열 슬롯으로 순서 보존
-            var items = new FileItem?[otherPaths.Count];
-            int processedCount = 0;
+            result.DuplicateCount += duplicates.Count;
 
-            await Parallel.ForEachAsync(
-                Enumerable.Range(0, otherPaths.Count),
-                options,
-                async (i, ct) =>
-                {
-                    // Single Touch: 스트림 하나로 메타데이터 + 시그니처 동시 획득
-                    items[i] = await _fileScannerService.CreateFileItemAsync(otherPaths[i]);
+            int canAdd = Math.Min(uniqueToProcess.Count, fileCapacity);
+            result.IgnoredCount += (uniqueToProcess.Count - canAdd);
 
-                    // 스레드 안전한 진행률 보고 (100개 단위)
-                    int current = Interlocked.Increment(ref processedCount);
-                    if (progress != null && (current % 100 == 0 || current == otherPaths.Count))
+            if (canAdd > 0)
+            {
+                var targetFiles = uniqueToProcess.Take(canAdd).ToList();
+                int parallelism = GetOptimalParallelism(targetFiles[0]);
+                var options = new ParallelOptions { MaxDegreeOfParallelism = parallelism };
+                var items = new FileItem?[canAdd];
+                int processedCount = 0;
+
+                await Parallel.ForEachAsync(
+                    Enumerable.Range(0, canAdd),
+                    options,
+                    async (i, ct) =>
                     {
-                        progress.Report(new FileProcessingProgress
+                        items[i] = await _fileScannerService.CreateFileItemAsync(targetFiles[i]);
+                        int current = Interlocked.Increment(ref processedCount);
+                        if (progress != null && (current % 100 == 0 || current == canAdd))
                         {
-                            CurrentIndex = current,
-                            TotalCount = otherPaths.Count
-                        });
-                    }
-                });
+                            progress.Report(new FileProcessingProgress { CurrentIndex = current, TotalCount = canAdd });
+                        }
+                    });
 
-            // null이 아닌 유효한 항목만 수집
-            newItems.AddRange(items.Where(item => item != null)!);
+                newItems.AddRange(items.Where(item => item != null)!);
+                fileCapacity -= newItems.Count;
+            }
         }
 
-        // 3. 폴더 내 파일 처리 (FileInfo 활용 + 병렬 시그니처 분석)
-        if (folders.Count > 0)
+        // 4. 2단계: 폴더 지연 스캔 (중복 제외 후 남은 공간만큼 채움)
+        if (folders.Count > 0 && fileCapacity > 0)
         {
             var folderFiles = new List<FileInfo>();
             await Task.Run(() =>
             {
                 foreach (var folderPath in folders)
                 {
-                    folderFiles.AddRange(_fileScannerService.GetFilesInFolder(folderPath));
+                    if (fileCapacity <= 0) break;
+
+                    // yield return 반복자를 통한 지연 로딩 스캔 (메모리 효율화)
+                    var filesInDir = _fileScannerService.GetFilesInFolder(folderPath);
+                    foreach (var file in filesInDir)
+                    {
+                        // 중복 체크: 이미 리스트에 있는 파일은 한도 계산에서 제외
+                        if (existingSet.Contains(file.FullName))
+                        {
+                            result.DuplicateCount++;
+                            continue;
+                        }
+
+                        if (fileCapacity > 0)
+                        {
+                            folderFiles.Add(file);
+                            fileCapacity--;
+                        }
+                        else
+                        {
+                            result.IgnoredCount++;
+                        }
+                    }
+
+                    if (fileCapacity <= 0)
+                    {
+                        _logger.LogWarning(GetString("Log_Process_LimitReached"), maxItemCount, "Scanning...");
+                    }
                 }
             });
 
-            int folderFileCount = folderFiles.Count;
-            if (folderFileCount > 0)
+            if (folderFiles.Count > 0)
             {
-                // FileItem 객체를 먼저 일괄 생성 (메타데이터는 FileInfo에서 즉시 획득)
-                var folderItems = new List<FileItem>(folderFileCount);
-                foreach (var fileInfo in folderFiles)
-                {
-                    var item = _fileScannerService.CreateFileItem(fileInfo);
-                    if (item != null) folderItems.Add(item);
-                }
-
-                // 적응형 병렬도 결정 (폴더 경로 기준)
                 int parallelism = GetOptimalParallelism(folders[0]);
                 var options = new ParallelOptions { MaxDegreeOfParallelism = parallelism };
-                int processedCount = 0;
-                int totalExpected = otherPaths.Count + folderItems.Count;
+                var items = new FileItem?[folderFiles.Count];
+                int folderProcessedCount = 0;
+                int totalExpected = newItems.Count + folderFiles.Count;
 
-                // 시그니처 분석만 병렬로 수행 (각 FileItem의 FileSignature 필드를 채움)
-                await Parallel.ForEachAsync(folderItems, options, async (item, ct) =>
-                {
-                    item.FileSignature = await _fileScannerService.AnalyzeSignatureAsync(item.Path);
-
-                    // 스레드 안전한 진행률 보고
-                    int current = Interlocked.Increment(ref processedCount);
-                    if (progress != null && (current % 100 == 0 || current == folderItems.Count))
+                await Parallel.ForEachAsync(
+                    Enumerable.Range(0, folderFiles.Count),
+                    options,
+                    async (i, ct) =>
                     {
-                        progress.Report(new FileProcessingProgress
-                        {
-                            CurrentIndex = newItems.Count + current,
-                            TotalCount = totalExpected
-                        });
-                    }
-                });
+                        // 폴더 내 파일도 분석 시점에 한 번만 열기
+                        items[i] = await _fileScannerService.CreateFileItemAsync(folderFiles[i].FullName);
 
-                newItems.AddRange(folderItems);
+                        int current = Interlocked.Increment(ref folderProcessedCount);
+                        if (progress != null && (current % 100 == 0 || current == folderFiles.Count))
+                        {
+                            progress.Report(new FileProcessingProgress
+                            {
+                                CurrentIndex = newItems.Count + current,
+                                TotalCount = totalExpected
+                            });
+                        }
+                    });
+
+                newItems.AddRange(items.Where(item => item != null)!);
             }
         }
-
-        // 4. 정책 검사: 최대 수량 초과 여부
-        if (currentCount + newItems.Count > maxItemCount)
+        else if (folders.Count > 0 && fileCapacity <= 0)
         {
-            result.IgnoredCount = newItems.Count;
-            return result;
+            // 폴더라고 할지라도 입력된 경로 자체를 무시 카운트에 합산 (최소한의 성의)
+            result.IgnoredCount += folders.Count;
         }
 
         result.NewItems = newItems;
+        sw.Stop();
+
+        _logger.LogInformation(GetString("Log_Process_Summary"), 
+            result.TotalPathCount, result.SuccessCount, result.DuplicateCount, result.IgnoredCount, sw.ElapsedMilliseconds);
+
         return result;
     }
 

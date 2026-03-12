@@ -20,6 +20,9 @@ public class FileListViewModel : ViewModelBase
     /// <summary>화면에 바인딩되는 읽기 전용 파일 아이템 컬렉션입니다.</summary>
     public ReadOnlyObservableCollection<FileItem> Items { get; }
 
+    /// <summary>중복 체크용 경로 집합 (읽기 전용 노출)</summary>
+    public IReadOnlySet<string> PathSet => _pathSet;
+
     /// <summary>목록의 전체 파일 수</summary>
     public int TotalCount => Items.Count;
 

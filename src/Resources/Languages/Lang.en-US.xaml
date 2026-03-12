@@ -102,11 +102,13 @@
     <sys:String x:Key="Setting_Cpu_Min">Minimum (Background)</sys:String>
 
     <!-- Snackbar -->
-    <sys:String x:Key="Msg_AddFile">Adding {0} file(s).</sys:String>
-    <sys:String x:Key="Msg_AddFilePartial">Adding {1} of {0} file(s).</sys:String>
+    <sys:String x:Key="Msg_AddFile">{0:N0} file(s) added</sys:String>
+    <sys:String x:Key="Msg_AddWithLimit">{0:N0} file(s) added, {1:N0} excluded</sys:String>
+    <sys:String x:Key="Msg_AddWithDuplicate">{0:N0} file(s) added, {1:N0} duplicates skipped</sys:String>
     <sys:String x:Key="Msg_AlreadyExists">Already exists in the list.</sys:String>
     <sys:String x:Key="Msg_FileAddError">Error adding file: {0}</sys:String>
-    <sys:String x:Key="Msg_MaxItemExceeded">File limit exceeded. Limit: {0:N0}, Existing: {1:N0}, New: {2:N0}</sys:String>
+    <sys:String x:Key="Msg_LimitReached">Cannot add more files.</sys:String>
+    <sys:String x:Key="Msg_NoNewFiles">No files available to add.</sys:String>
     <sys:String x:Key="Msg_ReorderIndex">Reordering index.</sys:String>
     <sys:String x:Key="Msg_RemoveFile">Removing {0} file(s) from list.</sys:String>
     <sys:String x:Key="Msg_ClearList">Clearing list.</sys:String>

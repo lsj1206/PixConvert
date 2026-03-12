@@ -27,6 +27,8 @@
     <system:String x:Key="Log_Process_WmiException">[FileAnalyzerService] WMI 디스크 조회 중 예외 발생. 경로({RootPath})를 판단할 수 없어 HDD(안전)로 간주합니다.</system:String>
     <system:String x:Key="Log_Process_WmiUnknown">[FileAnalyzerService] WMI 디스크 유형을 특정할 수 없습니다. 디스크({DiskNumber})를 HDD(안전)로 간주합니다.</system:String>
     <system:String x:Key="Log_Process_Parallelism">[FileAnalyzerService] 파일 처리용 스레드 수 최종 결정. 유형: {DriveType}, 병렬도(MaxDegree): {Parallelism}</system:String>
+    <system:String x:Key="Log_Process_Summary">[FileAnalyzerService] 파일 경로 분석 완료. 총: {Total}, 추가: {Added}, 중복됨: {Dup}, 한도초과: {Ignored}, 소요: {Time}ms</system:String>
+    <system:String x:Key="Log_Process_LimitReached">[FileAnalyzerService] 파일 개수 제한({Limit})에 도달하여 나머지 파일(약 {Count}개)을 무시합니다.</system:String>
 
     <!-- PresetService.cs -->
     <system:String x:Key="Log_Preset_FileNotFound">[PresetService] 설정 파일이 존재하지 않아 기본값을 생성합니다.</system:String>

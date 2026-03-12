@@ -237,25 +237,51 @@ public partial class SidebarViewModel : ViewModelBase
                 _snackbarService.UpdateProgress(string.Format(GetString("Msg_LoadingFileProgress"), p.CurrentIndex, p.TotalCount));
             });
 
-            // 서비스 엔진을 통해 파일 스캔 및 데이터 객체 생성
+            // 1. 서비스 엔진을 통해 파일 스캔 및 데이터 객체 생성 (기존 HashSet 재사용)
             var result = await _fileAnalyzerService.ProcessPathsAsync(
                 paths,
                 MaxItemCount,
                 _fileList.Items.Count,
+                _fileList.PathSet,
                 progress);
 
-            // 파일 한도 초과 등에 따른 예외 알림
-            if (result.SuccessCount == 0 && result.IgnoredCount > 0)
+            // 2. 추가 가능한 파일이 없는 경우 (상황별 명확한 메시지)
+            if (result.SuccessCount == 0 && (result.IgnoredCount > 0 || result.DuplicateCount > 0))
             {
-                var msg = string.Format(GetString("Msg_MaxItemExceeded"), MaxItemCount, _fileList.Items.Count, result.IgnoredCount);
-                _snackbarService.Show(msg, SnackbarType.Error);
+                if (result.IgnoredCount > 0)
+                {
+                    // 10000개 제한에 걸린 경우 (기존 존재 여부와 무관하게 더 추가 불가)
+                    _snackbarService.Show(GetString("Msg_LimitReached"), SnackbarType.Error);
+                }
+                else
+                {
+                    // 수량은 남았으나 입력된 파일이 모두 이미 존재하는 경우
+                    _snackbarService.Show(GetString("Msg_NoNewFiles"), SnackbarType.Error);
+                }
                 return;
             }
 
-            // 스캔 성공 시 목록 뷰모델에 실제 삽입
+            // 3. 스캔 성공 시 목록 뷰모델에 실제 삽입 및 결과 안내 가독성 개편
             if (result.SuccessCount > 0)
             {
                 AddFilesToList(result.NewItems);
+                
+                // 알림 우선순위: 한도 초과(부분추가) > 중복 제외 > 일반 성공
+                if (result.IgnoredCount > 0)
+                {
+                    // 부분 추가 (한도 제한으로 일부 누락)
+                    _snackbarService.Show(string.Format(GetString("Msg_AddWithLimit"), result.SuccessCount, result.IgnoredCount), SnackbarType.Warning);
+                }
+                else if (result.DuplicateCount > 0)
+                {
+                    // 일부 중복 제외
+                    _snackbarService.Show(string.Format(GetString("Msg_AddWithDuplicate"), result.SuccessCount, result.DuplicateCount), SnackbarType.Warning);
+                }
+                else
+                {
+                    // 깔끔하게 모두 성공
+                    _snackbarService.Show(string.Format(GetString("Msg_AddFile"), result.SuccessCount), SnackbarType.Success);
+                }
             }
         }
         catch (Exception ex)
@@ -274,19 +300,11 @@ public partial class SidebarViewModel : ViewModelBase
     /// 처리된 파일 아이템 리스트를 실제 FileListViewModel 데이터 소스에 삽입하고 결과에 따라 스낵바 알림을 표시합니다.
     /// </summary>
     /// <param name="items">추가할 파일 아이템 리스트</param>
-    private void AddFilesToList(List<FileItem> items)
+    private int AddFilesToList(List<FileItem> items)
     {
-        int totalCount = items.Count;
         int successCount = _fileList.AddRange(items);
         SortFiles();
-
-        // 추가 결과에 따른 사용자 피드백 (이미 존재, 일부 성공, 전체 성공 등)
-        if (successCount == 0 && totalCount > 0)
-            _snackbarService.Show(GetString("Msg_AlreadyExists"), SnackbarType.Error);
-        else if (successCount < totalCount)
-            _snackbarService.Show(string.Format(GetString("Msg_AddFilePartial"), totalCount, successCount), SnackbarType.Warning);
-        else
-            _snackbarService.Show(string.Format(GetString("Msg_AddFile"), successCount), SnackbarType.Success);
+        return successCount;
     }
 
     /// <summary>

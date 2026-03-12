@@ -58,5 +58,6 @@ public interface IFileAnalyzerService
         IEnumerable<string> paths,
         int maxItemCount,
         int currentCount,
+        IReadOnlySet<string>? existingPaths = null,
         IProgress<FileProcessingProgress>? progress = null);
 }

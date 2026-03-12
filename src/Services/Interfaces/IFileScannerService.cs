@@ -11,14 +11,6 @@ namespace PixConvert.Services;
 public interface IFileScannerService
 {
     /// <summary>
-    /// FileInfo 객체를 기반으로 목록에 표시할 FileItem 객체를 생성합니다.
-    /// 이미 조회된 정보를 활용하여 추가적인 디스크 I/O를 방지합니다.
-    /// </summary>
-    /// <param name="fileInfo">파일의 상세 정보가 포함된 FileInfo 객체</param>
-    /// <returns>생성된 FileItem 객체</returns>
-    FileItem? CreateFileItem(FileInfo fileInfo);
-
-    /// <summary>
     /// [Single Touch 최적화] 파일 경로를 직접 받아 단일 스트림 세션에서 메타데이터와 시그니처를 동시에 획득합니다.
     /// Exists 체크 및 FileInfo 생성을 생략하여 디스크 접근 횟수를 최소화합니다.
     /// </summary>
