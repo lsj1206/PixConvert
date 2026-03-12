@@ -1,11 +1,22 @@
-﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
     <!-- 앱/윈도우 공통 -->
     <sys:String x:Key="App_Title">PixConvert</sys:String>
 
-    <!-- 리스트 -->
+    <!-- 헤더 : 대시보드 -->
+    <sys:String x:Key="Status_Total">파일 합계</sys:String>
+    <sys:String x:Key="Status_Unknown">미지원 파일</sys:String>
+
+    <!-- 헤더 : 상태 -->
+    <sys:String x:Key="Status_Pending">대기</sys:String>
+    <sys:String x:Key="Status_Processing">변환 중</sys:String>
+    <sys:String x:Key="Status_Success">완료</sys:String>
+    <sys:String x:Key="Status_Error">실패</sys:String>
+    <sys:String x:Key="Status_Unsupported">미지원</sys:String>
+
+    <!-- 리스트 : 항목 -->
     <sys:String x:Key="List_Index">번호</sys:String>
     <sys:String x:Key="List_Name">이름</sys:String>
     <sys:String x:Key="List_Extension">확장자</sys:String>
@@ -14,26 +25,27 @@
     <sys:String x:Key="List_Size">크기</sys:String>
     <sys:String x:Key="List_Path">경로</sys:String>
 
-    <!-- 헤더 : 대시보드 -->
-    <sys:String x:Key="Status_Total">파일 합계</sys:String>
-    <sys:String x:Key="Status_Unknown">미지원 파일</sys:String>
-
     <!-- 사이드바 : 버튼 -->
     <sys:String x:Key="Btn_AddFile">파일 추가</sys:String>
     <sys:String x:Key="Btn_AddFolder">폴더 추가</sys:String>
     <sys:String x:Key="Btn_ListClear">목록 전부 제거</sys:String>
     <sys:String x:Key="Btn_ListManager">목록 관리</sys:String>
-    <sys:String x:Key="Btn_RenameRule">규칙 설정</sys:String>
-    <sys:String x:Key="Btn_ApplyRename">변경 적용</sys:String>
-    <sys:String x:Key="Btn_UndoRename">변경 취소</sys:String>
     <sys:String x:Key="Btn_ReorderIndex">번호 재정렬</sys:String>
     <sys:String x:Key="Btn_ConvertSetting">변환 설정</sys:String>
     <sys:String x:Key="Btn_Convert">변환</sys:String>
 
-    <!-- 목록 관리 사이드바 전용 -->
+    <!-- 사이드바 : 옵션 -->
+    <sys:String x:Key="Option_ConfirmDeletion">삭제 확인 표시</sys:String>
+    <sys:String x:Key="Option_MismatchOnly">불일치 필터</sys:String>
+    <!-- 사이드바 : 옵션 툴팁 -->
+    <sys:String x:Key="Tip_ConfirmDeletion">파일 삭제 확인 창을 ON/OFF 합니다.</sys:String>
+    <sys:String x:Key="Tip_MismatchOnly">확장자와 포맷 시그니처가 다른 파일만 필터링합니다.</sys:String>
+    <sys:String x:Key="Tip_FilteredNoReorder">필터링 중에는 순서 변경 및 재정렬이 불가능합니다.</sys:String>
+
+    <!-- 사이드바 : 목록 관리 -->
     <sys:String x:Key="Btn_Back">나가기</sys:String>
     <sys:String x:Key="ListManager_Title">목록 관리</sys:String>
-    <sys:String x:Key="ListManager_Desc">제거할 확장자를 선택하세요.</sys:String>
+    <sys:String x:Key="ListManager_Desc">제거할 포맷을 선택하세요.</sys:String>
     <sys:String x:Key="ListManager_Unsupported">미지원 파일</sys:String>
     <sys:String x:Key="Btn_RemoveSelected">선택 제거</sys:String>
 
@@ -41,7 +53,6 @@
     <sys:String x:Key="Sort_Label">정렬</sys:String>
     <sys:String x:Key="Sort_Asc">오름차순</sys:String>
     <sys:String x:Key="Sort_Desc">내림차순</sys:String>
-    <!-- 정렬 : 정렬 드롭다운 -->
     <sys:String x:Key="Sort_Index">번호</sys:String>
     <sys:String x:Key="Sort_NameIndex">이름-번호</sys:String>
     <sys:String x:Key="Sort_NamePath">이름-경로</sys:String>
@@ -51,13 +62,7 @@
     <sys:String x:Key="Sort_Extension">확장자</sys:String>
     <sys:String x:Key="Sort_Signature">포맷</sys:String>
 
-    <!-- 변환 설정 기본 -->
-    <sys:String x:Key="Setting_TargetFormat">변환 포맷</sys:String>
-    <sys:String x:Key="Setting_Quality">변환 품질</sys:String>
-    <sys:String x:Key="Setting_KeepExif">메타데이터(EXIF) 보존</sys:String>
-    <sys:String x:Key="Setting_BackgroundColor">배경 색상 (투명 이미지용)</sys:String>
-
-    <!-- 프리셋 관련 -->
+    <!-- 변환 설정 : 프리셋 -->
     <sys:String x:Key="Setting_PresetSelect">프리셋 지정</sys:String>
     <sys:String x:Key="Setting_PresetList">프리셋 선택</sys:String>
     <sys:String x:Key="Setting_PresetName">이름 변경</sys:String>
@@ -69,13 +74,19 @@
     <sys:String x:Key="Setting_GroupAnimation">애니메이션 이미지 변환 포맷</sys:String>
     <sys:String x:Key="Setting_OtherOptions">기타 옵션</sys:String>
 
-    <!-- 배경색 및 파일 선택 -->
+    <!-- 변환 설정 -->
+    <sys:String x:Key="Setting_TargetFormat">변환 포맷</sys:String>
+    <sys:String x:Key="Setting_Quality">변환 품질</sys:String>
+    <sys:String x:Key="Setting_KeepExif">메타데이터(EXIF) 보존</sys:String>
+    <sys:String x:Key="Setting_BackgroundColor">배경 색상 (투명 이미지용)</sys:String>
+
+    <!-- 변환 설정 : 배경색 및 파일 선택 -->
     <sys:String x:Key="Bg_White">흰색</sys:String>
     <sys:String x:Key="Bg_Black">검은색</sys:String>
     <sys:String x:Key="Bg_Custom">사용자 지정 (HEX)</sys:String>
     <sys:String x:Key="Btn_Browse">찾기...</sys:String>
 
-    <!-- 옵션 (덮어쓰기, 경로, CPU) -->
+    <!-- 변환 설정 : 덮어쓰기, 경로, CPU 사용량 -->
     <sys:String x:Key="Setting_OverwritePolicy">중복 파일 처리</sys:String>
     <sys:String x:Key="Setting_Overwrite_Overwrite">덮어쓰기</sys:String>
     <sys:String x:Key="Setting_Overwrite_Suffix">접미사 추가 (추천)</sys:String>
@@ -90,17 +101,6 @@
     <sys:String x:Key="Setting_Cpu_Half">절반 (50% 사용)</sys:String>
     <sys:String x:Key="Setting_Cpu_Min">최소 (백그라운드용)</sys:String>
 
-    <!-- 사이드바 : 옵션 -->
-    <sys:String x:Key="Option_ManualEdit">개별 변경 모드</sys:String>
-    <sys:String x:Key="Option_ConfirmDeletion">삭제 확인 표시</sys:String>
-    <sys:String x:Key="Option_MismatchOnly">불일치 필터</sys:String>
-    <!-- 옵션 : 툴팁 -->
-    <sys:String x:Key="Tip_ManualEdit" xml:space="preserve">파일을 더블 클릭하면 이름 개별 수정이 가능합니다.
-규칙 변경 시 수정 사항은 초기화됩니다.</sys:String>
-    <sys:String x:Key="Tip_ConfirmDeletion">파일 삭제 확인 창을 ON/OFF 합니다.</sys:String>
-    <sys:String x:Key="Tip_MismatchOnly">확장자와 포맷 시그니처가 다른 파일만 필터링합니다.</sys:String>
-    <sys:String x:Key="Tip_FilteredNoReorder">필터링 중에는 순서 변경 및 재정렬이 불가능합니다.</sys:String>
-
     <!-- 스낵바 -->
     <sys:String x:Key="Msg_AddFile">{0}개를 추가합니다.</sys:String>
     <sys:String x:Key="Msg_AddFilePartial">{0}개중 {1}개를 추가합니다.</sys:String>
@@ -110,29 +110,24 @@
     <sys:String x:Key="Msg_ReorderIndex">번호를 재정렬합니다.</sys:String>
     <sys:String x:Key="Msg_RemoveFile">{0}개를 목록에서 제거합니다.</sys:String>
     <sys:String x:Key="Msg_ClearList">목록을 전부 제거합니다.</sys:String>
-    <sys:String x:Key="Msg_NoRuleChanges">규칙 변경 사항이 없습니다.</sys:String>
-    <sys:String x:Key="Msg_NoChangeHistory">이름이 변경된 기록이 없습니다.</sys:String>
     <sys:String x:Key="Msg_Error_Occurred">작업 중 오류 발생: {0}</sys:String>
-    <sys:String x:Key="Msg_ApplyingChanges">이름 변경 적용 중...</sys:String>
-    <sys:String x:Key="Msg_ApplyingProgress">이름 변경 적용 중... ({0:0}%)</sys:String>
     <sys:String x:Key="Msg_LoadingFile">파일 불러오는 중...</sys:String>
     <sys:String x:Key="Msg_LoadingFileProgress">파일 불러오는 중... ({0}/{1})</sys:String>
-    <sys:String x:Key="Msg_UndoingProgress">변경 취소 중... ({0:0}%)</sys:String>
-
-    <sys:String x:Key="Msg_RenameSuccess">{0}개의 이름을 변경합니다.</sys:String>
-    <sys:String x:Key="Msg_UndoSuccess">{0}개의 이름 변경을 취소합니다.</sys:String>
-    <sys:String x:Key="Msg_PartialSuccess">{0}개 변경, {1}개 실패했습니다.</sys:String>
-    <sys:String x:Key="Msg_RenameFailure">실패 : {0}개의 작업에 오류가 발생했습니다.</sys:String>
 
     <sys:String x:Key="Err_PathTooLong">실패 : 파일명 또는 경로가 너무 깁니다.</sys:String>
     <sys:String x:Key="Err_FileNotFound">실패 : 원본을 찾을 수 없습니다.</sys:String>
     <sys:String x:Key="Err_Unauthorized">실패 : 권한이 없습니다.</sys:String>
     <sys:String x:Key="Err_IO">실패 : 사용할 수 없는 이름입니다.</sys:String>
+
     <sys:String x:Key="Msg_OperationComplete">{0}개의 작업이 완료되었습니다.</sys:String>
+    <sys:String x:Key="Msg_Error_ConfigInvalid">변환 설정에 문제가 있습니다. 다시 설정해주세요.</sys:String>
+    <sys:String x:Key="Msg_Preset_SaveSuccess">설정 저장이 완료되었습니다</sys:String>
+    <sys:String x:Key="Msg_Preset_SaveError">설정 저장을 실패했습니다</sys:String>
 
     <!-- 다이얼로그 -->
     <sys:String x:Key="Err_Fatal_Title">시작 오류</sys:String>
     <sys:String x:Key="Err_Fatal_Init">애플리케이션 시작 중 오류가 발생했습니다:\n{0}</sys:String>
+
     <sys:String x:Key="Dlg_Yes">네</sys:String>
     <sys:String x:Key="Dlg_No">아니오</sys:String>
     <sys:String x:Key="Dlg_Confirm">확인</sys:String>
@@ -152,28 +147,13 @@
     <sys:String x:Key="Dlg_Title_ClearList">목록 삭제</sys:String>
     <sys:String x:Key="Dlg_Ask_ClearList">목록을 전부 삭제하시겠습니까?</sys:String>
 
-    <sys:String x:Key="Dlg_Title_ManualRename">개별 이름 변경</sys:String>
-    <sys:String x:Key="Dlg_Ask_ManualRename">변경할 파일명을 입력하세요:</sys:String>
-
     <sys:String x:Key="Dlg_Title_FolderOption">폴더 추가 옵션</sys:String>
     <sys:String x:Key="Dlg_Btn_AddFileInFolder">폴더 내 파일 추가</sys:String>
     <sys:String x:Key="Dlg_Btn_AddFolder">폴더 추가</sys:String>
     <sys:String x:Key="Dlg_Ask_FolderOptionSingle">'{0}'폴더를 어떻게 추가하시겠습니까?</sys:String>
     <sys:String x:Key="Dlg_Ask_FolderOptionMulti">'{0}'폴더 외 {1}개의 폴더를 어떻게 추가하시겠습니까?</sys:String>
 
-    <!-- Convert Confirmation & Error-->
     <sys:String x:Key="Dlg_Title_Convert">변환 확인</sys:String>
     <sys:String x:Key="Dlg_Ask_Convert">총 {0}개의 파일을 변환하시겠습니까?</sys:String>
-    <sys:String x:Key="Msg_Error_ConfigInvalid">변환 설정에 문제가 있습니다. 다시 설정해주세요.</sys:String>
-
-    <!-- 상태 -->
-    <sys:String x:Key="Status_Pending">대기</sys:String>
-    <sys:String x:Key="Status_Processing">변환 중</sys:String>
-    <sys:String x:Key="Status_Success">완료</sys:String>
-    <sys:String x:Key="Status_Error">실패</sys:String>
-    <sys:String x:Key="Status_Unsupported">미지원</sys:String>
-    <!-- Preset Snackbar -->
-    <sys:String x:Key="Msg_Preset_SaveSuccess">설정 저장이 완료되었습니다</sys:String>
-    <sys:String x:Key="Msg_Preset_SaveError">설정 저장을 실패했습니다</sys:String>
 
 </ResourceDictionary>

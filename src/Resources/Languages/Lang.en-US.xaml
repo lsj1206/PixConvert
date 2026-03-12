@@ -1,11 +1,22 @@
-﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
     <!-- App/Window Common -->
     <sys:String x:Key="App_Title">PixConvert</sys:String>
 
-    <!-- List -->
+    <!-- Header : Dashboard -->
+    <sys:String x:Key="Status_Total">Total Files</sys:String>
+    <sys:String x:Key="Status_Unknown">Unsupported Files</sys:String>
+
+    <!-- Header : Status -->
+    <sys:String x:Key="Status_Pending">Ready</sys:String>
+    <sys:String x:Key="Status_Processing">Processing</sys:String>
+    <sys:String x:Key="Status_Success">Success</sys:String>
+    <sys:String x:Key="Status_Error">Error</sys:String>
+    <sys:String x:Key="Status_Unsupported">N/A</sys:String>
+
+    <!-- List : Item -->
     <sys:String x:Key="List_Index">Index</sys:String>
     <sys:String x:Key="List_Name">Name</sys:String>
     <sys:String x:Key="List_Extension">Ext.</sys:String>
@@ -14,33 +25,34 @@
     <sys:String x:Key="List_Size">Size</sys:String>
     <sys:String x:Key="List_Path">Path</sys:String>
 
-    <!-- Header : Dashboard -->
-    <sys:String x:Key="Status_Total">Total File</sys:String>
-    <sys:String x:Key="Status_Unknown">Unknown File</sys:String>
-
-    <!-- Sidebar : Btn -->
+    <!-- Sidebar : Button -->
     <sys:String x:Key="Btn_AddFile">Add File</sys:String>
     <sys:String x:Key="Btn_AddFolder">Add Folder</sys:String>
     <sys:String x:Key="Btn_ListClear">Remove All List</sys:String>
     <sys:String x:Key="Btn_ListManager">List Manager</sys:String>
-    <sys:String x:Key="Btn_RenameRule">Rename Rule</sys:String>
-    <sys:String x:Key="Btn_ApplyRename">Apply Rename</sys:String>
-    <sys:String x:Key="Btn_UndoRename">Undo Rename</sys:String>
     <sys:String x:Key="Btn_ReorderIndex">Reorder Index</sys:String>
     <sys:String x:Key="Btn_ConvertSetting">Convert Setting</sys:String>
     <sys:String x:Key="Btn_Convert">Convert</sys:String>
-    <!-- List Manager Sidebar -->
-    <sys:String x:Key="Btn_Back">Back</sys:String>
+
+    <!-- Sidebar : Option -->
+    <sys:String x:Key="Option_ConfirmDeletion">Show Deletion Confirm</sys:String>
+    <sys:String x:Key="Option_MismatchOnly">Diff Filter</sys:String>
+    <!-- Sidebar : Option Tooltip -->
+    <sys:String x:Key="Tip_ConfirmDeletion">Turn ON/OFF file deletion confirmation window.</sys:String>
+    <sys:String x:Key="Tip_MismatchOnly">Filter only files where extension and format signature differ.</sys:String>
+    <sys:String x:Key="Tip_FilteredNoReorder">Order change and reorder are disabled during filtering.</sys:String>
+
+    <!-- Sidebar : List Manager -->
+    <sys:String x:Key="Btn_Back">Exit</sys:String>
     <sys:String x:Key="ListManager_Title">List Manager</sys:String>
-    <sys:String x:Key="ListManager_Desc">Select Ext. to remove</sys:String>
+    <sys:String x:Key="ListManager_Desc">Select Format to remove.</sys:String>
     <sys:String x:Key="ListManager_Unsupported">Unsupported Files</sys:String>
     <sys:String x:Key="Btn_RemoveSelected">Remove Selected</sys:String>
 
-    <!-- Sidebar : Sort -->
+    <!-- Sidebar : Sorting -->
     <sys:String x:Key="Sort_Label">Sort</sys:String>
-    <sys:String x:Key="Sort_Asc">Asc</sys:String>
-    <sys:String x:Key="Sort_Desc">Desc</sys:String>
-    <!-- Sort : Sort Dropdown -->
+    <sys:String x:Key="Sort_Asc">Ascending</sys:String>
+    <sys:String x:Key="Sort_Desc">Descending</sys:String>
     <sys:String x:Key="Sort_Index">Index</sys:String>
     <sys:String x:Key="Sort_NameIndex">Name-Index</sys:String>
     <sys:String x:Key="Sort_NamePath">Name-Path</sys:String>
@@ -50,37 +62,37 @@
     <sys:String x:Key="Sort_Extension">Ext.</sys:String>
     <sys:String x:Key="Sort_Signature">Format</sys:String>
 
-    <!-- Conversion Settings -->
-    <sys:String x:Key="Setting_TargetFormat">Target Format</sys:String>
-    <sys:String x:Key="Setting_Quality">Conversion Quality</sys:String>
-    <sys:String x:Key="Setting_KeepExif">Preserve Metadata (EXIF)</sys:String>
-    <sys:String x:Key="Setting_BackgroundColor">Background Color (Transparency)</sys:String>
-
-    <!-- Preset Related -->
+    <!-- Convert Setting : Preset -->
     <sys:String x:Key="Setting_PresetSelect">Preset Selection</sys:String>
     <sys:String x:Key="Setting_PresetList">Select Preset</sys:String>
     <sys:String x:Key="Setting_PresetName">Rename</sys:String>
     <sys:String x:Key="Btn_PresetApply">Apply</sys:String>
-    <sys:String x:Key="Btn_PresetCreate">Add Preset</sys:String>
+    <sys:String x:Key="Btn_PresetCreate">Create Preset</sys:String>
     <sys:String x:Key="Btn_PresetCopy">Copy Preset</sys:String>
     <sys:String x:Key="Btn_PresetDelete">Delete Preset</sys:String>
     <sys:String x:Key="Setting_GroupStandard">Standard Image Format</sys:String>
     <sys:String x:Key="Setting_GroupAnimation">Animation Image Format</sys:String>
     <sys:String x:Key="Setting_OtherOptions">Other Options</sys:String>
 
-    <!-- Background Color and Browse -->
+    <!-- Convert Setting -->
+    <sys:String x:Key="Setting_TargetFormat">Target Format</sys:String>
+    <sys:String x:Key="Setting_Quality">Quality</sys:String>
+    <sys:String x:Key="Setting_KeepExif">Preserve Metadata (EXIF)</sys:String>
+    <sys:String x:Key="Setting_BackgroundColor">Background Color (Transparency)</sys:String>
+
+    <!-- Convert Setting : BgColor & File Selection -->
     <sys:String x:Key="Bg_White">White</sys:String>
     <sys:String x:Key="Bg_Black">Black</sys:String>
     <sys:String x:Key="Bg_Custom">Custom (HEX)</sys:String>
     <sys:String x:Key="Btn_Browse">Browse...</sys:String>
 
-    <!-- Options (Overwrite, Path, CPU) -->
+    <!-- Convert Setting : Overwrite, Path, CPU Usage -->
     <sys:String x:Key="Setting_OverwritePolicy">Duplicate File Policy</sys:String>
     <sys:String x:Key="Setting_Overwrite_Overwrite">Overwrite</sys:String>
-    <sys:String x:Key="Setting_Overwrite_Suffix">Add Suffix (Recommend)</sys:String>
+    <sys:String x:Key="Setting_Overwrite_Suffix">Add Suffix (Rec.)</sys:String>
     <sys:String x:Key="Setting_Overwrite_Skip">Skip</sys:String>
     <sys:String x:Key="Setting_OutputPath">Output Path Options</sys:String>
-    <sys:String x:Key="Setting_OutputDir_Sub">Create Subfolder (PixConvert_...)</sys:String>
+    <sys:String x:Key="Setting_OutputDir_Sub">Subfolder (PixConvert_...)</sys:String>
     <sys:String x:Key="Setting_OutputDir_Same">Same as Original Folder</sys:String>
     <sys:String x:Key="Setting_OutputDir_Custom">Custom Path</sys:String>
     <sys:String x:Key="Setting_CpuUsage">CPU Workload (Performance)</sys:String>
@@ -89,49 +101,32 @@
     <sys:String x:Key="Setting_Cpu_Half">Half (50% Usage)</sys:String>
     <sys:String x:Key="Setting_Cpu_Min">Minimum (Background)</sys:String>
 
-    <!-- Sidebar : Option -->
-    <sys:String x:Key="Option_ManualEdit">Manual Edit</sys:String>
-    <sys:String x:Key="Option_ConfirmDeletion">Confirm Delete</sys:String>
-    <sys:String x:Key="Option_MismatchOnly">Diff Only</sys:String>
-    <!-- Option : Tooltip -->
-    <sys:String x:Key="Tip_ManualEdit" xml:space="preserve">Double-click a file to rename.
-Edits are reset when the rule is changed.</sys:String>
-    <sys:String x:Key="Tip_ConfirmDeletion">File deletion confirmation ON/OFF</sys:String>
-    <sys:String x:Key="Tip_MismatchOnly">Show only files where extension and format signature differ.</sys:String>
-    <sys:String x:Key="Tip_FilteredNoReorder">Disabled during Diff Only.</sys:String>
-
     <!-- Snackbar -->
-    <sys:String x:Key="Msg_AddFile">Add {0} file.</sys:String>
-    <sys:String x:Key="Msg_AddFilePartial">Add {1} of {0} file.</sys:String>
+    <sys:String x:Key="Msg_AddFile">Adding {0} file(s).</sys:String>
+    <sys:String x:Key="Msg_AddFilePartial">Adding {1} of {0} file(s).</sys:String>
     <sys:String x:Key="Msg_AlreadyExists">Already exists in the list.</sys:String>
     <sys:String x:Key="Msg_FileAddError">Error adding file: {0}</sys:String>
-    <sys:String x:Key="Msg_MaxItemExceeded">File limit exceeded. Limit: {0:N0}, Current: {1:N0}, Add: {2:N0}</sys:String>
-    <sys:String x:Key="Msg_ReorderIndex">Reordering Index.</sys:String>
-    <sys:String x:Key="Msg_RemoveFile">Remove {0} file from list.</sys:String>
+    <sys:String x:Key="Msg_MaxItemExceeded">File limit exceeded. Limit: {0:N0}, Existing: {1:N0}, New: {2:N0}</sys:String>
+    <sys:String x:Key="Msg_ReorderIndex">Reordering index.</sys:String>
+    <sys:String x:Key="Msg_RemoveFile">Removing {0} file(s) from list.</sys:String>
     <sys:String x:Key="Msg_ClearList">Clearing list.</sys:String>
-    <sys:String x:Key="Msg_NoRuleChanges">No rule changes detected.</sys:String>
-    <sys:String x:Key="Msg_NoChangeHistory">No change history found.</sys:String>
-    <sys:String x:Key="Msg_Error_Occurred">An error occurred: {0}</sys:String>
-    <sys:String x:Key="Msg_ApplyingChanges">Applying name changes...</sys:String>
-    <sys:String x:Key="Msg_ApplyingProgress">Applying name changes... ({0:0}%)</sys:String>
-    <sys:String x:Key="Msg_LoadingFile">Loading file...</sys:String>
-    <sys:String x:Key="Msg_LoadingFileProgress">Loading file... ({0}/{1})</sys:String>
-    <sys:String x:Key="Msg_UndoProgress">Undo changes... ({0:0}%)</sys:String>
-
-    <sys:String x:Key="Msg_RenameSuccess">Renamed {0} file.</sys:String>
-    <sys:String x:Key="Msg_UndoSuccess">Undo {0} rename.</sys:String>
-    <sys:String x:Key="Msg_PartialSuccess">Success : {0} Fail : {1}.</sys:String>
-    <sys:String x:Key="Msg_RenameFailure">Fail: {0} errors occurred.</sys:String>
+    <sys:String x:Key="Msg_Error_Occurred">Error: {0}</sys:String>
+    <sys:String x:Key="Msg_LoadingFile">Loading files...</sys:String>
+    <sys:String x:Key="Msg_LoadingFileProgress">Loading files... ({0}/{1})</sys:String>
 
     <sys:String x:Key="Err_PathTooLong">Fail: Name or Path is too long.</sys:String>
     <sys:String x:Key="Err_FileNotFound">Fail: Original not found.</sys:String>
     <sys:String x:Key="Err_Unauthorized">Fail: Access denied.</sys:String>
     <sys:String x:Key="Err_IO">Fail: Invalid name.</sys:String>
-    <sys:String x:Key="Msg_OperationComplete">{0} operation complete.</sys:String>
+    <sys:String x:Key="Msg_OperationComplete">{0} operation(s) complete.</sys:String>
+    <sys:String x:Key="Msg_Error_ConfigInvalid">Invalid conversion settings. Please reconfigure.</sys:String>
+    <sys:String x:Key="Msg_Preset_SaveSuccess">Settings saved successfully</sys:String>
+    <sys:String x:Key="Msg_Preset_SaveError">Failed to save settings</sys:String>
 
-    <!-- Dialogs -->
+    <!-- Dialog -->
     <sys:String x:Key="Err_Fatal_Title">Startup Error</sys:String>
     <sys:String x:Key="Err_Fatal_Init">An error occurred while starting the application:\n{0}</sys:String>
+
     <sys:String x:Key="Dlg_Yes">Yes</sys:String>
     <sys:String x:Key="Dlg_No">No</sys:String>
     <sys:String x:Key="Dlg_Confirm">Confirm</sys:String>
@@ -141,7 +136,7 @@ Edits are reset when the rule is changed.</sys:String>
     <sys:String x:Key="Dlg_Title_AddFolder">Add Folder</sys:String>
 
     <sys:String x:Key="Dlg_Title_ReorderIndex">Reorder Index</sys:String>
-    <sys:String x:Key="Dlg_Ask_ReorderIndex" xml:space="preserve">Reindex based on the current order?
+    <sys:String x:Key="Dlg_Ask_ReorderIndex" xml:space="preserve">Reindex based on current order?
 Existing indexes will be reset.</sys:String>
 
     <sys:String x:Key="Dlg_Title_DeleteConfirm">Confirm Deletion</sys:String>
@@ -151,30 +146,13 @@ Existing indexes will be reset.</sys:String>
     <sys:String x:Key="Dlg_Title_ClearList">Clear List</sys:String>
     <sys:String x:Key="Dlg_Ask_ClearList">Clear all files from the list?</sys:String>
 
-    <sys:String x:Key="Dlg_Title_ManualRename">Manual Rename</sys:String>
-    <sys:String x:Key="Dlg_Ask_ManualRename">Enter the new file name:</sys:String>
-
     <sys:String x:Key="Dlg_Title_FolderOption">Folder Addition Options</sys:String>
-    <sys:String x:Key="Dlg_Btn_AddFileInFolder">Add File in Folder</sys:String>
+    <sys:String x:Key="Dlg_Btn_AddFileInFolder">Add File(s) in Folder</sys:String>
     <sys:String x:Key="Dlg_Btn_AddFolder">Add Folder</sys:String>
     <sys:String x:Key="Dlg_Ask_FolderOptionSingle">How would you like to add '{0}'?</sys:String>
     <sys:String x:Key="Dlg_Ask_FolderOptionMulti">How would you like to add '{0}' and {1} other folders?</sys:String>
 
-    <!-- Convert Confirmation & Error-->
     <sys:String x:Key="Dlg_Title_Convert">Confirm Conversion</sys:String>
-    <sys:String x:Key="Dlg_Ask_Convert">Are you sure you want to convert {0} files?</sys:String>
-    <sys:String x:Key="Msg_Error_ConfigInvalid">There is a problem with the conversion settings. Please reconfigure them.</sys:String>
-
-    <!-- Status -->
-    <sys:String x:Key="Status_Pending">Ready</sys:String>
-    <sys:String x:Key="Status_Processing">Processing</sys:String>
-    <sys:String x:Key="Status_Success">Success</sys:String>
-    <sys:String x:Key="Status_Error">Error</sys:String>
-    <sys:String x:Key="Status_Unsupported">N/A</sys:String>
-    <!-- Preset Snackbar -->
-    <sys:String x:Key="Msg_Preset_SaveSuccess">Settings saved successfully</sys:String>
-    <sys:String x:Key="Msg_Preset_SaveError">Failed to save settings</sys:String>
+    <sys:String x:Key="Dlg_Ask_Convert">Are you sure you want to convert {0} file(s)?</sys:String>
 
 </ResourceDictionary>
-
-
