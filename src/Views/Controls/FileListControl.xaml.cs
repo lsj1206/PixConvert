@@ -36,9 +36,9 @@ public partial class FileListControl : UserControl
             if (Window.GetWindow(this)?.DataContext is MainViewModel vm)
             {
                 var list = (sender as ListView)?.SelectedItems;
-                if (vm.DeleteFilesCommand.CanExecute(list))
+                if (vm.ListManager.DeleteFilesCommand.CanExecute(list))
                 {
-                    vm.DeleteFilesCommand.Execute(list);
+                    vm.ListManager.DeleteFilesCommand.Execute(list);
                 }
             }
         }
@@ -253,7 +253,7 @@ public partial class FileListControl : UserControl
     /// <summary>
     /// 외부 파일 드롭 또는 내부 아이템 이동 드롭 시 실제 데이터를 처리합니다.
     /// </summary>
-    private void FileListView_Drop(object sender, DragEventArgs e)
+    private async void FileListView_Drop(object sender, DragEventArgs e)
     {
         DropIndicator.Visibility = Visibility.Collapsed;
 
@@ -264,7 +264,15 @@ public partial class FileListControl : UserControl
             {
                 if (Window.GetWindow(this)?.DataContext is MainViewModel vm)
                 {
-                    vm.DropFiles(files);
+                    try
+                    {
+                        await vm.FileInput.DropFilesAsync(files);
+                    }
+                    catch (Exception ex)
+                    {
+                        // 비동기 처리 중 발생하는 예외를 캡처하여 로그 등에 기록하고 사용자에게 알림
+                        System.Diagnostics.Debug.WriteLine($"DropFilesAsync failed: {ex.Message}");
+                    }
                 }
             }
         }
@@ -314,9 +322,9 @@ public partial class FileListControl : UserControl
                 if (Window.GetWindow(this)?.DataContext is MainViewModel vm)
                 {
                     // ViewModel의 정렬 명령 실행
-                    if (vm.SortByColumnCommand.CanExecute(sortType))
+                    if (vm.SortFilter.SortByColumnCommand.CanExecute(sortType))
                     {
-                        vm.SortByColumnCommand.Execute(sortType);
+                        vm.SortFilter.SortByColumnCommand.Execute(sortType);
                     }
                 }
             }

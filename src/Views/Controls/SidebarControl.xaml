@@ -42,20 +42,20 @@
                                         <!-- 파일 추가/삭제 -->
                                         <StackPanel Orientation="Vertical">
                                             <Button Content="{DynamicResource Btn_AddFile}"
-                                                    Command="{Binding Sidebar.AddFilesCommand}"
+                                                    Command="{Binding FileInput.AddFilesCommand}"
                                                     Style="{StaticResource SidebarButtonStyle}" />
                                             <Button Content="{DynamicResource Btn_AddFolder}"
-                                                    Command="{Binding Sidebar.AddFolderCommand}"
+                                                    Command="{Binding FileInput.AddFolderCommand}"
                                                     Style="{StaticResource SidebarButtonStyle}" />
 
                                             <Separator Margin="0,0,0,8" />
 
                                             <!-- 변환 설정 및 변환 -->
                                             <Button Content="{DynamicResource Btn_ConvertSetting}"
-                                                    Command="{Binding Sidebar.OpenConvertSettingCommand}"
+                                                    Command="{Binding Conversion.OpenConvertSettingCommand}"
                                                     Style="{StaticResource SidebarButtonStyle}" />
                                             <Button Content="{DynamicResource Btn_Convert}"
-                                                    Command="{Binding Sidebar.ConvertFilesCommand}"
+                                                    Command="{Binding Conversion.ConvertFilesCommand}"
                                                     Foreground="{DynamicResource SystemControlForegroundAccentBrush}"
                                                     Style="{StaticResource SidebarButtonStyle}" />
                                         </StackPanel>
@@ -65,7 +65,7 @@
                                         <!-- 정렬 및 설정 -->
                                         <StackPanel Orientation="Vertical">
                                             <Button Content="{DynamicResource Btn_ListManager}"
-                                                    Command="{Binding Sidebar.EnterListManagerCommand}"
+                                                    Command="{Binding ListManager.EnterListManagerCommand}"
                                                     Style="{StaticResource SidebarButtonStyle}" />
 
                                             <TextBlock Margin="0,0,0,4"
@@ -95,7 +95,7 @@
                                                              ToolTip="{DynamicResource Tip_MismatchOnly}"
                                                              Margin="0,0,0,4"/>
                                             <Button Content="{DynamicResource Btn_ReorderIndex}"
-                                                    Command="{Binding ReorderNumberCommand}"
+                                                    Command="{Binding SortFilter.ReorderNumberCommand}"
                                                     ToolTip="{DynamicResource Tip_FilteredNoReorder}"
                                                     ToolTipService.ShowOnDisabled="True"
                                                     Style="{StaticResource SidebarButtonStyle}" />
@@ -107,7 +107,7 @@
                                         <StackPanel Orientation="Vertical">
                                             <Grid Margin="0">
                                                 <CheckBox Content="{DynamicResource Option_ConfirmDeletion}"
-                                                          IsChecked="{Binding ConfirmDeletion}"
+                                                          IsChecked="{Binding ListManager.ConfirmDeletion}"
                                                           VerticalAlignment="Center"/>
                                                 <Image Source="{StaticResource HelpIcon}"
                                                        Width="12" Height="12"
@@ -129,7 +129,7 @@
                                                 <TextBlock Text="{DynamicResource Status_Processing}" FontSize="14" FontWeight="SemiBold" Foreground="{DynamicResource SystemControlForegroundAccentBrush}" Margin="0,0,0,16" />
 
                                                 <TextBlock Text="{Binding Header.CurrentFileName}" ToolTip="{Binding Header.CurrentFileName}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" Margin="0,0,0,8" />
-                                                <ProgressBar Minimum="0" Maximum="100" Value="{Binding Sidebar.ConvertProgressPercent}" Height="6" Margin="0,0,0,8" />
+                                                <ProgressBar Minimum="0" Maximum="100" Value="{Binding Conversion.ConvertProgressPercent}" Height="6" Margin="0,0,0,8" />
 
                                                 <Grid Margin="0,0,0,24">
                                                     <Grid.ColumnDefinitions>
@@ -175,7 +175,7 @@
                                             <StackPanel Orientation="Vertical">
                                                 <!-- 나가기 버튼 (최상단) -->
                                                 <Button Content="{DynamicResource Btn_Back}"
-                                                        Command="{Binding Sidebar.ExitListManagerCommand}"
+                                                        Command="{Binding ListManager.ExitListManagerCommand}"
                                                         Style="{StaticResource SidebarButtonStyle}"
                                                         Margin="0,0,0,12" />
 
@@ -186,7 +186,7 @@
                                                 <TextBlock Text="{DynamicResource ListManager_Desc}" FontSize="11" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" Margin="0,0,0,8" TextWrapping="Wrap" />
 
                                                 <!-- 포맷별 확장자 태그 (다중 선택) -->
-                                                <ItemsControl ItemsSource="{Binding Sidebar.ExtensionTags}" Margin="0,0,0,8">
+                                                <ItemsControl ItemsSource="{Binding ListManager.ExtensionTags}" Margin="0,0,0,8">
                                                     <ItemsControl.ItemsPanel>
                                                         <ItemsPanelTemplate>
                                                             <WrapPanel Orientation="Horizontal" />
@@ -207,14 +207,14 @@
 
                                                 <!-- 미지원 파일 체크박스 -->
                                                 <CheckBox Content="{DynamicResource ListManager_Unsupported}"
-                                                          IsChecked="{Binding Sidebar.RemoveUnsupported, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                          IsChecked="{Binding ListManager.RemoveUnsupported, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                           FontWeight="SemiBold"
                                                           Foreground="#FF5555"
                                                           Margin="0,0,0,8" />
 
                                                 <!-- 적용 버튼 -->
                                                 <Button Content="{DynamicResource Btn_RemoveSelected}"
-                                                        Command="{Binding Sidebar.RemoveSelectedCommand}"
+                                                        Command="{Binding ListManager.RemoveSelectedCommand}"
                                                         Style="{StaticResource SidebarButtonStyle}"
                                                         Margin="0,0,0,4" />
 
@@ -222,7 +222,7 @@
 
                                                 <!-- 목록 전부 제거 -->
                                                 <Button Content="{DynamicResource Btn_ListClear}"
-                                                        Command="{Binding Sidebar.RemoveAllListCommand}"
+                                                        Command="{Binding ListManager.RemoveAllListCommand}"
                                                         Foreground="#FF5555"
                                                         Style="{StaticResource SidebarButtonStyle}"
                                                         Margin="0,0,0,8" />

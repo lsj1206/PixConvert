@@ -119,15 +119,22 @@ public partial class App : Application
         services.AddSingleton<NetVipsProvider>();
         services.AddSingleton<EngineSelector>();
 
-        // [ViewModels] 화면 상태 관리 뷰모델 등록
+        // [ViewModel] 화면 상태 관리 뷰모델 등록
         services.AddTransient<MainViewModel>();
         services.AddSingleton<SnackbarViewModel>();
         services.AddSingleton<FileListViewModel>();
-        services.AddSingleton<SortFilterViewModel>(); // SidebarVM·MainVM이 공유하는 정렬/필터 상태
-        services.AddSingleton<SidebarViewModel>();
-        services.AddTransient<ConvertSettingViewModel>(); // 다이얼로그용
+        services.AddSingleton<SortFilterViewModel>(); // 정렬/필터 상태
 
-        // [Views] UI 창 등록
+        // [ViewModel] 사이드바 3분할 뷰모델 등록
+        services.AddSingleton<FileInputViewModel>();
+        services.AddSingleton<ConversionViewModel>();
+        services.AddSingleton<ListManagerViewModel>();
+
+        // 다이얼로그 전용 뷰모델 및 팩토리 패턴 등록
+        services.AddTransient<ConvertSettingViewModel>();
+        services.AddTransient<Func<ConvertSettingViewModel>>(sp => () => sp.GetRequiredService<ConvertSettingViewModel>());
+
+        // [View] UI 창 등록
         services.AddSingleton<MainWindow>();
 
         return services.BuildServiceProvider();
