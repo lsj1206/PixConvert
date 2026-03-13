@@ -16,26 +16,16 @@ namespace PixConvert.ViewModels;
 /// </summary>
 public partial class SidebarViewModel : ViewModelBase
 {
-    private const int MaxItemCount = 10000;
-
     private readonly IDialogService _dialogService;
     private readonly ISnackbarService _snackbarService;
     private readonly IFileAnalyzerService _fileAnalyzerService;
-    private readonly ISortingService _sortingService;
     private readonly IPresetService _presetService;
     private readonly ILoggerFactory _loggerFactory;
 
     // 타 뷰모델 참조
     private readonly FileListViewModel _fileList;
-
-    /// <summary>현재 선택된 정렬 기준</summary>
-    [ObservableProperty] private SortType _selectedSortType = SortType.AddIndex;
-
-    /// <summary>오름차순/내림차순 정렬 여부</summary>
-    [ObservableProperty] private bool _isSortAscending = true;
-
-    /// <summary>필터 적용 기준: 불일치 파일들만 표시할지 여부</summary>
-    [ObservableProperty] private bool _showMismatchOnly = false;
+    // 정렬·필터 상태를 단독 소유하는 뷰모델 (Main↔Sidebar 결합 제거)
+    private readonly SortFilterViewModel _sortFilter;
 
     /// <summary>현재 변환 작업의 전체 진행률(0~100)을 나타냅니다.</summary>
     [ObservableProperty] private int _convertProgressPercent;
@@ -74,19 +64,19 @@ public partial class SidebarViewModel : ViewModelBase
         ISnackbarService snackbarService,
         ILanguageService languageService,
         IFileAnalyzerService fileAnalyzerService,
-        ISortingService sortingService,
         IPresetService presetService,
         ILoggerFactory loggerFactory,
-        FileListViewModel fileList)
+        FileListViewModel fileList,
+        SortFilterViewModel sortFilter)
         : base(languageService, logger)
     {
         _dialogService = dialogService;
         _snackbarService = snackbarService;
         _fileAnalyzerService = fileAnalyzerService;
-        _sortingService = sortingService;
         _presetService = presetService;
         _loggerFactory = loggerFactory;
         _fileList = fileList;
+        _sortFilter = sortFilter;
 
         // 명령 초기화: Busy 상태에 따른 실행 가능 여부 설정
         AddFilesCommand = new AsyncRelayCommand(AddFilesAsync, () => CurrentStatus == AppStatus.Idle);
@@ -105,11 +95,6 @@ public partial class SidebarViewModel : ViewModelBase
     {
         NotifyCommandsStateChanged();
     }
-
-    /// <summary>필터 또는 정렬 값이 변경될 때 UI를 갱신합니다.</summary>
-    partial void OnSelectedSortTypeChanged(SortType value) => SortFiles();
-    partial void OnIsSortAscendingChanged(bool value) => SortFiles();
-    partial void OnShowMismatchOnlyChanged(bool value) => ApplyFilter();
 
     /// <summary>외부 상태 변경에 따라 사이드바 명령들의 실행 가능 여부를 강제로 갱신합니다.</summary>
     public void NotifyCommandsStateChanged()
@@ -240,7 +225,7 @@ public partial class SidebarViewModel : ViewModelBase
             // 1. 서비스 엔진을 통해 파일 스캔 및 데이터 객체 생성 (기존 HashSet 재사용)
             var result = await _fileAnalyzerService.ProcessPathsAsync(
                 paths,
-                MaxItemCount,
+                10000,
                 _fileList.Items.Count,
                 _fileList.PathSet,
                 progress);
@@ -265,7 +250,7 @@ public partial class SidebarViewModel : ViewModelBase
             if (result.SuccessCount > 0)
             {
                 AddFilesToList(result.NewItems);
-                
+
                 // 알림 우선순위: 한도 초과(부분추가) > 중복 제외 > 일반 성공
                 if (result.IgnoredCount > 0)
                 {
@@ -297,13 +282,13 @@ public partial class SidebarViewModel : ViewModelBase
     }
 
     /// <summary>
-    /// 처리된 파일 아이템 리스트를 실제 FileListViewModel 데이터 소스에 삽입하고 결과에 따라 스낵바 알림을 표시합니다.
+    /// 처리된 파일 아이템 리스트를 실제 FileListViewModel 데이터 소스에 삽입하고 정렬을 재적용합니다.
     /// </summary>
-    /// <param name="items">추가할 파일 아이템 리스트</param>
     private int AddFilesToList(List<FileItem> items)
     {
         int successCount = _fileList.AddRange(items);
-        SortFiles();
+        // 파일 추가 후 현재 정렬 상태를 SortFilterViewModel에 위임하여 재적용
+        _sortFilter.ApplySortAndFilter();
         return successCount;
     }
 
@@ -413,32 +398,6 @@ public partial class SidebarViewModel : ViewModelBase
             ConvertProgressPercent = 0;
             RequestStatus(AppStatus.Idle); // 작업 완료 후 대기 상태로 복구
         }
-    }
-
-    /// <summary>
-    /// 현재 설정된 옵션에 따라 목록을 정렬합니다.
-    /// </summary>
-    private void SortFiles()
-    {
-        _fileList.Sorting(_sortingService, SelectedSortType, IsSortAscending);
-        ApplyFilter();
-    }
-
-    /// <summary>
-    /// 현재 설정된 필터 옵션(예: 불일치 파일만 보기)을 목록 뷰에 적용합니다.
-    /// </summary>
-    private void ApplyFilter()
-    {
-        var view = System.Windows.Data.CollectionViewSource.GetDefaultView(_fileList.Items);
-        if (ShowMismatchOnly)
-        {
-            view.Filter = item => item is FileItem fileItem && fileItem.IsMismatch;
-        }
-        else
-        {
-            view.Filter = null;
-        }
-        view.Refresh();
     }
 
 }

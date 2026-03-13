@@ -25,6 +25,9 @@ public partial class MainViewModel : ViewModelBase, IRecipient<AppStatusRequestM
     /// <summary>파일 목록 데이터 도메인 관리 뷰모델</summary>
     public FileListViewModel FileList { get; }
 
+    /// <summary>정렬 기준, 정렬 방향, 필터 상태를 단독 소유하는 뷰모델</summary>
+    public SortFilterViewModel SortFilter { get; }
+
     /// <summary>좌측 사이드바 액션 관리 뷰모델</summary>
     public SidebarViewModel Sidebar { get; }
 
@@ -56,14 +59,15 @@ public partial class MainViewModel : ViewModelBase, IRecipient<AppStatusRequestM
         ILogger<HeaderViewModel> headerLogger,
         SidebarViewModel sidebarViewModel,
         SnackbarViewModel snackbarViewModel,
-        FileListViewModel fileListViewModel)
+        FileListViewModel fileListViewModel,
+        SortFilterViewModel sortFilterViewModel)
         : base(languageService, logger)
     {
         _dialogService = dialogService;
         _snackbarService = snackbarService;
         FileList = fileListViewModel;
-
         Snackbar = snackbarViewModel;
+        SortFilter = sortFilterViewModel;
 
         // 하위 뷰모델 초기화 (기능별 역할 분담)
         Header = new HeaderViewModel(languageService, headerLogger, FileList);
@@ -74,13 +78,13 @@ public partial class MainViewModel : ViewModelBase, IRecipient<AppStatusRequestM
 
         // 목록 조작 명령 초기화 (목록 데이터 직접 핸들링)
         DeleteFilesCommand = new AsyncRelayCommand<System.Collections.IList>(DeleteFilesAsync, _ => CurrentStatus == AppStatus.Idle);
-        ReorderNumberCommand = new AsyncRelayCommand(ReorderNumberAsync, () => CurrentStatus == AppStatus.Idle && !Sidebar.ShowMismatchOnly);
+        ReorderNumberCommand = new AsyncRelayCommand(ReorderNumberAsync, () => CurrentStatus == AppStatus.Idle && !SortFilter.ShowMismatchOnly);
         SortByColumnCommand = new RelayCommand<SortType>(SortByColumn);
 
-        // 설정 값 변경에 따라 명령의 실행 가능 여부(CanExecute) 동적으로 갱신
-        Sidebar.PropertyChanged += (s, e) =>
+        // SortFilter의 ShowMismatchOnly 변경에 따라 ReorderNumberCommand CanExecute 갱신
+        SortFilter.PropertyChanged += (s, e) =>
         {
-            if (e.PropertyName == nameof(SidebarViewModel.ShowMismatchOnly))
+            if (e.PropertyName == nameof(SortFilterViewModel.ShowMismatchOnly))
             {
                 ReorderNumberCommand.NotifyCanExecuteChanged();
             }
@@ -171,19 +175,12 @@ public partial class MainViewModel : ViewModelBase, IRecipient<AppStatusRequestM
 
     /// <summary>
     /// 특정 컬럼 헤더 클릭 시 호출되어 정렬 기준을 변경하거나 정렬 방향을 반전시킵니다.
+    /// 정렬 상태는 SortFilterViewModel이 단독 소유하므로 해당 VM에 위임합니다.
     /// </summary>
-    /// <param name="type">정렬 대상 컬럼 타입</param>
     private void SortByColumn(SortType type)
     {
-        // 동일한 컬럼 클릭 시 오름차순/내림차순 토글
-        if (Sidebar.SelectedSortType == type)
-            Sidebar.IsSortAscending = !Sidebar.IsSortAscending;
-        else
-        {
-            // 새로운 컬럼 클릭 시 해당 기준으로 정렬 설정
-            Sidebar.SelectedSortType = type;
-            Sidebar.IsSortAscending = true;
-        }
+        // SortFilter VM에 위임: 같은 기준이면 방향 토글, 다른 기준이면 해당 기준으로 변경
+        SortFilter.ToggleOrSetSort(type);
     }
 
     #endregion

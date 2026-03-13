@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Windows;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -123,6 +123,7 @@ public partial class App : Application
         services.AddTransient<MainViewModel>();
         services.AddSingleton<SnackbarViewModel>();
         services.AddSingleton<FileListViewModel>();
+        services.AddSingleton<SortFilterViewModel>(); // SidebarVM·MainVM이 공유하는 정렬/필터 상태
         services.AddSingleton<SidebarViewModel>();
         services.AddTransient<ConvertSettingViewModel>(); // 다이얼로그용
 
