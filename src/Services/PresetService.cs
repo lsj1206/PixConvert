@@ -21,13 +21,11 @@ public class PresetService : IPresetService
     public PresetConfig Config { get; private set; } = new();
 
     private readonly ILanguageService _languageService;
-    private readonly ISnackbarService _snackbarService;
 
-    public PresetService(ILogger<PresetService> logger, ILanguageService languageService, ISnackbarService snackbarService)
+    public PresetService(ILogger<PresetService> logger, ILanguageService languageService)
     {
         _logger = logger;
         _languageService = languageService;
-        _snackbarService = snackbarService;
 
         // %AppData%/PixConvert/settings.json 경로 설정
         string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
@@ -80,7 +78,8 @@ public class PresetService : IPresetService
     /// <summary>
     /// 현재 설정을 파일에 비동기적으로 저장합니다.
     /// </summary>
-    public async Task SaveAsync()
+    /// <returns>저장 성공 시 true, 실패 시 false. 알림 처리는 호출자(ViewModel)에서 수행합니다.</returns>
+    public async Task<bool> SaveAsync()
     {
         try
         {
@@ -88,12 +87,12 @@ public class PresetService : IPresetService
             string json = JsonSerializer.Serialize(Config, options);
             await File.WriteAllTextAsync(_configPath, json);
             _logger.LogInformation(_languageService.GetString("Log_Preset_FileSaveSuccess"));
-            _snackbarService.Show(_languageService.GetString("Msg_Preset_SaveSuccess"), SnackbarType.Success);
+            return true; // 저장 성공
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, _languageService.GetString("Log_Preset_FileSaveError"));
-            _snackbarService.Show(_languageService.GetString("Msg_Preset_SaveError"), SnackbarType.Error);
+            return false; // 저장 실패
         }
     }
 

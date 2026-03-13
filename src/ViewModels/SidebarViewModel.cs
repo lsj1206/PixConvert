@@ -333,8 +333,12 @@ public partial class SidebarViewModel : ViewModelBase
             vm.SyncToSettings();
         }
 
-        // 설정창이 종료될 때 자동 저장
-        await _presetService.SaveAsync();
+        // 설정창이 종료될 때 자동 저장 및 결과에 따른 알림 표시
+        bool saved = await _presetService.SaveAsync();
+        if (saved)
+            _snackbarService.Show(GetString("Msg_Preset_SaveSuccess"), SnackbarType.Success);
+        else
+            _snackbarService.Show(GetString("Msg_Preset_SaveError"), SnackbarType.Error);
     }
 
     /// <summary>

@@ -15,8 +15,8 @@ public interface IPresetService
     /// <summary>설정 파일을 읽어 Config 객체를 초기화합니다.</summary>
     Task LoadAsync();
 
-    /// <summary>현재 Config 객체의 상태를 설정 파일로 저장합니다.</summary>
-    Task SaveAsync();
+    /// <summary>현재 Config 객체의 상태를 설정 파일로 저장합니다. 성공 시 true, 실패 시 false를 반환합니다.</summary>
+    Task<bool> SaveAsync();
 
     /// <summary>현재 구조의 무결성을 검사하고 이상 시 기본값으로 복구합니다. 정상이면 true를 반환합니다.</summary>
     bool ValidPresetFile();
