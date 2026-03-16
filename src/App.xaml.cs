@@ -112,6 +112,7 @@ public partial class App : Application
         services.AddSingleton<IFileScannerService, FileScannerService>();
         services.AddSingleton<ISortingService, SortingService>();
         services.AddSingleton<ILanguageService, LanguageService>();
+        services.AddSingleton<IDriveInfoService, DriveInfoService>(); // 추가
         services.AddSingleton<IFileAnalyzerService, FileAnalyzerService>();
 
         // [Conversion Engine] 변환 엔진 관련 서비스 등록

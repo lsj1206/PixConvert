@@ -19,12 +19,18 @@ public class FileAnalyzerService : IFileAnalyzerService
     private readonly IFileScannerService _fileScannerService;
     private readonly ILogger<FileAnalyzerService> _logger;
     private readonly ILanguageService _languageService;
+    private readonly IDriveInfoService _driveInfoService;
 
-    public FileAnalyzerService(IFileScannerService fileScannerService, ILogger<FileAnalyzerService> logger, ILanguageService languageService)
+    public FileAnalyzerService(
+        IFileScannerService fileScannerService,
+        ILogger<FileAnalyzerService> logger,
+        ILanguageService languageService,
+        IDriveInfoService driveInfoService)
     {
         _fileScannerService = fileScannerService;
         _logger = logger;
         _languageService = languageService;
+        _driveInfoService = driveInfoService;
     }
 
     private string GetString(string key) => _languageService.GetString(key);
@@ -73,7 +79,7 @@ public class FileAnalyzerService : IFileAnalyzerService
             if (canAdd > 0)
             {
                 var targetFiles = uniqueToProcess.Take(canAdd).ToList();
-                int parallelism = GetOptimalParallelism(targetFiles[0]);
+                int parallelism = await _driveInfoService.GetOptimalParallelismAsync(targetFiles[0]);
                 var options = new ParallelOptions { MaxDegreeOfParallelism = parallelism };
                 var items = new FileItem?[canAdd];
                 int processedCount = 0;
@@ -137,7 +143,7 @@ public class FileAnalyzerService : IFileAnalyzerService
 
             if (folderFiles.Count > 0)
             {
-                int parallelism = GetOptimalParallelism(folders[0]);
+                int parallelism = await _driveInfoService.GetOptimalParallelismAsync(folders[0]);
                 var options = new ParallelOptions { MaxDegreeOfParallelism = parallelism };
                 var items = new FileItem?[folderFiles.Count];
                 int folderProcessedCount = 0;
@@ -174,120 +180,10 @@ public class FileAnalyzerService : IFileAnalyzerService
         result.NewItems = newItems;
         sw.Stop();
 
-        _logger.LogInformation(GetString("Log_Process_Summary"), 
+        _logger.LogInformation(GetString("Log_Process_Summary"),
             result.TotalPathCount, result.SuccessCount, result.DuplicateCount, result.IgnoredCount, sw.ElapsedMilliseconds);
 
         return result;
     }
 
-    /// <summary>
-    /// 파일 경로의 드라이브 유형에 따라 최적의 병렬도를 결정합니다.
-    /// DriveType 1차 분류 → WMI 2차 분류(Fixed 디스크) → Fallback 순으로 판별합니다.
-    /// </summary>
-    private int GetOptimalParallelism(string samplePath)
-    {
-        try
-        {
-            string root = Path.GetPathRoot(samplePath) ?? "C:\\";
-            var drive = new DriveInfo(root);
-
-            int parallelism;
-
-            // 네트워크 드라이브: 동시 연결 제한을 고려하여 최소 병렬
-            if (drive.DriveType == DriveType.Network)
-                parallelism = 2;
-            // 이동식 저장장치(USB 등): 중간 수준 병렬
-            else if (drive.DriveType == DriveType.Removable)
-                parallelism = 4;
-            // 고정 디스크: WMI로 SSD/HDD 판별 시도
-            else if (drive.DriveType == DriveType.Fixed)
-            {
-                if (IsSsd(root))
-                    parallelism = Environment.ProcessorCount; // SSD: 최대 병렬
-                else
-                    parallelism = 4; // HDD: Seek Storm 방지를 위해 제한
-            }
-            else
-            {
-                parallelism = Math.Min(Environment.ProcessorCount, 8);
-            }
-
-            _logger.LogInformation(GetString("Log_Process_Parallelism"), drive.DriveType, parallelism);
-            return parallelism;
-        }
-        catch { } // 감지 실패 시 안전한 기본값
-        return Math.Min(Environment.ProcessorCount, 8);
-    }
-
-    /// <summary>
-    /// MSFT_PhysicalDisk를 통해 지정된 드라이브가 SSD인지 판별합니다. (Best Effort)
-    /// Win32_DiskDrive의 MediaType은 SSD/HDD를 구분하지 못하므로 Storage WMI를 사용합니다.
-    /// MSFT_PhysicalDisk.MediaType: 3=HDD, 4=SSD
-    /// </summary>
-    private bool IsSsd(string rootPath)
-    {
-        int diskNumber = -1;
-        try
-        {
-            // 1단계: 드라이브 문자 → 디스크 번호 매핑 (Win32_LogicalDisk → Win32_DiskDrive)
-            string driveLetter = rootPath.TrimEnd('\\');
-            _logger.LogInformation(GetString("Log_Process_WmiDiskNumber"), driveLetter);
-
-            using (var searcher = new ManagementObjectSearcher(
-                $"ASSOCIATORS OF {{Win32_LogicalDisk.DeviceID='{driveLetter}'}} WHERE AssocClass=Win32_LogicalDiskToPartition"))
-            {
-                foreach (ManagementObject partition in searcher.Get())
-                {
-                    using var diskSearcher = new ManagementObjectSearcher(
-                        $"ASSOCIATORS OF {{Win32_DiskPartition.DeviceID='{partition["DeviceID"]}'}} WHERE AssocClass=Win32_DiskDriveToDiskPartition");
-
-                    foreach (ManagementObject disk in diskSearcher.Get())
-                    {
-                        // DeviceID 형식: "\\.\PHYSICALDRIVE0" → 숫자만 추출
-                        string deviceId = disk["DeviceID"]?.ToString() ?? "";
-                        string numberStr = new string(deviceId.Where(char.IsDigit).ToArray());
-                        if (int.TryParse(numberStr, out int num))
-                            diskNumber = num;
-                    }
-                }
-            }
-
-            if (diskNumber < 0)
-            {
-                _logger.LogWarning(GetString("Log_Process_WmiFail"), driveLetter);
-                return false; // 매핑 실패 시 HDD 간주 (Seek Storm 방지)
-            }
-
-            // 2단계: 디스크 번호로 MSFT_PhysicalDisk 조회 (Storage WMI namespace)
-            using var physicalSearcher = new ManagementObjectSearcher(
-                @"root\Microsoft\Windows\Storage",
-                $"SELECT MediaType FROM MSFT_PhysicalDisk WHERE DeviceId='{diskNumber}'");
-
-            foreach (ManagementObject physicalDisk in physicalSearcher.Get())
-            {
-                // MediaType: 3 = HDD, 4 = SSD, 5 = SCM
-                var mediaType = physicalDisk["MediaType"];
-                if (mediaType != null && Convert.ToInt32(mediaType) == 4)
-                {
-                    _logger.LogInformation(GetString("Log_Process_WmiSsdCheck"), diskNumber, true);
-                    return true; // SSD 확인
-                }
-                if (mediaType != null && Convert.ToInt32(mediaType) == 3)
-                {
-                    _logger.LogInformation(GetString("Log_Process_WmiSsdCheck"), diskNumber, false);
-                    return false; // HDD 확인
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            // WMI 접근 실패 시 HDD로 간주하여 Seek Storm 억제
-            _logger.LogWarning(ex, GetString("Log_Process_WmiException"), rootPath);
-            return false;
-        }
-
-        // 판별 불가(결과 없음) 시 HDD로 간주 (안전한 쪽으로)
-        _logger.LogWarning(GetString("Log_Process_WmiUnknown"), diskNumber);
-        return false;
-    }
 }

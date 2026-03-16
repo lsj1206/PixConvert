@@ -19,6 +19,7 @@ public class FileAnalyzerServiceTests
     private readonly Mock<IFileScannerService> _mockScanner;
     private readonly Mock<ILogger<FileAnalyzerService>> _mockLogger;
     private readonly Mock<ILanguageService> _mockLang;
+    private readonly Mock<IDriveInfoService> _mockDriveInfo; // 추가
     private readonly FileAnalyzerService _service;
 
     public FileAnalyzerServiceTests()
@@ -26,10 +27,19 @@ public class FileAnalyzerServiceTests
         _mockScanner = new Mock<IFileScannerService>();
         _mockLogger = new Mock<ILogger<FileAnalyzerService>>();
         _mockLang = new Mock<ILanguageService>();
+        _mockDriveInfo = new Mock<IDriveInfoService>(); // 추가
 
         _mockLang.Setup(x => x.GetString(It.IsAny<string>())).Returns((string key) => key);
 
-        _service = new FileAnalyzerService(_mockScanner.Object, _mockLogger.Object, _mockLang.Object);
+        // 테스트 시 병렬도를 1로 고정하여 결정론적 결과 확인
+        _mockDriveInfo.Setup(x => x.GetOptimalParallelismAsync(It.IsAny<string>()))
+            .ReturnsAsync(1); // 추가
+
+        _service = new FileAnalyzerService(
+            _mockScanner.Object, 
+            _mockLogger.Object, 
+            _mockLang.Object, 
+            _mockDriveInfo.Object); // 서비스 추가
     }
 
     [Fact]
