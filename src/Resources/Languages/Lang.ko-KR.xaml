@@ -147,6 +147,8 @@
     <sys:String x:Key="Dlg_Title_ClearList">목록 삭제</sys:String>
     <sys:String x:Key="Dlg_Ask_ClearList">목록을 전부 삭제하시겠습니까?</sys:String>
 
+    <sys:String x:Key="Dlg_Title_SelectOutputPath">출력 폴더 선택</sys:String>
+
     <sys:String x:Key="Dlg_Title_FolderOption">폴더 추가 옵션</sys:String>
     <sys:String x:Key="Dlg_Btn_AddFileInFolder">폴더 내 파일 추가</sys:String>
     <sys:String x:Key="Dlg_Btn_AddFolder">폴더 추가</sys:String>

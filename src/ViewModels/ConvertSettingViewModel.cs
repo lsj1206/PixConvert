@@ -256,7 +256,7 @@ public partial class ConvertSettingViewModel : ViewModelBase
     {
         var dialog = new Microsoft.Win32.OpenFolderDialog
         {
-            Title = "출력 폴더 선택" // TODO: 다국어 리소스 적용 권장
+            Title = _languageService.GetString("Dlg_Title_SelectOutputPath")
         };
 
         if (dialog.ShowDialog() == true)
