@@ -100,7 +100,7 @@ public partial class ListManagerViewModel : ViewModelBase
         if (itemsToRemove.Count > 0)
         {
             _fileList.RemoveItems(itemsToRemove);
-            _snackbarService.Show(string.Format(GetString("Msg_RemoveFile"), itemsToRemove.Count), SnackbarType.Success);
+            _snackbarService.Show(string.Format(GetString("Msg_RemoveFile"), itemsToRemove.Count), SnackbarType.Warning);
         }
 
         EnterListManager(); // 목록 갱신 후 태그 재초기화
@@ -119,7 +119,7 @@ public partial class ListManagerViewModel : ViewModelBase
             _fileList.Clear();
             ExtensionTags.Clear();
             RemoveUnsupported = false;
-            _snackbarService.Show(GetString("Msg_ClearList"), SnackbarType.Success);
+            _snackbarService.Show(GetString("Msg_ClearList"), SnackbarType.Warning);
         }
     }
 
