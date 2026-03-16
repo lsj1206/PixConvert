@@ -6,15 +6,8 @@
     <sys:String x:Key="App_Title">PixConvert</sys:String>
 
     <!-- Header : Dashboard -->
-    <sys:String x:Key="Status_Total">Total Files</sys:String>
-    <sys:String x:Key="Status_Unknown">Unsupported Files</sys:String>
-
-    <!-- Header : Status -->
-    <sys:String x:Key="Status_Pending">Ready</sys:String>
-    <sys:String x:Key="Status_Processing">Processing</sys:String>
-    <sys:String x:Key="Status_Success">Success</sys:String>
-    <sys:String x:Key="Status_Error">Error</sys:String>
-    <sys:String x:Key="Status_Unsupported">N/A</sys:String>
+    <sys:String x:Key="Status_Total">Total</sys:String> <!-- Key: Header_Total -->
+    <sys:String x:Key="Status_Unknown">Unsupported</sys:String> <!-- Key: Header_Unsupported -->
 
     <!-- List : Item -->
     <sys:String x:Key="List_Index">Index</sys:String>
@@ -25,34 +18,32 @@
     <sys:String x:Key="List_Size">Size</sys:String>
     <sys:String x:Key="List_Path">Path</sys:String>
 
+    <!-- List : Status -->
+    <sys:String x:Key="Status_Pending">Ready</sys:String> <!-- Key: List_Ready -->
+    <sys:String x:Key="Status_Processing">Converting</sys:String> <!-- Key: List_Converting -->
+    <sys:String x:Key="Status_Success">Success</sys:String> <!-- Key: List_Success -->
+    <sys:String x:Key="Status_Error">Error</sys:String> <!-- Key: List_Error -->
+    <sys:String x:Key="Status_Unsupported">N/A</sys:String> <!-- Key: List_Unsupported -->
+
     <!-- Sidebar : Button -->
     <sys:String x:Key="Btn_AddFile">Add File</sys:String>
     <sys:String x:Key="Btn_AddFolder">Add Folder</sys:String>
-    <sys:String x:Key="Btn_ListClear">Remove All List</sys:String>
-    <sys:String x:Key="Btn_ListManager">List Manager</sys:String>
-    <sys:String x:Key="Btn_ReorderIndex">Reorder Index</sys:String>
     <sys:String x:Key="Btn_ConvertSetting">Convert Setting</sys:String>
     <sys:String x:Key="Btn_Convert">Convert</sys:String>
+    <sys:String x:Key="Btn_ListManager">List Manager</sys:String>
+    <sys:String x:Key="Btn_ReorderIndex">Reorder Index</sys:String>
 
     <!-- Sidebar : Option -->
-    <sys:String x:Key="Option_ConfirmDeletion">Show Deletion Confirm</sys:String>
-    <sys:String x:Key="Option_MismatchOnly">Diff Filter</sys:String>
-    <!-- Sidebar : Option Tooltip -->
-    <sys:String x:Key="Tip_ConfirmDeletion">Turn ON/OFF file deletion confirmation window.</sys:String>
-    <sys:String x:Key="Tip_MismatchOnly">Filter only files where extension and format signature differ.</sys:String>
-    <sys:String x:Key="Tip_FilteredNoReorder">Order change and reorder are disabled during filtering.</sys:String>
-
-    <!-- Sidebar : List Manager -->
-    <sys:String x:Key="Btn_Back">Exit</sys:String>
-    <sys:String x:Key="ListManager_Title">List Manager</sys:String>
-    <sys:String x:Key="ListManager_Desc">Select Format to remove.</sys:String>
-    <sys:String x:Key="ListManager_Unsupported">Unsupported Files</sys:String>
-    <sys:String x:Key="Btn_RemoveSelected">Remove Selected</sys:String>
-
-    <!-- Sidebar : Sorting -->
     <sys:String x:Key="Sort_Label">Sort</sys:String>
     <sys:String x:Key="Sort_Asc">Ascending</sys:String>
     <sys:String x:Key="Sort_Desc">Descending</sys:String>
+    <sys:String x:Key="Option_MismatchOnly">Diff Filter</sys:String> <!-- Key: Sort_MismatchOnly -->
+    <sys:String x:Key="Tip_MismatchOnly">Filter only files where extension and format signature differ.</sys:String> <!-- Key: Doc_MismatchOnly -->
+
+    <sys:String x:Key="Option_ConfirmDeletion">Delete Confirm</sys:String> <!-- Key: Opt_ConfirmDelete -->
+    <sys:String x:Key="Tip_ConfirmDeletion">Turn ON/OFF file deletion confirmation window.</sys:String> <!-- Key: Doc_ConfirmDelete -->
+
+    <!-- Sidebar : Sorting -->
     <sys:String x:Key="Sort_Index">Index</sys:String>
     <sys:String x:Key="Sort_NameIndex">Name-Index</sys:String>
     <sys:String x:Key="Sort_NamePath">Name-Path</sys:String>
@@ -62,29 +53,37 @@
     <sys:String x:Key="Sort_Extension">Ext.</sys:String>
     <sys:String x:Key="Sort_Signature">Format</sys:String>
 
+    <!-- Sidebar : List Manager -->
+    <sys:String x:Key="Btn_Back">Exit</sys:String>
+    <sys:String x:Key="Btn_ListClear">Remove All List</sys:String>
+    <sys:String x:Key="ListManager_Title">List Manager</sys:String> <!-- Key: ListManager_Label -->
+    <sys:String x:Key="ListManager_Desc">Select Format to remove.</sys:String> <!-- Key: ListManager_Doc -->
+    <sys:String x:Key="ListManager_Unsupported">Unsupported</sys:String>
+    <sys:String x:Key="Btn_RemoveSelected">Remove Selected</sys:String>
+
     <!-- Convert Setting : Preset -->
-    <sys:String x:Key="Setting_PresetSelect">Preset Selection</sys:String>
-    <sys:String x:Key="Setting_PresetList">Select Preset</sys:String>
-    <sys:String x:Key="Setting_PresetName">Rename</sys:String>
+    <sys:String x:Key="Setting_PresetList">Select Preset</sys:String> <!-- Key: Preset_List -->
+    <sys:String x:Key="Setting_PresetName">Rename</sys:String> <!-- Key: Preset_ReName -->
     <sys:String x:Key="Btn_PresetApply">Apply</sys:String>
     <sys:String x:Key="Btn_PresetCreate">Create Preset</sys:String>
     <sys:String x:Key="Btn_PresetCopy">Copy Preset</sys:String>
     <sys:String x:Key="Btn_PresetDelete">Delete Preset</sys:String>
-    <sys:String x:Key="Setting_GroupStandard">Standard Image Format</sys:String>
-    <sys:String x:Key="Setting_GroupAnimation">Animation Image Format</sys:String>
-    <sys:String x:Key="Setting_OtherOptions">Other Options</sys:String>
 
     <!-- Convert Setting -->
-    <sys:String x:Key="Setting_TargetFormat">Target Format</sys:String>
-    <sys:String x:Key="Setting_Quality">Quality</sys:String>
-    <sys:String x:Key="Setting_KeepExif">Preserve Metadata (EXIF)</sys:String>
-    <sys:String x:Key="Setting_BackgroundColor">Background Color (Transparency)</sys:String>
+    <sys:String x:Key="Setting_GroupStandard">Standard Image Format</sys:String> <!-- Key: Convert_ImgFormat -->
+    <sys:String x:Key="Setting_GroupAnimation">Animation Image Format</sys:String> <!-- Key: Convert_AniFormat -->
+    <sys:String x:Key="Setting_OtherOptions">Detail</sys:String> <!-- Key: Convert_Detail -->
+    <sys:String x:Key="Setting_TargetFormat">Target Format</sys:String> <!-- Key: Convert_TargetFormat -->
+    <sys:String x:Key="Setting_Quality">Quality</sys:String> <!-- Key: Convert_Quality -->
+    <sys:String x:Key="Setting_BackgroundColor">Background Color(Transparency)</sys:String> <!-- Key: Convert_BgColor -->
+    <sys:String x:Key="Setting_KeepExif">Preserve Metadata(EXIF)</sys:String> <!-- Key: Convert_KeepExif -->
 
-    <!-- Convert Setting : BgColor & File Selection -->
-    <sys:String x:Key="Bg_White">White</sys:String>
-    <sys:String x:Key="Bg_Black">Black</sys:String>
-    <sys:String x:Key="Bg_Custom">Custom (HEX)</sys:String>
-    <sys:String x:Key="Btn_Browse">Browse...</sys:String>
+    <!-- Convert Setting : BgColor -->
+    <sys:String x:Key="Bg_White">White</sys:String> <!-- Key: Convert_BgWhite -->
+    <sys:String x:Key="Bg_Black">Black</sys:String> <!-- Key: Convert_BgBlack -->
+    <sys:String x:Key="Bg_Custom">Custom(HEX)</sys:String> <!-- Key: Convert_BgCustom -->
+
+    <!-- 여기까지 수정 작업 진행했음. -->
 
     <!-- Convert Setting : Overwrite, Path, CPU Usage -->
     <sys:String x:Key="Setting_OverwritePolicy">Duplicate File Policy</sys:String>
@@ -95,6 +94,7 @@
     <sys:String x:Key="Setting_OutputDir_Sub">Subfolder (PixConvert_...)</sys:String>
     <sys:String x:Key="Setting_OutputDir_Same">Same as Original Folder</sys:String>
     <sys:String x:Key="Setting_OutputDir_Custom">Custom Path</sys:String>
+    <sys:String x:Key="Btn_Browse">Browse...</sys:String> <!-- Key: Btn_Browse -->
     <sys:String x:Key="Setting_CpuUsage">CPU Workload (Performance)</sys:String>
     <sys:String x:Key="Setting_Cpu_Max">Maximum (All Cores)</sys:String>
     <sys:String x:Key="Setting_Cpu_Optimal">Optimal (70~80% Rec.)</sys:String>

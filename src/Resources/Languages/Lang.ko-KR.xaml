@@ -9,13 +9,6 @@
     <sys:String x:Key="Status_Total">파일 합계</sys:String>
     <sys:String x:Key="Status_Unknown">미지원 파일</sys:String>
 
-    <!-- 헤더 : 상태 -->
-    <sys:String x:Key="Status_Pending">대기</sys:String>
-    <sys:String x:Key="Status_Processing">변환 중</sys:String>
-    <sys:String x:Key="Status_Success">완료</sys:String>
-    <sys:String x:Key="Status_Error">실패</sys:String>
-    <sys:String x:Key="Status_Unsupported">미지원</sys:String>
-
     <!-- 리스트 : 항목 -->
     <sys:String x:Key="List_Index">번호</sys:String>
     <sys:String x:Key="List_Name">이름</sys:String>
@@ -25,34 +18,32 @@
     <sys:String x:Key="List_Size">크기</sys:String>
     <sys:String x:Key="List_Path">경로</sys:String>
 
+    <!-- 리스트 : 상태 -->
+    <sys:String x:Key="Status_Pending">대기</sys:String>
+    <sys:String x:Key="Status_Processing">변환 중</sys:String>
+    <sys:String x:Key="Status_Success">완료</sys:String>
+    <sys:String x:Key="Status_Error">실패</sys:String>
+    <sys:String x:Key="Status_Unsupported">미지원</sys:String>
+
     <!-- 사이드바 : 버튼 -->
     <sys:String x:Key="Btn_AddFile">파일 추가</sys:String>
     <sys:String x:Key="Btn_AddFolder">폴더 추가</sys:String>
-    <sys:String x:Key="Btn_ListClear">목록 전부 제거</sys:String>
-    <sys:String x:Key="Btn_ListManager">목록 관리</sys:String>
-    <sys:String x:Key="Btn_ReorderIndex">번호 재정렬</sys:String>
     <sys:String x:Key="Btn_ConvertSetting">변환 설정</sys:String>
     <sys:String x:Key="Btn_Convert">변환</sys:String>
+    <sys:String x:Key="Btn_ListManager">목록 관리</sys:String>
+    <sys:String x:Key="Btn_ReorderIndex">번호 재정렬</sys:String>
 
     <!-- 사이드바 : 옵션 -->
-    <sys:String x:Key="Option_ConfirmDeletion">삭제 확인 표시</sys:String>
-    <sys:String x:Key="Option_MismatchOnly">불일치 필터</sys:String>
-    <!-- 사이드바 : 옵션 툴팁 -->
-    <sys:String x:Key="Tip_ConfirmDeletion">파일 삭제 확인 창을 ON/OFF 합니다.</sys:String>
-    <sys:String x:Key="Tip_MismatchOnly">확장자와 포맷 시그니처가 다른 파일만 필터링합니다.</sys:String>
-    <sys:String x:Key="Tip_FilteredNoReorder">필터링 중에는 순서 변경 및 재정렬이 불가능합니다.</sys:String>
-
-    <!-- 사이드바 : 목록 관리 -->
-    <sys:String x:Key="Btn_Back">나가기</sys:String>
-    <sys:String x:Key="ListManager_Title">목록 관리</sys:String>
-    <sys:String x:Key="ListManager_Desc">제거할 포맷을 선택하세요.</sys:String>
-    <sys:String x:Key="ListManager_Unsupported">미지원 파일</sys:String>
-    <sys:String x:Key="Btn_RemoveSelected">선택 제거</sys:String>
-
-    <!-- 사이드바 : 정렬 -->
     <sys:String x:Key="Sort_Label">정렬</sys:String>
     <sys:String x:Key="Sort_Asc">오름차순</sys:String>
     <sys:String x:Key="Sort_Desc">내림차순</sys:String>
+    <sys:String x:Key="Option_MismatchOnly">불일치 필터</sys:String>
+    <sys:String x:Key="Tip_MismatchOnly">확장자와 포맷 시그니처가 다른 파일만 필터링합니다.</sys:String>
+
+    <sys:String x:Key="Option_ConfirmDeletion">삭제 확인 표시</sys:String>
+    <sys:String x:Key="Tip_ConfirmDeletion">파일 삭제 확인 창을 ON/OFF 합니다.</sys:String>
+
+    <!-- 사이드바 : 정렬 -->
     <sys:String x:Key="Sort_Index">번호</sys:String>
     <sys:String x:Key="Sort_NameIndex">이름-번호</sys:String>
     <sys:String x:Key="Sort_NamePath">이름-경로</sys:String>
@@ -62,29 +53,35 @@
     <sys:String x:Key="Sort_Extension">확장자</sys:String>
     <sys:String x:Key="Sort_Signature">포맷</sys:String>
 
+    <!-- 사이드바 : 목록 관리 -->
+    <sys:String x:Key="Btn_Back">나가기</sys:String>
+    <sys:String x:Key="Btn_ListClear">목록 전부 제거</sys:String>
+    <sys:String x:Key="ListManager_Title">목록 관리</sys:String>
+    <sys:String x:Key="ListManager_Desc">제거할 포맷을 선택하세요.</sys:String>
+    <sys:String x:Key="ListManager_Unsupported">미지원 파일</sys:String>
+    <sys:String x:Key="Btn_RemoveSelected">선택 제거</sys:String>
+
     <!-- 변환 설정 : 프리셋 -->
-    <sys:String x:Key="Setting_PresetSelect">프리셋 지정</sys:String>
     <sys:String x:Key="Setting_PresetList">프리셋 선택</sys:String>
     <sys:String x:Key="Setting_PresetName">이름 변경</sys:String>
     <sys:String x:Key="Btn_PresetApply">적용</sys:String>
     <sys:String x:Key="Btn_PresetCreate">프리셋 생성</sys:String>
     <sys:String x:Key="Btn_PresetCopy">프리셋 복사</sys:String>
     <sys:String x:Key="Btn_PresetDelete">프리셋 삭제</sys:String>
-    <sys:String x:Key="Setting_GroupStandard">일반 이미지 변환 포맷</sys:String>
-    <sys:String x:Key="Setting_GroupAnimation">애니메이션 이미지 변환 포맷</sys:String>
-    <sys:String x:Key="Setting_OtherOptions">기타 옵션</sys:String>
 
     <!-- 변환 설정 -->
+    <sys:String x:Key="Setting_GroupStandard">일반 이미지 변환 포맷</sys:String>
+    <sys:String x:Key="Setting_GroupAnimation">애니메이션 이미지 변환 포맷</sys:String>
+    <sys:String x:Key="Setting_OtherOptions">세부 옵션</sys:String>
     <sys:String x:Key="Setting_TargetFormat">변환 포맷</sys:String>
-    <sys:String x:Key="Setting_Quality">변환 품질</sys:String>
+    <sys:String x:Key="Setting_Quality">품질</sys:String>
+    <sys:String x:Key="Setting_BackgroundColor">배경 색상(투명 이미지용)</sys:String>
     <sys:String x:Key="Setting_KeepExif">메타데이터(EXIF) 보존</sys:String>
-    <sys:String x:Key="Setting_BackgroundColor">배경 색상 (투명 이미지용)</sys:String>
 
-    <!-- 변환 설정 : 배경색 및 파일 선택 -->
+    <!-- 변환 설정 : 배경색 -->
     <sys:String x:Key="Bg_White">흰색</sys:String>
     <sys:String x:Key="Bg_Black">검은색</sys:String>
-    <sys:String x:Key="Bg_Custom">사용자 지정 (HEX)</sys:String>
-    <sys:String x:Key="Btn_Browse">찾기...</sys:String>
+    <sys:String x:Key="Bg_Custom">사용자 지정(HEX)</sys:String>
 
     <!-- 변환 설정 : 덮어쓰기, 경로, CPU 사용량 -->
     <sys:String x:Key="Setting_OverwritePolicy">중복 파일 처리</sys:String>
@@ -95,6 +92,7 @@
     <sys:String x:Key="Setting_OutputDir_Sub">하위 폴더 생성 (PixConvert_...)</sys:String>
     <sys:String x:Key="Setting_OutputDir_Same">원본 파일과 동일 위치</sys:String>
     <sys:String x:Key="Setting_OutputDir_Custom">사용자 지정 경로</sys:String>
+    <sys:String x:Key="Btn_Browse">찾기...</sys:String>
     <sys:String x:Key="Setting_CpuUsage">CPU 작업 부하 (성능 제어)</sys:String>
     <sys:String x:Key="Setting_Cpu_Max">최대 (모든 코어 사용)</sys:String>
     <sys:String x:Key="Setting_Cpu_Optimal">최적 (70~80% 권장)</sys:String>
