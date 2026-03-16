@@ -30,6 +30,7 @@ public class SnackbarService : ISnackbarService
 
     /// <summary>
     /// 새로운 메시지를 표시합니다. 진행 중인 다른 알림이 있다면 즉시 교체합니다.
+    /// (Fire-and-forget: 호출자는 애니메이션 완료를 기다리지 않음)
     /// </summary>
     public async void Show(string message, SnackbarType type = SnackbarType.Info, int durationMs = 3000)
     {
@@ -42,7 +43,8 @@ public class SnackbarService : ISnackbarService
             var cts = _sessionCts.Token;
 
             // 2. UI 상태를 원자적으로(Atomically) 변경
-            await Application.Current.Dispatcher.InvokeAsync(async () =>
+            // await await: DispatcherOperation<Task>를 unwrap하여 내부 람다의 예외 전파 보장
+            await await Application.Current.Dispatcher.InvokeAsync(async () =>
             {
                 if (_viewModel.IsVisible)
                 {
@@ -63,7 +65,8 @@ public class SnackbarService : ISnackbarService
             // 4. 대기 후 내가 여전히 최신 알림인지 확인하고 퇴장
             if (Interlocked.Read(ref _currentSessionId) == sessionId)
             {
-                await Application.Current.Dispatcher.InvokeAsync(async () =>
+                // await await 적용: 내부 람다 예외 전파 보장
+                await await Application.Current.Dispatcher.InvokeAsync(async () =>
                 {
                     // 마지막 확인 (Dispatcher 큐 진입 시간차 고려)
                     if (Interlocked.Read(ref _currentSessionId) == sessionId)
