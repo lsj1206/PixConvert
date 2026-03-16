@@ -11,6 +11,11 @@ namespace PixConvert.Services;
 public class LanguageService : ILanguageService
 {
     /// <summary>
+    /// 언어가 변경되었음을 알리는 이벤트입니다.
+    /// </summary>
+    public event Action LanguageChanged = delegate { };
+
+    /// <summary>
     /// 애플리케이션의 언어를 변경합니다.
     /// DynamicResource를 사용하는 모든 UI가 자동으로 업데이트됩니다.
     /// </summary>
@@ -39,6 +44,9 @@ public class LanguageService : ILanguageService
 
             // 새 언어 리소스 추가
             app.Resources.MergedDictionaries.Add(newDict);
+
+            // 언어 변경 이벤트 발행
+            LanguageChanged?.Invoke();
         }
         catch (Exception ex)
         {

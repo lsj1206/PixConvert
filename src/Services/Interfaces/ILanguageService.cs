@@ -8,6 +8,11 @@ namespace PixConvert.Services;
 public interface ILanguageService
 {
     /// <summary>
+    /// 언어가 변경되었음을 알리는 이벤트입니다.
+    /// </summary>
+    event Action LanguageChanged;
+
+    /// <summary>
     /// 애플리케이션의 언어를 변경합니다.
     /// </summary>
     /// <param name="culture">언어 코드 (예: "ko-KR", "en-US")</param>

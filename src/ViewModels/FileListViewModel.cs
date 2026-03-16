@@ -43,6 +43,18 @@ public class FileListViewModel : ViewModelBase
             OnPropertyChanged(nameof(TotalCount));
             OnPropertyChanged(nameof(UnsupportedCount));
         };
+
+        // 언어 변경 시 목록 전체의 상태 텍스트 쇄신 (안전한 제3방식)
+        _languageService.LanguageChanged += OnLanguageChanged;
+    }
+
+    /// <summary>언어 변경 시 모든 아이템의 상태 텍스트를 다시 그리도록 알림을 발생시킵니다.</summary>
+    private void OnLanguageChanged()
+    {
+        foreach (var item in _items)
+        {
+            item.RefreshStatusText();
+        }
     }
 
     /// <summary>

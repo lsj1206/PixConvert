@@ -1,4 +1,4 @@
-﻿<Application x:Class="PixConvert.App"
+<Application x:Class="PixConvert.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:PixConvert"
@@ -16,7 +16,6 @@
             </ResourceDictionary.MergedDictionaries>
             <converters:AppStatusToVisibilityConverter x:Key="AppStatusToVisibilityConverter" />
             <converters:AppStatusToInverseBooleanConverter x:Key="AppStatusToInverseBooleanConverter" />
-            <converters:FileStatusConverter x:Key="FileStatusConverter" />
             <converters:UpperCaseConverter x:Key="UpperCaseConverter" />
             <converters:EnumToBoolConverter x:Key="EnumToBoolConverter" />
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
