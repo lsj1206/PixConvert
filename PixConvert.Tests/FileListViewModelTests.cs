@@ -277,8 +277,7 @@ public class FileListViewModelTests
 
     /// <summary>
     /// 시나리오: 이미 정렬된 상태에서 정렬 수행.
-    /// 검증 목표: Move가 발생하지 않아야 하며, CollectionChanged 이벤트는 0번 발생해야 함.
-    ///            (가드 플래그에 의해 무거운 통계 연산이 억제됨)
+    /// 검증 목표: Move가 발생하지 않아야 함. (동일 인덱스 이동 방지 로직 검증)
     /// </summary>
     [Fact]
     public void Sorting_WhenAlreadySorted_ShouldFireZeroMoveEvents()
@@ -341,24 +340,35 @@ public class FileListViewModelTests
     }
 
     /// <summary>
-    /// 시나리오: 정렬 중 예외 발생.
+    /// 시나리오: 정렬 도중(try 블록 내부) 예외 발생.
     /// 검증 목표: finally 블록을 통해 _isSorting 플래그가 반드시 false로 복구되어야 함.
     /// </summary>
     [Fact]
-    public void Sorting_WhenExceptionOccurs_ShouldResetIsSortingFlag()
+    public void Sorting_WhenExceptionInsideTryBlock_ShouldResetIsSortingFlag()
     {
         // Arrange
-        _vm.AddItem(new FileItem { Path = "C:\\test.jpg" });
+        var itemInList = new FileItem { Path = "C:\\in.jpg" };
+        var itemNotInList = new FileItem { Path = "C:\\out.jpg" }; // 맵에 없는 아이템
+        _vm.AddItem(itemInList);
+
         var mockSort = new Mock<ISortingService>();
+        // Sort() 결과에 목록에 없는 아이템을 섞어서 반환 -> try 블록 내 indexMap 조회 시 KeyNotFoundException 유발
         mockSort.Setup(s => s.Sort(It.IsAny<IEnumerable<FileItem>>(), It.IsAny<SortType>(), It.IsAny<bool>()))
-                .Throws(new System.Exception("Sort error"));
+                .Returns(new List<FileItem> { itemNotInList });
+
+        string notifiedProperty = null;
+        _vm.PropertyChanged += (s, e) => notifiedProperty = e.PropertyName;
 
         // Act & Assert
-        Assert.Throws<System.Exception>(() => _vm.Sorting(mockSort.Object, SortType.NameIndex, true));
+        // 1. 예외가 발생하는지 확인
+        Assert.ThrowsAny<System.Exception>(() => _vm.Sorting(mockSort.Object, SortType.NameIndex, true));
         
-        // _isSorting은 private이므로 간접 확인: 
-        // 추가 시 OnPropertyChanged(TotalCount)가 호출되면 _isSorting이 false인 것임.
-        // 여기서는 검증을 위해 Reflection을 사용하거나, 리팩토링된 통계 갱신 여부로 확인.
-        // 일단 로직상 finally 가드는 확실하므로 컴파일 및 실행 확인에 집중.
+        // 2. _isSorting이 false로 복구되었는지 Reflection으로 직접 검증
+        var field = typeof(FileListViewModel).GetField("_isSorting", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        var isSortingValue = (bool)field.GetValue(_vm);
+        Assert.False(isSortingValue);
+
+        // 3. finally 블록에서 통계 갱신(OnPropertyChanged)이 호출되었는지 확인
+        Assert.Equal(nameof(FileListViewModel.UnsupportedCount), notifiedProperty);
     }
 }
