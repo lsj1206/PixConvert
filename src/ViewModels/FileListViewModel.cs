@@ -13,15 +13,20 @@ namespace PixConvert.ViewModels;
 /// </summary>
 public class FileListViewModel : ViewModelBase
 {
-    private readonly ObservableCollection<FileItem> _items = new();
-    // 중복 체크용 HashSet (O(1) 탐색, 대소문자 무시)
-    private readonly HashSet<string> _pathSet = new(StringComparer.OrdinalIgnoreCase);
+    /// <summary>파일 항목들을 저장하는 실제 데이터 컬렉션 (단위 테스트 접근을 위해 internal)</summary>
+    internal readonly ObservableCollection<FileItem> _items = new();
 
-    /// <summary>화면에 바인딩되는 읽기 전용 파일 아이템 컬렉션입니다.</summary>
+    /// <summary>화면에 바인딩되는 읽기 전용 파일 아이템 컬렉션</summary>
     public ReadOnlyObservableCollection<FileItem> Items { get; }
+
+    /// <summary>중복 체크용 HashSet (O(1) 탐색, 대소문자 무시)</summary>
+    private readonly HashSet<string> _pathSet = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>중복 체크용 경로 집합 (읽기 전용 노출)</summary>
     public IReadOnlySet<string> PathSet => _pathSet;
+
+    /// <summary>정렬 수행 중 불필요한 이벤트 및 통계 재계산을 방지하기 위한 가드 플래그</summary>
+    private bool _isSorting;
 
     /// <summary>목록의 전체 파일 수</summary>
     public int TotalCount => Items.Count;
@@ -29,7 +34,7 @@ public class FileListViewModel : ViewModelBase
     /// <summary>미지원(시그니처 미판별) 파일 수</summary>
     public int UnsupportedCount => Items.Count(x => x.FileSignature == "-");
 
-    // 다음에 추가될 아이템의 기본 순번
+    /// <summary>다음에 추가될 아이템의 기본 순번</summary>
     private int _nextAddIndex = 1;
 
     public FileListViewModel(ILanguageService languageService, ILogger<FileListViewModel> logger)
@@ -40,6 +45,7 @@ public class FileListViewModel : ViewModelBase
         // 컬렉션 변경 시 통계 갱신 및 UI 알림
         _items.CollectionChanged += (s, e) =>
         {
+            if (_isSorting) return;
             OnPropertyChanged(nameof(TotalCount));
             OnPropertyChanged(nameof(UnsupportedCount));
         };
@@ -110,11 +116,44 @@ public class FileListViewModel : ViewModelBase
 
         var sortedItems = sortingService.Sort(_items, sortType, ascending).ToList();
 
-        // UI 갱신을 위해 컬렉션을 재구성합니다.
-        _items.Clear();
-        foreach (var item in sortedItems)
+        // 이미 정렬된 상태라면 이벤트를 발생시키지 않음
+        _isSorting = true;
+        try
         {
-            _items.Add(item);
+            // 1. 현재 인덱스 위치를 Dictionary에 캐싱 (O(N))
+            var indexMap = new Dictionary<FileItem, int>(_items.Count);
+            for (int i = 0; i < _items.Count; i++)
+            {
+                indexMap[_items[i]] = i;
+            }
+
+            // 2. 목표 순서(sortedItems)대로 현재 컬렉션의 위치를 조정
+            for (int targetIdx = 0; targetIdx < sortedItems.Count; targetIdx++)
+            {
+                var item = sortedItems[targetIdx];
+                int currentIdx = indexMap[item];
+
+                if (currentIdx != targetIdx)
+                {
+                    // ObservableCollection.Move를 통해 최소한의 UI 변경 이벤트만 발생시킴
+                    _items.Move(currentIdx, targetIdx);
+
+                    // Move에 의해 위치가 바뀐 구간의 인덱스 정보를 갱신 (O(N) 미만)
+                    int lo = Math.Min(currentIdx, targetIdx);
+                    int hi = Math.Max(currentIdx, targetIdx);
+                    for (int j = lo; j <= hi; j++)
+                    {
+                        indexMap[_items[j]] = j;
+                    }
+                }
+            }
+        }
+        finally
+        {
+            _isSorting = false;
+            // 정렬 완료 후 통계를 딱 한 번만 갱신
+            OnPropertyChanged(nameof(TotalCount));
+            OnPropertyChanged(nameof(UnsupportedCount));
         }
     }
 
