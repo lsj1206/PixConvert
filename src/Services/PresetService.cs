@@ -169,7 +169,7 @@ public class PresetService : IPresetService
 
         // 지원하는 확장자 포맷 배열
         var allowedStandard = new[] { "JPEG", "PNG", "BMP", "WEBP", "AVIF" };
-        var allowedAnimation = new[] { "GIF", "WEBP" };
+        var allowedAnimation = new[] { "GIF", "WEBP", "AVIF" };
 
         // 3. 일반 이미지 변환 목표 확장자가 규격(리스트)에 맞는지 확인
         if (string.IsNullOrEmpty(settings.StandardTargetFormat) || !allowedStandard.Contains(settings.StandardTargetFormat, StringComparer.OrdinalIgnoreCase))
