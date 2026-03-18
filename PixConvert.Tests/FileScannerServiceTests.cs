@@ -173,6 +173,26 @@ public class FileScannerServiceTests : IDisposable
     }
 
     /// <summary>
+    /// 시나리오: GIF87a 포맷 바이트 헤더를 가진 파일 (확장자는 .png로 위장).
+    /// 검증 목표: GIF 매직 바이트(47 49 46 38) 중 87a 버전을 판별하여 IsAnimation = false인지 확인.
+    /// </summary>
+    [Fact]
+    public async Task AnalyzeSignatureAsync_GivenGif87aHeader_ShouldReturnGifAndIsAnimationFalse()
+    {
+        // Arrange: GIF87a 시그니처 = "GIF87a"의 ASCII 코드 (38 37 61)
+        string path = Path.Combine(_tempDirectory, "fake87a.png");
+        byte[] gifBytes = [0x47, 0x49, 0x46, 0x38, 0x37, 0x61]; // GIF87a
+        File.WriteAllBytes(path, gifBytes);
+
+        // Act
+        var (result, isAnim) = await _fileScannerService.AnalyzeSignatureAsync(path);
+
+        // Assert: 87a 버전은 애니메이션이 미지원되므로 false여야 함
+        Assert.Equal("GIF", result);
+        Assert.False(isAnim);
+    }
+
+    /// <summary>
     /// 시나리오: BMP 포맷 바이트 헤더를 가진 파일 (확장자는 .jpg로 위장).
     /// 검증 목표: BMP 매직 바이트 "BM"(42 4D)을 정확히 판별하는지 확인.
     /// </summary>
