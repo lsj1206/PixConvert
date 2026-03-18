@@ -27,26 +27,26 @@ public class FileScannerService : IFileScannerService
     }
 
     /// <summary>
-    /// 파일의 헤더(매직 넘버)를 분석하여 실제 포맷(확장자 형태)을 반환합니다.
+    /// 파일의 헤더(매직 넘버)를 분석하여 실제 포맷(확장자 형태)과 애니메이션 여부를 반환합니다.
     /// </summary>
-    public async Task<string> AnalyzeSignatureAsync(string path)
+    public async Task<(string Format, bool IsAnimation)> AnalyzeSignatureAsync(string path)
     {
-        if (string.IsNullOrEmpty(path)) return "-";
+        if (string.IsNullOrEmpty(path)) return ("-", false);
 
         try
         {
-            // useAsync: true를 설정하여 OS 비동기 I/O 경로를 사용하도록 설정
-            await using (var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 16, useAsync: true))
+            // 32바이트로 확장하여 WebP의 상세 플래그 및 AVIF 시퀀스 확인 가능하게 함
+            await using (var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 32, useAsync: true))
             {
-                byte[] header = new byte[16];
-                int bytesRead = await fs.ReadAsync(header.AsMemory(0, 16));
+                byte[] header = new byte[32];
+                int bytesRead = await fs.ReadAsync(header.AsMemory(0, 32));
                 return GetFormatFromHeader(header, bytesRead);
             }
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, GetString("Log_File_SignatureFail"), path);
-            return "-";
+            return ("-", false);
         }
     }
 
@@ -60,13 +60,14 @@ public class FileScannerService : IFileScannerService
         try
         {
             // 파일을 한 번만 열어서 모든 정보를 획득 (Single Touch)
-            await using (var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 16, useAsync: true))
+            // 32바이트 헤더 읽기로 확장하여 애니메이션 여부 판별
+            await using (var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 32, useAsync: true))
             {
                 long length = fs.Length;
 
-                byte[] header = new byte[16];
-                int bytesRead = await fs.ReadAsync(header.AsMemory(0, 16));
-                string signature = GetFormatFromHeader(header, bytesRead);
+                byte[] header = new byte[32];
+                int bytesRead = await fs.ReadAsync(header.AsMemory(0, 32));
+                var (signature, isAnim) = GetFormatFromHeader(header, bytesRead);
 
                 return new FileItem
                 {
@@ -74,6 +75,7 @@ public class FileScannerService : IFileScannerService
                     Size = length,
                     DisplaySize = FormatFileSize(length),
                     FileSignature = signature,
+                    IsAnimation = isAnim,
                     AddIndex = null
                 };
             }
@@ -86,47 +88,61 @@ public class FileScannerService : IFileScannerService
     }
 
     /// <summary>
-    /// 바이트 헤더를 분석하여 포맷을 반환하는 공통 로직입니다.
+    /// 바이트 헤더를 분석하여 포맷과 애니메이션 여부를 반환하는 공통 로직입니다.
     /// 지원 포맷: JPEG, PNG, BMP, WEBP, AVIF, GIF
     /// </summary>
-    private static string GetFormatFromHeader(byte[] header, int bytesRead)
+    private static (string Format, bool IsAnimation) GetFormatFromHeader(byte[] header, int bytesRead)
     {
-        if (bytesRead < 2) return "-";
+        if (bytesRead < 2) return ("-", false);
 
         // 1. JPEG (FF D8 FF)
         if (header[0] == 0xFF && header[1] == 0xD8 && header[2] == 0xFF)
-            return "JPEG";
+            return ("JPEG", false);
 
         // 2. PNG 판별 (89 50 4E 47)
         if (bytesRead >= 4 && header[0] == 0x89 && header[1] == 0x50 && header[2] == 0x4E && header[3] == 0x47)
-            return "PNG";
+            return ("PNG", false);
 
         // 3. GIF 판별 (47 49 46 38)
         if (bytesRead >= 4 && header[0] == 0x47 && header[1] == 0x49 && header[2] == 0x46 && header[3] == 0x38)
-            return "GIF";
+        {
+            // GIF89a (89a = 0x39 0x61) 만 애니메이션 지원 가능성이 큼
+            bool isAnim = bytesRead >= 6 && header[4] == 0x39 && header[5] == 0x61;
+            return ("GIF", isAnim);
+        }
 
         // 4. BMP 판별 (42 4D)
         if (header[0] == 0x42 && header[1] == 0x4D)
-            return "BMP";
+            return ("BMP", false);
 
         // 5. WebP 판별 (RIFF....WebP)
-        //    바이트 0-3: RIFF (52 49 46 46)
-        //    바이트 8-11: WEBP (57 45 42 50)
         if (bytesRead >= 12 &&
             header[0] == 0x52 && header[1] == 0x49 && header[2] == 0x46 && header[3] == 0x46 &&
             header[8] == 0x57 && header[9] == 0x45 && header[10] == 0x42 && header[11] == 0x50)
-            return "WEBP";
+        {
+            // WebP 서브타입 판별 (VP8X인 경우에만 애니메이션 지원 가능)
+            if (bytesRead >= 16 && header[12] == 0x56 && header[13] == 0x50 && header[14] == 0x38 && header[15] == 0x58)
+            {
+                // VP8X Chunk의 Flags 바이트 (Offset 20)
+                // Bit 1 (0x02) 가 Animation 플래그
+                bool isAnim = bytesRead >= 21 && (header[20] & 0x02) != 0;
+                return ("WEBP", isAnim);
+            }
+            return ("WEBP", false);
+        }
 
         // 6. AVIF 판별 (ISO Base Media File Format 기반)
-        //    바이트 4-7: ftyp (66 74 79 70)
-        //    바이트 8-11: avif (61 76 69 66) 또는 avis (61 76 69 73, Sequence)
         if (bytesRead >= 12 &&
             header[4] == 0x66 && header[5] == 0x74 && header[6] == 0x79 && header[7] == 0x70 &&
             header[8] == 0x61 && header[9] == 0x76 && header[10] == 0x69 &&
             (header[11] == 0x66 || header[11] == 0x73))
-            return "AVIF";
+        {
+            // brand가 'avis'(sequence) 인 경우 애니메이션(움짤)으로 간주
+            bool isAnim = header[11] == 0x73;
+            return ("AVIF", isAnim);
+        }
 
-        return "-";
+        return ("-", false);
     }
 
     public IEnumerable<FileInfo> GetFilesInFolder(string folderPath)

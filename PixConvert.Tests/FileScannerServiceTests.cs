@@ -70,10 +70,11 @@ public class FileScannerServiceTests : IDisposable
         File.WriteAllBytes(fakePngPath, jpgBytes);
 
         // Act: 위장 파일을 시그니처 분석에 투입
-        string result = await _fileScannerService.AnalyzeSignatureAsync(fakePngPath);
+        var (result, isAnim) = await _fileScannerService.AnalyzeSignatureAsync(fakePngPath);
 
         // Assert: 확장자(.png)에 속지 않고 바이트 헤더 기반으로 "JPEG"를 반환해야 함
         Assert.Equal("JPEG", result);
+        Assert.False(isAnim);
     }
 
     /// <summary>
@@ -89,10 +90,11 @@ public class FileScannerServiceTests : IDisposable
         File.WriteAllBytes(fakeJpgPath, pngBytes);
 
         // Act
-        string result = await _fileScannerService.AnalyzeSignatureAsync(fakeJpgPath);
+        var (result, isAnim) = await _fileScannerService.AnalyzeSignatureAsync(fakeJpgPath);
 
         // Assert: 확장자(.jpg)에 속지 않고 "PNG"를 반환해야 함
         Assert.Equal("PNG", result);
+        Assert.False(isAnim);
     }
 
     /// <summary>
@@ -108,10 +110,11 @@ public class FileScannerServiceTests : IDisposable
         File.WriteAllText(emptyPath, "");
 
         // Act
-        string result = await _fileScannerService.AnalyzeSignatureAsync(emptyPath);
+        var (result, isAnim) = await _fileScannerService.AnalyzeSignatureAsync(emptyPath);
 
         // Assert: 예외(Exception) 없이 "-"를 반환하여 안전한 폴백(Safe Fallback)을 보장해야 함
         Assert.Equal("-", result);
+        Assert.False(isAnim);
     }
 
     /// <summary>
@@ -125,10 +128,11 @@ public class FileScannerServiceTests : IDisposable
     public async Task AnalyzeSignatureAsync_GivenNonExistentFile_ShouldReturnDashAndLogError()
     {
         // Act: 세상에 존재하지 않는 경로로 호출
-        string result = await _fileScannerService.AnalyzeSignatureAsync("C:\\NonExistentPath\\Fake.jpg");
+        var (result, isAnim) = await _fileScannerService.AnalyzeSignatureAsync("C:\\NonExistentPath\\Fake.jpg");
 
         // Assert 1: 예외 없이 안전하게 "-" 반환 확인
         Assert.Equal("-", result);
+        Assert.False(isAnim);
 
         // Assert 2: Mock 객체가 Error 수준 로그를 정확히 1번 호출받았는지 검증.
         //   - It.Is<LogLevel>(l => l == LogLevel.Error): 반드시 Error 레벨이어야 함
@@ -161,10 +165,11 @@ public class FileScannerServiceTests : IDisposable
         File.WriteAllBytes(path, gifBytes);
 
         // Act
-        string result = await _fileScannerService.AnalyzeSignatureAsync(path);
+        var (result, isAnim) = await _fileScannerService.AnalyzeSignatureAsync(path);
 
         // Assert: 확장자(.png)가 아닌 바이트 기반으로 "GIF"를 반환해야 함
         Assert.Equal("GIF", result);
+        Assert.True(isAnim); // GIF89a는 애니메이션 가능
     }
 
     /// <summary>
@@ -180,10 +185,11 @@ public class FileScannerServiceTests : IDisposable
         File.WriteAllBytes(path, bmpBytes);
 
         // Act
-        string result = await _fileScannerService.AnalyzeSignatureAsync(path);
+        var (result, isAnim) = await _fileScannerService.AnalyzeSignatureAsync(path);
 
         // Assert
         Assert.Equal("BMP", result);
+        Assert.False(isAnim);
     }
 
     /// <summary>
@@ -209,10 +215,38 @@ public class FileScannerServiceTests : IDisposable
         File.WriteAllBytes(path, webpBytes);
 
         // Act
-        string result = await _fileScannerService.AnalyzeSignatureAsync(path);
+        var (result, isAnim) = await _fileScannerService.AnalyzeSignatureAsync(path);
 
-        // Assert: 대문자 "WEBP" 반환 확인 (ConvertSettingViewModel의 SupportedStandardTargets와 일치)
+        // Assert
         Assert.Equal("WEBP", result);
+        Assert.False(isAnim); // 기본 WEBP 헤더는 정지 이미지로 판별
+    }
+
+    /// <summary>
+    /// 시나리오: 애니메이션 비트가 켜진 WebP VP8X 헤더를 가진 파일.
+    /// </summary>
+    [Fact]
+    public async Task AnalyzeSignatureAsync_GivenAnimatedWebpHeader_ShouldReturnWebpAndIsAnimationTrue()
+    {
+        // Arrange
+        string path = Path.Combine(_tempDirectory, "animated.webp");
+        byte[] webpBytes = new byte[32];
+        // RIFF
+        webpBytes[0] = 0x52; webpBytes[1] = 0x49; webpBytes[2] = 0x46; webpBytes[3] = 0x46;
+        // WEBP
+        webpBytes[8] = 0x57; webpBytes[9] = 0x45; webpBytes[10] = 0x42; webpBytes[11] = 0x50;
+        // VP8X
+        webpBytes[12] = 0x56; webpBytes[13] = 0x50; webpBytes[14] = 0x38; webpBytes[15] = 0x58;
+        // Flags (Offset 20), Animation bit (0x02)
+        webpBytes[20] = 0x02; 
+        File.WriteAllBytes(path, webpBytes);
+
+        // Act
+        var (result, isAnim) = await _fileScannerService.AnalyzeSignatureAsync(path);
+
+        // Assert
+        Assert.Equal("WEBP", result);
+        Assert.True(isAnim);
     }
 
     /// <summary>
@@ -236,10 +270,11 @@ public class FileScannerServiceTests : IDisposable
         File.WriteAllBytes(path, avifBytes);
 
         // Act
-        string result = await _fileScannerService.AnalyzeSignatureAsync(path);
+        var (result, isAnim) = await _fileScannerService.AnalyzeSignatureAsync(path);
 
         // Assert
         Assert.Equal("AVIF", result);
+        Assert.False(isAnim);
     }
 
     /// <summary>
@@ -259,10 +294,11 @@ public class FileScannerServiceTests : IDisposable
         File.WriteAllBytes(path, avisBytes);
 
         // Act
-        string result = await _fileScannerService.AnalyzeSignatureAsync(path);
+        var (result, isAnim) = await _fileScannerService.AnalyzeSignatureAsync(path);
 
-        // Assert: avis도 AVIF 그룹으로 통일 처리되어야 함
+        // Assert: avis도 AVIF 그룹으로 통일 처리 + 애니메이션 판별 확인
         Assert.Equal("AVIF", result);
+        Assert.True(isAnim);
     }
 
     /// <summary>
@@ -290,6 +326,8 @@ public class FileScannerServiceTests : IDisposable
         Assert.Equal(jpegBytes.Length, item.Size);
         // Assert 4: 바이트 헤더 기반으로 시그니처가 "JPEG"로 판별되어야 함
         Assert.Equal("JPEG", item.FileSignature);
+        // Assert 5: JPEG는 애니메이션이 아님 확인
+        Assert.False(item.IsAnimation);
     }
 
     /// <summary>

@@ -19,11 +19,11 @@ public interface IFileScannerService
     Task<FileItem?> CreateFileItemAsync(string path);
 
     /// <summary>
-    /// 파일의 헤더(매직 넘버)를 분석하여 실제 포맷(확장자 형태)을 반환합니다.
+    /// 파일의 헤더(매직 넘버)를 분석하여 실제 포맷(확장자 형태)과 애니메이션 여부를 반환합니다.
     /// </summary>
     /// <param name="path">분석할 파일 경로</param>
-    /// <returns>탐지된 확장자 문자열 (예: "png")</returns>
-    Task<string> AnalyzeSignatureAsync(string path);
+    /// <returns>탐지된 확장자 문자열과 애니메이션 여부 튜플</returns>
+    Task<(string Format, bool IsAnimation)> AnalyzeSignatureAsync(string path);
 
     /// <summary>
     /// 지정된 폴더 경로 내의 모든 파일 정보를 재귀적으로 검색하여 가져옵니다.

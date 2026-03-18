@@ -27,7 +27,7 @@ public class ConvertSettings
     /// <summary>일반 이미지를 변환할 목표 확장자 (예: JPEG)</summary>
     public string StandardTargetFormat { get; set; } = "JPEG";
 
-    // 2. 애니메이션 이미지 (Animation: GIF, WebP-Ani)
+    // 2. 애니메이션 이미지 (Animation: GIF, WebP-Ani, AVIF-Seq)
 
     /// <summary>애니메이션(움짤)을 변환할 목표 확장자 (예: GIF)</summary>
     public string AnimationTargetFormat { get; set; } = "GIF";

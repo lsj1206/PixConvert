@@ -67,6 +67,10 @@ public partial class FileItem : ObservableObject
     [ObservableProperty]
     private string fileSignature = "-";
 
+    /// <summary>애니메이션 포함 여부 (GIF, WebP-Ani, AVIF-Seq)</summary>
+    [ObservableProperty]
+    private bool isAnimation = false;
+
     /// <summary>목록에 추가된 순번</summary>
     [ObservableProperty]
     private int? addIndex;

@@ -49,15 +49,15 @@ public class EngineSelectorTests
     ///            SkiaSharp는 단일 프레임만 처리하므로 GIF 애니메이션 처리 불가합니다.
     /// </summary>
     [Fact]
-    public void GetProvider_WhenSignatureIsGif_ShouldReturnNetVips()
+    public void GetProvider_WhenIsAnimationIsTrue_ShouldReturnNetVips()
     {
-        // Arrange: GIF 시그니처를 가진 FileItem (파일 경로는 엔진 선택에 영향 없음)
-        var file = new FileItem { Path = "test.bmp", FileSignature = "GIF" };
-
-        // Act: 엔진 선택
+        // Arrange: 애니메이션 플래그가 설정된 파일 (GIF, WebP-Ani, AVIF-Seq 등 공통)
+        var file = new FileItem { Path = "test.img", FileSignature = "ANY", IsAnimation = true };
+ 
+        // Act
         var provider = _selector.GetProvider(file);
-
-        // Assert: NetVipsProvider 타입인지 확인 (Assert.IsType은 정확한 타입을 검증)
+ 
+        // Assert: 애니메이션은 항상 NetVips
         Assert.IsType<NetVipsProvider>(provider);
     }
 
@@ -125,17 +125,38 @@ public class EngineSelectorTests
     ///        이후 VP8X 청크의 Animation 플래그를 확인하여 NetVips로 분기하는 로직이 추가될 예정입니다.
     ///        해당 구현 후에는 이 테스트가 실패할 수 있으며, 업데이트가 필요합니다.
     /// </summary>
+    /// <summary>
+    /// 시나리오: FileSignature가 "WEBP"이고 IsAnimation이 false인 파일.
+    /// 검증 목표: 정지 WebP는 SkiaSharpProvider가 선택되어야 함.
+    /// </summary>
     [Fact]
-    public void GetProvider_WhenSignatureIsWebp_ShouldReturnSkiaSharp()
+    public void GetProvider_WhenSignatureIsWebpAndNotAnimated_ShouldReturnSkiaSharp()
     {
         // Arrange
-        var file = new FileItem { Path = "test.jpg", FileSignature = "WEBP" };
+        var file = new FileItem { Path = "test.webp", FileSignature = "WEBP", IsAnimation = false };
 
         // Act
         var provider = _selector.GetProvider(file);
 
-        // Assert: 현재 기준에서는 SkiaSharp 경로
+        // Assert
         Assert.IsType<SkiaSharpProvider>(provider);
+    }
+
+    /// <summary>
+    /// 시나리오: FileSignature가 "WEBP"이고 IsAnimation이 true인 파일.
+    /// 검증 목표: 애니메이션 WebP는 NetVipsProvider가 선택되어야 함.
+    /// </summary>
+    [Fact]
+    public void GetProvider_WhenSignatureIsWebpAndIsAnimated_ShouldReturnNetVips()
+    {
+        // Arrange
+        var file = new FileItem { Path = "test.webp", FileSignature = "WEBP", IsAnimation = true };
+
+        // Act
+        var provider = _selector.GetProvider(file);
+
+        // Assert
+        Assert.IsType<NetVipsProvider>(provider);
     }
 
     // ─────────────────────────────────────────────────
@@ -152,18 +173,16 @@ public class EngineSelectorTests
     ///        사용자 수동 입력이나 다른 경로로 소문자가 유입될 수 있으므로 방어 검증을 수행합니다.
     /// </summary>
     [Theory]
-    [InlineData("gif")] // 소문자
-    [InlineData("Gif")] // 대소문자 혼합
-    [InlineData("GIF")] // 대문자 (FileScannerService 표준 출력값)
-    public void GetProvider_WhenGifSignatureIsDifferentCase_ShouldAlwaysReturnNetVips(string signature)
+    [InlineData("avif")]
+    [InlineData("AVIF")]
+    public void GetProvider_WhenSignatureIsAvif_ShouldAlwaysReturnNetVipsRegardlessOfAnimationFlag(string signature)
     {
-        // Arrange: 대소문자만 다른 GIF 시그니처
-        var file = new FileItem { Path = "test.jpg", FileSignature = signature };
+        // Arrange: AVIF는 정지/애니메이션 무관하게 NetVips (고압축 포맷 지원)
+        var fileStatic = new FileItem { Path = "static.avif", FileSignature = signature, IsAnimation = false };
+        var fileAnim = new FileItem { Path = "anim.avif", FileSignature = signature, IsAnimation = true };
 
-        // Act
-        var provider = _selector.GetProvider(file);
-
-        // Assert: 대소문자 무관하게 항상 NetVipsProvider를 반환해야 함
-        Assert.IsType<NetVipsProvider>(provider);
+        // Act & Assert
+        Assert.IsType<NetVipsProvider>(_selector.GetProvider(fileStatic));
+        Assert.IsType<NetVipsProvider>(_selector.GetProvider(fileAnim));
     }
 }

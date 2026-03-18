@@ -33,24 +33,15 @@ public class EngineSelector
     /// <returns>선택된 변환 서비스 공급자</returns>
     public IProviderService GetProvider(FileItem file)
     {
-        string signature = file.FileSignature.ToUpper();
+        // 1. 애니메이션 파일(GIF, WebP-Animated, AVIF-Sequence)은 NetVips로 라우팅
+        if (file.IsAnimation)
+            return _netVips;
 
-        switch (signature)
-        {
-            // NetVips 경로: 애니메이션 및 고압축 포맷
-            case "GIF":
-                return _netVips;
+        // 2. 정지 AVIF도 NetVips: 고압축 포맷으로 NetVips가 더 적합
+        if (file.FileSignature.Equals("AVIF", StringComparison.OrdinalIgnoreCase))
+            return _netVips;
 
-            case "AVIF":
-                return _netVips;
-
-            // TODO: WebP-Animated 판별 로직 추가 필요 (Step 4 구현 예정)
-            // 현재 WEBP는 헤더만으로 정지/애니메이션 구분 불가 → 기본 SkiaSharp 사용
-            // 실제 구현 시: VP8X 청크의 Animation 플래그를 확인하여 분기 필요
-
-            // SkiaSharp 경로: 정지 이미지 포맷 (JPEG, PNG, BMP, WEBP-Static)
-            default:
-                return _skiaSharp;
-        }
+        // 3. 나머지 정지 이미지(JPEG, PNG, BMP, WEBP-Static)는 SkiaSharp
+        return _skiaSharp;
     }
 }
