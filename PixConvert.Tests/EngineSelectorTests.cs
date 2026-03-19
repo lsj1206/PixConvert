@@ -55,7 +55,7 @@ public class EngineSelectorTests
         var file = new FileItem { Path = "test.img", FileSignature = "ANY", IsAnimation = true };
  
         // Act
-        var provider = _selector.GetProvider(file);
+        var provider = _selector.GetProvider(file, new ConvertSettings());
  
         // Assert: 애니메이션은 항상 NetVips
         Assert.IsType<NetVipsProvider>(provider);
@@ -74,7 +74,7 @@ public class EngineSelectorTests
         var file = new FileItem { Path = "test.png", FileSignature = "AVIF" };
 
         // Act
-        var provider = _selector.GetProvider(file);
+        var provider = _selector.GetProvider(file, new ConvertSettings());
 
         // Assert
         Assert.IsType<NetVipsProvider>(provider);
@@ -96,7 +96,7 @@ public class EngineSelectorTests
         var file = new FileItem { Path = "test.jpg", FileSignature = "JPEG" };
 
         // Act
-        var provider = _selector.GetProvider(file);
+        var provider = _selector.GetProvider(file, new ConvertSettings());
 
         // Assert: SkiaSharpProvider 타입인지 확인
         Assert.IsType<SkiaSharpProvider>(provider);
@@ -111,7 +111,7 @@ public class EngineSelectorTests
     {
         // Arrange & Act
         var file = new FileItem { Path = "test.jpg", FileSignature = "PNG" };
-        var provider = _selector.GetProvider(file);
+        var provider = _selector.GetProvider(file, new ConvertSettings());
 
         // Assert
         Assert.IsType<SkiaSharpProvider>(provider);
@@ -136,7 +136,7 @@ public class EngineSelectorTests
         var file = new FileItem { Path = "test.webp", FileSignature = "WEBP", IsAnimation = false };
 
         // Act
-        var provider = _selector.GetProvider(file);
+        var provider = _selector.GetProvider(file, new ConvertSettings());
 
         // Assert
         Assert.IsType<SkiaSharpProvider>(provider);
@@ -153,7 +153,7 @@ public class EngineSelectorTests
         var file = new FileItem { Path = "test.webp", FileSignature = "WEBP", IsAnimation = true };
 
         // Act
-        var provider = _selector.GetProvider(file);
+        var provider = _selector.GetProvider(file, new ConvertSettings());
 
         // Assert
         Assert.IsType<NetVipsProvider>(provider);
@@ -182,7 +182,47 @@ public class EngineSelectorTests
         var fileAnim = new FileItem { Path = "anim.avif", FileSignature = signature, IsAnimation = true };
 
         // Act & Assert
-        Assert.IsType<NetVipsProvider>(_selector.GetProvider(fileStatic));
-        Assert.IsType<NetVipsProvider>(_selector.GetProvider(fileAnim));
+        Assert.IsType<NetVipsProvider>(_selector.GetProvider(fileStatic, new ConvertSettings()));
+        Assert.IsType<NetVipsProvider>(_selector.GetProvider(fileAnim, new ConvertSettings()));
+    }
+
+    // ─────────────────────────────────────────────────
+    // 출력 포맷 기반 라우팅 (Phase B 신규 정책)
+    // ─────────────────────────────────────────────────
+
+    /// <summary>
+    /// 시나리오: 정지 PNG 파일을 AVIF로 변환하려고 함.
+    /// 검증 목표: SkiaSharp은 AVIF 인코딩을 지원하지 않으므로 NetVipsProvider가 선택되어야 함.
+    /// </summary>
+    [Fact]
+    public void GetProvider_WhenStandardTargetFormatIsAvif_ShouldReturnNetVips()
+    {
+        // Arrange
+        var file = new FileItem { Path = "test.png", FileSignature = "PNG", IsAnimation = false };
+        var settings = new ConvertSettings { StandardTargetFormat = "AVIF" };
+
+        // Act
+        var provider = _selector.GetProvider(file, settings);
+
+        // Assert
+        Assert.IsType<NetVipsProvider>(provider);
+    }
+
+    /// <summary>
+    /// 시나리오: 애니메이션 WebP 파일을 GIF로 변환하려고 함.
+    /// 검증 목표: 애니메이션 파일은 항상 NetVipsProvider가 선택되어야 함.
+    /// </summary>
+    [Fact]
+    public void GetProvider_WhenAnimationFile_ShouldAlwaysReturnNetVipsRegardlessOfTargetFormat()
+    {
+        // Arrange
+        var file = new FileItem { Path = "test.webp", FileSignature = "WEBP", IsAnimation = true };
+        var settings = new ConvertSettings { AnimationTargetFormat = "GIF" };
+
+        // Act
+        var provider = _selector.GetProvider(file, settings);
+
+        // Assert
+        Assert.IsType<NetVipsProvider>(provider);
     }
 }

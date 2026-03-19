@@ -198,6 +198,14 @@ public class PresetService : IPresetService
             return false;
         }
 
+        // 6. 사용자 지정 출력 경로(Custom) 선택 시 경로가 비어 있는지 확인
+        if (settings.OutputType == OutputPathType.Custom && string.IsNullOrWhiteSpace(settings.CustomOutputPath))
+        {
+            _logger.LogError(_languageService.GetString("Log_Preset_EmptyCustomPath"));
+            errorMessageKey = "Msg_Error_ConfigInvalid";
+            return false;
+        }
+
         _logger.LogInformation(_languageService.GetString("Log_Preset_DataValid"));
         errorMessageKey = string.Empty;
         return true;
