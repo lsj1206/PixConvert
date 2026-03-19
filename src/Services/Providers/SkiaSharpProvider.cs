@@ -79,11 +79,12 @@ public class SkiaSharpProvider : IProviderService, IDisposable
             {
                 var (skFormat, quality) = ResolveEncodeParams(targetFormat, settings.Quality);
 
-                // SKImage.Encode가 실패하는 경우 SKBitmap.Encode를 시도 (인코더 존재 여부 재확인)
-                using var data = bitmapToEncode.Encode(skFormat, quality);
+                // SKImage.FromBitmap()을 사용하여 인코딩 수행
+                using var image = SKImage.FromBitmap(bitmapToEncode);
+                using var data  = image.Encode(skFormat, quality);
 
                 if (data is null)
-                    throw new InvalidOperationException($"SKImage/Bitmap.Encode 실패 (인코더 누락 가능성): 포맷={targetFormat}");
+                    throw new InvalidOperationException($"SKImage.Encode 실패(인코더 누락 가능성): 포맷={targetFormat}");
 
                 // 인코딩된 메모리 버퍼를 스트림에 쓰는 동기 호출 (데이터 복사 비용 미미)
                 await using var outputStream = new FileStream(
@@ -125,8 +126,7 @@ public class SkiaSharpProvider : IProviderService, IDisposable
     {
         SKColor bgColor = ParseBackgroundColor(settings);
 
-        // BMP나 일부 구형 인코더는 Rgb565와 같은 단순 포맷을 더 잘 지원할 수 있음
-        var colorType = settings.StandardTargetFormat == "BMP" ? SKColorType.Rgb565 : SKImageInfo.PlatformColorType;
+        var colorType = SKImageInfo.PlatformColorType;
         var dst = new SKBitmap(src.Width, src.Height, colorType, SKAlphaType.Opaque);
         using var canvas = new SKCanvas(dst);
 
@@ -190,9 +190,8 @@ public class SkiaSharpProvider : IProviderService, IDisposable
         {
             "JPEG" => (SKEncodedImageFormat.Jpeg, quality),
             "PNG"  => (SKEncodedImageFormat.Png,  100),    // PNG는 무손실 → quality 무의미
-            "BMP"  => (SKEncodedImageFormat.Bmp,  100),
             "WEBP" => (SKEncodedImageFormat.Webp, quality),
-            _      => throw new NotSupportedException($"SkiaSharpProvider: 지원하지 않는 출력 포맷 '{targetFormat}'")
+            _      => throw new NotSupportedException($"SkiaSharpProvider에서 지원하지 않는 대상 포맷: {targetFormat}")
         };
     }
 

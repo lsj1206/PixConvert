@@ -164,12 +164,12 @@ public class EngineSelectorTests
     // ─────────────────────────────────────────────────
 
     /// <summary>
-    /// 시나리오: GIF 시그니처를 소문자("gif"), 혼합("Gif"), 대문자("GIF")로 전달.
+    /// 시나리오: AVIF 시그니처를 소문자("avif"), 대문자("AVIF")로 전달.
     /// 검증 목표: EngineSelector 내부에서 ToUpper()로 정규화하므로 대소문자와 무관하게
     ///            항상 동일한 엔진(NetVipsProvider)을 반환하는지 확인.
-    ///            [Theory]를 사용하여 3개의 케이스를 단일 테스트로 검증합니다.
+    ///            [Theory]를 사용하여 2개의 케이스를 단일 테스트로 검증합니다.
     ///
-    /// [중요] FileScannerService는 시그니처를 "GIF"(대문자)로 반환하지만,
+    /// [중요] FileScannerService는 시그니처를 "AVIF"(대문자)로 반환하지만,
     ///        사용자 수동 입력이나 다른 경로로 소문자가 유입될 수 있으므로 방어 검증을 수행합니다.
     /// </summary>
     [Theory]

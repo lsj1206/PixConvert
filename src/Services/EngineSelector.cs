@@ -43,9 +43,7 @@ public class EngineSelector
             return _netVips;
 
         // 3. AVIF 출력 포맷은 SkiaSharp 미지원 -> NetVips
-        string targetFormat = file.IsAnimation
-            ? settings.AnimationTargetFormat
-            : settings.StandardTargetFormat;
+        string targetFormat = settings.StandardTargetFormat;
 
         if (targetFormat.Equals("AVIF", StringComparison.OrdinalIgnoreCase) ||
             targetFormat.Equals("BMP", StringComparison.OrdinalIgnoreCase))

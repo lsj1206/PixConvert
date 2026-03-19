@@ -51,6 +51,7 @@
     <system:String x:Key="Log_Preset_InvalidAnimFormat">[PresetService] 지원하지 않는 AnimationTargetFormat 값입니다: {Format}</system:String>
     <system:String x:Key="Log_Preset_InvalidEnum">[PresetService] 열거형(Enum) 설정 값 중 지원하지 않는 값이 포함되어 있습니다.</system:String>
     <system:String x:Key="Log_Preset_DataValid">[PresetService] 현재 프리셋 데이터 검증 완료 (이상 없음).</system:String>
+    <system:String x:Key="Log_Preset_EmptyCustomPath">[PresetService] 사용자 지정 경로가 비어있습니다.</system:String>
 
     <!-- SnackbarService.cs -->
     <system:String x:Key="Log_Snackbar_ShowError">[SnackbarService] Show 처리 중 예외 발생</system:String>

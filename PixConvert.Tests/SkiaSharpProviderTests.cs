@@ -224,4 +224,29 @@ public class SkiaSharpProviderTests : IDisposable
         Assert.True(pixel.Green < 10);
         Assert.True(pixel.Blue > 245);
     }
+
+    [Fact]
+    public async Task ConvertAsync_WhenOutputTypeIsSubFolder_ShouldCreateSubFolderAndSaveFile()
+    {
+        // Arrange
+        var file = new FileItem { Path = _inputPath, FileSignature = "PNG" };
+        var settings = new ConvertSettings
+        {
+            StandardTargetFormat = "JPEG",
+            OutputType = OutputPathType.SubFolder,
+            OverwriteSide = OverwritePolicy.Overwrite
+        };
+
+        // Act
+        await _provider.ConvertAsync(file, settings, CancellationToken.None);
+
+        // Assert
+        string dateStr = DateTime.Today.ToString("yyyy-MM-dd");
+        string expectedDir = Path.Combine(_testDir, $"PixConvert_{dateStr}");
+        string expectedPath = Path.Combine(expectedDir, "input.jpg");
+
+        Assert.True(Directory.Exists(expectedDir));
+        Assert.True(File.Exists(expectedPath));
+        Assert.Equal(FileConvertStatus.Success, file.Status);
+    }
 }
