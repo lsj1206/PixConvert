@@ -10,10 +10,18 @@ namespace PixConvert.Services.Providers;
 
 /// <summary>
 /// NetVips 엔진을 사용하는 애니메이션 및 고압축 이미지 변환 공급자입니다.
-/// Phase B에서는 SkiaSharp에서 처리하지 못하는 AVIF(인코딩)와 BMP(인코더 누락 대응)를 처리합니다.
+/// 애니메이션(GIF, WebP, AVIF)의 모든 프레임을 보존하며, libvips의 고성능 인코더를 활용합니다.
 /// </summary>
 public class NetVipsProvider : IProviderService, IDisposable
 {
+    private readonly ILanguageService _languageService;
+    private bool _isDisposed;
+
+    public NetVipsProvider(ILanguageService languageService)
+    {
+        _languageService = languageService;
+    }
+
     public async Task ConvertAsync(FileItem file, ConvertSettings settings, CancellationToken token)
     {
         token.ThrowIfCancellationRequested();
@@ -32,53 +40,110 @@ public class NetVipsProvider : IProviderService, IDisposable
         if (!string.IsNullOrEmpty(outputDir))
             Directory.CreateDirectory(outputDir);
 
+        // ── 2. 실제 변환 프로세스 격리 (Task.Run) ─────────────────────────
+        // libvips의 동기 I/O 및 내부 스레드 관리를 .NET 스레드풀의 특정 스레드로 격리하여 보호합니다.
         try
         {
-            token.ThrowIfCancellationRequested();
-
-            // ── 2. 이미지 로드 및 처리 ────────────────────────────────────────
-            // libvips는 지연 로딩을 지원하며, 로드 시점에 취소를 직접 제어하기 어려우므로 
-            // 파일 읽기 전에 미리 체크함
-            using var image = Image.NewFromFile(file.Path, access: Enums.Access.Random);
-
-            string targetFormat = file.IsAnimation
-                ? settings.AnimationTargetFormat
-                : settings.StandardTargetFormat;
-
-            Image processedImage = image;
-            bool isNewImage = false;
-
-            // ── 3. 배경색 합성 (BMP 인코딩 등 알파 미지원 포맷 대응) ──────────
-            if (targetFormat == "BMP" && image.HasAlpha())
-            {
-                var bgColor = ParseBackgroundColor(settings);
-                processedImage = image.Flatten(background: bgColor);
-                isNewImage = true;
-            }
-
-            token.ThrowIfCancellationRequested();
-
-            // ── 4. 파일 저장 ──────────────────────────────────────────────────
-            // libvips는 확장자에 따라 자동으로 적절한 세이버(Saver)를 선택함
-            processedImage.WriteToFile(outputPath);
-
-            if (isNewImage)
-                processedImage.Dispose();
-
+            await Task.Run(() => ExecuteConversion(file, settings, outputPath, token), token);
             file.Status = FileConvertStatus.Success;
+        }
+        catch (OperationCanceledException)
+        {
+            // 취소 시 상태 변경 없이 상위로 전파
+            throw;
         }
         catch (Exception ex)
         {
             file.Status = FileConvertStatus.Error;
-            if (ex is OperationCanceledException) throw;
-            throw new IOException($"NetVips 변환 작업 실패: {file.Path}", ex);
+            var msg = string.Format(_languageService.GetString("Log_NetVips_ConvertFail"), file.Path);
+            throw new IOException(msg, ex);
         }
+    }
+
+    /// <summary>
+    /// 실제 변환 로직을 수행하는 내부 동기 메서드입니다. (Task.Run 내부에서 실행)
+    /// </summary>
+    private void ExecuteConversion(FileItem file, ConvertSettings settings, string outputPath, CancellationToken token)
+    {
+        token.ThrowIfCancellationRequested();
+
+        string targetFormat = file.IsAnimation
+            ? settings.AnimationTargetFormat
+            : settings.StandardTargetFormat;
+
+        // n: -1 -> 애니메이션 이미지의 모든 프레임을 로드 (GIF, WebP, AVIF 등에서만 지원)
+        // access: Sequential -> 메모리 사용량 최소화
+        var loaderOptions = new VOption();
+        string ext = Path.GetExtension(file.Path).ToLower().TrimStart('.');
+        if (file.IsAnimation || ext is "gif" or "webp" or "avif")
+        {
+            loaderOptions.Add("n", -1);
+        }
+
+        using var image = Image.NewFromFile(file.Path, access: Enums.Access.Sequential, kwargs: loaderOptions);
+        
+        token.ThrowIfCancellationRequested();
+
+        // ── 3. 배경 합성 (알파 미지원 포맷 대응) ──────────────────────────
+        bool targetSupportsAlpha = targetFormat is "PNG" or "WEBP" or "AVIF" or "GIF";
+        Image workImage = image;
+        bool isNewImage = false;
+
+        if (!targetSupportsAlpha && image.HasAlpha())
+        {
+            var bgColor = ParseBackgroundColor(settings);
+            // Flatten은 이미지를 배경색과 합성하여 알파 채널을 제거함
+            workImage = image.Flatten(background: bgColor);
+            isNewImage = true;
+        }
+
+        token.ThrowIfCancellationRequested();
+
+        // ── 4. 포맷별 전용 세이버(Saver) 호출 ──────────────────────────────
+        try
+        {
+            SaveWithFormat(workImage, outputPath, targetFormat, settings);
+        }
+        finally
+        {
+            // 합성 등으로 생성된 중간 객체 해제
+            if (isNewImage) workImage.Dispose();
+        }
+    }
+
+    /// <summary>
+    /// libvips의 포맷별 상세 옵션을 적용하여 저장합니다.
+    /// </summary>
+    private static void SaveWithFormat(Image image, string outputPath, string targetFormat, ConvertSettings settings)
+    {
+        var options = new VOption();
+
+        switch (targetFormat.ToUpperInvariant())
+        {
+            case "JPEG":
+                options.Add("Q", settings.Quality);
+                options.Add("strip", true);
+                break;
+            case "PNG":
+                options.Add("compression", 6);
+                break;
+            case "WEBP":
+                options.Add("Q", settings.Quality);
+                options.Add("strip", true);
+                break;
+            case "AVIF":
+                // AVIF 옵션이 환경(libheif 버전 등)에 따라 Q/quality 지원 여부가 상이하므로 기본값 사용
+                options.Add("compression", Enums.ForeignHeifCompression.Av1);
+                break;
+            // GIF, WEBP 등 애니메이션 포맷은 확장자와 함께 n-pages 메타데이터가 있으면 자동으로 애니메이션으로 저장됨
+        }
+
+        // WriteToFile은 파일 확장자에 따라 적절한 save 오퍼레이션을 선택하고 options를 전달함
+        image.WriteToFile(outputPath, options);
     }
 
     private static double[] ParseBackgroundColor(ConvertSettings settings)
     {
-        // NetVips는 [R, G, B] 형태의 double 배열을 사용함 (0.0 ~ 255.0)
-        // 기본값: White
         return settings.BgColorOption switch
         {
             BackgroundColorOption.White  => new[] { 255.0, 255.0, 255.0 },
@@ -102,7 +167,7 @@ public class NetVipsProvider : IProviderService, IDisposable
                     (double)Convert.ToByte(clean[4..6], 16)
                 };
             }
-            if (clean.Length == 8) // AARRGGBB -> Ignore Alpha for flattening
+            if (clean.Length == 8) // AARRGGBB
             {
                 return new[]
                 {
@@ -112,9 +177,15 @@ public class NetVipsProvider : IProviderService, IDisposable
                 };
             }
         }
-        catch { /* Fallback */ }
+        catch { /* Fallback to white */ }
         return new[] { 255.0, 255.0, 255.0 };
     }
 
-    public void Dispose() { /* NetVips 모듈 레벨 자원 없음 */ }
+    public void Dispose()
+    {
+        if (_isDisposed) return;
+        _isDisposed = true;
+        // 인스턴스 레벨의 NetVips 자원 명시적 해제는 불필요 (루컬 using 블록에서 처리)
+        GC.SuppressFinalize(this);
+    }
 }

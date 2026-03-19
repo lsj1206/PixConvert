@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Xunit;
 using SkiaSharp;
 using PixConvert.Models;
+using PixConvert.Services;
 using PixConvert.Services.Providers;
 
 namespace PixConvert.Tests;
@@ -12,12 +13,22 @@ namespace PixConvert.Tests;
 public class SkiaSharpProviderTests : IDisposable
 {
     private readonly SkiaSharpProvider _provider;
+    private readonly ILanguageService _lang;
     private readonly string _testDir;
     private readonly string _inputPath;
 
+    private class MockLanguageService : ILanguageService
+    {
+        public string GetString(string key) => key;
+        public void ChangeLanguage(string culture) { }
+        public string GetSystemLanguage() => "ko-KR";
+        public event Action LanguageChanged = delegate { };
+    }
+
     public SkiaSharpProviderTests()
     {
-        _provider = new SkiaSharpProvider();
+        _lang = new MockLanguageService();
+        _provider = new SkiaSharpProvider(_lang);
         _testDir = Path.Combine(Path.GetTempPath(), "PixConvertTests_" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(_testDir);
         _inputPath = Path.Combine(_testDir, "input.png");
@@ -194,7 +205,7 @@ public class SkiaSharpProviderTests : IDisposable
         var ex = await Assert.ThrowsAsync<IOException>(async () => 
             await _provider.ConvertAsync(file, settings, CancellationToken.None));
         
-        Assert.Contains("디코딩 실패", ex.Message);
+        Assert.Contains("Log_Skia_DecodeFail", ex.Message);
         Assert.Equal(FileConvertStatus.Error, file.Status);
     }
 

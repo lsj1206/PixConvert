@@ -25,15 +25,25 @@ public class EngineSelectorTests
 {
     private readonly SkiaSharpProvider _skia;
     private readonly NetVipsProvider _netVips;
+    private readonly ILanguageService _lang;
 
     // 테스트 대상(SUT)
     private readonly EngineSelector _selector;
 
+    private class MockLanguageService : ILanguageService
+    {
+        public string GetString(string key) => key;
+        public void ChangeLanguage(string culture) { }
+        public string GetSystemLanguage() => "ko-KR";
+        public event Action LanguageChanged = delegate { };
+    }
+
     public EngineSelectorTests()
     {
+        _lang = new MockLanguageService();
         // 실제 Provider 인스턴스를 생성하여 주입 (Mock 없이 실제 타입 사용)
-        _skia = new SkiaSharpProvider();
-        _netVips = new NetVipsProvider();
+        _skia = new SkiaSharpProvider(_lang);
+        _netVips = new NetVipsProvider(_lang);
 
         // 두 Provider를 주입하여 EngineSelector 생성
         _selector = new EngineSelector(_skia, _netVips);

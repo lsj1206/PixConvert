@@ -14,6 +14,13 @@ namespace PixConvert.Services.Providers;
 /// </summary>
 public class SkiaSharpProvider : IProviderService, IDisposable
 {
+    private readonly ILanguageService _languageService;
+
+    public SkiaSharpProvider(ILanguageService languageService)
+    {
+        _languageService = languageService;
+    }
+
     public async Task ConvertAsync(FileItem file, ConvertSettings settings, CancellationToken token)
     {
         token.ThrowIfCancellationRequested();
@@ -50,7 +57,8 @@ public class SkiaSharpProvider : IProviderService, IDisposable
             catch (Exception ex)
             {
                 file.Status = FileConvertStatus.Error;
-                throw new IOException($"이미지 디코딩 실패: {file.Path}", ex);
+                var msg = string.Format(_languageService.GetString("Log_Skia_DecodeFail"), file.Path);
+                throw new IOException(msg, ex);
             }
 
             token.ThrowIfCancellationRequested();
@@ -84,7 +92,10 @@ public class SkiaSharpProvider : IProviderService, IDisposable
                 using var data  = image.Encode(skFormat, quality);
 
                 if (data is null)
-                    throw new InvalidOperationException($"SKImage.Encode 실패(인코더 누락 가능성): 포맷={targetFormat}");
+                {
+                    var msg = string.Format(_languageService.GetString("Log_Skia_EncodeFail"), targetFormat);
+                    throw new InvalidOperationException(msg);
+                }
 
                 // 인코딩된 메모리 버퍼를 스트림에 쓰는 동기 호출 (데이터 복사 비용 미미)
                 await using var outputStream = new FileStream(
@@ -96,7 +107,8 @@ public class SkiaSharpProvider : IProviderService, IDisposable
             catch (Exception ex)
             {
                 file.Status = FileConvertStatus.Error;
-                throw new IOException($"인코딩 및 저장 실패: {outputPath}", ex);
+                var msg = string.Format(_languageService.GetString("Log_Skia_SaveFail"), outputPath);
+                throw new IOException(msg, ex);
             }
         }
         finally

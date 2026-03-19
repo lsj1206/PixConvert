@@ -20,6 +20,7 @@ public partial class ConversionViewModel : ViewModelBase
     private readonly ISnackbarService _snackbarService;
     private readonly IPresetService _presetService;
     private readonly FileListViewModel _fileList;
+    private readonly EngineSelector _engineSelector;
     private readonly Func<ConvertSettingViewModel> _convertSettingVmFactory;
 
     [ObservableProperty] private int _convertProgressPercent;
@@ -34,6 +35,7 @@ public partial class ConversionViewModel : ViewModelBase
         ISnackbarService snackbarService,
         IPresetService presetService,
         FileListViewModel fileList,
+        EngineSelector engineSelector,
         Func<ConvertSettingViewModel> convertSettingVmFactory)
         : base(languageService, logger)
     {
@@ -41,6 +43,7 @@ public partial class ConversionViewModel : ViewModelBase
         _snackbarService = snackbarService;
         _presetService = presetService;
         _fileList = fileList;
+        _engineSelector = engineSelector;
         _convertSettingVmFactory = convertSettingVmFactory;
 
         OpenConvertSettingCommand = new AsyncRelayCommand(OpenConvertSettingAsync, () => CurrentStatus != AppStatus.Converting);
@@ -105,20 +108,26 @@ public partial class ConversionViewModel : ViewModelBase
         }
 
         RequestStatus(AppStatus.Converting);
+        using var cts = new CancellationTokenSource();
+        // TODO: UI에서 취소 버튼을 활성화하면 cts.Cancel()과 연결 예정 (Phase D)
+
         try
         {
             int processedCount = 0;
             int totalConvertCount = _fileList.Items.Count(item => item.Status != FileConvertStatus.Unsupported);
             int failCount = 0;
+            var settings = GetCurrentSettings();
             string presetName = _presetService.Config.LastSelectedPresetName ?? string.Empty;
 
             foreach (var item in _fileList.Items)
             {
                 if (item.Status == FileConvertStatus.Unsupported) continue;
+                cts.Token.ThrowIfCancellationRequested();
 
                 item.Status = FileConvertStatus.Processing;
                 item.Progress = 0;
 
+                // 진행 상황 메시지 전파
                 WeakReferenceMessenger.Default.Send(new ConvertProgressMessage
                 {
                     FileName = System.IO.Path.GetFileName(item.Path),
@@ -128,24 +137,60 @@ public partial class ConversionViewModel : ViewModelBase
                     PresetName = presetName
                 });
 
-                // 시뮬레이션 로직
-                for (int i = 0; i <= 100; i += 20)
+                // 실 엔진 호출
+                try
                 {
-                    item.Progress = i;
-                    double totalProg = (processedCount + (i / 100.0)) / totalConvertCount * 100.0;
-                    ConvertProgressPercent = (int)totalProg;
-                    await Task.Delay(100);
+                    var provider = _engineSelector.GetProvider(item, settings);
+                    await provider.ConvertAsync(item, settings, cts.Token);
+                }
+                catch (OperationCanceledException) { break; }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, GetString("Log_Conversion_FileError"), item.Path);
+                    failCount++;
+                    // item.Status는 Provider 내부에서 Error로 설정됨
                 }
 
-                item.Status = FileConvertStatus.Success;
                 processedCount++;
                 ConvertProgressPercent = (int)((double)processedCount / totalConvertCount * 100.0);
+
+                // 최종 진행 완료 혹은 실패 후 메시지 갱신
+                WeakReferenceMessenger.Default.Send(new ConvertProgressMessage
+                {
+                    FileName = System.IO.Path.GetFileName(item.Path),
+                    ProcessedCount = processedCount,
+                    TotalCount = totalConvertCount,
+                    FailCount = failCount,
+                    PresetName = presetName
+                });
             }
+
+            if (failCount > 0)
+            {
+                _snackbarService.Show(string.Format(GetString("Msg_OperationComplete"), processedCount - failCount), SnackbarType.Warning);
+            }
+            else
+            {
+                _snackbarService.Show(string.Format(GetString("Msg_OperationComplete"), processedCount), SnackbarType.Success);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            _snackbarService.Show("작업이 취소되었습니다.", SnackbarType.Info);
         }
         finally
         {
             ConvertProgressPercent = 0;
             RequestStatus(AppStatus.Idle);
         }
+    }
+
+    /// <summary>
+    /// 현재 선택된 프리셋의 설정 객체를 안전하게 가져옵니다.
+    /// </summary>
+    private ConvertSettings GetCurrentSettings()
+    {
+        var preset = _presetService.Config.Presets.FirstOrDefault(p => p.Name == _presetService.Config.LastSelectedPresetName);
+        return preset?.Settings ?? new ConvertSettings();
     }
 }
