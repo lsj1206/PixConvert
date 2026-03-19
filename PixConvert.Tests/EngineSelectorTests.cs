@@ -225,4 +225,18 @@ public class EngineSelectorTests
         // Assert
         Assert.IsType<NetVipsProvider>(provider);
     }
+
+    [Fact]
+    public void GetProvider_WhenAnimationFileAndTargetIsAvif_ShouldReturnNetVips()
+    {
+        // Arrange
+        var file = new FileItem { Path = "dummy.gif", IsAnimation = true };
+        var settings = new ConvertSettings { AnimationTargetFormat = "AVIF" };
+
+        // Act
+        var provider = _selector.GetProvider(file, settings);
+
+        // Assert
+        Assert.IsType<NetVipsProvider>(provider);
+    }
 }

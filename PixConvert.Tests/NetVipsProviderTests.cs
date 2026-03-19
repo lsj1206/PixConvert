@@ -83,6 +83,8 @@ public class NetVipsProviderTests : IDisposable
         }
 
         // Assert: 상태가 Success 또는 Error여야 함 (작업이 시도되었음을 의미)
+        // 현재 환경에서는 전형적으로 Error가 발생해야 함
+        Assert.True(file.Status == FileConvertStatus.Success || file.Status == FileConvertStatus.Error);
         Assert.NotEqual(FileConvertStatus.Pending, file.Status);
     }
 }

@@ -275,7 +275,7 @@ public class PresetServiceTests
         _presetService.RemovePreset("ToRemove");
 
         // Assert: "Remaining"만 남아 1개인지 확인
-        Assert.Equal(1, _presetService.Config.Presets.Count);
+        Assert.Single(_presetService.Config.Presets);
         // Assert: 지정한 프리셋이 실제로 목록에서 사라졌는지 추가 확인
         Assert.DoesNotContain(_presetService.Config.Presets, p => p.Name == "ToRemove");
     }
@@ -408,5 +408,33 @@ public class PresetServiceTests
         //   만약 Shallow Copy였다면 복사본도 50으로 바뀌었을 것입니다.
         var copy = _presetService.Config.Presets.First(p => p.Name == "Dest");
         Assert.Equal(80, copy.Settings.Quality);
+    }
+
+    /// <summary>
+    /// 시나리오: OutputType이 Custom인데 CustomOutputPath가 비어있는 경우.
+    /// 검증 목표: 유효성 검사가 실패(false)하고 적절한 로그 메시지 키를 사용하는지 확인.
+    /// </summary>
+    [Fact]
+    public void ValidPresetData_WhenCustomPathIsEmpty_ShouldReturnFalse()
+    {
+        // Arrange
+        _presetService.Config.Presets.Clear();
+        var settings = new ConvertSettings 
+        { 
+            StandardTargetFormat = "JPEG",
+            AnimationTargetFormat = "GIF",
+            OutputType = OutputPathType.Custom,
+            CustomOutputPath = "" // 빈 값
+        };
+        _presetService.Config.Presets.Add(new ConvertPreset { Name = "Test", Settings = settings });
+        _presetService.Config.LastSelectedPresetName = "Test";
+
+        // Act
+        var result = _presetService.ValidPresetData(out string errorKey);
+
+        // Assert
+        Assert.False(result);
+        // 에러 키가 설정되었는지 확인
+        Assert.Equal("Msg_Error_ConfigInvalid", errorKey);
     }
 }
