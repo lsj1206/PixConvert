@@ -102,6 +102,7 @@ public class SkiaSharpProvider : IProviderService, IDisposable
                     outputPath, FileMode.Create, FileAccess.Write, FileShare.None, 4096, useAsync: true);
                 data.SaveTo(outputStream);
 
+                file.Progress = 100;
                 file.Status = FileConvertStatus.Success;
             }
             catch (Exception ex)

@@ -76,13 +76,12 @@ public partial class ConversionViewModel : ViewModelBase
         if (isSaved)
         {
             vm.SyncToSettings();
+            bool saved = await _presetService.SaveAsync();
+            if (saved)
+                _snackbarService.Show(GetString("Msg_Preset_SaveSuccess"), SnackbarType.Success);
+            else
+                _snackbarService.Show(GetString("Msg_Preset_SaveError"), SnackbarType.Error);
         }
-
-        bool saved = await _presetService.SaveAsync();
-        if (saved)
-            _snackbarService.Show(GetString("Msg_Preset_SaveSuccess"), SnackbarType.Success);
-        else
-            _snackbarService.Show(GetString("Msg_Preset_SaveError"), SnackbarType.Error);
     }
 
     /// <summary>
@@ -119,15 +118,36 @@ public partial class ConversionViewModel : ViewModelBase
             var settings = GetCurrentSettings();
             string presetName = _presetService.Config.LastSelectedPresetName ?? string.Empty;
 
-            foreach (var item in _fileList.Items)
+            // CPU 사용량에 따른 병렬도 결정 (Defect 2)
+            int maxDegree = settings.CpuUsage switch
             {
-                if (item.Status == FileConvertStatus.Unsupported) continue;
-                cts.Token.ThrowIfCancellationRequested();
+                CpuUsageOption.Max     => Environment.ProcessorCount,
+                CpuUsageOption.Optimal => Math.Max(1, Environment.ProcessorCount * 3 / 4),
+                CpuUsageOption.Half    => Math.Max(1, Environment.ProcessorCount / 2),
+                CpuUsageOption.Minimum => 1,
+                _                      => 1
+            };
 
+            var parallelOptions = new ParallelOptions
+            {
+                CancellationToken = cts.Token,
+                MaxDegreeOfParallelism = maxDegree
+            };
+
+            var activeFiles = _fileList.Items
+                .Where(item => item.Status != FileConvertStatus.Unsupported)
+                .ToList();
+
+            // ── 1. 일괄 변환 시작 로그 ───────────────────────────────────
+            _logger.LogInformation(GetString("Log_Conversion_BatchStart"), activeFiles.Count);
+
+            await Parallel.ForEachAsync(activeFiles, parallelOptions, async (item, token) =>
+            {
+                // 개별 파일 처리 시작
                 item.Status = FileConvertStatus.Processing;
                 item.Progress = 0;
 
-                // 진행 상황 메시지 전파
+                // 진행 상황 메시지 전파 (UI 업데이트용)
                 WeakReferenceMessenger.Default.Send(new ConvertProgressMessage
                 {
                     FileName = System.IO.Path.GetFileName(item.Path),
@@ -137,33 +157,38 @@ public partial class ConversionViewModel : ViewModelBase
                     PresetName = presetName
                 });
 
-                // 실 엔진 호출
                 try
                 {
                     var provider = _engineSelector.GetProvider(item, settings);
-                    await provider.ConvertAsync(item, settings, cts.Token);
+                    await provider.ConvertAsync(item, settings, token);
                 }
-                catch (OperationCanceledException) { break; }
+                catch (OperationCanceledException)
+                {
+                    // 취소 시 상태 복구 (Defect 3)
+                    item.Status = FileConvertStatus.Pending;
+                    throw; // 상위 ForEachAsync로 전파하여 중단 유도
+                }
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, GetString("Log_Conversion_FileError"), item.Path);
-                    failCount++;
-                    // item.Status는 Provider 내부에서 Error로 설정됨
+                    Interlocked.Increment(ref failCount);
                 }
-
-                processedCount++;
-                ConvertProgressPercent = (int)((double)processedCount / totalConvertCount * 100.0);
-
-                // 최종 진행 완료 혹은 실패 후 메시지 갱신
-                WeakReferenceMessenger.Default.Send(new ConvertProgressMessage
+                finally
                 {
-                    FileName = System.IO.Path.GetFileName(item.Path),
-                    ProcessedCount = processedCount,
-                    TotalCount = totalConvertCount,
-                    FailCount = failCount,
-                    PresetName = presetName
-                });
-            }
+                    Interlocked.Increment(ref processedCount);
+                    ConvertProgressPercent = (int)((double)processedCount / totalConvertCount * 100.0);
+
+                    // 최종 진행 완료 혹은 실패 후 메시지 갱신
+                    WeakReferenceMessenger.Default.Send(new ConvertProgressMessage
+                    {
+                        FileName = System.IO.Path.GetFileName(item.Path),
+                        ProcessedCount = processedCount,
+                        TotalCount = totalConvertCount,
+                        FailCount = failCount,
+                        PresetName = presetName
+                    });
+                }
+            });
 
             if (failCount > 0)
             {
@@ -176,7 +201,12 @@ public partial class ConversionViewModel : ViewModelBase
         }
         catch (OperationCanceledException)
         {
-            _snackbarService.Show("작업이 취소되었습니다.", SnackbarType.Info);
+            // 루프 외부에서 처리되지 않은 파일들 복구 (Defect 3)
+            foreach (var item in _fileList.Items.Where(i => i.Status == FileConvertStatus.Processing))
+            {
+                item.Status = FileConvertStatus.Pending;
+            }
+            _snackbarService.Show(GetString("Msg_Convert_Cancel"), SnackbarType.Info);
         }
         finally
         {

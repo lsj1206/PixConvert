@@ -121,6 +121,7 @@
     <sys:String x:Key="Err_Unauthorized">Fail: Access denied.</sys:String>
     <sys:String x:Key="Err_IO">Fail: Invalid name.</sys:String>
     <sys:String x:Key="Msg_OperationComplete">{0} operation(s) complete.</sys:String>
+    <sys:String x:Key="Msg_Convert_Cancel">Operation has been cancelled.</sys:String>
     <sys:String x:Key="Msg_Error_ConfigInvalid">Invalid conversion settings. Please reconfigure.</sys:String>
     <sys:String x:Key="Msg_Preset_SaveSuccess">Settings saved successfully</sys:String>
     <sys:String x:Key="Msg_Preset_SaveError">Failed to save settings</sys:String>
