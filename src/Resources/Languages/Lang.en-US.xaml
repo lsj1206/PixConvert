@@ -30,6 +30,7 @@
     <sys:String x:Key="Btn_AddFolder">Add Folder</sys:String>
     <sys:String x:Key="Btn_ConvertSetting">Convert Setting</sys:String>
     <sys:String x:Key="Btn_Convert">Convert</sys:String>
+    <sys:String x:Key="Btn_Cancel">Cancel</sys:String>
     <sys:String x:Key="Btn_ListManager">List Manager</sys:String>
     <sys:String x:Key="Btn_ReorderIndex">Reorder Index</sys:String>
 

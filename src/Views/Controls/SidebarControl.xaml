@@ -158,8 +158,11 @@
                                                     </TextBlock>
                                                 </Grid>
 
-                                                <!-- Step 4 취소 버튼 예비 -->
-                                                <!-- <Button Content="{DynamicResource Btn_Cancel}" Style="{StaticResource SidebarButtonStyle}" Foreground="#FF5555" /> -->
+                                                <!-- Step 4 취소 버튼 연결 -->
+                                                <Button Content="{DynamicResource Btn_Cancel}"
+                                                        Command="{Binding Conversion.CancelConvertCommand}"
+                                                        Style="{StaticResource SidebarButtonStyle}"
+                                                        Foreground="#FF5555" />
                                             </StackPanel>
                                         </DataTemplate>
                                     </Setter.Value>

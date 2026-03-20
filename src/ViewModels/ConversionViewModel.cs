@@ -22,11 +22,13 @@ public partial class ConversionViewModel : ViewModelBase
     private readonly FileListViewModel _fileList;
     private readonly EngineSelector _engineSelector;
     private readonly Func<ConvertSettingViewModel> _convertSettingVmFactory;
+    private CancellationTokenSource? _convertCts;
 
     [ObservableProperty] private int _convertProgressPercent;
 
     public IAsyncRelayCommand OpenConvertSettingCommand { get; }
     public IAsyncRelayCommand ConvertFilesCommand { get; }
+    public IRelayCommand CancelConvertCommand { get; }
 
     public ConversionViewModel(
         ILogger<ConversionViewModel> logger,
@@ -48,12 +50,15 @@ public partial class ConversionViewModel : ViewModelBase
 
         OpenConvertSettingCommand = new AsyncRelayCommand(OpenConvertSettingAsync, () => CurrentStatus != AppStatus.Converting);
         ConvertFilesCommand = new AsyncRelayCommand(ConvertFilesAsync, () => CurrentStatus != AppStatus.Converting);
+        CancelConvertCommand = new RelayCommand(CancelConvert, () => CurrentStatus == AppStatus.Converting);
     }
 
     protected override void OnStatusChanged(AppStatus newStatus)
     {
+        _logger.LogInformation("[ConversionViewModel] OnStatusChanged to {Status}", newStatus);
         OpenConvertSettingCommand.NotifyCanExecuteChanged();
         ConvertFilesCommand.NotifyCanExecuteChanged();
+        CancelConvertCommand.NotifyCanExecuteChanged();
     }
 
     /// <summary>
@@ -107,8 +112,8 @@ public partial class ConversionViewModel : ViewModelBase
         }
 
         RequestStatus(AppStatus.Converting);
-        using var cts = new CancellationTokenSource();
-        // TODO: UI에서 취소 버튼을 활성화하면 cts.Cancel()과 연결 예정 (Phase D)
+        _convertCts = new CancellationTokenSource();
+        var cts = _convertCts;
 
         try
         {
@@ -141,21 +146,28 @@ public partial class ConversionViewModel : ViewModelBase
             // ── 1. 일괄 변환 시작 로그 ───────────────────────────────────
             _logger.LogInformation(GetString("Log_Conversion_BatchStart"), activeFiles.Count);
 
+            long lastUpdateTicks = DateTime.UtcNow.Ticks;
+
             await Parallel.ForEachAsync(activeFiles, parallelOptions, async (item, token) =>
             {
                 // 개별 파일 처리 시작
                 item.Status = FileConvertStatus.Processing;
                 item.Progress = 0;
 
-                // 진행 상황 메시지 전파 (UI 업데이트용)
-                WeakReferenceMessenger.Default.Send(new ConvertProgressMessage
+                // 진행 상황 임시 알림 (너무 잦은 업데이트 방지)
+                long currentTicks = DateTime.UtcNow.Ticks;
+                if (new TimeSpan(currentTicks - Interlocked.Read(ref lastUpdateTicks)).TotalMilliseconds > 100)
                 {
-                    FileName = System.IO.Path.GetFileName(item.Path),
-                    ProcessedCount = processedCount,
-                    TotalCount = totalConvertCount,
-                    FailCount = failCount,
-                    PresetName = presetName
-                });
+                    Interlocked.Exchange(ref lastUpdateTicks, currentTicks);
+                    WeakReferenceMessenger.Default.Send(new ConvertProgressMessage
+                    {
+                        FileName = System.IO.Path.GetFileName(item.Path),
+                        ProcessedCount = processedCount,
+                        TotalCount = totalConvertCount,
+                        FailCount = failCount,
+                        PresetName = presetName
+                    });
+                }
 
                 try
                 {
@@ -175,18 +187,23 @@ public partial class ConversionViewModel : ViewModelBase
                 }
                 finally
                 {
-                    Interlocked.Increment(ref processedCount);
-                    ConvertProgressPercent = (int)((double)processedCount / totalConvertCount * 100.0);
+                    int currentProcessed = Interlocked.Increment(ref processedCount);
+                    int newPercent = (int)((double)currentProcessed / totalConvertCount * 100.0);
 
-                    // 최종 진행 완료 혹은 실패 후 메시지 갱신
-                    WeakReferenceMessenger.Default.Send(new ConvertProgressMessage
+                    // UI 스레드 부하 방지: 퍼센트가 변경되었거나 최후의 1개일 때만 업데이트 수행
+                    if (newPercent != ConvertProgressPercent || currentProcessed == totalConvertCount)
                     {
-                        FileName = System.IO.Path.GetFileName(item.Path),
-                        ProcessedCount = processedCount,
-                        TotalCount = totalConvertCount,
-                        FailCount = failCount,
-                        PresetName = presetName
-                    });
+                        ConvertProgressPercent = newPercent;
+
+                        WeakReferenceMessenger.Default.Send(new ConvertProgressMessage
+                        {
+                            FileName = System.IO.Path.GetFileName(item.Path),
+                            ProcessedCount = currentProcessed,
+                            TotalCount = totalConvertCount,
+                            FailCount = failCount,
+                            PresetName = presetName
+                        });
+                    }
                 }
             });
 
@@ -211,8 +228,19 @@ public partial class ConversionViewModel : ViewModelBase
         finally
         {
             ConvertProgressPercent = 0;
+            _convertCts?.Dispose();
+            _convertCts = null;
             RequestStatus(AppStatus.Idle);
         }
+    }
+
+    /// <summary>
+    /// 현재 진행 중인 변환 작업을 중단합니다.
+    /// </summary>
+    private void CancelConvert()
+    {
+        _logger.LogInformation("[ConversionViewModel] CancelConvert triggered! _convertCts is null: {IsNull}", _convertCts == null);
+        _convertCts?.Cancel();
     }
 
     /// <summary>

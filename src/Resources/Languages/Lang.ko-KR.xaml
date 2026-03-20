@@ -30,6 +30,7 @@
     <sys:String x:Key="Btn_AddFolder">폴더 추가</sys:String>
     <sys:String x:Key="Btn_ConvertSetting">변환 설정</sys:String>
     <sys:String x:Key="Btn_Convert">변환</sys:String>
+    <sys:String x:Key="Btn_Cancel">취소</sys:String>
     <sys:String x:Key="Btn_ListManager">목록 관리</sys:String>
     <sys:String x:Key="Btn_ReorderIndex">번호 재정렬</sys:String>
 
