@@ -28,7 +28,7 @@ public partial class ConversionViewModel : ViewModelBase
 
     public IAsyncRelayCommand OpenConvertSettingCommand { get; }
     public IAsyncRelayCommand ConvertFilesCommand { get; }
-    public IRelayCommand CancelConvertCommand { get; }
+    public IAsyncRelayCommand CancelConvertCommand { get; }
 
     public ConversionViewModel(
         ILogger<ConversionViewModel> logger,
@@ -50,7 +50,7 @@ public partial class ConversionViewModel : ViewModelBase
 
         OpenConvertSettingCommand = new AsyncRelayCommand(OpenConvertSettingAsync, () => CurrentStatus != AppStatus.Converting);
         ConvertFilesCommand = new AsyncRelayCommand(ConvertFilesAsync, () => CurrentStatus != AppStatus.Converting);
-        CancelConvertCommand = new RelayCommand(CancelConvert, () => CurrentStatus == AppStatus.Converting);
+        CancelConvertCommand = new AsyncRelayCommand(CancelConvertAsync, () => CurrentStatus == AppStatus.Converting);
     }
 
     protected override void OnStatusChanged(AppStatus newStatus)
@@ -207,13 +207,23 @@ public partial class ConversionViewModel : ViewModelBase
                 }
             });
 
-            if (failCount > 0)
+            // 모든 항목이 루프에 진입한 직후 취소된 경우, 활성 작업들이 무사히 완료되어
+            // Parallel.ForEachAsync가 예외를 던지지 않고 정상 종료될 수 있습니다.
+            // (Option A) 강제로 throw를 발생시키지 않고 명시적 조건 분기로 처리합니다.
+            if (cts.IsCancellationRequested)
             {
-                _snackbarService.Show(string.Format(GetString("Msg_OperationComplete"), processedCount - failCount), SnackbarType.Warning);
+                _snackbarService.Show(GetString("Msg_Convert_Cancelled"), SnackbarType.Info);
             }
             else
             {
-                _snackbarService.Show(string.Format(GetString("Msg_OperationComplete"), processedCount), SnackbarType.Success);
+                if (failCount > 0)
+                {
+                    _snackbarService.Show(string.Format(GetString("Msg_OperationComplete"), processedCount - failCount), SnackbarType.Warning);
+                }
+                else
+                {
+                    _snackbarService.Show(string.Format(GetString("Msg_OperationComplete"), processedCount), SnackbarType.Success);
+                }
             }
         }
         catch (OperationCanceledException)
@@ -223,7 +233,7 @@ public partial class ConversionViewModel : ViewModelBase
             {
                 item.Status = FileConvertStatus.Pending;
             }
-            _snackbarService.Show(GetString("Msg_Convert_Cancel"), SnackbarType.Info);
+            _snackbarService.Show(GetString("Msg_Convert_Cancelled"), SnackbarType.Info);
         }
         finally
         {
@@ -235,12 +245,20 @@ public partial class ConversionViewModel : ViewModelBase
     }
 
     /// <summary>
-    /// 현재 진행 중인 변환 작업을 중단합니다.
+    /// 현재 진행 중인 변환 작업을 중단합니다. (사용자 확인 다이얼로그 표시 포함)
     /// </summary>
-    private void CancelConvert()
+    private async Task CancelConvertAsync()
     {
-        _logger.LogInformation("[ConversionViewModel] CancelConvert triggered! _convertCts is null: {IsNull}", _convertCts == null);
+        bool confirmed = await _dialogService.ShowConfirmationAsync(
+            GetString("Dlg_Ask_CancelConvert"),
+            GetString("Dlg_Title_CancelConvert"),
+            GetString("Dlg_Warn_CancelConvert"));
+
+        if (!confirmed) return;
+
+        _logger.LogInformation("[ConversionViewModel] CancelConvertAsync triggered!");
         _convertCts?.Cancel();
+        _snackbarService.ShowProgress(GetString("Msg_Convert_Cancelling"));
     }
 
     /// <summary>

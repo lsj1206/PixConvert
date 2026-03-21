@@ -121,7 +121,11 @@
     <sys:String x:Key="Err_IO">실패 : 사용할 수 없는 이름입니다.</sys:String>
 
     <sys:String x:Key="Msg_OperationComplete">{0}개의 작업이 완료되었습니다.</sys:String>
-    <sys:String x:Key="Msg_Convert_Cancel">작업이 취소되었습니다.</sys:String>
+    <sys:String x:Key="Dlg_Title_CancelConvert">변환 취소 확인</sys:String>
+    <sys:String x:Key="Dlg_Ask_CancelConvert">변환 작업을 취소하시겠습니까?</sys:String>
+    <sys:String x:Key="Dlg_Warn_CancelConvert">⚠️ 이미 변환 중인 작업은 취소되지 않습니다.</sys:String>
+    <sys:String x:Key="Msg_Convert_Cancelling">작업을 취소하고 있습니다...</sys:String>
+    <sys:String x:Key="Msg_Convert_Cancelled">작업을 취소했습니다.</sys:String>
     <sys:String x:Key="Msg_Error_ConfigInvalid">변환 설정에 문제가 있습니다. 다시 설정해주세요.</sys:String>
     <sys:String x:Key="Msg_Preset_SaveSuccess">설정 저장이 완료되었습니다</sys:String>
     <sys:String x:Key="Msg_Preset_SaveError">설정 저장을 실패했습니다</sys:String>

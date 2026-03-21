@@ -10,7 +10,7 @@ public interface IDialogService
     /// </summary>
     /// <param name="message">표시할 메시지 내용</param>
     /// <param name="title">대화 상자 제목</param>
-    Task<bool> ShowConfirmationAsync(string message, string title);
+    Task<bool> ShowConfirmationAsync(string message, string title, string? warningMessage = null);
 
     /// <summary>
     /// 커스텀 UI 요소를 본문으로 하는 다이얼로그를 표시합니다.

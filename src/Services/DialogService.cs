@@ -19,8 +19,9 @@ public class DialogService : IDialogService
 
     /// <summary>
     /// 예/아니오 선택이 필요한 확인 창을 표시합니다.
+    /// 경고 메시지가 전달되면 2단(기본+노란색 경고 텍스트)으로 구성하여 렌더링합니다.
     /// </summary>
-    public async Task<bool> ShowConfirmationAsync(string message, string title)
+    public async Task<bool> ShowConfirmationAsync(string message, string title, string? warningMessage = null)
     {
         // 현재 활성화된 메인 윈도우를 찾아 다이얼로그의 부모로 설정합니다.
         var window = Application.Current.MainWindow;
@@ -29,10 +30,36 @@ public class DialogService : IDialogService
         if (string.IsNullOrEmpty(title))
             title = _languageService.GetString("Dlg_Confirm");
 
+        object dialogContent = message;
+
+        if (!string.IsNullOrWhiteSpace(warningMessage))
+        {
+            var stackPanel = new System.Windows.Controls.StackPanel { Margin = new System.Windows.Thickness(0, 4, 0, 0) };
+            
+            stackPanel.Children.Add(new System.Windows.Controls.TextBlock
+            {
+                Text = message,
+                FontSize = 14,
+                TextWrapping = System.Windows.TextWrapping.Wrap
+            });
+            
+            stackPanel.Children.Add(new System.Windows.Controls.TextBlock
+            {
+                Text = warningMessage,
+                FontSize = 12,
+                Foreground = new System.Windows.Media.SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#D97706")), // Dark Orange/Yellow
+                FontFamily = new System.Windows.Media.FontFamily("Segoe UI Emoji, Segoe UI"), // For emoji
+                Margin = new System.Windows.Thickness(0, 12, 0, 0),
+                TextWrapping = System.Windows.TextWrapping.Wrap
+            });
+            
+            dialogContent = stackPanel;
+        }
+
         var dialog = new ContentDialog
         {
             Title = title,
-            Content = message,
+            Content = dialogContent,
             PrimaryButtonText = _languageService.GetString("Dlg_Yes"),
             CloseButtonText = _languageService.GetString("Dlg_No"),
             DefaultButton = ContentDialogButton.Primary,
