@@ -35,14 +35,14 @@ public class DialogService : IDialogService
         if (!string.IsNullOrWhiteSpace(warningMessage))
         {
             var stackPanel = new System.Windows.Controls.StackPanel { Margin = new System.Windows.Thickness(0, 4, 0, 0) };
-            
+
             stackPanel.Children.Add(new System.Windows.Controls.TextBlock
             {
                 Text = message,
                 FontSize = 14,
                 TextWrapping = System.Windows.TextWrapping.Wrap
             });
-            
+
             stackPanel.Children.Add(new System.Windows.Controls.TextBlock
             {
                 Text = warningMessage,
@@ -52,7 +52,7 @@ public class DialogService : IDialogService
                 Margin = new System.Windows.Thickness(0, 12, 0, 0),
                 TextWrapping = System.Windows.TextWrapping.Wrap
             });
-            
+
             dialogContent = stackPanel;
         }
 
@@ -60,14 +60,14 @@ public class DialogService : IDialogService
         {
             Title = title,
             Content = dialogContent,
-            PrimaryButtonText = _languageService.GetString("Dlg_Yes"),
-            CloseButtonText = _languageService.GetString("Dlg_No"),
-            DefaultButton = ContentDialogButton.Primary,
+            PrimaryButtonText = _languageService.GetString("Dlg_No"),
+            CloseButtonText = _languageService.GetString("Dlg_Yes"),
+            DefaultButton = ContentDialogButton.Close,
             Owner = window
         };
 
         var result = await dialog.ShowAsync();
-        return result == ContentDialogResult.Primary;
+        return result == ContentDialogResult.None;
     }
 
     /// <summary>
@@ -82,9 +82,9 @@ public class DialogService : IDialogService
         {
             Title = title,
             Content = content,
-            PrimaryButtonText = primaryText,
-            CloseButtonText = closeText ?? _languageService.GetString("Dlg_Close"),
-            DefaultButton = ContentDialogButton.Primary,
+            PrimaryButtonText = closeText ?? _languageService.GetString("Dlg_Close"),
+            CloseButtonText = primaryText,
+            DefaultButton = ContentDialogButton.Close,
             Owner = window
         };
 
@@ -95,7 +95,7 @@ public class DialogService : IDialogService
         }
 
         var result = await dialog.ShowAsync();
-        return result == ContentDialogResult.Primary;
+        return result == ContentDialogResult.None;
     }
 
     private static double GetPreferredContentWidth(object content)
