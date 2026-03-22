@@ -54,11 +54,11 @@ public class SkiaSharpProvider : IProviderService, IDisposable
                 srcBitmap = SKBitmap.Decode(inputStream)
                     ?? throw new InvalidOperationException($"SKBitmap.Decode returned null: {file.Path}");
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 file.Status = FileConvertStatus.Error;
-                var msg = string.Format(_languageService.GetString("Log_Skia_DecodeFail"), file.Path);
-                throw new IOException(msg, ex);
+                // 원본 예외 보존 (상위 ConversionViewModel에서 전체 예외 기록)
+                throw;
             }
 
             token.ThrowIfCancellationRequested();
@@ -105,11 +105,11 @@ public class SkiaSharpProvider : IProviderService, IDisposable
                 file.Progress = 100;
                 file.Status = FileConvertStatus.Success;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 file.Status = FileConvertStatus.Error;
-                var msg = string.Format(_languageService.GetString("Log_Skia_SaveFail"), outputPath);
-                throw new IOException(msg, ex);
+                // 원본 예외 보존 (상위 ConversionViewModel에서 전체 예외 기록)
+                throw;
             }
         }
         finally

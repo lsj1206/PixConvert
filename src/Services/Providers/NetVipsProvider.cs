@@ -53,11 +53,12 @@ public class NetVipsProvider : IProviderService, IDisposable
             // 취소 시 상태 변경 없이 상위로 전파
             throw;
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             file.Status = FileConvertStatus.Error;
-            var msg = string.Format(_languageService.GetString("Log_NetVips_ConvertFail"), file.Path);
-            throw new IOException(msg, ex);
+            // 원본 예외와 스택 트레이스를 보존하기 위해 그대로 전파
+            // 상위의 ConversionViewModel.LogError가 전체 정보를 Serilog에 기록함
+            throw;
         }
     }
 

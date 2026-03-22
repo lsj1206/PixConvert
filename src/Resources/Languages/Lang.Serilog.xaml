@@ -60,9 +60,5 @@
     <!-- ConversionViewModel.cs / Providers -->
     <system:String x:Key="Log_Conversion_FileError">[ConversionViewModel] 파일 변환 중 예외 발생: {Path}</system:String>
     <system:String x:Key="Log_Conversion_BatchStart">[ConversionViewModel] 일괄 변환 시작. 총 파일 수: {Count}</system:String>
-    <system:String x:Key="Log_NetVips_ConvertFail">NetVips 변환 작업 실패: {Path}</system:String>
-    <system:String x:Key="Log_Skia_DecodeFail">이미지 디코딩 실패: {Path}</system:String>
-    <system:String x:Key="Log_Skia_EncodeFail">이미지 인코딩 실패 (인코더 누락 가능성): 포맷={Format}</system:String>
-    <system:String x:Key="Log_Skia_SaveFail">인코딩 및 저장 실패: {Path}</system:String>
 
 </ResourceDictionary>
