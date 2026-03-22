@@ -6,8 +6,8 @@
     <sys:String x:Key="App_Title">PixConvert</sys:String>
 
     <!-- Header : Dashboard -->
-    <sys:String x:Key="Status_Total">Total</sys:String> <!-- Key: Header_Total -->
-    <sys:String x:Key="Status_Unknown">Unsupported</sys:String> <!-- Key: Header_Unsupported -->
+    <sys:String x:Key="Status_Total">Total</sys:String>
+    <sys:String x:Key="Status_Unknown">Unsupported</sys:String>
 
     <!-- List : Item -->
     <sys:String x:Key="List_Index">Index</sys:String>
@@ -19,11 +19,11 @@
     <sys:String x:Key="List_Path">Path</sys:String>
 
     <!-- List : Status -->
-    <sys:String x:Key="Status_Pending">Ready</sys:String> <!-- Key: List_Ready -->
-    <sys:String x:Key="Status_Processing">Converting</sys:String> <!-- Key: List_Converting -->
-    <sys:String x:Key="Status_Success">Success</sys:String> <!-- Key: List_Success -->
-    <sys:String x:Key="Status_Error">Error</sys:String> <!-- Key: List_Error -->
-    <sys:String x:Key="Status_Unsupported">N/A</sys:String> <!-- Key: List_Unsupported -->
+    <sys:String x:Key="Status_Pending">Ready</sys:String>
+    <sys:String x:Key="Status_Processing">Converting</sys:String>
+    <sys:String x:Key="Status_Success">Success</sys:String>
+    <sys:String x:Key="Status_Error">Error</sys:String>
+    <sys:String x:Key="Status_Unsupported">N/A</sys:String>
 
     <!-- Sidebar : Button -->
     <sys:String x:Key="Btn_AddFile">Add File</sys:String>
@@ -38,11 +38,11 @@
     <sys:String x:Key="Sort_Label">Sort</sys:String>
     <sys:String x:Key="Sort_Asc">Ascending</sys:String>
     <sys:String x:Key="Sort_Desc">Descending</sys:String>
-    <sys:String x:Key="Option_MismatchOnly">Diff Filter</sys:String> <!-- Key: Sort_MismatchOnly -->
-    <sys:String x:Key="Tip_MismatchOnly">Filter only files where extension and format signature differ.</sys:String> <!-- Key: Doc_MismatchOnly -->
+    <sys:String x:Key="Option_MismatchOnly">Diff Filter</sys:String>
+    <sys:String x:Key="Tip_MismatchOnly">Filter only files where extension and format signature differ.</sys:String>
 
-    <sys:String x:Key="Option_ConfirmDeletion">Delete Confirm</sys:String> <!-- Key: Opt_ConfirmDelete -->
-    <sys:String x:Key="Tip_ConfirmDeletion">Turn ON/OFF file deletion confirmation window.</sys:String> <!-- Key: Doc_ConfirmDelete -->
+    <sys:String x:Key="Option_ConfirmDeletion">Delete Confirm</sys:String>
+    <sys:String x:Key="Tip_ConfirmDeletion">Turn ON/OFF file deletion confirmation window.</sys:String>
 
     <!-- Sidebar : Sorting -->
     <sys:String x:Key="Sort_Index">Index</sys:String>
@@ -57,34 +57,32 @@
     <!-- Sidebar : List Manager -->
     <sys:String x:Key="Btn_Back">Exit</sys:String>
     <sys:String x:Key="Btn_ListClear">Remove All List</sys:String>
-    <sys:String x:Key="ListManager_Title">List Manager</sys:String> <!-- Key: ListManager_Label -->
-    <sys:String x:Key="ListManager_Desc">Select Format to remove.</sys:String> <!-- Key: ListManager_Doc -->
+    <sys:String x:Key="ListManager_Title">List Manager</sys:String>
+    <sys:String x:Key="ListManager_Desc">Select Format to remove.</sys:String>
     <sys:String x:Key="ListManager_Unsupported">Unsupported</sys:String>
     <sys:String x:Key="Btn_RemoveSelected">Remove Selected</sys:String>
 
     <!-- Convert Setting : Preset -->
-    <sys:String x:Key="Setting_PresetList">Select Preset</sys:String> <!-- Key: Preset_List -->
-    <sys:String x:Key="Setting_PresetName">Rename</sys:String> <!-- Key: Preset_ReName -->
+    <sys:String x:Key="Setting_PresetList">Select Preset</sys:String>
+    <sys:String x:Key="Setting_PresetName">Rename</sys:String>
     <sys:String x:Key="Btn_PresetApply">Apply</sys:String>
     <sys:String x:Key="Btn_PresetCreate">Create Preset</sys:String>
     <sys:String x:Key="Btn_PresetCopy">Copy Preset</sys:String>
     <sys:String x:Key="Btn_PresetDelete">Delete Preset</sys:String>
 
     <!-- Convert Setting -->
-    <sys:String x:Key="Setting_GroupStandard">Standard Image Format</sys:String> <!-- Key: Convert_ImgFormat -->
-    <sys:String x:Key="Setting_GroupAnimation">Animation Image Format</sys:String> <!-- Key: Convert_AniFormat -->
-    <sys:String x:Key="Setting_OtherOptions">Detail</sys:String> <!-- Key: Convert_Detail -->
-    <sys:String x:Key="Setting_TargetFormat">Target Format</sys:String> <!-- Key: Convert_TargetFormat -->
-    <sys:String x:Key="Setting_Quality">Quality</sys:String> <!-- Key: Convert_Quality -->
-    <sys:String x:Key="Setting_BackgroundColor">Background Color(Transparency)</sys:String> <!-- Key: Convert_BgColor -->
-    <sys:String x:Key="Setting_KeepExif">Preserve Metadata(EXIF)</sys:String> <!-- Key: Convert_KeepExif -->
+    <sys:String x:Key="Setting_GroupStandard">Standard Image Format</sys:String>
+    <sys:String x:Key="Setting_GroupAnimation">Animation Image Format</sys:String>
+    <sys:String x:Key="Setting_OtherOptions">Detail</sys:String>
+    <sys:String x:Key="Setting_TargetFormat">Target Format</sys:String>
+    <sys:String x:Key="Setting_Quality">Quality</sys:String>
+    <sys:String x:Key="Setting_BackgroundColor">Background Color(Transparency)</sys:String>
+    <sys:String x:Key="Setting_KeepExif">Preserve Metadata(EXIF)</sys:String>
 
     <!-- Convert Setting : BgColor -->
-    <sys:String x:Key="Bg_White">White</sys:String> <!-- Key: Convert_BgWhite -->
-    <sys:String x:Key="Bg_Black">Black</sys:String> <!-- Key: Convert_BgBlack -->
-    <sys:String x:Key="Bg_Custom">Custom(HEX)</sys:String> <!-- Key: Convert_BgCustom -->
-
-    <!-- 여기까지 수정 작업 진행했음. -->
+    <sys:String x:Key="Bg_White">White</sys:String>
+    <sys:String x:Key="Bg_Black">Black</sys:String>
+    <sys:String x:Key="Bg_Custom">Custom(HEX)</sys:String>
 
     <!-- Convert Setting : Overwrite, Path, CPU Usage -->
     <sys:String x:Key="Setting_OverwritePolicy">Duplicate File Policy</sys:String>
@@ -95,7 +93,7 @@
     <sys:String x:Key="Setting_OutputDir_Sub">Subfolder (PixConvert_...)</sys:String>
     <sys:String x:Key="Setting_OutputDir_Same">Same as Original Folder</sys:String>
     <sys:String x:Key="Setting_OutputDir_Custom">Custom Path</sys:String>
-    <sys:String x:Key="Btn_Browse">Browse...</sys:String> <!-- Key: Btn_Browse -->
+    <sys:String x:Key="Btn_Browse">Browse...</sys:String>
     <sys:String x:Key="Setting_CpuUsage">CPU Workload (Performance)</sys:String>
     <sys:String x:Key="Setting_Cpu_Max">Maximum (All Cores)</sys:String>
     <sys:String x:Key="Setting_Cpu_Optimal">Optimal (70~80% Rec.)</sys:String>
@@ -116,15 +114,11 @@
     <sys:String x:Key="Msg_Error_Occurred">Error: {0}</sys:String>
     <sys:String x:Key="Msg_LoadingFile">Loading files...</sys:String>
     <sys:String x:Key="Msg_LoadingFileProgress">Loading files... ({0}/{1})</sys:String>
-
     <sys:String x:Key="Err_PathTooLong">Fail: Name or Path is too long.</sys:String>
     <sys:String x:Key="Err_FileNotFound">Fail: Original not found.</sys:String>
     <sys:String x:Key="Err_Unauthorized">Fail: Access denied.</sys:String>
     <sys:String x:Key="Err_IO">Fail: Invalid name.</sys:String>
     <sys:String x:Key="Msg_OperationComplete">{0} operation(s) complete.</sys:String>
-    <sys:String x:Key="Dlg_Title_CancelConvert">Cancel Conversion</sys:String>
-    <sys:String x:Key="Dlg_Ask_CancelConvert">Are you sure you want to cancel?</sys:String>
-    <sys:String x:Key="Dlg_Warn_CancelConvert">⚠️ Tasks already in progress will not be cancelled.</sys:String>
     <sys:String x:Key="Msg_Convert_Cancelling">Cancelling operation...</sys:String>
     <sys:String x:Key="Msg_Convert_Cancelled">Operation has been cancelled.</sys:String>
     <sys:String x:Key="Msg_Error_ConfigInvalid">Invalid conversion settings. Please reconfigure.</sys:String>
@@ -134,35 +128,44 @@
     <!-- Dialog -->
     <sys:String x:Key="Err_Fatal_Title">Startup Error</sys:String>
     <sys:String x:Key="Err_Fatal_Init">An error occurred while starting the application:\n{0}</sys:String>
-
     <sys:String x:Key="Dlg_Yes">Yes</sys:String>
     <sys:String x:Key="Dlg_No">No</sys:String>
     <sys:String x:Key="Dlg_Confirm">Confirm</sys:String>
     <sys:String x:Key="Dlg_Cancel">Cancel</sys:String>
 
-    <sys:String x:Key="Dlg_Title_AddFile">Add File</sys:String>
-    <sys:String x:Key="Dlg_Title_AddFolder">Add Folder</sys:String>
+    <!-- Confirmation Dialogs -->
 
+    <!-- Convert -->
+    <sys:String x:Key="Dlg_Title_Convert">Confirm Conversion</sys:String>
+    <sys:String x:Key="Dlg_Ask_Convert">Are you sure you want to convert {0} file(s)?</sys:String>
+
+    <!-- Cancel Convert -->
+    <sys:String x:Key="Dlg_Title_CancelConvert">Cancel Conversion</sys:String>
+    <sys:String x:Key="Dlg_Ask_CancelConvert">Are you sure you want to cancel?</sys:String>
+    <sys:String x:Key="Dlg_Warn_CancelConvert">⚠️ Tasks already in progress will not be cancelled.</sys:String>
+
+    <!-- Reorder Index -->
     <sys:String x:Key="Dlg_Title_ReorderIndex">Reorder Index</sys:String>
-    <sys:String x:Key="Dlg_Ask_ReorderIndex" xml:space="preserve">Reindex based on current order?
-Existing indexes will be reset.</sys:String>
+    <sys:String x:Key="Dlg_Ask_ReorderIndex">Reindex based on current order?</sys:String>
+    <sys:String x:Key="Dlg_Warn_ReorderIndex">⚠️ Existing indexes will be reset.</sys:String>
 
+    <!-- Clear List -->
+    <sys:String x:Key="Dlg_Title_ClearList">Clear List</sys:String>
+    <sys:String x:Key="Dlg_Ask_ClearList">Clear all files from the list?</sys:String>
+
+    <!-- Delete File -->
     <sys:String x:Key="Dlg_Title_DeleteConfirm">Confirm Deletion</sys:String>
     <sys:String x:Key="Dlg_Ask_DeleteSingle">Remove the selected file from the list?</sys:String>
     <sys:String x:Key="Dlg_Ask_DeleteMulti">Remove {0} files from the list?</sys:String>
 
-    <sys:String x:Key="Dlg_Title_ClearList">Clear List</sys:String>
-    <sys:String x:Key="Dlg_Ask_ClearList">Clear all files from the list?</sys:String>
-
-    <sys:String x:Key="Dlg_Title_SelectOutputPath">Select Output Folder</sys:String>
-
+    <!-- Add Folder -->
+    <sys:String x:Key="Dlg_Title_AddFile">Add File</sys:String>
+    <sys:String x:Key="Dlg_Title_AddFolder">Add Folder</sys:String>
     <sys:String x:Key="Dlg_Title_FolderOption">Folder Addition Options</sys:String>
     <sys:String x:Key="Dlg_Btn_AddFileInFolder">Add File(s) in Folder</sys:String>
     <sys:String x:Key="Dlg_Btn_AddFolder">Add Folder</sys:String>
     <sys:String x:Key="Dlg_Ask_FolderOptionSingle">How would you like to add '{0}'?</sys:String>
     <sys:String x:Key="Dlg_Ask_FolderOptionMulti">How would you like to add '{0}' and {1} other folders?</sys:String>
-
-    <sys:String x:Key="Dlg_Title_Convert">Confirm Conversion</sys:String>
-    <sys:String x:Key="Dlg_Ask_Convert">Are you sure you want to convert {0} file(s)?</sys:String>
+    <sys:String x:Key="Dlg_Title_SelectOutputPath">Select Output Folder</sys:String>
 
 </ResourceDictionary>

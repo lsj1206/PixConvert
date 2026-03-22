@@ -110,7 +110,10 @@ public partial class SortFilterViewModel : ViewModelBase
     {
         if (_fileList.Items.Count == 0) return;
 
-        if (await _dialogService.ShowConfirmationAsync(GetString("Dlg_Ask_ReorderIndex"), GetString("Dlg_Title_ReorderIndex")))
+        if (await _dialogService.ShowConfirmationAsync(
+            GetString("Dlg_Ask_ReorderIndex"),
+            GetString("Dlg_Title_ReorderIndex"),
+            GetString("Dlg_Warn_ReorderIndex")))
         {
             RequestStatus(AppStatus.Processing);
             try

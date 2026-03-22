@@ -114,16 +114,11 @@
     <sys:String x:Key="Msg_Error_Occurred">작업 중 오류 발생: {0}</sys:String>
     <sys:String x:Key="Msg_LoadingFile">파일 불러오는 중...</sys:String>
     <sys:String x:Key="Msg_LoadingFileProgress">파일 불러오는 중... ({0}/{1})</sys:String>
-
     <sys:String x:Key="Err_PathTooLong">실패 : 파일명 또는 경로가 너무 깁니다.</sys:String>
     <sys:String x:Key="Err_FileNotFound">실패 : 원본을 찾을 수 없습니다.</sys:String>
     <sys:String x:Key="Err_Unauthorized">실패 : 권한이 없습니다.</sys:String>
     <sys:String x:Key="Err_IO">실패 : 사용할 수 없는 이름입니다.</sys:String>
-
     <sys:String x:Key="Msg_OperationComplete">{0}개의 작업이 완료되었습니다.</sys:String>
-    <sys:String x:Key="Dlg_Title_CancelConvert">변환 취소 확인</sys:String>
-    <sys:String x:Key="Dlg_Ask_CancelConvert">변환 작업을 취소하시겠습니까?</sys:String>
-    <sys:String x:Key="Dlg_Warn_CancelConvert">⚠️ 이미 변환 중인 작업은 취소되지 않습니다.</sys:String>
     <sys:String x:Key="Msg_Convert_Cancelling">작업을 취소하고 있습니다...</sys:String>
     <sys:String x:Key="Msg_Convert_Cancelled">작업을 취소했습니다.</sys:String>
     <sys:String x:Key="Msg_Error_ConfigInvalid">변환 설정에 문제가 있습니다. 다시 설정해주세요.</sys:String>
@@ -133,35 +128,44 @@
     <!-- 다이얼로그 -->
     <sys:String x:Key="Err_Fatal_Title">시작 오류</sys:String>
     <sys:String x:Key="Err_Fatal_Init">애플리케이션 시작 중 오류가 발생했습니다:\n{0}</sys:String>
-
     <sys:String x:Key="Dlg_Yes">네</sys:String>
     <sys:String x:Key="Dlg_No">아니오</sys:String>
     <sys:String x:Key="Dlg_Confirm">확인</sys:String>
     <sys:String x:Key="Dlg_Cancel">취소</sys:String>
 
-    <sys:String x:Key="Dlg_Title_AddFile">파일 추가</sys:String>
-    <sys:String x:Key="Dlg_Title_AddFolder">폴더 추가</sys:String>
+    <!-- 확인창 -->
 
+    <!-- 변환 확인 -->
+    <sys:String x:Key="Dlg_Title_Convert">변환 확인</sys:String>
+    <sys:String x:Key="Dlg_Ask_Convert">총 {0}개의 파일을 변환하시겠습니까?</sys:String>
+
+    <!-- 변환 취소 -->
+    <sys:String x:Key="Dlg_Title_CancelConvert">변환 취소 확인</sys:String>
+    <sys:String x:Key="Dlg_Ask_CancelConvert">변환 작업을 취소하시겠습니까?</sys:String>
+    <sys:String x:Key="Dlg_Warn_CancelConvert">⚠️ 이미 변환 중인 작업은 취소되지 않습니다.</sys:String>
+
+    <!-- 번호 재정렬 -->
     <sys:String x:Key="Dlg_Title_ReorderIndex">번호 재정렬</sys:String>
-    <sys:String x:Key="Dlg_Ask_ReorderIndex" xml:space="preserve">번호를 현재 순서대로 정렬하시겠습니까?
-기존 번호는 초기화됩니다.</sys:String>
+    <sys:String x:Key="Dlg_Ask_ReorderIndex">번호를 현재 순서대로 정렬하시겠습니까?</sys:String>
+    <sys:String x:Key="Dlg_Warn_ReorderIndex">⚠️ 기존 번호는 초기화됩니다.</sys:String>
 
+    <!-- 목록 삭제 -->
+    <sys:String x:Key="Dlg_Title_ClearList">목록 삭제</sys:String>
+    <sys:String x:Key="Dlg_Ask_ClearList">목록을 전부 삭제하시겠습니까?</sys:String>
+
+    <!-- 파일 삭제 -->
     <sys:String x:Key="Dlg_Title_DeleteConfirm">삭제 확인</sys:String>
     <sys:String x:Key="Dlg_Ask_DeleteSingle">선택한 파일을 목록에서 삭제하시겠습니까?</sys:String>
     <sys:String x:Key="Dlg_Ask_DeleteMulti">{0}개의 파일을 목록에서 삭제하시겠습니까?</sys:String>
 
-    <sys:String x:Key="Dlg_Title_ClearList">목록 삭제</sys:String>
-    <sys:String x:Key="Dlg_Ask_ClearList">목록을 전부 삭제하시겠습니까?</sys:String>
-
-    <sys:String x:Key="Dlg_Title_SelectOutputPath">출력 폴더 선택</sys:String>
-
+    <!-- 폴더 추가 -->
+    <sys:String x:Key="Dlg_Title_AddFile">파일 추가</sys:String>
+    <sys:String x:Key="Dlg_Title_AddFolder">폴더 추가</sys:String>
     <sys:String x:Key="Dlg_Title_FolderOption">폴더 추가 옵션</sys:String>
     <sys:String x:Key="Dlg_Btn_AddFileInFolder">폴더 내 파일 추가</sys:String>
     <sys:String x:Key="Dlg_Btn_AddFolder">폴더 추가</sys:String>
     <sys:String x:Key="Dlg_Ask_FolderOptionSingle">'{0}'폴더를 어떻게 추가하시겠습니까?</sys:String>
     <sys:String x:Key="Dlg_Ask_FolderOptionMulti">'{0}'폴더 외 {1}개의 폴더를 어떻게 추가하시겠습니까?</sys:String>
-
-    <sys:String x:Key="Dlg_Title_Convert">변환 확인</sys:String>
-    <sys:String x:Key="Dlg_Ask_Convert">총 {0}개의 파일을 변환하시겠습니까?</sys:String>
+    <sys:String x:Key="Dlg_Title_SelectOutputPath">출력 폴더 선택</sys:String>
 
 </ResourceDictionary>
