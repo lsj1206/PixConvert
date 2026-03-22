@@ -84,7 +84,7 @@
     <sys:String x:Key="Bg_Black">검은색</sys:String>
     <sys:String x:Key="Bg_Custom">사용자 지정(HEX)</sys:String>
 
-    <!-- 변환 설정 : 덮어쓰기, 경로, CPU 사용량 -->
+    <!-- 변환 설정 : 덮어쓰기, 경로 -->
     <sys:String x:Key="Setting_OverwritePolicy">중복 파일 처리</sys:String>
     <sys:String x:Key="Setting_Overwrite_Overwrite">덮어쓰기</sys:String>
     <sys:String x:Key="Setting_Overwrite_Suffix">접미사 추가 (추천)</sys:String>
@@ -94,11 +94,13 @@
     <sys:String x:Key="Setting_OutputDir_Same">원본 파일과 동일 위치</sys:String>
     <sys:String x:Key="Setting_OutputDir_Custom">사용자 지정 경로</sys:String>
     <sys:String x:Key="Btn_Browse">찾기...</sys:String>
+
+    <!-- 변환 설정 : CPU 사용량 -->
     <sys:String x:Key="Setting_CpuUsage">CPU 작업 부하 (성능 제어)</sys:String>
-    <sys:String x:Key="Setting_Cpu_Max">최대 (모든 코어 사용)</sys:String>
-    <sys:String x:Key="Setting_Cpu_Optimal">최적 (70~80% 권장)</sys:String>
-    <sys:String x:Key="Setting_Cpu_Half">절반 (50% 사용)</sys:String>
-    <sys:String x:Key="Setting_Cpu_Min">최소 (백그라운드용)</sys:String>
+    <sys:String x:Key="Setting_Cpu_Max">최대: 모든 코어 사용</sys:String>
+    <sys:String x:Key="Setting_Cpu_Optimal">최적: 70~80%</sys:String>
+    <sys:String x:Key="Setting_Cpu_Half">절반: 50%</sys:String>
+    <sys:String x:Key="Setting_Cpu_Min">최소: 10%</sys:String>
 
     <!-- 스낵바 -->
     <sys:String x:Key="Msg_AddFile">{0:N0}개의 파일을 추가했습니다.</sys:String>
@@ -133,14 +135,12 @@
     <sys:String x:Key="Dlg_Confirm">확인</sys:String>
     <sys:String x:Key="Dlg_Cancel">취소</sys:String>
 
-    <!-- 확인창 -->
-
     <!-- 변환 확인 -->
-    <sys:String x:Key="Dlg_Title_Convert">변환 확인</sys:String>
+    <sys:String x:Key="Dlg_Title_Convert">변환</sys:String>
     <sys:String x:Key="Dlg_Ask_Convert">총 {0}개의 파일을 변환하시겠습니까?</sys:String>
 
     <!-- 변환 취소 -->
-    <sys:String x:Key="Dlg_Title_CancelConvert">변환 취소 확인</sys:String>
+    <sys:String x:Key="Dlg_Title_CancelConvert">변환 취소</sys:String>
     <sys:String x:Key="Dlg_Ask_CancelConvert">변환 작업을 취소하시겠습니까?</sys:String>
     <sys:String x:Key="Dlg_Warn_CancelConvert">⚠️ 이미 변환 중인 작업은 취소되지 않습니다.</sys:String>
 
@@ -150,22 +150,17 @@
     <sys:String x:Key="Dlg_Warn_ReorderIndex">⚠️ 기존 번호는 초기화됩니다.</sys:String>
 
     <!-- 목록 삭제 -->
-    <sys:String x:Key="Dlg_Title_ClearList">목록 삭제</sys:String>
+    <sys:String x:Key="Dlg_Title_ClearList">목록 청소</sys:String>
     <sys:String x:Key="Dlg_Ask_ClearList">목록을 전부 삭제하시겠습니까?</sys:String>
 
     <!-- 파일 삭제 -->
-    <sys:String x:Key="Dlg_Title_DeleteConfirm">삭제 확인</sys:String>
+    <sys:String x:Key="Dlg_Title_DeleteConfirm">삭제</sys:String>
     <sys:String x:Key="Dlg_Ask_DeleteSingle">선택한 파일을 목록에서 삭제하시겠습니까?</sys:String>
     <sys:String x:Key="Dlg_Ask_DeleteMulti">{0}개의 파일을 목록에서 삭제하시겠습니까?</sys:String>
 
     <!-- 폴더 추가 -->
     <sys:String x:Key="Dlg_Title_AddFile">파일 추가</sys:String>
     <sys:String x:Key="Dlg_Title_AddFolder">폴더 추가</sys:String>
-    <sys:String x:Key="Dlg_Title_FolderOption">폴더 추가 옵션</sys:String>
-    <sys:String x:Key="Dlg_Btn_AddFileInFolder">폴더 내 파일 추가</sys:String>
-    <sys:String x:Key="Dlg_Btn_AddFolder">폴더 추가</sys:String>
-    <sys:String x:Key="Dlg_Ask_FolderOptionSingle">'{0}'폴더를 어떻게 추가하시겠습니까?</sys:String>
-    <sys:String x:Key="Dlg_Ask_FolderOptionMulti">'{0}'폴더 외 {1}개의 폴더를 어떻게 추가하시겠습니까?</sys:String>
     <sys:String x:Key="Dlg_Title_SelectOutputPath">출력 폴더 선택</sys:String>
 
 </ResourceDictionary>
