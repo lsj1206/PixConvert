@@ -1,6 +1,7 @@
 using PixConvert.Models;
 using PixConvert.Services;
 using PixConvert.Services.Providers;
+using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
 
 namespace PixConvert.Tests;
@@ -42,8 +43,8 @@ public class EngineSelectorTests
     {
         _lang = new MockLanguageService();
         // 실제 Provider 인스턴스를 생성하여 주입 (Mock 없이 실제 타입 사용)
-        _skia = new SkiaSharpProvider(_lang);
-        _netVips = new NetVipsProvider(_lang);
+        _skia = new SkiaSharpProvider(_lang, NullLogger<SkiaSharpProvider>.Instance);
+        _netVips = new NetVipsProvider(_lang, NullLogger<NetVipsProvider>.Instance);
 
         // 두 Provider를 주입하여 EngineSelector 생성
         _selector = new EngineSelector(_skia, _netVips);
