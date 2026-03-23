@@ -135,7 +135,7 @@
                 <!-- 출력 저장 위치 -->
                 <TextBlock Text="{DynamicResource Setting_OutputLocation}" FontWeight="SemiBold" Margin="0,0,0,8" />
                 <StackPanel Margin="0,0,0,16">
-                    <RadioButton Content="{DynamicResource Setting_OutputLocation_Same}" GroupName="OutputLocationGroup" 
+                    <RadioButton Content="{DynamicResource Setting_OutputLocation_Same}" GroupName="OutputLocationGroup"
                                  IsChecked="{Binding OutputLocation, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=SameAsOriginal}" Margin="0,0,0,8" />
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -167,7 +167,7 @@
                 <!-- 출력 생성 방식 -->
                 <TextBlock Text="{DynamicResource Setting_OutputStrategy}" FontWeight="SemiBold" Margin="0,0,0,8" />
                 <StackPanel Margin="0,0,0,16">
-                    <RadioButton Content="{DynamicResource Setting_OutputStrategy_None}" GroupName="OutputStrategyGroup" 
+                    <RadioButton Content="{DynamicResource Setting_OutputStrategy_None}" GroupName="OutputStrategyGroup"
                                  IsChecked="{Binding FolderStrategy, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=NoFolder}" Margin="0,0,0,8" />
                     <StackPanel Orientation="Horizontal">
                         <RadioButton Content="{DynamicResource Setting_OutputStrategy_Folder}"
@@ -176,15 +176,11 @@
                                      VerticalAlignment="Center"
                                      Margin="0,0,12,0" />
 
-                        <Grid IsEnabled="{Binding FolderStrategy, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=CreateFolder}">
-                            <ComboBox ItemsSource="{Binding FolderNameTemplates}"
-                                      Text="{Binding OutputSubFolderName, UpdateSourceTrigger=PropertyChanged}"
-                                      IsEditable="True"
-                                      MinWidth="240"
-                                      ToolTip="{DynamicResource Tip_OutputFolderName}"
-                                      ui:ControlHelper.Header="{DynamicResource Setting_OutputFolderName}"
-                                      VerticalAlignment="Bottom"/>
-                        </Grid>
+                        <ctrls:FilterTextBox Text="{Binding OutputSubFolderName, UpdateSourceTrigger=PropertyChanged}"
+                                             FilterMode="Block"
+                                             Filter="InvalidSpecial"
+                                             MinWidth="160"
+                                             IsEnabled="{Binding FolderStrategy, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=CreateFolder}"/>
                     </StackPanel>
                 </StackPanel>
 

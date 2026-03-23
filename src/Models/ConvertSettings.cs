@@ -41,7 +41,7 @@ public class ConvertSettings
     public OutputFolderStrategy FolderStrategy { get; set; } = OutputFolderStrategy.CreateFolder;
 
     /// <summary>하위 폴더 이름 (필터/토큰 지원)</summary>
-    public string OutputSubFolderName { get; set; } = "PixConvert_{yyyy-MM-dd}";
+    public string OutputSubFolderName { get; set; } = "PixConvert";
 
     /// <summary>사용자 지정 출력 경로</summary>
     public string CustomOutputPath { get; set; } = string.Empty;

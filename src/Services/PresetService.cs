@@ -212,16 +212,16 @@ public class PresetService : IPresetService
         {
             if (string.IsNullOrWhiteSpace(settings.OutputSubFolderName))
             {
-                _logger.LogError("하위 폴더 이름이 비어 있음.");
+                _logger.LogError(_languageService.GetString("Log_Preset_SubFolderEmpty"));
                 errorMessageKey = "Msg_Error_ConfigInvalid";
                 return false;
             }
 
-            // 파일명/폴더명에 사용할 수 없는 문자 포함 여부 체크 (토큰 { } 제외)
-            var invalidChars = Path.GetInvalidFileNameChars().Where(c => c != '{' && c != '}').ToArray();
+            // 파일명/폴더명에 사용할 수 없는 문자 포함 여부 체크 (v3: 토큰 예외 없이 전체 금지 문자 체크)
+            var invalidChars = Path.GetInvalidFileNameChars();
             if (settings.OutputSubFolderName.IndexOfAny(invalidChars) >= 0)
             {
-                _logger.LogError("하위 폴더 이름에 부적절한 문자가 포함됨: {Name}", settings.OutputSubFolderName);
+                _logger.LogError(_languageService.GetString("Log_Preset_SubFolderInvalid"), settings.OutputSubFolderName);
                 errorMessageKey = "Msg_Error_ConfigInvalid";
                 return false;
             }

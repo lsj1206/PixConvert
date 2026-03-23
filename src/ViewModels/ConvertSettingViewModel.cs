@@ -41,7 +41,7 @@ public partial class ConvertSettingViewModel : ViewModelBase
     [ObservableProperty] private OverwritePolicy _overwriteSide = OverwritePolicy.Suffix;
     [ObservableProperty] private OutputLocationType _outputLocation = OutputLocationType.SameAsOriginal;
     [ObservableProperty] private OutputFolderStrategy _folderStrategy = OutputFolderStrategy.CreateFolder;
-    [ObservableProperty] private string _outputSubFolderName = "PixConvert_{yyyy-MM-dd}";
+    [ObservableProperty] private string _outputSubFolderName = "PixConvert";
     [ObservableProperty] private string _customOutputPath = string.Empty;
     [ObservableProperty] private CpuUsageOption _cpuUsage = CpuUsageOption.Optimal;
 
@@ -75,22 +75,12 @@ public partial class ConvertSettingViewModel : ViewModelBase
     public OutputFolderStrategy[] FolderStrategies { get; } = (OutputFolderStrategy[])System.Enum.GetValues(typeof(OutputFolderStrategy));
     public CpuUsageOption[] CpuUsageOptions { get; } = (CpuUsageOption[])System.Enum.GetValues(typeof(CpuUsageOption));
 
-    /// <summary>하위 폴더 이름의 입력을 돕기 위한 템플릿 목록</summary>
-    public string[] FolderNameTemplates { get; } = 
-    [
-        "PixConvert_{yyyy-MM-dd}",
-        "PixConvert_{yyyyMMdd}_{HHmmss}",
-        "Export_{yyyy-MM-dd}",
-        "{yyyy}/{MM}/{dd}"
-    ];
-
     // --- 명령 ---
     public IRelayCommand CreatePresetCommand { get; }
     public IRelayCommand CopyPresetCommand { get; }
     public IRelayCommand RemovePresetCommand { get; }
     public IRelayCommand RenamePresetCommand { get; }
     public IRelayCommand ChangeOutputPathCommand { get; }
-    public IRelayCommand<string> SetFolderNameTemplateCommand { get; }
 
     public ConvertSettingViewModel(
         ILanguageService languageService,
@@ -109,10 +99,6 @@ public partial class ConvertSettingViewModel : ViewModelBase
         RemovePresetCommand = new RelayCommand(RemovePreset, () => SelectedPreset != null && Presets.Count > 1);
         RenamePresetCommand = new RelayCommand(RenamePreset, () => SelectedPreset != null && !string.IsNullOrWhiteSpace(PresetNameEdit));
         ChangeOutputPathCommand = new RelayCommand(ChangeOutputPath);
-        SetFolderNameTemplateCommand = new RelayCommand<string>(template =>
-        {
-            if (template != null) OutputSubFolderName = template;
-        });
 
         // 초기 프리셋 설정
         var lastPreset = Presets.FirstOrDefault(p => p.Name == _presetService.Config.LastSelectedPresetName) ?? Presets.FirstOrDefault();
@@ -195,7 +181,7 @@ public partial class ConvertSettingViewModel : ViewModelBase
         OverwriteSide = s.OverwriteSide;
         OutputLocation = s.OutputLocation;
         FolderStrategy = s.FolderStrategy;
-        OutputSubFolderName = s.OutputSubFolderName ?? "PixConvert_{yyyy-MM-dd}";
+        OutputSubFolderName = s.OutputSubFolderName ?? "PixConvert";
         CustomOutputPath = s.CustomOutputPath ?? string.Empty;
         CpuUsage = s.CpuUsage;
 

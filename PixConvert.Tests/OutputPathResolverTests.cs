@@ -97,26 +97,6 @@ public class OutputPathResolverTests
     }
 
     [Fact]
-    public void Resolve_WithDateToken_ShouldReplaceCorrectly()
-    {
-        // Arrange
-        var settings = new ConvertSettings
-        {
-            OutputLocation = OutputLocationType.SameAsOriginal,
-            FolderStrategy = OutputFolderStrategy.CreateFolder,
-            OutputSubFolderName = "Pix_{yyyy-MM-dd}",
-            StandardTargetFormat = "JPEG"
-        };
-
-        // Act
-        var result = OutputPathResolver.Resolve(_testFile, settings);
-
-        // Assert
-        string dateStr = DateTime.Now.ToString("yyyy-MM-dd");
-        Assert.Equal($@"C:\Photos\Pix_{dateStr}\Image.jpg", result);
-    }
-
-    [Fact]
     public void Resolve_WhenCustomPathEmpty_ShouldFallbackToOriginalDirectory()
     {
         // Arrange
@@ -133,5 +113,24 @@ public class OutputPathResolverTests
 
         // Assert
         Assert.Equal(@"C:\Photos\Image.jpg", result);
+    }
+
+    [Fact]
+    public void Resolve_WithLiteralFolderName_ShouldNotReplaceTokens()
+    {
+        // Arrange - v3에서는 토큰 치환을 하지 않으므로 {yyyy}가 그대로 나와야 함
+        var settings = new ConvertSettings
+        {
+            OutputLocation = OutputLocationType.SameAsOriginal,
+            FolderStrategy = OutputFolderStrategy.CreateFolder,
+            OutputSubFolderName = "Pix_{yyyy}",
+            StandardTargetFormat = "JPEG"
+        };
+
+        // Act
+        var result = OutputPathResolver.Resolve(_testFile, settings);
+
+        // Assert
+        Assert.Equal(@"C:\Photos\Pix_{yyyy}\Image.jpg", result);
     }
 }

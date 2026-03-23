@@ -89,14 +89,12 @@
     <sys:String x:Key="Setting_Overwrite_Overwrite">Overwrite</sys:String>
     <sys:String x:Key="Setting_Overwrite_Suffix">Add Suffix (Rec.)</sys:String>
     <sys:String x:Key="Setting_Overwrite_Skip">Skip</sys:String>
-    <sys:String x:Key="Setting_OutputLocation">Output Storage Location</sys:String>
+    <sys:String x:Key="Setting_OutputLocation">File Save Location</sys:String>
     <sys:String x:Key="Setting_OutputLocation_Same">Same as Original Folder</sys:String>
     <sys:String x:Key="Setting_OutputLocation_Custom">Custom Path</sys:String>
-    <sys:String x:Key="Setting_OutputStrategy">Creation Method</sys:String>
+    <sys:String x:Key="Setting_OutputStrategy">File Save Method</sys:String>
     <sys:String x:Key="Setting_OutputStrategy_None">File Only</sys:String>
-    <sys:String x:Key="Setting_OutputStrategy_Folder">Create Subfolder</sys:String>
-    <sys:String x:Key="Setting_OutputFolderName">Folder Name Filter</sys:String>
-    <sys:String x:Key="Tip_OutputFolderName">You can use date/time tokens (e.g., {yyyy-MM-dd}, {HHmmss}).</sys:String>
+    <sys:String x:Key="Setting_OutputStrategy_Folder">Create Folder</sys:String>
     <sys:String x:Key="Btn_Browse">Browse...</sys:String>
 
     <!-- Convert Setting : CPU Usage -->

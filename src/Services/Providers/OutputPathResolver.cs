@@ -9,7 +9,7 @@ namespace PixConvert.Services.Providers;
 /// 변환 출력 파일의 경로를 결정하는 정적 헬퍼입니다.
 /// SkiaSharpProvider, NetVipsProvider 양쪽에서 공유합니다.
 /// </summary>
-public static class OutputPathResolver
+internal static class OutputPathResolver
 {
     // 포맷 → 확장자 매핑
     private static readonly Dictionary<string, string> FormatToExtension =
@@ -51,31 +51,15 @@ public static class OutputPathResolver
         string outputDir = baseDir;
         if (settings.FolderStrategy == OutputFolderStrategy.CreateFolder)
         {
-            string subFolderName = ReplaceTokens(settings.OutputSubFolderName);
+            // 토큰 치환 없이 설정된 이름을 그대로 사용 (v3 단순화)
+            string subFolderName = string.IsNullOrWhiteSpace(settings.OutputSubFolderName)
+                ? "PixConvert"
+                : settings.OutputSubFolderName;
+
             outputDir = Path.Combine(baseDir, subFolderName);
         }
 
         return Path.Combine(outputDir, $"{System.IO.Path.GetFileNameWithoutExtension(file.Path)}.{ext}");
-    }
-
-    /// <summary>
-    /// 폴더 이름 내의 토큰({yyyy-MM-dd} 등)을 현재 시간 값으로 치환합니다.
-    /// </summary>
-    private static string ReplaceTokens(string template)
-    {
-        if (string.IsNullOrWhiteSpace(template))
-            return "PixConvert_Output";
-
-        var now = DateTime.Now;
-        return template
-            .Replace("{yyyy-MM-dd}", now.ToString("yyyy-MM-dd"))
-            .Replace("{yyyyMMdd}", now.ToString("yyyyMMdd"))
-            .Replace("{yyyy}", now.ToString("yyyy"))
-            .Replace("{MM}", now.ToString("MM"))
-            .Replace("{dd}", now.ToString("dd"))
-            .Replace("{HHmmss}", now.ToString("HHmmss"))
-            .Replace("{HH}", now.ToString("HH"))
-            .Replace("{mm}", now.ToString("mm"));
     }
 
     /// <summary>

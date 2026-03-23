@@ -89,14 +89,12 @@
     <sys:String x:Key="Setting_Overwrite_Overwrite">덮어쓰기</sys:String>
     <sys:String x:Key="Setting_Overwrite_Suffix">접미사 추가 (추천)</sys:String>
     <sys:String x:Key="Setting_Overwrite_Skip">건너뛰기</sys:String>
-    <sys:String x:Key="Setting_OutputLocation">출력 저장 위치</sys:String>
+    <sys:String x:Key="Setting_OutputLocation">파일 저장 위치</sys:String>
     <sys:String x:Key="Setting_OutputLocation_Same">원본 파일과 동일 위치</sys:String>
     <sys:String x:Key="Setting_OutputLocation_Custom">사용자 지정 경로</sys:String>
-    <sys:String x:Key="Setting_OutputStrategy">출력 생성 방식</sys:String>
+    <sys:String x:Key="Setting_OutputStrategy">파일 저장 방식</sys:String>
     <sys:String x:Key="Setting_OutputStrategy_None">파일만 생성</sys:String>
-    <sys:String x:Key="Setting_OutputStrategy_Folder">하위 폴더 생성</sys:String>
-    <sys:String x:Key="Setting_OutputFolderName">폴더 이름 필터</sys:String>
-    <sys:String x:Key="Tip_OutputFolderName">날짜/시간 토큰({yyyy-MM-dd}, {HHmmss} 등)을 사용할 수 있습니다.</sys:String>
+    <sys:String x:Key="Setting_OutputStrategy_Folder">폴더 생성</sys:String>
     <sys:String x:Key="Btn_Browse">찾기...</sys:String>
 
     <!-- 변환 설정 : CPU 사용량 -->
