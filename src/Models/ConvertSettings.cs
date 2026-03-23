@@ -34,8 +34,14 @@ public class ConvertSettings
 
     // --- 출력 및 성능 옵션 (Step 2 상세화) ---
 
-    /// <summary>출력 경로 설정 방식</summary>
-    public OutputPathType OutputType { get; set; } = OutputPathType.SubFolder;
+    /// <summary>출력 저장 위치 방식</summary>
+    public OutputLocationType OutputLocation { get; set; } = OutputLocationType.SameAsOriginal;
+
+    /// <summary>하위 폴더 생성 정책</summary>
+    public OutputFolderStrategy FolderStrategy { get; set; } = OutputFolderStrategy.CreateFolder;
+
+    /// <summary>하위 폴더 이름 (필터/토큰 지원)</summary>
+    public string OutputSubFolderName { get; set; } = "PixConvert_{yyyy-MM-dd}";
 
     /// <summary>사용자 지정 출력 경로</summary>
     public string CustomOutputPath { get; set; } = string.Empty;
@@ -44,8 +50,11 @@ public class ConvertSettings
     public CpuUsageOption CpuUsage { get; set; } = CpuUsageOption.Optimal;
 }
 
-/// <summary>출력 경로 결정 방식</summary>
-public enum OutputPathType { SubFolder, SameFolder, Custom }
+/// <summary>출력 저장 위치 유형</summary>
+public enum OutputLocationType { SameAsOriginal, Custom }
+
+/// <summary>하위 폴더 생성 전략</summary>
+public enum OutputFolderStrategy { NoFolder, CreateFolder }
 
 /// <summary>배경색 결정 방식</summary>
 public enum BackgroundColorOption { White, Black, Custom }

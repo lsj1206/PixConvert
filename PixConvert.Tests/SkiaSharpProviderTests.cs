@@ -61,11 +61,12 @@ public class SkiaSharpProviderTests : IDisposable
     {
         // Arrange
         var file = new FileItem { Path = _inputPath, FileSignature = "PNG" };
-        var settings = new ConvertSettings 
-        { 
-            StandardTargetFormat = format, 
-            OutputType = OutputPathType.SameFolder,
-            OverwriteSide = OverwritePolicy.Overwrite 
+        var settings = new ConvertSettings
+        {
+            StandardTargetFormat = format,
+            OutputLocation = OutputLocationType.SameAsOriginal,
+            FolderStrategy = OutputFolderStrategy.NoFolder,
+            OverwriteSide = OverwritePolicy.Overwrite
         };
 
         // Act
@@ -82,11 +83,12 @@ public class SkiaSharpProviderTests : IDisposable
     {
         // Arrange
         var file = new FileItem { Path = _inputPath, FileSignature = "PNG" };
-        var settings = new ConvertSettings 
-        { 
-            StandardTargetFormat = "JPEG", 
-            OutputType = OutputPathType.SameFolder,
-            OverwriteSide = OverwritePolicy.Suffix 
+        var settings = new ConvertSettings
+        {
+            StandardTargetFormat = "JPEG",
+            OutputLocation = OutputLocationType.SameAsOriginal,
+            FolderStrategy = OutputFolderStrategy.NoFolder,
+            OverwriteSide = OverwritePolicy.Suffix
         };
 
         // 이미 파일이 존재하는 상황 시뮬레이션
@@ -107,11 +109,12 @@ public class SkiaSharpProviderTests : IDisposable
     {
         // Arrange
         var file = new FileItem { Path = _inputPath, FileSignature = "PNG" };
-        var settings = new ConvertSettings 
-        { 
-            StandardTargetFormat = "JPEG", 
-            OutputType = OutputPathType.SameFolder,
-            OverwriteSide = OverwritePolicy.Skip 
+        var settings = new ConvertSettings
+        {
+            StandardTargetFormat = "JPEG",
+            OutputLocation = OutputLocationType.SameAsOriginal,
+            FolderStrategy = OutputFolderStrategy.NoFolder,
+            OverwriteSide = OverwritePolicy.Skip
         };
 
         string basePath = Path.Combine(_testDir, "input.jpg");
@@ -131,11 +134,12 @@ public class SkiaSharpProviderTests : IDisposable
     {
         // Arrange
         var file = new FileItem { Path = _inputPath, FileSignature = "PNG" };
-        var settings = new ConvertSettings 
-        { 
-            StandardTargetFormat = "JPEG", 
+        var settings = new ConvertSettings
+        {
+            StandardTargetFormat = "JPEG",
             BgColorOption = BackgroundColorOption.Black, // 검은색 배경 합성
-            OutputType = OutputPathType.SameFolder 
+            OutputLocation = OutputLocationType.SameAsOriginal,
+            FolderStrategy = OutputFolderStrategy.NoFolder
         };
 
         // Act
@@ -145,7 +149,7 @@ public class SkiaSharpProviderTests : IDisposable
         string outputPath = Path.Combine(_testDir, "input.jpg");
         using var stream = File.OpenRead(outputPath);
         using var bitmap = SKBitmap.Decode(stream);
-        
+
         // 투명했던 (0,0) 좌표가 검은색(0,0,0)에 근사해야 함 (JPEG 손실 압축 고려)
         var pixel = bitmap.GetPixel(0, 0);
         Assert.True(pixel.Red < 10);
@@ -159,10 +163,11 @@ public class SkiaSharpProviderTests : IDisposable
     {
         // Arrange
         var file = new FileItem { Path = _inputPath, FileSignature = "PNG" };
-        var settings = new ConvertSettings 
-        { 
-            StandardTargetFormat = "WEBP", 
-            OutputType = OutputPathType.SameFolder 
+        var settings = new ConvertSettings
+        {
+            StandardTargetFormat = "WEBP",
+            OutputLocation = OutputLocationType.SameAsOriginal,
+            FolderStrategy = OutputFolderStrategy.NoFolder
         };
 
         // Act
@@ -172,7 +177,7 @@ public class SkiaSharpProviderTests : IDisposable
         string outputPath = Path.Combine(_testDir, "input.webp");
         using var stream = File.OpenRead(outputPath);
         using var bitmap = SKBitmap.Decode(stream);
-        
+
         // 투명도가 유지되어야 함 (Alpha < 255)
         var pixel = bitmap.GetPixel(0, 0);
         Assert.True(pixel.Alpha < 255);
@@ -188,7 +193,7 @@ public class SkiaSharpProviderTests : IDisposable
         cts.Cancel();
 
         // Act & Assert
-        await Assert.ThrowsAsync<OperationCanceledException>(async () => 
+        await Assert.ThrowsAsync<OperationCanceledException>(async () =>
             await _provider.ConvertAsync(file, settings, cts.Token));
     }
 
@@ -201,11 +206,11 @@ public class SkiaSharpProviderTests : IDisposable
         var file = new FileItem { Path = corruptedPath, FileSignature = "PNG" };
         var settings = new ConvertSettings { StandardTargetFormat = "JPEG" };
 
-        // Act & Assert
-        var ex = await Assert.ThrowsAsync<IOException>(async () => 
+        // Act & Assert - 래핑 없이 원본 예외(InvalidOperationException)가 전파됨
+        var ex = await Assert.ThrowsAsync<InvalidOperationException>(async () =>
             await _provider.ConvertAsync(file, settings, CancellationToken.None));
-        
-        Assert.Contains("Log_Skia_DecodeFail", ex.Message);
+
+        Assert.Contains("SKBitmap.Decode returned null", ex.Message);
         Assert.Equal(FileConvertStatus.Error, file.Status);
     }
 
@@ -214,12 +219,13 @@ public class SkiaSharpProviderTests : IDisposable
     {
         // Arrange
         var file = new FileItem { Path = _inputPath, FileSignature = "PNG" };
-        var settings = new ConvertSettings 
-        { 
-            StandardTargetFormat = "JPEG", 
+        var settings = new ConvertSettings
+        {
+            StandardTargetFormat = "JPEG",
             BgColorOption = BackgroundColorOption.Custom,
             CustomBackgroundColor = "#FF00FF", // Magenta
-            OutputType = OutputPathType.SameFolder 
+            OutputLocation = OutputLocationType.SameAsOriginal,
+            FolderStrategy = OutputFolderStrategy.NoFolder
         };
 
         // Act
@@ -229,7 +235,7 @@ public class SkiaSharpProviderTests : IDisposable
         string outputPath = Path.Combine(_testDir, "input.jpg");
         using var stream = File.OpenRead(outputPath);
         using var bitmap = SKBitmap.Decode(stream);
-        
+
         var pixel = bitmap.GetPixel(0, 0);
         Assert.True(pixel.Red > 245);
         Assert.True(pixel.Green < 10);
@@ -244,7 +250,9 @@ public class SkiaSharpProviderTests : IDisposable
         var settings = new ConvertSettings
         {
             StandardTargetFormat = "JPEG",
-            OutputType = OutputPathType.SubFolder,
+            OutputLocation = OutputLocationType.SameAsOriginal,
+            FolderStrategy = OutputFolderStrategy.CreateFolder,
+            OutputSubFolderName = $"PixConvert_{DateTime.Today:yyyy-MM-dd}",
             OverwriteSide = OverwritePolicy.Overwrite
         };
 

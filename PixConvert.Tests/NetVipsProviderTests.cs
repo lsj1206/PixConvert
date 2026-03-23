@@ -76,7 +76,8 @@ public class NetVipsProviderTests : IDisposable
         var settings = new ConvertSettings 
         { 
             StandardTargetFormat = "AVIF", 
-            OutputType = OutputPathType.SameFolder 
+            OutputLocation = OutputLocationType.SameAsOriginal,
+            FolderStrategy = OutputFolderStrategy.NoFolder
         };
 
         // Act
@@ -96,7 +97,8 @@ public class NetVipsProviderTests : IDisposable
         var settings = new ConvertSettings 
         { 
             StandardTargetFormat = "BMP", 
-            OutputType = OutputPathType.SameFolder 
+            OutputLocation = OutputLocationType.SameAsOriginal,
+            FolderStrategy = OutputFolderStrategy.NoFolder
         };
 
         // Act
@@ -105,9 +107,9 @@ public class NetVipsProviderTests : IDisposable
         {
             await _provider.ConvertAsync(file, settings, CancellationToken.None);
         }
-        catch (IOException)
+        catch (Exception)
         {
-            // Expected in this specific environment if encoder is missing
+            // Expected in this specific environment if encoder is missing (e.g. VipsException)
         }
 
         // Assert: 상태가 Success 또는 Error여야 함 (작업이 시도되었음을 의미)
@@ -125,7 +127,8 @@ public class NetVipsProviderTests : IDisposable
         var settings = new ConvertSettings 
         { 
             AnimationTargetFormat = "WEBP", 
-            OutputType = OutputPathType.SameFolder 
+            OutputLocation = OutputLocationType.SameAsOriginal,
+            FolderStrategy = OutputFolderStrategy.NoFolder
         };
 
         // Act
@@ -151,7 +154,8 @@ public class NetVipsProviderTests : IDisposable
         var settings = new ConvertSettings 
         { 
             StandardTargetFormat = "JPEG", 
-            OutputType = OutputPathType.SameFolder,
+            OutputLocation = OutputLocationType.SameAsOriginal,
+            FolderStrategy = OutputFolderStrategy.NoFolder,
             BgColorOption = BackgroundColorOption.Black // 검은색으로 합성
         };
 

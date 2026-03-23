@@ -189,7 +189,8 @@ public class PresetService : IPresetService
 
         // 5. 열거형(Enum: CPU 사용량 설정, 경로, 배경색, 덮어쓰기 여부) 옵션이 유효한지 확인
         if (!Enum.IsDefined(typeof(CpuUsageOption), settings.CpuUsage) ||
-            !Enum.IsDefined(typeof(OutputPathType), settings.OutputType) ||
+            !Enum.IsDefined(typeof(OutputLocationType), settings.OutputLocation) ||
+            !Enum.IsDefined(typeof(OutputFolderStrategy), settings.FolderStrategy) ||
             !Enum.IsDefined(typeof(BackgroundColorOption), settings.BgColorOption) ||
             !Enum.IsDefined(typeof(OverwritePolicy), settings.OverwriteSide))
         {
@@ -199,11 +200,31 @@ public class PresetService : IPresetService
         }
 
         // 6. 사용자 지정 출력 경로(Custom) 선택 시 경로가 비어 있는지 확인
-        if (settings.OutputType == OutputPathType.Custom && string.IsNullOrWhiteSpace(settings.CustomOutputPath))
+        if (settings.OutputLocation == OutputLocationType.Custom && string.IsNullOrWhiteSpace(settings.CustomOutputPath))
         {
             _logger.LogError(_languageService.GetString("Log_Preset_EmptyCustomPath"));
             errorMessageKey = "Msg_Error_ConfigInvalid";
             return false;
+        }
+
+        // 7. 하위 폴더 생성 선택 시 폴더 이름 유효성 검사
+        if (settings.FolderStrategy == OutputFolderStrategy.CreateFolder)
+        {
+            if (string.IsNullOrWhiteSpace(settings.OutputSubFolderName))
+            {
+                _logger.LogError("하위 폴더 이름이 비어 있음.");
+                errorMessageKey = "Msg_Error_ConfigInvalid";
+                return false;
+            }
+
+            // 파일명/폴더명에 사용할 수 없는 문자 포함 여부 체크 (토큰 { } 제외)
+            var invalidChars = Path.GetInvalidFileNameChars().Where(c => c != '{' && c != '}').ToArray();
+            if (settings.OutputSubFolderName.IndexOfAny(invalidChars) >= 0)
+            {
+                _logger.LogError("하위 폴더 이름에 부적절한 문자가 포함됨: {Name}", settings.OutputSubFolderName);
+                errorMessageKey = "Msg_Error_ConfigInvalid";
+                return false;
+            }
         }
 
         _logger.LogInformation(_languageService.GetString("Log_Preset_DataValid"));
