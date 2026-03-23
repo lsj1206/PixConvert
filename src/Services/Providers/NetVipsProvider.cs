@@ -76,8 +76,8 @@ public class NetVipsProvider : IProviderService, IDisposable
         // n: -1 -> 애니메이션 이미지의 모든 프레임을 로드 (GIF, WebP, AVIF 등에서만 지원)
         // access: Sequential -> 메모리 사용량 최소화
         var loaderOptions = new VOption();
-        string ext = Path.GetExtension(file.Path).ToLower().TrimStart('.');
-        if (file.IsAnimation || ext is "gif" or "webp" or "avif")
+        string sig = file.FileSignature.ToLowerInvariant();
+        if (file.IsAnimation || sig is "gif" or "webp" or "avif")
         {
             loaderOptions.Add("n", -1);
         }
