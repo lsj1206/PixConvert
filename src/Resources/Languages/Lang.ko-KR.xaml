@@ -24,6 +24,7 @@
     <sys:String x:Key="Status_Success">완료</sys:String>
     <sys:String x:Key="Status_Error">실패</sys:String>
     <sys:String x:Key="Status_Unsupported">미지원</sys:String>
+    <sys:String x:Key="Status_Skipped">건너뜀</sys:String>
 
     <!-- 사이드바 : 버튼 -->
     <sys:String x:Key="Btn_AddFile">파일 추가</sys:String>
@@ -123,6 +124,7 @@
     <sys:String x:Key="Err_Unauthorized">실패 : 권한이 없습니다.</sys:String>
     <sys:String x:Key="Err_IO">실패 : 사용할 수 없는 이름입니다.</sys:String>
     <sys:String x:Key="Msg_OperationComplete">{0}개의 작업이 완료되었습니다.</sys:String>
+    <sys:String x:Key="Msg_OperationCompleteWithSkipped">{0}개 변환 완료, {1}개 건너뜀</sys:String>
     <sys:String x:Key="Msg_Convert_Cancelling">작업을 취소하고 있습니다...</sys:String>
     <sys:String x:Key="Msg_Convert_Cancelled">작업을 취소했습니다.</sys:String>
     <sys:String x:Key="Msg_Error_ConfigInvalid">변환 설정에 문제가 있습니다. 다시 설정해주세요.</sys:String>

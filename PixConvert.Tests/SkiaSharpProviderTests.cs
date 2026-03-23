@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
+using Microsoft.Extensions.Logging.Abstractions;
 using SkiaSharp;
 using PixConvert.Models;
 using PixConvert.Services;
@@ -28,7 +29,7 @@ public class SkiaSharpProviderTests : IDisposable
     public SkiaSharpProviderTests()
     {
         _lang = new MockLanguageService();
-        _provider = new SkiaSharpProvider(_lang);
+        _provider = new SkiaSharpProvider(_lang, NullLogger<SkiaSharpProvider>.Instance);
         _testDir = Path.Combine(Path.GetTempPath(), "PixConvertTests_" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(_testDir);
         _inputPath = Path.Combine(_testDir, "input.png");
@@ -70,7 +71,7 @@ public class SkiaSharpProviderTests : IDisposable
         };
 
         // Act
-        await _provider.ConvertAsync(file, settings, CancellationToken.None);
+        await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
 
         // Assert
         string expectedPath = Path.Combine(_testDir, "input." + expectedExt);
@@ -96,7 +97,7 @@ public class SkiaSharpProviderTests : IDisposable
         File.WriteAllText(basePath, "existing");
 
         // Act
-        await _provider.ConvertAsync(file, settings, CancellationToken.None);
+        await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
 
         // Assert
         string suffixedPath = Path.Combine(_testDir, "input_1.jpg");
@@ -122,11 +123,11 @@ public class SkiaSharpProviderTests : IDisposable
         var lastWriteTime = File.GetLastWriteTime(basePath);
 
         // Act
-        await _provider.ConvertAsync(file, settings, CancellationToken.None);
+        await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
 
         // Assert
         Assert.Equal(lastWriteTime, File.GetLastWriteTime(basePath));
-        Assert.Equal(FileConvertStatus.Success, file.Status);
+        Assert.Equal(FileConvertStatus.Skipped, file.Status);
     }
 
     [Fact]
@@ -143,7 +144,7 @@ public class SkiaSharpProviderTests : IDisposable
         };
 
         // Act
-        await _provider.ConvertAsync(file, settings, CancellationToken.None);
+        await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
 
         // Assert
         string outputPath = Path.Combine(_testDir, "input.jpg");
@@ -171,7 +172,7 @@ public class SkiaSharpProviderTests : IDisposable
         };
 
         // Act
-        await _provider.ConvertAsync(file, settings, CancellationToken.None);
+        await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
 
         // Assert
         string outputPath = Path.Combine(_testDir, "input.webp");
@@ -194,7 +195,7 @@ public class SkiaSharpProviderTests : IDisposable
 
         // Act & Assert
         await Assert.ThrowsAsync<OperationCanceledException>(async () =>
-            await _provider.ConvertAsync(file, settings, cts.Token));
+            await _provider.ConvertAsync(file, settings, new ConversionSession(), cts.Token));
     }
 
     [Fact]
@@ -208,7 +209,7 @@ public class SkiaSharpProviderTests : IDisposable
 
         // Act & Assert - 래핑 없이 원본 예외(InvalidOperationException)가 전파됨
         var ex = await Assert.ThrowsAsync<InvalidOperationException>(async () =>
-            await _provider.ConvertAsync(file, settings, CancellationToken.None));
+            await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None));
 
         Assert.Contains("SKBitmap.Decode returned null", ex.Message);
         Assert.Equal(FileConvertStatus.Error, file.Status);
@@ -229,7 +230,7 @@ public class SkiaSharpProviderTests : IDisposable
         };
 
         // Act
-        await _provider.ConvertAsync(file, settings, CancellationToken.None);
+        await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
 
         // Assert
         string outputPath = Path.Combine(_testDir, "input.jpg");
@@ -257,7 +258,7 @@ public class SkiaSharpProviderTests : IDisposable
         };
 
         // Act
-        await _provider.ConvertAsync(file, settings, CancellationToken.None);
+        await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
 
         // Assert
         string dateStr = DateTime.Today.ToString("yyyy-MM-dd");

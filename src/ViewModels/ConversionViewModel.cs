@@ -115,6 +115,8 @@ public partial class ConversionViewModel : ViewModelBase
         _convertCts = new CancellationTokenSource();
         var cts = _convertCts;
 
+        using var session = new ConversionSession();
+
         try
         {
             int processedCount = 0;
@@ -172,7 +174,7 @@ public partial class ConversionViewModel : ViewModelBase
                 try
                 {
                     var provider = _engineSelector.GetProvider(item, settings);
-                    await provider.ConvertAsync(item, settings, token);
+                    await provider.ConvertAsync(item, settings, session, token);
                 }
                 catch (OperationCanceledException)
                 {
@@ -210,20 +212,27 @@ public partial class ConversionViewModel : ViewModelBase
             // 모든 항목이 루프에 진입한 직후 취소된 경우, 활성 작업들이 무사히 완료되어
             // Parallel.ForEachAsync가 예외를 던지지 않고 정상 종료될 수 있습니다.
             // (Option A) 강제로 throw를 발생시키지 않고 명시적 조건 분기로 처리합니다.
+            int skippedCount = activeFiles.Count(i => i.Status == FileConvertStatus.Skipped);
+            int successCount = activeFiles.Count(i => i.Status == FileConvertStatus.Success);
+
             if (cts.IsCancellationRequested)
             {
                 _snackbarService.Show(GetString("Msg_Convert_Cancelled"), SnackbarType.Info);
             }
+            else if (skippedCount > 0 && failCount == 0)
+            {
+                _snackbarService.Show(
+                    string.Format(GetString("Msg_OperationCompleteWithSkipped"),
+                        successCount, skippedCount),
+                    SnackbarType.Warning);
+            }
+            else if (failCount > 0)
+            {
+                _snackbarService.Show(string.Format(GetString("Msg_OperationComplete"), successCount), SnackbarType.Warning);
+            }
             else
             {
-                if (failCount > 0)
-                {
-                    _snackbarService.Show(string.Format(GetString("Msg_OperationComplete"), processedCount - failCount), SnackbarType.Warning);
-                }
-                else
-                {
-                    _snackbarService.Show(string.Format(GetString("Msg_OperationComplete"), processedCount), SnackbarType.Success);
-                }
+                _snackbarService.Show(string.Format(GetString("Msg_OperationComplete"), successCount), SnackbarType.Success);
             }
         }
         catch (OperationCanceledException)

@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using SkiaSharp;
 using PixConvert.Models;
 using PixConvert.Services.Interfaces;
@@ -15,23 +16,30 @@ namespace PixConvert.Services.Providers;
 public class SkiaSharpProvider : IProviderService, IDisposable
 {
     private readonly ILanguageService _languageService;
+    private readonly ILogger<SkiaSharpProvider> _logger;
 
-    public SkiaSharpProvider(ILanguageService languageService)
+    public SkiaSharpProvider(ILanguageService languageService, ILogger<SkiaSharpProvider> logger)
     {
         _languageService = languageService;
+        _logger = logger;
     }
 
-    public async Task ConvertAsync(FileItem file, ConvertSettings settings, CancellationToken token)
+    public async Task ConvertAsync(FileItem file, ConvertSettings settings, ConversionSession session, CancellationToken token)
     {
         token.ThrowIfCancellationRequested();
 
         // ── 1. 출력 경로 결정 ──────────────────────────────────────────────
-        string basePath    = OutputPathResolver.Resolve(file, settings);
-        string? outputPath = OutputPathResolver.ApplyOverwritePolicy(basePath, settings.OverwriteSide);
+        string basePath = OutputPathResolver.Resolve(file, settings);
+        var (outputPath, isCollision) = OutputPathResolver.ApplyOverwritePolicy(basePath, settings.OverwriteSide, session, file.Path);
+
+        if (isCollision && outputPath is not null)
+        {
+            _logger.LogWarning(_languageService.GetString("Log_Conversion_PathCollision"), outputPath);
+        }
 
         if (outputPath is null)
         {
-            file.Status = FileConvertStatus.Success;
+            file.Status = FileConvertStatus.Skipped;
             return;
         }
 

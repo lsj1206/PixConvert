@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
+using Microsoft.Extensions.Logging.Abstractions;
 using NetVips;
 using PixConvert.Models;
 using PixConvert.Services;
@@ -28,7 +29,7 @@ public class NetVipsProviderTests : IDisposable
     public NetVipsProviderTests()
     {
         _lang = new MockLanguageService();
-        _provider = new NetVipsProvider(_lang);
+        _provider = new NetVipsProvider(_lang, NullLogger<NetVipsProvider>.Instance);
         _testDir = Path.Combine(Path.GetTempPath(), "NetVipsTests_" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(_testDir);
         _inputPath = Path.Combine(_testDir, "input.png");
@@ -81,7 +82,7 @@ public class NetVipsProviderTests : IDisposable
         };
 
         // Act
-        await _provider.ConvertAsync(file, settings, CancellationToken.None);
+        await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
 
         // Assert
         string expectedPath = Path.Combine(_testDir, "input.avif");
@@ -105,7 +106,7 @@ public class NetVipsProviderTests : IDisposable
         // 현재 환경에서는 BMP 인코더가 누락되어 IOException이 발생할 수 있음 (status는 Error로 세팅됨)
         try
         {
-            await _provider.ConvertAsync(file, settings, CancellationToken.None);
+            await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
         }
         catch (Exception)
         {
@@ -132,7 +133,7 @@ public class NetVipsProviderTests : IDisposable
         };
 
         // Act
-        await _provider.ConvertAsync(file, settings, CancellationToken.None);
+        await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
 
         // Assert
         string expectedPath = Path.Combine(_testDir, "animated.webp");
@@ -160,7 +161,7 @@ public class NetVipsProviderTests : IDisposable
         };
 
         // Act
-        await _provider.ConvertAsync(file, settings, CancellationToken.None);
+        await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
 
         // Assert
         string expectedPath = Path.Combine(_testDir, "input.jpg");
@@ -182,7 +183,7 @@ public class NetVipsProviderTests : IDisposable
 
         // Act & Assert
         await Assert.ThrowsAsync<OperationCanceledException>(async () => 
-            await _provider.ConvertAsync(file, settings, cts.Token));
+            await _provider.ConvertAsync(file, settings, new ConversionSession(), cts.Token));
     }
 
     [Fact]
@@ -195,7 +196,7 @@ public class NetVipsProviderTests : IDisposable
         var settings = new ConvertSettings { StandardTargetFormat = "JPEG" };
 
         // Act
-        try { await _provider.ConvertAsync(file, settings, CancellationToken.None); }
+        try { await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None); }
         catch { /* Expected */ }
 
         // Assert

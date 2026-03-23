@@ -191,6 +191,10 @@
                                         <Setter TargetName="StatusProgressBar" Property="Foreground" Value="#4DFFC107"/>
                                         <Setter TargetName="StatusLabel" Property="Foreground" Value="#F57F17"/>
                                     </DataTrigger>
+                                    <!-- Skipped: 회색 -->
+                                    <DataTrigger Binding="{Binding Status}" Value="Skipped">
+                                        <Setter TargetName="StatusLabel" Property="Foreground" Value="#9E9E9E"/>
+                                    </DataTrigger>
                                     <!-- Unsupported: 회색 -->
                                     <DataTrigger Binding="{Binding Status}" Value="Unsupported">
                                         <Setter TargetName="StatusLabel" Property="Foreground" Value="#9E9E9E"/>

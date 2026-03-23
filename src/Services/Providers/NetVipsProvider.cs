@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using NetVips;
 using PixConvert.Models;
 using PixConvert.Services.Interfaces;
@@ -15,24 +16,35 @@ namespace PixConvert.Services.Providers;
 public class NetVipsProvider : IProviderService, IDisposable
 {
     private readonly ILanguageService _languageService;
+    private readonly ILogger<NetVipsProvider> _logger;
     private bool _isDisposed;
 
-    public NetVipsProvider(ILanguageService languageService)
+    public NetVipsProvider(ILanguageService languageService, ILogger<NetVipsProvider> logger)
     {
         _languageService = languageService;
+        _logger = logger;
     }
 
-    public async Task ConvertAsync(FileItem file, ConvertSettings settings, CancellationToken token)
+    public async Task ConvertAsync(FileItem file, ConvertSettings settings, ConversionSession session, CancellationToken token)
     {
         token.ThrowIfCancellationRequested();
 
         // ── 1. 출력 경로 결정 ──────────────────────────────────────────────
-        string basePath    = OutputPathResolver.Resolve(file, settings);
-        string? outputPath = OutputPathResolver.ApplyOverwritePolicy(basePath, settings.OverwriteSide);
+        string basePath = OutputPathResolver.Resolve(file, settings);
+        var (outputPath, isCollision) = OutputPathResolver.ApplyOverwritePolicy(basePath, settings.OverwriteSide, session, file.Path);
+
+        if (isCollision && outputPath is not null)
+        {
+            _logger.LogWarning(_languageService.GetString("Log_Conversion_PathCollision"), outputPath);
+        }
+
+        // Overwrite 정책에서 세션 내 동명 파일 충돌 발생 시 경고 로그
+        // ILogger가 없으므로 생략 또는 추가 분석, 현재 로거를 DI받지 않았으므로 생략
+        // (Serilog 로거를 쓸 수도 있으나, 현재 NetVipsProvider 생성자엔 ILogger 없음)
 
         if (outputPath is null)
         {
-            file.Status = FileConvertStatus.Success;
+            file.Status = FileConvertStatus.Skipped;
             return;
         }
 

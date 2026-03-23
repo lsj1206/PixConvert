@@ -63,44 +63,46 @@ internal static class OutputPathResolver
     }
 
     /// <summary>
-    /// 덮어쓰기 정책에 따라 최종 출력 경로를 결정합니다.
-    /// Skip 정책이고 파일이 이미 존재하면 null을 반환합니다.
+    /// ConversionSession을 필수 파라미터로 받아
+    /// 세션 단위 경로 예약을 강제합니다.
+    /// session 없이 단독 호출하는 코드를 컴파일 시점에 차단합니다.
+    /// 원본 파일 경로와 동일할 경우 과의도적 덮어쓰기로 인한 파괴를 방지하기 위해 Suffix로 전환합니다.
     /// </summary>
-    /// <returns>최종 출력 경로. Skip 조건이면 null.</returns>
-    public static string? ApplyOverwritePolicy(string basePath, OverwritePolicy policy)
+    /// <returns>(최종 출력 경로, 동일 세션 내 충돌 여부). Skip 조건이면 Path는 null.</returns>
+    public static (string? Path, bool IsCollision) ApplyOverwritePolicy(
+        string basePath, 
+        OverwritePolicy policy, 
+        ConversionSession session,
+        string originalPath)
     {
-        if (!File.Exists(basePath))
-            return basePath;
-
-        return policy switch
+        // 원본 파일 보호 메커니즘: 출력 경로가 원본과 동일할 때 Overwrite 금지
+        if (policy == OverwritePolicy.Overwrite &&
+            string.Equals(basePath, originalPath, StringComparison.OrdinalIgnoreCase))
         {
-            OverwritePolicy.Overwrite => basePath,
-            OverwritePolicy.Skip      => null,
-            OverwritePolicy.Suffix    => GenerateSuffixedPath(basePath),
-            _                         => basePath
-        };
-    }
-
-    // ─── Private helpers ─────────────────────────────────────────────────────
-
-    /// <summary>
-    /// 같은 이름 파일이 존재할 때 _1, _2 ... 접미사를 붙여 비어 있는 경로를 찾습니다.
-    /// 최대 9999회 시도 후 포기하면 타임스탬프 접미사로 폴백합니다.
-    /// </summary>
-    private static string GenerateSuffixedPath(string basePath)
-    {
-        string dir  = Path.GetDirectoryName(basePath) ?? string.Empty;
-        string name = Path.GetFileNameWithoutExtension(basePath);
-        string ext  = Path.GetExtension(basePath); // ".jpg" 형태
-
-        for (int i = 1; i <= 9999; i++)
-        {
-            string candidate = Path.Combine(dir, $"{name}_{i}{ext}");
-            if (!File.Exists(candidate))
-                return candidate;
+            policy = OverwritePolicy.Suffix;
         }
 
-        // 폴백: 타임스탬프 접미사
-        return Path.Combine(dir, $"{name}_{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}{ext}");
+        switch (policy)
+        {
+            case OverwritePolicy.Overwrite:
+            {
+                var (path, collision) = session.ReserveForce(basePath);
+                return (path, collision);
+            }
+
+            case OverwritePolicy.Skip:
+            {
+                bool ok = session.TryReserve(basePath);
+                return ok ? (basePath, false) : (null, false);
+            }
+
+            case OverwritePolicy.Suffix:
+            default:
+            {
+                string path = session.FindAndReserveSuffixed(basePath);
+                return (path, false);
+            }
+        }
     }
+
 }

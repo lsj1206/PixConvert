@@ -62,5 +62,6 @@
     <!-- ConversionViewModel.cs / Providers -->
     <system:String x:Key="Log_Conversion_FileError">[ConversionViewModel] 파일 변환 중 예외 발생: {Path}</system:String>
     <system:String x:Key="Log_Conversion_BatchStart">[ConversionViewModel] 일괄 변환 시작. 총 파일 수: {Count}</system:String>
+    <system:String x:Key="Log_Conversion_PathCollision">[ConversionViewModel] 동일 배치 내 출력 경로 충돌 (덮어쓰기): {Path}</system:String>
 
 </ResourceDictionary>

@@ -21,7 +21,10 @@ public enum FileConvertStatus
     Error,
 
     /// <summary>변환을 지원하지 않는 파일(시그니처 미판별 등)</summary>
-    Unsupported
+    Unsupported,
+
+    /// <summary>Skip 정책으로 변환이 의도적으로 생략된 상태</summary>
+    Skipped
 }
 
 
