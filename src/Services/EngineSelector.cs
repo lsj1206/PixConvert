@@ -38,15 +38,9 @@ public class EngineSelector
         if (file.IsAnimation)
             return _netVips;
 
-        // 2. 정지 AVIF 입력 파일도 NetVips: 고압축 포맷 지원용
-        if (file.FileSignature.Equals("AVIF", StringComparison.OrdinalIgnoreCase))
-            return _netVips;
-
-        // 3. AVIF 출력 포맷은 SkiaSharp 미지원 -> NetVips
-        string targetFormat = settings.StandardTargetFormat;
-
-        if (targetFormat.Equals("AVIF", StringComparison.OrdinalIgnoreCase) ||
-            targetFormat.Equals("BMP", StringComparison.OrdinalIgnoreCase))
+        // 2. AVIF (입력 또는 출력)는 NetVips로 라우팅 (고압축 포맷 지원)
+        if (file.FileSignature.Equals("AVIF", StringComparison.OrdinalIgnoreCase) ||
+            settings.StandardTargetFormat.Equals("AVIF", StringComparison.OrdinalIgnoreCase))
             return _netVips;
 
         // 4. 나머지 정지 이미지(JPEG, PNG, WEBP-Static)는 SkiaSharp

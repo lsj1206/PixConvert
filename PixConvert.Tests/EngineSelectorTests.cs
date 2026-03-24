@@ -250,4 +250,22 @@ public class EngineSelectorTests
         // Assert
         Assert.IsType<NetVipsProvider>(provider);
     }
+
+    /// <summary>
+    /// 시나리오: 대상 포맷이 BMP인 경우.
+    /// 검증 목표: BMP는 SkiaSharpProvider가 수동 인코더를 통해 처리하므로 SkiaSharpProvider가 선택되는지 확인.
+    /// </summary>
+    [Fact]
+    public void GetProvider_WhenStandardTargetFormatIsBmp_ShouldReturnSkiaSharp()
+    {
+        // Arrange
+        var file = new FileItem { Path = "test.png", FileSignature = "PNG", IsAnimation = false };
+        var settings = new ConvertSettings { StandardTargetFormat = "BMP" };
+
+        // Act
+        var provider = _selector.GetProvider(file, settings);
+
+        // Assert
+        Assert.IsType<SkiaSharpProvider>(provider);
+    }
 }

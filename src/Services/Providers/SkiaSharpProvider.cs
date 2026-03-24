@@ -93,22 +93,30 @@ public class SkiaSharpProvider : IProviderService, IDisposable
             // ── 4. 인코딩 및 파일 저장 ────────────────────────────────────────
             try
             {
-                var (skFormat, quality) = ResolveEncodeParams(targetFormat, settings.Quality);
-
-                // SKImage.FromBitmap()을 사용하여 인코딩 수행
-                using var image = SKImage.FromBitmap(bitmapToEncode);
-                using var data  = image.Encode(skFormat, quality);
-
-                if (data is null)
+                if (targetFormat.Equals("BMP", StringComparison.OrdinalIgnoreCase))
                 {
-                    var msg = string.Format(_languageService.GetString("Log_Skia_EncodeFail"), targetFormat);
-                    throw new InvalidOperationException(msg);
+                    // BMP는 SKImage.Encode가 null을 반환하므로 별도 고성능 경로로 처리
+                    await SaveAsBmpAsync(bitmapToEncode, outputPath);
                 }
+                else
+                {
+                    var (skFormat, quality) = ResolveEncodeParams(targetFormat, settings.Quality);
 
-                // 인코딩된 메모리 버퍼를 스트림에 쓰는 동기 호출 (데이터 복사 비용 미미)
-                await using var outputStream = new FileStream(
-                    outputPath, FileMode.Create, FileAccess.Write, FileShare.None, 4096, useAsync: true);
-                data.SaveTo(outputStream);
+                    // SKImage.FromBitmap()을 사용하여 인코딩 수행
+                    using var image = SKImage.FromBitmap(bitmapToEncode);
+                    using var data  = image.Encode(skFormat, quality);
+
+                    if (data is null)
+                    {
+                        var msg = string.Format(_languageService.GetString("Log_Skia_EncodeFail"), targetFormat);
+                        throw new InvalidOperationException(msg);
+                    }
+
+                    // 인코딩된 메모리 버퍼를 스트림에 쓰는 동기 호출 (데이터 복사 비용 미미)
+                    await using var outputStream = new FileStream(
+                        outputPath, FileMode.Create, FileAccess.Write, FileShare.None, 4096, useAsync: true);
+                    data.SaveTo(outputStream);
+                }
 
                 file.Progress = 100;
                 file.Status = FileConvertStatus.Success;
@@ -212,8 +220,82 @@ public class SkiaSharpProvider : IProviderService, IDisposable
             "JPEG" => (SKEncodedImageFormat.Jpeg, quality),
             "PNG"  => (SKEncodedImageFormat.Png,  100),    // PNG는 무손실 → quality 무의미
             "WEBP" => (SKEncodedImageFormat.Webp, quality),
+            // BMP는 위의 SaveAsBmpAsync로 처리되므로 여기 도달하지 않음
             _      => throw new NotSupportedException($"SkiaSharpProvider에서 지원하지 않는 대상 포맷: {targetFormat}")
         };
+    }
+
+    /// <summary>
+    /// SKImage.Encode가 BMP를 지원하지 않으므로(null 반환), BMP 이진 포맷을 직접 기록합니다.
+    /// Bgra8888 픽셀 순서(Windows x64 기본값)가 BMP의 BGR 순서와 일치하므로
+    /// 바이트 변환 없이 B, G, R 순으로 직접 읽을 수 있습니다.
+    /// </summary>
+    private static async Task SaveAsBmpAsync(SKBitmap src, string outputPath)
+    {
+        // PlatformColorType(Bgra8888)으로 강제 변환하여 바이트 순서를 고정
+        bool wasCopied = src.ColorType != SKImageInfo.PlatformColorType;
+        SKBitmap bmp = wasCopied ? src.Copy(SKImageInfo.PlatformColorType) : src;
+
+        try
+        {
+            int w          = bmp.Width;
+            int h          = bmp.Height;
+            int rowBytes24 = ((w * 3 + 3) / 4) * 4;  // 4바이트 패딩
+            int pixelSize  = rowBytes24 * h;
+            int fileSize   = 54 + pixelSize;           // 14 + 40 + pixel data
+
+            await using var fs = new FileStream(
+                outputPath, FileMode.Create, FileAccess.Write,
+                FileShare.None, 4096, useAsync: true);
+
+            // BinaryWriter는 fs를 소유하지 않도록 설정
+            using var bw = new BinaryWriter(fs, System.Text.Encoding.ASCII, leaveOpen: true);
+
+            // ── BITMAPFILEHEADER (14 bytes) ─────────────────────────────
+            bw.Write(new byte[] { (byte)'B', (byte)'M' }); // 시그니처
+            bw.Write(fileSize);                             // bfSize
+            bw.Write(0);                                    // bfReserved
+            bw.Write(54);                                   // bfOffBits
+
+            // ── BITMAPINFOHEADER (40 bytes) ─────────────────────────────
+            bw.Write(40);         // biSize
+            bw.Write(w);          // biWidth
+            bw.Write(h);          // biHeight (양수 = bottom-up)
+            bw.Write((short)1);   // biPlanes
+            bw.Write((short)24);  // biBitCount (24-bit RGB)
+            bw.Write(0);          // biCompression (BI_RGB)
+            bw.Write(pixelSize);  // biSizeImage
+            bw.Write(2835);       // biXPelsPerMeter (~72 DPI)
+            bw.Write(2835);       // biYPelsPerMeter
+            bw.Write(0);          // biClrUsed
+            bw.Write(0);          // biClrImportant
+            bw.Flush();
+
+            // ── 픽셀 데이터 (bottom-to-top, BGR, 행 패딩) ──────────────
+            byte[] srcBytes  = bmp.Bytes;                // Bgra8888: [B, G, R, A] per pixel
+            int    srcStride = bmp.RowBytes;             // 원본 행 바이트 수 (w * 4)
+            byte[] rowBuf    = new byte[rowBytes24];     // 출력 행 버퍼 (zero-initialized = 패딩 포함)
+
+            for (int y = h - 1; y >= 0; y--)            // bottom-to-top
+            {
+                int srcRow  = y * srcStride;
+                int dstOff  = 0;
+                for (int x = 0; x < w; x++)
+                {
+                    int src4   = srcRow + x * 4;
+                    rowBuf[dstOff++] = srcBytes[src4];      // B
+                    rowBuf[dstOff++] = srcBytes[src4 + 1];  // G
+                    rowBuf[dstOff++] = srcBytes[src4 + 2];  // R
+                    // src4 + 3 (A) 건너뜀
+                }
+                // rowBuf의 나머지(패딩)는 0으로 초기화된 상태 유지
+                await fs.WriteAsync(rowBuf, 0, rowBytes24);
+            }
+        }
+        finally
+        {
+            if (wasCopied) bmp.Dispose();
+        }
     }
 
     public void Dispose() { /* SkiaSharp은 인스턴스 레벨 네이티브 자원 없음 */ }
