@@ -21,33 +21,31 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="40" />  <!-- 헤더 영역 높이 -->
-            <RowDefinition Height="38"/>   <!-- 빈 공간 -->
-            <RowDefinition />              <!-- 메인 콘텐츠 영역 -->
+            <RowDefinition Height="36" />  <!-- 헤더 영역 높이 -->
+            <RowDefinition Height="*" />   <!-- 메인 콘텐츠 영역 -->
         </Grid.RowDefinitions>
 
         <!-- 헤더 섹션 -->
         <controls:HeaderControl Grid.Row="0" />
 
-
         <!-- 메인 섹션 -->
-        <Grid Grid.Row="2" Margin="16">
+        <Grid Grid.Row="1" Margin="6">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="300" />  <!-- 좌측 사이드바 너비 -->
+                <ColumnDefinition Width="180" />  <!-- 좌측 사이드바 너비 -->
                 <ColumnDefinition Width="*" />    <!-- 우측 파일 목록 영역 -->
             </Grid.ColumnDefinitions>
 
             <!-- 좌측 사이드바 -->
-            <controls:SidebarControl Grid.Column="0" Margin="-10,-50,140,-10" />
+            <controls:SidebarControl Grid.Column="0"/>
 
             <!-- 파일 목록 -->
-            <Border Grid.ColumnSpan="2"
-                    Margin="166,-50,-10,-10"
+            <controls:FileListControl
+                    Grid.Column="1"
+                    Margin="6,0,0,0"
                     Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
                     BorderBrush="{DynamicResource SystemControlBackgroundBaseMediumBrush}"
-                    BorderThickness="1">
-                <controls:FileListControl DataContext="{Binding FileList}" />
-            </Border>
+                    BorderThickness="1"
+                    DataContext="{Binding FileList}" />
         </Grid>
 
         <!-- 스낵바 알림 레이어 (가장 위에 표시) -->
