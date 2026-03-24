@@ -6,6 +6,8 @@ using PixConvert.Models;
 using PixConvert.Services;
 using CommunityToolkit.Mvvm.Messaging;
 using CommunityToolkit.Mvvm.Messaging.Messages;
+using System.Diagnostics;
+using System.Windows.Threading;
 
 namespace PixConvert.ViewModels;
 
@@ -15,6 +17,11 @@ namespace PixConvert.ViewModels;
 public partial class HeaderViewModel : ViewModelBase
 {
     private readonly FileListViewModel _fileList;
+    private readonly DispatcherTimer _resourceTimer;
+
+    // CPU 계산용 필드
+    private DateTime _lastCpuCheckTime = DateTime.UtcNow;
+    private TimeSpan _lastTotalProcessorTime = TimeSpan.Zero;
 
     /// <summary>
     /// HeaderViewModel의 새 인스턴스를 초기화하며 필요한 서비스를 주입받고 초기 상태를 설정합니다.
@@ -43,13 +50,24 @@ public partial class HeaderViewModel : ViewModelBase
 
         WeakReferenceMessenger.Default.Register<ConvertProgressMessage>(this, (r, m) =>
         {
-            CurrentFileName = m.FileName;
             ProcessedCount = m.ProcessedCount;
             TotalConvertCount = m.TotalCount;
             FailCount = m.FailCount;
-            ActivePresetName = m.PresetName;
             OnPropertyChanged(nameof(HasFailures));
         });
+
+        // 리소스 모니터링 타이머 설정 (1초 주기)
+        try
+        {
+            using var proc = Process.GetCurrentProcess();
+            _lastTotalProcessorTime = proc.TotalProcessorTime;
+            _lastCpuCheckTime = DateTime.UtcNow;
+        }
+        catch { }
+
+        _resourceTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+        _resourceTimer.Tick += (s, e) => UpdateResourceUsage();
+        _resourceTimer.Start();
     }
 
     /// <summary>애플리케이션에서 지원하는 언어 목록</summary>
@@ -71,12 +89,50 @@ public partial class HeaderViewModel : ViewModelBase
     // --- 변환 진행 상태 관리 속성 ---
 
     [ObservableProperty] private string _currentFileName = string.Empty;
-    [ObservableProperty] private string _activePresetName = string.Empty;
     [ObservableProperty] private int _processedCount;
     [ObservableProperty] private int _totalConvertCount;
     [ObservableProperty] private int _failCount;
 
     public bool HasFailures => FailCount > 0;
+
+    // --- 시스템 리소스 모니터링 (앱 프로세스 전용) ---
+
+    [ObservableProperty] private string _cpuUsageText = "0%";
+    [ObservableProperty] private string _memoryUsageText = "0 MB";
+
+    private void UpdateResourceUsage()
+    {
+        try
+        {
+            using var process = Process.GetCurrentProcess();
+            var currentTime = DateTime.UtcNow;
+
+            // 1. CPU 사용량 계산 (프로세스 전용)
+            var currentCpuTime = process.TotalProcessorTime;
+            var elapsedMs = (currentTime - _lastCpuCheckTime).TotalMilliseconds;
+
+            if (elapsedMs > 500) // 최소 0.5초 간격 유지
+            {
+                var cpuDeltaMs = (currentCpuTime - _lastTotalProcessorTime).TotalMilliseconds;
+                double cpuUsage = (cpuDeltaMs / elapsedMs / Environment.ProcessorCount) * 100;
+
+                // 0~100 사이로 보정
+                cpuUsage = Math.Min(100.0, Math.Max(0.0, cpuUsage));
+                CpuUsageText = $"{(int)cpuUsage}%";
+
+                _lastCpuCheckTime = currentTime;
+                _lastTotalProcessorTime = currentCpuTime;
+            }
+
+            // 2. RAM 사용량 (Private Working Set)
+            long memBytes = process.PrivateMemorySize64;
+            MemoryUsageText = $"{(memBytes / 1024.0 / 1024.0):N1} MB";
+        }
+        catch (Exception ex)
+        {
+            _logger.LogDebug("Resource monitoring error: {Message}", ex.Message);
+        }
+    }
 
     /// <summary>언어 선택 변경 시 호출되어 실제 애플리케이션의 언어를 변경합니다.</summary>
     partial void OnSelectedLanguageChanged(LanguageOption value)
