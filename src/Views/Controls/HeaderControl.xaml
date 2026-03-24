@@ -14,14 +14,14 @@
             BorderBrush="{DynamicResource SystemControlBackgroundBaseMediumBrush}">
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="186"/>
-                <ColumnDefinition Width="240" />   <!-- 중앙: 상태 대시보드 -->
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />   <!-- 우측: 버전 정보 -->
+                <ColumnDefinition Width="186"/>   <!-- 좌측: 빈공간 -->
+                <ColumnDefinition Width="240" />  <!-- 중앙: 상태 대시보드 -->
+                <ColumnDefinition Width="*" />    <!-- 중앙: 프로세스 CPU/RAM 사용량 -->
+                <ColumnDefinition Width="Auto" /> <!-- 우측: 버전 정보 -->
             </Grid.ColumnDefinitions>
 
             <StackPanel Grid.Column="0">
-                
+
             </StackPanel>
 
             <!-- 상태 대시보드 -->
