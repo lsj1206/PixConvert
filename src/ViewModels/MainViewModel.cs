@@ -47,13 +47,13 @@ public partial class MainViewModel : ViewModelBase, IRecipient<AppStatusRequestM
         ILanguageService languageService,
         IDialogService dialogService,
         ISnackbarService snackbarService,
-        ILogger<HeaderViewModel> headerLogger,
         SnackbarViewModel snackbarViewModel,
         FileListViewModel fileList,
         SortFilterViewModel sortFilter,
         FileInputViewModel fileInput,
         ConversionViewModel conversion,
-        ListManagerViewModel listManager)
+        ListManagerViewModel listManager,
+        HeaderViewModel header)
         : base(languageService, logger)
     {
         _dialogService = dialogService;
@@ -64,9 +64,7 @@ public partial class MainViewModel : ViewModelBase, IRecipient<AppStatusRequestM
         FileInput = fileInput;
         Conversion = conversion;
         ListManager = listManager;
-
-        // 하위 뷰모델 초기화 (기능별 역할 분담)
-        Header = new HeaderViewModel(languageService, headerLogger, FileList);
+        Header = header;
 
         // 다른 VM의 상태 변경 요청을 수신 등록
         WeakReferenceMessenger.Default.Register<AppStatusRequestMessage>(this);

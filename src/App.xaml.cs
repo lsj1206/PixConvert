@@ -130,10 +130,14 @@ public partial class App : Application
         services.AddSingleton<FileInputViewModel>();
         services.AddSingleton<ConversionViewModel>();
         services.AddSingleton<ListManagerViewModel>();
+        services.AddSingleton<HeaderViewModel>(); // 추가
 
         // 다이얼로그 전용 뷰모델 및 팩토리 패턴 등록
         services.AddTransient<ConvertSettingViewModel>();
         services.AddTransient<Func<ConvertSettingViewModel>>(sp => () => sp.GetRequiredService<ConvertSettingViewModel>());
+
+        services.AddTransient<AppSettingViewModel>();
+        services.AddTransient<Func<AppSettingViewModel>>(sp => () => sp.GetRequiredService<AppSettingViewModel>());
 
         // [View] UI 창 등록
         services.AddSingleton<MainWindow>();

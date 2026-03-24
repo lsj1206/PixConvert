@@ -111,6 +111,17 @@
                            Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
                            Text="{x:Static local:App.Version}"/>
 
+                <!-- 설정 버튼 -->
+                <Button Margin="0"
+                        Padding="0"
+                        BorderThickness="0"
+                        Background="Transparent"
+                        Command="{Binding Header.ShowAppSettingCommand}">
+                    <ui:FontIcon Glyph="&#xE713;"
+                                 FontSize="16"
+                                 Foreground="{DynamicResource SystemControlForegroundAccentBrush}"/>
+                </Button>
+
                 <!-- 언어 선택 (Segmented 제어 방식) -->
                 <ListBox VerticalAlignment="Center"
                          Margin="0,0,-4,0"

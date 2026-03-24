@@ -8,6 +8,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using CommunityToolkit.Mvvm.Messaging.Messages;
 using System.Diagnostics;
 using System.Windows.Threading;
+using CommunityToolkit.Mvvm.Input;
 
 namespace PixConvert.ViewModels;
 
@@ -17,6 +18,8 @@ namespace PixConvert.ViewModels;
 public partial class HeaderViewModel : ViewModelBase
 {
     private readonly FileListViewModel _fileList;
+    private readonly IDialogService _dialogService;
+    private readonly Func<AppSettingViewModel> _settingsFactory;
     private readonly DispatcherTimer _resourceTimer;
 
     // CPU 계산용 필드
@@ -28,10 +31,15 @@ public partial class HeaderViewModel : ViewModelBase
     /// </summary>
     /// <param name="languageService">언어 변경 및 시스템 언어 조회 서비스</param>
     /// <param name="fileList">파일 통계 정보를 가져올 목록 뷰모델</param>
-    public HeaderViewModel(ILanguageService languageService, ILogger<HeaderViewModel> logger, FileListViewModel fileList)
+    /// <param name="dialogService">설정 등의 다이얼로그 호출 서비스</param>
+    /// <param name="settingsFactory">AppSettingViewModel 생성을 위한 팩토리</param>
+    public HeaderViewModel(ILanguageService languageService, ILogger<HeaderViewModel> logger, 
+        FileListViewModel fileList, IDialogService dialogService, Func<AppSettingViewModel> settingsFactory)
         : base(languageService, logger)
     {
         _fileList = fileList;
+        _dialogService = dialogService;
+        _settingsFactory = settingsFactory;
 
         // 초기 언어 설정: 시스템 언어를 확인하여 기본값 지정
         var systemLang = _languageService.GetSystemLanguage();
@@ -141,5 +149,18 @@ public partial class HeaderViewModel : ViewModelBase
         {
             _languageService.ChangeLanguage(value.Code);
         }
+    }
+
+    [RelayCommand]
+    private async Task ShowAppSettingAsync()
+    {
+        var vm = _settingsFactory();
+        var view = new Views.Controls.AppSettingDialog { DataContext = vm };
+
+        await _dialogService.ShowCustomDialogAsync(
+            view,
+            (string)App.Current.TryFindResource("Dlg_Title_AppSetting"),
+            null, // 주 동작 버튼 불필요 시 null
+            (string)App.Current.TryFindResource("Dlg_Confirm"));
     }
 }

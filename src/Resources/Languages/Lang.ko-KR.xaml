@@ -167,4 +167,12 @@
     <sys:String x:Key="Dlg_Title_AddFolder">폴더 추가</sys:String>
     <sys:String x:Key="Dlg_Title_SelectOutputPath">출력 폴더 선택</sys:String>
 
+    <!-- 앱 설정 -->
+    <sys:String x:Key="Dlg_Title_AppSetting">설정</sys:String>
+    <sys:String x:Key="Setting_App_General">일반</sys:String>
+    <sys:String x:Key="Setting_App_Theme">테마</sys:String>
+    <sys:String x:Key="Setting_App_ThemeDesc">애플리케이션의 시각적 테마를 변경합니다.</sys:String>
+    <sys:String x:Key="Setting_App_Info">앱 정보</sys:String>
+    <sys:String x:Key="Setting_App_Developer">개발자</sys:String>
+
 </ResourceDictionary>

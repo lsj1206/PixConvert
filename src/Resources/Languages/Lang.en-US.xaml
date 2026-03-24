@@ -167,4 +167,13 @@
     <sys:String x:Key="Dlg_Title_AddFolder">Add Folder</sys:String>
     <sys:String x:Key="Dlg_Title_SelectOutputPath">Select Output Folder</sys:String>
 
+    <!-- App Setting -->
+    <sys:String x:Key="Dlg_Title_AppSetting">Setting</sys:String>
+    <sys:String x:Key="Setting_App_General">General</sys:String>
+    <sys:String x:Key="Setting_App_Theme">Theme</sys:String>
+    <sys:String x:Key="Setting_App_ThemeDesc">Change theme of the application.</sys:String>
+    <sys:String x:Key="Setting_App_Info">App Info</sys:String>
+    <sys:String x:Key="Setting_App_Version">Version</sys:String>
+    <sys:String x:Key="Setting_App_Developer">Developer</sys:String>
+
 </ResourceDictionary>
