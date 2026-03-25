@@ -42,9 +42,6 @@
     <sys:String x:Key="Option_MismatchOnly">불일치 필터</sys:String>
     <sys:String x:Key="Tip_MismatchOnly">확장자와 포맷 시그니처가 다른 파일만 필터링합니다.</sys:String>
 
-    <sys:String x:Key="Option_ConfirmDeletion">삭제 확인 표시</sys:String>
-    <sys:String x:Key="Tip_ConfirmDeletion">파일 삭제 확인 창을 ON/OFF 합니다.</sys:String>
-
     <!-- 사이드바 : 정렬 -->
     <sys:String x:Key="Sort_Index">번호</sys:String>
     <sys:String x:Key="Sort_NameIndex">이름-번호</sys:String>
@@ -170,9 +167,11 @@
     <!-- 앱 설정 -->
     <sys:String x:Key="Dlg_Title_AppSetting">설정</sys:String>
     <sys:String x:Key="Setting_App_General">일반</sys:String>
-    <sys:String x:Key="Setting_App_Theme">테마</sys:String>
-    <sys:String x:Key="Setting_App_ThemeDesc">애플리케이션의 시각적 테마를 변경합니다.</sys:String>
+    <sys:String x:Key="Setting_App_Language">언어</sys:String>
+    <sys:String x:Key="Setting_App_LanguageDesc">표시 언어를 선택합니다.</sys:String>
+    <sys:String x:Key="Setting_App_DelConfirm">삭제 확인 표시</sys:String>
+    <sys:String x:Key="Setting_App_DelConfirmDesc">파일 삭제 확인 창을 ON/OFF 합니다.</sys:String>
     <sys:String x:Key="Setting_App_Info">앱 정보</sys:String>
-    <sys:String x:Key="Setting_App_Developer">개발자</sys:String>
+    <sys:String x:Key="Setting_App_Version">버전</sys:String>
 
 </ResourceDictionary>

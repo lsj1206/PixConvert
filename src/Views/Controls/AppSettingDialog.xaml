@@ -20,26 +20,47 @@
                     <Border Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
                             BorderBrush="{DynamicResource SystemControlBackgroundBaseLowBrush}"
                             BorderThickness="1" CornerRadius="4" Padding="16">
-                        <ui:SimpleStackPanel Spacing="12">
-                            <!-- 테마 설정 -->
+                        <ui:SimpleStackPanel Spacing="12" HorizontalAlignment="Stretch">
+                            <!-- 언어 설정 -->
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <StackPanel>
-                                    <TextBlock Text="{DynamicResource Setting_App_Theme}" FontWeight="Medium" />
-                                    <TextBlock Text="{DynamicResource Setting_App_ThemeDesc}"
-                                               FontSize="12" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                                    <TextBlock FontWeight="Medium" Text="{DynamicResource Setting_App_Language}"/>
+                                    <TextBlock FontSize="12"
+                                               Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                               Text="{DynamicResource Setting_App_LanguageDesc}"/>
                                 </StackPanel>
-                                <ComboBox Grid.Column="1" SelectedItem="{Binding CurrentTheme}" Width="120" VerticalAlignment="Center">
-                                    <ComboBoxItem Content="Light" />
-                                    <ComboBoxItem Content="Dark" />
-                                    <ComboBoxItem Content="System" />
-                                </ComboBox>
+                                <ComboBox Grid.Column="1"
+                                          Width="120"
+                                          VerticalAlignment="Center"
+                                          DisplayMemberPath="Display"
+                                          ItemsSource="{Binding Languages}"
+                                          SelectedItem="{Binding SelectedLanguage, Mode=TwoWay}"/>
                             </Grid>
 
                             <Separator />
+
+                            <!-- 삭제 확인 옵션 -->
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="40" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" HorizontalAlignment="Left" >
+                                    <TextBlock FontWeight="Medium" Text="{DynamicResource Setting_App_DelConfirm}"/>
+                                    <TextBlock FontSize="12"
+                                               Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                               Text="{DynamicResource Setting_App_DelConfirmDesc}"/>
+                                </StackPanel>
+                                <ui:ToggleSwitch Grid.Column="1"
+                                                 HorizontalAlignment="Right"
+                                                 VerticalAlignment="Center"
+                                                 IsOn="{Binding ConfirmDeletion, Mode=TwoWay}"
+                                                 OnContent="" OffContent=""/>
+                            </Grid>
                         </ui:SimpleStackPanel>
                     </Border>
                 </StackPanel>
@@ -53,15 +74,14 @@
                             BorderBrush="{DynamicResource SystemControlBackgroundBaseLowBrush}"
                             BorderThickness="1" CornerRadius="4" Padding="16">
                         <ui:SimpleStackPanel Spacing="12">
-
-                            <!-- 개발자 -->
+                            <!-- 버전 정보 -->
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="{DynamicResource Setting_App_Developer}" FontWeight="Medium" />
-                                <TextBlock Grid.Column="1" Text="{Binding DeveloperName}" />
+                                <TextBlock Text="{DynamicResource Setting_App_Version}" FontWeight="Medium" />
+                                <TextBlock Grid.Column="1" Text="{Binding AppVersion}" FontWeight="SemiBold" />
                             </Grid>
                         </ui:SimpleStackPanel>
                     </Border>

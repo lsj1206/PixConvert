@@ -1,5 +1,7 @@
-using CommunityToolkit.Mvvm.ComponentModel;
+using System.Collections.ObjectModel;
 using Microsoft.Extensions.Logging;
+using CommunityToolkit.Mvvm.ComponentModel;
+using PixConvert.Models;
 using PixConvert.Services;
 
 namespace PixConvert.ViewModels;
@@ -9,13 +11,52 @@ namespace PixConvert.ViewModels;
 /// </summary>
 public partial class AppSettingViewModel : ViewModelBase
 {
-    [ObservableProperty] private bool _enableNotification = true;
-    [ObservableProperty] private string _currentTheme = "Light";
-    [ObservableProperty] private string _appVersion = App.Version;
-    [ObservableProperty] private string _developerName = "PixConvert Team";
+    private readonly ListManagerViewModel _listManager;
 
-    public AppSettingViewModel(ILanguageService languageService, ILogger<AppSettingViewModel> logger)
+    [ObservableProperty] private string _appVersion = App.Version;
+
+    /// <summary>애플리케이션에서 지원하는 언어 목록</summary>
+    public ObservableCollection<LanguageOption> Languages { get; } =
+    [
+        new() { Display = "English", Code = "en-US" },
+        new() { Display = "한국어", Code = "ko-KR" }
+    ];
+
+    /// <summary>현재 선택된 언어 옵션</summary>
+    [ObservableProperty] private LanguageOption _selectedLanguage;
+
+    /// <summary>파일 삭제 시 확인 메시지 표시 여부 (ListManagerViewModel 연동)</summary>
+    public bool ConfirmDeletion
+    {
+        get => _listManager.ConfirmDeletion;
+        set
+        {
+            if (_listManager.ConfirmDeletion != value)
+            {
+                _listManager.ConfirmDeletion = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public AppSettingViewModel(
+        ILanguageService languageService,
+        ILogger<AppSettingViewModel> logger,
+        ListManagerViewModel listManager)
         : base(languageService, logger)
     {
+        _listManager = listManager;
+
+        // 초기 언어 설정 동기화 (현재 적용된 언어 기준)
+        var currentLang = _languageService.GetCurrentLanguage();
+        SelectedLanguage = Languages.FirstOrDefault(l => l.Code == currentLang) ?? Languages[0];
+    }
+
+    partial void OnSelectedLanguageChanged(LanguageOption value)
+    {
+        if (value != null && _languageService.GetCurrentLanguage() != value.Code)
+        {
+            _languageService.ChangeLanguage(value.Code);
+        }
     }
 }

@@ -15,6 +15,8 @@ public class LanguageService : ILanguageService
     /// </summary>
     public event Action LanguageChanged = delegate { };
 
+    private string _currentLanguage = "en-US"; // 기본값 영어
+
     /// <summary>
     /// 애플리케이션의 언어를 변경합니다.
     /// DynamicResource를 사용하는 모든 UI가 자동으로 업데이트됩니다.
@@ -44,6 +46,7 @@ public class LanguageService : ILanguageService
 
             // 새 언어 리소스 추가
             app.Resources.MergedDictionaries.Add(newDict);
+            _currentLanguage = culture;
 
             // 언어 변경 이벤트 발행
             LanguageChanged?.Invoke();
@@ -54,6 +57,11 @@ public class LanguageService : ILanguageService
             System.Diagnostics.Debug.WriteLine($"언어 변경 실패: {ex.Message}");
         }
     }
+
+    /// <summary>
+    /// 현재 설정된 언어 코드를 반환합니다.
+    /// </summary>
+    public string GetCurrentLanguage() => _currentLanguage;
 
     /// <summary>
     /// 시스템 언어를 감지하여 지원하는 언어 코드를 반환합니다.

@@ -42,9 +42,6 @@
     <sys:String x:Key="Option_MismatchOnly">Diff Filter</sys:String>
     <sys:String x:Key="Tip_MismatchOnly">Filter only files where extension and format signature differ.</sys:String>
 
-    <sys:String x:Key="Option_ConfirmDeletion">Delete Confirm</sys:String>
-    <sys:String x:Key="Tip_ConfirmDeletion">Turn ON/OFF file deletion confirmation window.</sys:String>
-
     <!-- Sidebar : Sorting -->
     <sys:String x:Key="Sort_Index">Index</sys:String>
     <sys:String x:Key="Sort_NameIndex">Name-Index</sys:String>
@@ -168,12 +165,13 @@
     <sys:String x:Key="Dlg_Title_SelectOutputPath">Select Output Folder</sys:String>
 
     <!-- App Setting -->
-    <sys:String x:Key="Dlg_Title_AppSetting">Setting</sys:String>
+    <sys:String x:Key="Dlg_Title_AppSetting">Settings</sys:String>
     <sys:String x:Key="Setting_App_General">General</sys:String>
-    <sys:String x:Key="Setting_App_Theme">Theme</sys:String>
-    <sys:String x:Key="Setting_App_ThemeDesc">Change theme of the application.</sys:String>
+    <sys:String x:Key="Setting_App_Language">Language</sys:String>
+    <sys:String x:Key="Setting_App_LanguageDesc">Select the display language.</sys:String>
+    <sys:String x:Key="Setting_App_DelConfirm">Delete Confirm</sys:String>
+    <sys:String x:Key="Setting_App_DelConfirmDesc">Turn ON/OFF file delete confirm dialog.</sys:String>
     <sys:String x:Key="Setting_App_Info">App Info</sys:String>
     <sys:String x:Key="Setting_App_Version">Version</sys:String>
-    <sys:String x:Key="Setting_App_Developer">Developer</sys:String>
 
 </ResourceDictionary>

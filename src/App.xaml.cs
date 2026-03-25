@@ -159,6 +159,10 @@ public partial class App : Application
             // ModernWpf 테마를 Light(밝게) 모드로 설정
             ThemeManager.Current.ApplicationTheme = ApplicationTheme.Light;
 
+            // 기존 언어 설정 초기화 (시스템 언어 적용)
+            var langService = Services.GetRequiredService<ILanguageService>();
+            langService.ChangeLanguage(langService.GetSystemLanguage());
+
             // 메인 윈도우 생성 및 뷰모델 연결 후 표시
             var mainWindow = Services.GetRequiredService<MainWindow>();
             mainWindow.DataContext = Services.GetRequiredService<MainViewModel>();

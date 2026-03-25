@@ -38,7 +38,6 @@
                             <Setter.Value>
                                 <DataTemplate>
                                     <StackPanel Orientation="Vertical">
-
                                         <!-- 파일 추가/삭제 -->
                                         <StackPanel Orientation="Vertical">
                                             <Button Content="{DynamicResource Btn_AddFile}"
@@ -87,32 +86,16 @@
                                                 <ComboBoxItem Content="{DynamicResource Sort_Signature}" Tag="{x:Static services:SortType.Signature}" />
                                             </ComboBox>
                                             <ui:ToggleSwitch IsOn="{Binding SortFilter.IsSortAscending}"
-                                                             OnContent="{DynamicResource Sort_Asc}"
-                                                             OffContent="{DynamicResource Sort_Desc}" />
+                                                              OnContent="{DynamicResource Sort_Asc}"
+                                                              OffContent="{DynamicResource Sort_Desc}" />
                                             <ui:ToggleSwitch IsOn="{Binding SortFilter.ShowMismatchOnly}"
-                                                             OnContent="{DynamicResource Option_MismatchOnly}"
-                                                             OffContent="{DynamicResource Option_MismatchOnly}"
-                                                             ToolTip="{DynamicResource Tip_MismatchOnly}"
-                                                             Margin="0,0,0,4"/>
+                                                              OnContent="{DynamicResource Option_MismatchOnly}"
+                                                              OffContent="{DynamicResource Option_MismatchOnly}"
+                                                              ToolTip="{DynamicResource Tip_MismatchOnly}"
+                                                              Margin="0,0,0,4"/>
                                             <Button Content="{DynamicResource Btn_ReorderIndex}"
                                                     Command="{Binding SortFilter.ReorderNumberCommand}"
                                                     Style="{StaticResource SidebarButtonStyle}" />
-                                        </StackPanel>
-
-                                        <Separator Margin="0,0,0,8" />
-
-                                        <!-- 기타 -->
-                                        <StackPanel Orientation="Vertical">
-                                            <Grid Margin="0">
-                                                <CheckBox Content="{DynamicResource Option_ConfirmDeletion}"
-                                                          IsChecked="{Binding ListManager.ConfirmDeletion}"
-                                                          VerticalAlignment="Center"/>
-                                                <Image Source="{StaticResource HelpIcon}"
-                                                       Width="12" Height="12"
-                                                       HorizontalAlignment="Right"
-                                                       VerticalAlignment="Center"
-                                                       ToolTip="{DynamicResource Tip_ConfirmDeletion}" />
-                                            </Grid>
                                         </StackPanel>
                                     </StackPanel>
                                 </DataTemplate>
@@ -157,8 +140,6 @@
                                                         <Run Text="{Binding Header.FailCount}" FontWeight="SemiBold" />
                                                     </TextBlock>
                                                 </Grid>
-
-                                                <!-- Step 4 취소 버튼 연결 -->
                                                 <Button Content="{DynamicResource Btn_Cancel}"
                                                         Command="{Binding Conversion.CancelConvertCommand}"
                                                         Style="{StaticResource SidebarButtonStyle}"
@@ -168,7 +149,6 @@
                                     </Setter.Value>
                                 </Setter>
                             </DataTrigger>
-                            <!-- 목록 설정 모드: 사이드바를 전용 편집 패널로 교체 -->
                             <DataTrigger Binding="{Binding CurrentStatus}" Value="ListManager">
                                 <Setter Property="ContentTemplate">
                                     <Setter.Value>
@@ -227,7 +207,6 @@
                                                         Foreground="#FF5555"
                                                         Style="{StaticResource SidebarButtonStyle}"
                                                         Margin="0,0,0,8" />
-
                                             </StackPanel>
                                         </DataTemplate>
                                     </Setter.Value>

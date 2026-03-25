@@ -25,6 +25,11 @@ public interface ILanguageService
     string GetSystemLanguage();
 
     /// <summary>
+    /// 현재 설정된 언어 코드를 반환합니다.
+    /// </summary>
+    string GetCurrentLanguage();
+
+    /// <summary>
     /// 리소스 키를 사용하여 번역된 텍스트를 가져옵니다.
     /// </summary>
     string GetString(string key);
