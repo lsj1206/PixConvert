@@ -20,8 +20,8 @@ public partial class ListManagerViewModel : ViewModelBase
     private readonly IDialogService _dialogService;
     private readonly FileListViewModel _fileList;
 
-    /// <summary>목록 설정 모드에서 선택가능한 확장자 태그 목록</summary>
-    public ObservableCollection<FormatTagViewModel> ExtensionTags { get; } = new();
+    /// <summary>목록 설정 모드에서 선택가능한 포맷 태그 목록</summary>
+    public ObservableCollection<FormatTagViewModel> FormatTags { get; } = new();
 
     [ObservableProperty] private bool _removeUnsupported;
     [ObservableProperty] private bool _confirmDeletion = true;
@@ -68,7 +68,7 @@ public partial class ListManagerViewModel : ViewModelBase
 
     private void EnterListManager()
     {
-        ExtensionTags.Clear();
+        FormatTags.Clear();
         RemoveUnsupported = false;
 
         var signatures = _fileList.Items
@@ -78,7 +78,7 @@ public partial class ListManagerViewModel : ViewModelBase
             .OrderBy(s => s);
 
         foreach (var sig in signatures)
-            ExtensionTags.Add(new FormatTagViewModel(sig));
+            FormatTags.Add(new FormatTagViewModel(sig));
 
         RequestStatus(AppStatus.ListManager);
     }
@@ -87,7 +87,7 @@ public partial class ListManagerViewModel : ViewModelBase
 
     private void RemoveSelected()
     {
-        var extsToRemove = ExtensionTags
+        var extsToRemove = FormatTags
             .Where(t => t.IsSelected)
             .Select(t => t.Format)
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
@@ -117,7 +117,7 @@ public partial class ListManagerViewModel : ViewModelBase
         if (confirmed)
         {
             _fileList.Clear();
-            ExtensionTags.Clear();
+            FormatTags.Clear();
             RemoveUnsupported = false;
             _snackbarService.Show(GetString("Msg_ClearList"), SnackbarType.Warning);
         }
