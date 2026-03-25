@@ -36,6 +36,7 @@ public class EngineSelectorTests
         public string GetString(string key) => key;
         public void ChangeLanguage(string culture) { }
         public string GetSystemLanguage() => "ko-KR";
+        public string GetCurrentLanguage() => "ko-KR";
         public event Action LanguageChanged = delegate { };
     }
 

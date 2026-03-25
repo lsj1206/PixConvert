@@ -23,6 +23,7 @@ public class SkiaSharpProviderTests : IDisposable
         public string GetString(string key) => key;
         public void ChangeLanguage(string culture) { }
         public string GetSystemLanguage() => "ko-KR";
+        public string GetCurrentLanguage() => "ko-KR";
         public event Action LanguageChanged = delegate { };
     }
 
@@ -58,6 +59,7 @@ public class SkiaSharpProviderTests : IDisposable
     [InlineData("JPEG", "jpg")]
     [InlineData("PNG", "png")]
     [InlineData("WEBP", "webp")]
+    [InlineData("BMP", "bmp")]
     public async Task ConvertAsync_ShouldConvertFileToVariousFormats(string format, string expectedExt)
     {
         // Arrange
@@ -267,6 +269,38 @@ public class SkiaSharpProviderTests : IDisposable
 
         Assert.True(Directory.Exists(expectedDir));
         Assert.True(File.Exists(expectedPath));
+        Assert.True(File.Exists(expectedPath));
         Assert.Equal(FileConvertStatus.Success, file.Status);
+    }
+
+    [Fact]
+    public async Task ConvertAsync_WhenTargetIsBmp_ShouldCompositeBackground()
+    {
+        // Arrange
+        var file = new FileItem { Path = _inputPath, FileSignature = "PNG" };
+        var settings = new ConvertSettings
+        {
+            StandardTargetFormat = "BMP",
+            BgColorOption = BackgroundColorOption.Custom,
+            CustomBackgroundColor = "#0000FF", // 파란색 배경 합성
+            OutputLocation = OutputLocationType.SameAsOriginal,
+            FolderStrategy = OutputFolderStrategy.NoFolder
+        };
+
+        // Act
+        await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
+
+        // Assert
+        string outputPath = Path.Combine(_testDir, "input.bmp");
+        Assert.True(File.Exists(outputPath));
+        using var stream = File.OpenRead(outputPath);
+        using var bitmap = SKBitmap.Decode(stream);
+
+        // 투명했던 (0,0) 좌표가 파란색(0,0,255)이어야 함
+        var pixel = bitmap.GetPixel(0, 0);
+        Assert.Equal(0, pixel.Red);
+        Assert.Equal(0, pixel.Green);
+        Assert.Equal(255, pixel.Blue);
+        Assert.Equal(255, pixel.Alpha);
     }
 }

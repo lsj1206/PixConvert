@@ -23,6 +23,7 @@ public class NetVipsProviderTests : IDisposable
         public string GetString(string key) => key;
         public void ChangeLanguage(string culture) { }
         public string GetSystemLanguage() => "ko-KR";
+        public string GetCurrentLanguage() => "ko-KR";
         public event Action LanguageChanged = delegate { };
     }
 
@@ -93,6 +94,10 @@ public class NetVipsProviderTests : IDisposable
     [Fact]
     public async Task ConvertAsync_WhenTargetIsBmp_ShouldAttemptConversion()
     {
+        // [의도] NetVips는 현재 환경에서 BMP 쓰기를 지원하지 않지만, 
+        // 향후 라이브러리 업데이트나 환경 변화로 지원될 가능성을 열어두기 위해 
+        // 명시적인 금지 대신 시도는 허용하되 상태(Success/Error) 기반으로 검증합니다.
+        
         // Arrange
         var file = new FileItem { Path = _inputPath, FileSignature = "PNG" };
         var settings = new ConvertSettings 
