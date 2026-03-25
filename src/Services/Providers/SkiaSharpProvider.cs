@@ -246,7 +246,7 @@ public class SkiaSharpProvider : IProviderService, IDisposable
 
             await using var fs = new FileStream(
                 outputPath, FileMode.Create, FileAccess.Write,
-                FileShare.None, 4096, useAsync: true);
+                FileShare.None, 81920, useAsync: true);
 
             // BinaryWriter는 fs를 소유하지 않도록 설정
             using var bw = new BinaryWriter(fs, System.Text.Encoding.ASCII, leaveOpen: true);
@@ -272,22 +272,12 @@ public class SkiaSharpProvider : IProviderService, IDisposable
             bw.Flush();
 
             // ── 픽셀 데이터 (bottom-to-top, BGR, 행 패딩) ──────────────
-            byte[] srcBytes  = bmp.Bytes;                // Bgra8888: [B, G, R, A] per pixel
-            int    srcStride = bmp.RowBytes;             // 원본 행 바이트 수 (w * 4)
-            byte[] rowBuf    = new byte[rowBytes24];     // 출력 행 버퍼 (zero-initialized = 패딩 포함)
+            int    srcStride = bmp.RowBytes;         // 원본 행 바이트 수 (w * 4)
+            byte[] rowBuf    = new byte[rowBytes24]; // 출력 행 버퍼 (zero-initialized = 패딩 포함)
 
             for (int y = h - 1; y >= 0; y--)            // bottom-to-top
             {
-                int srcRow  = y * srcStride;
-                int dstOff  = 0;
-                for (int x = 0; x < w; x++)
-                {
-                    int src4   = srcRow + x * 4;
-                    rowBuf[dstOff++] = srcBytes[src4];      // B
-                    rowBuf[dstOff++] = srcBytes[src4 + 1];  // G
-                    rowBuf[dstOff++] = srcBytes[src4 + 2];  // R
-                    // src4 + 3 (A) 건너뜀
-                }
+                CopyRow(y, rowBuf, bmp, srcStride, w);
                 // rowBuf의 나머지(패딩)는 0으로 초기화된 상태 유지
                 await fs.WriteAsync(rowBuf, 0, rowBytes24);
             }
@@ -295,6 +285,21 @@ public class SkiaSharpProvider : IProviderService, IDisposable
         finally
         {
             if (wasCopied) bmp.Dispose();
+        }
+
+        // ReadOnlySpan(ref struct)은 await 지점을 넘나들 수 없으므로 별도 로컬 함수로 분리
+        static void CopyRow(int y, byte[] buffer, SKBitmap bitmap, int stride, int width)
+        {
+            ReadOnlySpan<byte> span = bitmap.GetPixelSpan();
+            int srcRow = y * stride;
+            int dstOff = 0;
+            for (int x = 0; x < width; x++)
+            {
+                int src4 = srcRow + x * 4;
+                buffer[dstOff++] = span[src4];     // B
+                buffer[dstOff++] = span[src4 + 1]; // G
+                buffer[dstOff++] = span[src4 + 2]; // R
+            }
         }
     }
 
