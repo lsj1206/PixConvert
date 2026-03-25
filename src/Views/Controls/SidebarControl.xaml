@@ -20,6 +20,19 @@
         </Style>
     </UserControl.Resources>
 
+    <UserControl.Style>
+        <Style TargetType="UserControl">
+            <!-- 기본 너비 -->
+            <Setter Property="Width" Value="180" />
+            <Style.Triggers>
+                <!-- "Value" 상태일 때 너비 확장 -->
+                <DataTrigger Binding="{Binding CurrentStatus}" Value="">
+                    <Setter Property="Width" Value="360" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Style>
+
     <!-- 사이드바 -->
     <ScrollViewer PanningMode="VerticalOnly"
                   VerticalScrollBarVisibility="Hidden"
@@ -102,6 +115,7 @@
                             </Setter.Value>
                         </Setter>
                         <Style.Triggers>
+                            <!-- App Status : Converting -->
                             <DataTrigger Binding="{Binding CurrentStatus}" Value="Converting">
                                 <Setter Property="ContentTemplate">
                                     <Setter.Value>
@@ -149,6 +163,7 @@
                                     </Setter.Value>
                                 </Setter>
                             </DataTrigger>
+                            <!-- App Status : ListManager -->
                             <DataTrigger Binding="{Binding CurrentStatus}" Value="ListManager">
                                 <Setter Property="ContentTemplate">
                                     <Setter.Value>

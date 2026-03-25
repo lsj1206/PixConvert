@@ -31,7 +31,7 @@
         <!-- 메인 섹션 -->
         <Grid Grid.Row="1" Margin="6">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="180" />  <!-- 좌측 사이드바 너비 -->
+                <ColumnDefinition Width="Auto" />  <!-- 좌측 사이드바 너비 (내부 크기에 따라 가변) -->
                 <ColumnDefinition Width="*" />    <!-- 우측 파일 목록 영역 -->
             </Grid.ColumnDefinitions>
 
