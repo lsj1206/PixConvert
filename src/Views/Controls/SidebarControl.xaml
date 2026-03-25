@@ -109,7 +109,7 @@
                                             <StackPanel Orientation="Vertical" Margin="4">
                                                 <TextBlock Text="{DynamicResource Status_Processing}" FontSize="14" FontWeight="SemiBold" Foreground="{DynamicResource SystemControlForegroundAccentBrush}" Margin="0,0,0,16" />
 
-                                                <TextBlock Text="{Binding Header.CurrentFileName}" ToolTip="{Binding Header.CurrentFileName}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" Margin="0,0,0,8" />
+                                                <TextBlock Text="{Binding Conversion.CurrentFileName}" ToolTip="{Binding Conversion.CurrentFileName}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" Margin="0,0,0,8" />
                                                 <ProgressBar Minimum="0" Maximum="100" Value="{Binding Conversion.ConvertProgressPercent}" Height="6" Margin="0,0,0,8" />
 
                                                 <Grid Margin="0,0,0,24">
@@ -119,9 +119,9 @@
                                                     </Grid.ColumnDefinitions>
 
                                                     <TextBlock Grid.Column="0">
-                                                        <Run Text="{Binding Header.ProcessedCount}" FontWeight="SemiBold" Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+                                                        <Run Text="{Binding Conversion.ProcessedCount}" FontWeight="SemiBold" Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}" />
                                                         <Run Text="/" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
-                                                        <Run Text="{Binding Header.TotalConvertCount}" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                                                        <Run Text="{Binding Conversion.TotalConvertCount}" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
                                                     </TextBlock>
 
                                                     <TextBlock Grid.Column="1" Foreground="#FF5555">
@@ -129,7 +129,7 @@
                                                             <Style TargetType="TextBlock">
                                                                 <Setter Property="Visibility" Value="Collapsed" />
                                                                 <Style.Triggers>
-                                                                    <DataTrigger Binding="{Binding Header.HasFailures}" Value="True">
+                                                                    <DataTrigger Binding="{Binding Conversion.HasFailures}" Value="True">
                                                                         <Setter Property="Visibility" Value="Visible" />
                                                                     </DataTrigger>
                                                                 </Style.Triggers>
@@ -137,7 +137,7 @@
                                                         </TextBlock.Style>
                                                         <Run Text="{DynamicResource Status_Error}" />
                                                         <Run Text=" " />
-                                                        <Run Text="{Binding Header.FailCount}" FontWeight="SemiBold" />
+                                                        <Run Text="{Binding Conversion.FailCount}" FontWeight="SemiBold" />
                                                     </TextBlock>
                                                 </Grid>
                                                 <Button Content="{DynamicResource Btn_Cancel}"

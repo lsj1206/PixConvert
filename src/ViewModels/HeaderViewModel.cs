@@ -37,10 +37,6 @@ public partial class HeaderViewModel : ViewModelBase
         _dialogService = dialogService;
         _settingsFactory = settingsFactory;
 
-        // 초기 언어 설정 동기화
-        var systemLang = _languageService.GetSystemLanguage();
-        SelectedLanguage = Languages.FirstOrDefault(l => l.Code == systemLang) ?? Languages[0];
-
         // FileListViewModel의 속성 변경 알림을 구독하여 자신의 통계 속성도 함께 알림(UI 동기화)
         _fileList.PropertyChanged += (s, e) =>
         {
@@ -49,14 +45,6 @@ public partial class HeaderViewModel : ViewModelBase
             else if (e.PropertyName == nameof(FileListViewModel.UnsupportedCount))
                 OnPropertyChanged(nameof(UnsupportedCount));
         };
-
-        WeakReferenceMessenger.Default.Register<ConvertProgressMessage>(this, (r, m) =>
-        {
-            ProcessedCount = m.ProcessedCount;
-            TotalConvertCount = m.TotalCount;
-            FailCount = m.FailCount;
-            OnPropertyChanged(nameof(HasFailures));
-        });
 
         // 리소스 모니터링 타이머 설정 (1초 주기)
         try
@@ -72,33 +60,24 @@ public partial class HeaderViewModel : ViewModelBase
         _resourceTimer.Start();
     }
 
-    /// <summary>애플리케이션에서 지원하는 언어 목록</summary>
-    public ObservableCollection<LanguageOption> Languages { get; } =
-    [
-        new() { Display = "EN", Code = "en-US" },
-        new() { Display = "KR", Code = "ko-KR" }
-    ];
-
-    /// <summary>현재 선택된 언어 옵션</summary>
-    [ObservableProperty] private LanguageOption selectedLanguage;
-
     /// <summary>목록의 전체 파일 수 (FileList 위임)</summary>
     public int TotalCount => _fileList.TotalCount;
 
     /// <summary>미지원(시그니처 미판별) 파일 수 (FileList 위임)</summary>
     public int UnsupportedCount => _fileList.UnsupportedCount;
 
-    // --- 변환 진행 상태 관리 속성 ---
-    [ObservableProperty] private string _currentFileName = string.Empty;
-    [ObservableProperty] private int _processedCount;
-    [ObservableProperty] private int _totalConvertCount;
-    [ObservableProperty] private int _failCount;
-
-    public bool HasFailures => FailCount > 0;
-
     // --- 시스템 리소스 모니터링 ---
     [ObservableProperty] private string _cpuUsageText = "0%";
     [ObservableProperty] private string _memoryUsageText = "0 MB";
+
+    // --- 테스트용 상태 제어 ---
+    public AppStatus[] AllStatus => Enum.GetValues<AppStatus>();
+
+    public AppStatus SelectedStatus
+    {
+        get => CurrentStatus;
+        set => RequestStatus(value);
+    }
 
     private void UpdateResourceUsage()
     {
@@ -139,12 +118,8 @@ public partial class HeaderViewModel : ViewModelBase
 
         await _dialogService.ShowCustomDialogAsync(
             view,
-            (string)App.Current.TryFindResource("Dlg_Title_AppSetting"),
+            GetString("Dlg_Title_AppSetting"),
             null,
-            (string)App.Current.TryFindResource("Dlg_Confirm"));
-
-        // 언어 표시 동기화
-        var currentLang = _languageService.GetCurrentLanguage();
-        SelectedLanguage = Languages.FirstOrDefault(l => l.Code == currentLang) ?? Languages[0];
+            GetString("Dlg_Confirm"));
     }
 }

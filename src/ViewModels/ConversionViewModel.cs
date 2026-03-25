@@ -25,6 +25,12 @@ public partial class ConversionViewModel : ViewModelBase
     private CancellationTokenSource? _convertCts;
 
     [ObservableProperty] private int _convertProgressPercent;
+    [ObservableProperty] private string _currentFileName = string.Empty;
+    [ObservableProperty] private int _processedCount;
+    [ObservableProperty] private int _totalConvertCount;
+    [ObservableProperty] private int _failCount;
+
+    public bool HasFailures => FailCount > 0;
 
     public IAsyncRelayCommand OpenConvertSettingCommand { get; }
     public IAsyncRelayCommand ConvertFilesCommand { get; }
@@ -155,6 +161,7 @@ public partial class ConversionViewModel : ViewModelBase
                 // 개별 파일 처리 시작
                 item.Status = FileConvertStatus.Processing;
                 item.Progress = 0;
+                CurrentFileName = System.IO.Path.GetFileName(item.Path);
 
                 // 진행 상황 임시 알림 (너무 잦은 업데이트 방지)
                 long currentTicks = DateTime.UtcNow.Ticks;
@@ -190,19 +197,27 @@ public partial class ConversionViewModel : ViewModelBase
                 finally
                 {
                     int currentProcessed = Interlocked.Increment(ref processedCount);
+                    int currentFailCount = Interlocked.CompareExchange(ref failCount, 0, 0); // 현재 값 읽기용
                     int newPercent = (int)((double)currentProcessed / totalConvertCount * 100.0);
+
+                    // UI 비핵심 상태 업데이트 (사이드바 바인딩용)
+                    ProcessedCount = currentProcessed;
+                    TotalConvertCount = totalConvertCount;
+                    FailCount = currentFailCount;
+                    OnPropertyChanged(nameof(HasFailures));
 
                     // UI 스레드 부하 방지: 퍼센트가 변경되었거나 최후의 1개일 때만 업데이트 수행
                     if (newPercent != ConvertProgressPercent || currentProcessed == totalConvertCount)
                     {
                         ConvertProgressPercent = newPercent;
 
+                        // 메신저는 여전히 필요한 곳이 있을 수 있으므로 유지 (단, 내부 업데이트 로직은 뷰모델 속성으로 처리됨)
                         WeakReferenceMessenger.Default.Send(new ConvertProgressMessage
                         {
                             FileName = System.IO.Path.GetFileName(item.Path),
                             ProcessedCount = currentProcessed,
                             TotalCount = totalConvertCount,
-                            FailCount = failCount,
+                            FailCount = currentFailCount,
                             PresetName = presetName
                         });
                     }
@@ -247,6 +262,11 @@ public partial class ConversionViewModel : ViewModelBase
         finally
         {
             ConvertProgressPercent = 0;
+            ProcessedCount = 0;
+            TotalConvertCount = 0;
+            FailCount = 0;
+            CurrentFileName = string.Empty;
+            OnPropertyChanged(nameof(HasFailures));
             _convertCts?.Dispose();
             _convertCts = null;
             RequestStatus(AppStatus.Idle);

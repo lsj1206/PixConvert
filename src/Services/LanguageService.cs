@@ -15,7 +15,7 @@ public class LanguageService : ILanguageService
     /// </summary>
     public event Action LanguageChanged = delegate { };
 
-    private string _currentLanguage = "en-US"; // 기본값 영어
+    private string _currentLanguage = "ko-KR"; // 기본값을 한국어로 설정
 
     /// <summary>
     /// 애플리케이션의 언어를 변경합니다.
@@ -60,6 +60,7 @@ public class LanguageService : ILanguageService
 
     /// <summary>
     /// 현재 설정된 언어 코드를 반환합니다.
+    /// 앱 설정에서 드롭박스 초기값을 설정하기 위해 사용됩니다.
     /// </summary>
     public string GetCurrentLanguage() => _currentLanguage;
 
