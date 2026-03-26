@@ -38,7 +38,6 @@ HorizontalContentAlignment / VerticalContentAlignment
 ```
 
 - [MUST] For elements with 3 or more attributes, place one attribute per line.
-- [MUST] The closing tag (`/>`, `>`) must be placed on a new line by itself at the same indentation level as the last attribute.
 
 ## Formatting & Comments
 
