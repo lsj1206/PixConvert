@@ -1,0 +1,17 @@
+{
+  "AttributesTolerance": 3,
+  "KeepFirstAttributeOnSameLine": false,
+  "MaxAttributesPerLine": 1,
+  "AttributeOrderingRuleGroups": [
+    "x:Name, x:Key",
+    "Grid.Row, Grid.Column, Grid.RowSpan, Grid.ColumnSpan, DockPanel.Dock, Canvas.Left, Canvas.Top, ui:ControlHelper.*",
+    "Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight, Margin, Padding, HorizontalAlignment, VerticalAlignment, HorizontalContentAlignment, VerticalContentAlignment, Visibility",
+    "Background, Foreground, BorderBrush, BorderThickness, Opacity, Style, Template",
+    "Content, Header, Text, Icon, ToolTip",
+    "ItemsSource, DataContext, SelectedItem, {Binding .*}, {x:Bind .*}",
+    "Command, CommandParameter, Click, SelectionChanged, i:Interaction.Triggers"
+  ],
+  "IndentSize": 4,
+  "IndentWithTabs": false,
+  "RemoveAttributeOrderLineBreaks": true
+}

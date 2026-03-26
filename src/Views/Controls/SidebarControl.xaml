@@ -9,40 +9,48 @@
 
     <!-- 사이드바 버튼 스타일 정의 -->
     <UserControl.Resources>
-        <Style x:Key="SidebarButtonStyle" TargetType="Button">
+        <!-- Sidebar : Button_Style -->
+        <Style
+            x:Key="SidebarButtonStyle"
+            TargetType="Button">
             <Setter Property="Margin" Value="0,0,0,8" />
             <Setter Property="Padding" Value="10,6" />
             <Setter Property="HorizontalAlignment" Value="Stretch" />
             <Setter Property="FontWeight" Value="SemiBold" />
             <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource SystemControlBackgroundBaseLowBrush}"/>
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="BorderBrush" Value="{DynamicResource SystemControlBackgroundBaseLowBrush}" />
         </Style>
     </UserControl.Resources>
 
     <UserControl.Style>
         <Style TargetType="UserControl">
-            <!-- 기본 너비 -->
+            <!-- Sidebar : Default_Width -->
             <Setter Property="Width" Value="180" />
             <Style.Triggers>
-                <!-- "Value" 상태일 때 너비 확장 -->
-                <DataTrigger Binding="{Binding CurrentStatus}" Value="">
+                <!-- Sidebar : Width_Expansion_Trigger -->
+                <DataTrigger
+                    Binding="{Binding CurrentStatus}"
+                    Value="">
                     <Setter Property="Width" Value="360" />
                 </DataTrigger>
             </Style.Triggers>
         </Style>
     </UserControl.Style>
 
-    <!-- 사이드바 -->
-    <ScrollViewer PanningMode="VerticalOnly"
-                  VerticalScrollBarVisibility="Hidden"
-                  HorizontalScrollBarVisibility="Disabled">
+    <!-- Sidebar : Main_Layout -->
+    <ScrollViewer
+        HorizontalScrollBarVisibility="Disabled"
+        PanningMode="VerticalOnly"
+        VerticalScrollBarVisibility="Hidden">
 
-        <Border Padding="12"
-                Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}"
-                CornerRadius="8"
-                BorderBrush="{DynamicResource SystemControlBackgroundBaseMediumBrush}"
-                BorderThickness="1">
+        <Border
+            Margin="0"
+            Padding="12"
+            Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}"
+            BorderBrush="{DynamicResource SystemControlBackgroundBaseMediumBrush}"
+            BorderThickness="1"
+            CornerRadius="8">
 
             <ContentControl Content="{Binding}">
                 <ContentControl.Style>
@@ -51,81 +59,133 @@
                             <Setter.Value>
                                 <DataTemplate>
                                     <StackPanel Orientation="Vertical">
-                                        <!-- 파일 추가/삭제 -->
+                                        <!-- Sidebar : File_Operations_Group -->
                                         <StackPanel Orientation="Vertical">
-                                            <Button Content="{DynamicResource Btn_AddFile}"
-                                                    Command="{Binding FileInput.AddFilesCommand}"
-                                                    Style="{StaticResource SidebarButtonStyle}" />
-                                            <Button Content="{DynamicResource Btn_AddFolder}"
-                                                    Command="{Binding FileInput.AddFolderCommand}"
-                                                    Style="{StaticResource SidebarButtonStyle}" />
+                                            <Button
+                                                Command="{Binding FileInput.AddFilesCommand}"
+                                                Content="{DynamicResource Btn_AddFile}"
+                                                Style="{StaticResource SidebarButtonStyle}" />
+                                            <Button
+                                                Command="{Binding FileInput.AddFolderCommand}"
+                                                Content="{DynamicResource Btn_AddFolder}"
+                                                Style="{StaticResource SidebarButtonStyle}" />
 
                                             <Separator Margin="0,0,0,8" />
 
-                                            <!-- 변환 설정 및 변환 -->
-                                            <Button Content="{DynamicResource Btn_ConvertSetting}"
-                                                    Command="{Binding Conversion.OpenConvertSettingCommand}"
-                                                    Style="{StaticResource SidebarButtonStyle}" />
-                                            <Button Content="{DynamicResource Btn_Convert}"
-                                                    Command="{Binding Conversion.ConvertFilesCommand}"
-                                                    Foreground="{DynamicResource SystemControlForegroundAccentBrush}"
-                                                    Style="{StaticResource SidebarButtonStyle}" />
+                                            <!-- Sidebar : Conversion_Group -->
+                                            <Button
+                                                Command="{Binding Conversion.OpenConvertSettingCommand}"
+                                                Content="{DynamicResource Btn_ConvertSetting}"
+                                                Style="{StaticResource SidebarButtonStyle}" />
+                                            <Button
+                                                Command="{Binding Conversion.ConvertFilesCommand}"
+                                                Content="{DynamicResource Btn_Convert}"
+                                                Foreground="{DynamicResource SystemControlForegroundAccentBrush}"
+                                                Style="{StaticResource SidebarButtonStyle}" />
                                         </StackPanel>
 
                                         <Separator Margin="0,0,0,8" />
 
-                                        <!-- 정렬 및 설정 -->
+                                        <!-- Sidebar : Sort_Filter_Group -->
                                         <StackPanel Orientation="Vertical">
-                                            <Button Content="{DynamicResource Btn_ListManager}"
-                                                    Command="{Binding ListManager.EnterListManagerCommand}"
-                                                    Style="{StaticResource SidebarButtonStyle}" />
+                                            <Button
+                                                Command="{Binding ListManager.EnterListManagerCommand}"
+                                                Content="{DynamicResource Btn_ListManager}"
+                                                Style="{StaticResource SidebarButtonStyle}" />
 
-                                            <TextBlock Margin="0,0,0,4"
-                                                       FontSize="12"
-                                                       FontWeight="SemiBold"
-                                                       Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}"
-                                                       Text="{DynamicResource Sort_Label}" />
-                                            <ComboBox HorizontalAlignment="Stretch"
-                                                      Margin="0,0,0,2"
-                                                      SelectedValuePath="Tag"
-                                                      SelectedValue="{Binding SortFilter.SelectedSortType, Mode=TwoWay}">
-                                                <ComboBoxItem Content="{DynamicResource Sort_Index}" Tag="{x:Static services:SortType.AddIndex}" />
-                                                <ComboBoxItem Content="{DynamicResource Sort_NameIndex}" Tag="{x:Static services:SortType.NameIndex}" />
-                                                <ComboBoxItem Content="{DynamicResource Sort_NamePath}" Tag="{x:Static services:SortType.NamePath}" />
-                                                <ComboBoxItem Content="{DynamicResource Sort_PathIndex}" Tag="{x:Static services:SortType.PathIndex}" />
-                                                <ComboBoxItem Content="{DynamicResource Sort_PathName}" Tag="{x:Static services:SortType.PathName}" />
-                                                <ComboBoxItem Content="{DynamicResource Sort_Size}" Tag="{x:Static services:SortType.Size}" />
-                                                <ComboBoxItem Content="{DynamicResource Sort_Extension}" Tag="{x:Static services:SortType.Extension}" />
-                                                <ComboBoxItem Content="{DynamicResource Sort_Signature}" Tag="{x:Static services:SortType.Signature}" />
+                                            <TextBlock
+                                                Margin="0,0,0,4"
+                                                VerticalAlignment="Center"
+                                                FontSize="12"
+                                                FontWeight="SemiBold"
+                                                Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}"
+                                                Text="{DynamicResource Sort_Label}" />
+
+                                            <!-- Sidebar : Sort_Selection -->
+                                            <ComboBox
+                                                Margin="0,0,0,2"
+                                                HorizontalAlignment="Stretch"
+                                                SelectedValue="{Binding SortFilter.SelectedSortType, Mode=TwoWay}"
+                                                SelectedValuePath="Tag">
+                                                <ComboBoxItem
+                                                    Content="{DynamicResource Sort_Index}"
+                                                    Tag="{x:Static services:SortType.AddIndex}" />
+                                                <ComboBoxItem
+                                                    Content="{DynamicResource Sort_NameIndex}"
+                                                    Tag="{x:Static services:SortType.NameIndex}" />
+                                                <ComboBoxItem
+                                                    Content="{DynamicResource Sort_NamePath}"
+                                                    Tag="{x:Static services:SortType.NamePath}" />
+                                                <ComboBoxItem
+                                                    Content="{DynamicResource Sort_PathIndex}"
+                                                    Tag="{x:Static services:SortType.PathIndex}" />
+                                                <ComboBoxItem
+                                                    Content="{DynamicResource Sort_PathName}"
+                                                    Tag="{x:Static services:SortType.PathName}" />
+                                                <ComboBoxItem
+                                                    Content="{DynamicResource Sort_Size}"
+                                                    Tag="{x:Static services:SortType.Size}" />
+                                                <ComboBoxItem
+                                                    Content="{DynamicResource Sort_Extension}"
+                                                    Tag="{x:Static services:SortType.Extension}" />
+                                                <ComboBoxItem
+                                                    Content="{DynamicResource Sort_Signature}"
+                                                    Tag="{x:Static services:SortType.Signature}" />
                                             </ComboBox>
-                                            <ui:ToggleSwitch IsOn="{Binding SortFilter.IsSortAscending}"
-                                                              OnContent="{DynamicResource Sort_Asc}"
-                                                              OffContent="{DynamicResource Sort_Desc}" />
-                                            <ui:ToggleSwitch IsOn="{Binding SortFilter.ShowMismatchOnly}"
-                                                              OnContent="{DynamicResource Option_MismatchOnly}"
-                                                              OffContent="{DynamicResource Option_MismatchOnly}"
-                                                              ToolTip="{DynamicResource Tip_MismatchOnly}"
-                                                              Margin="0,0,0,4"/>
-                                            <Button Content="{DynamicResource Btn_ReorderIndex}"
-                                                    Command="{Binding SortFilter.ReorderNumberCommand}"
-                                                    Style="{StaticResource SidebarButtonStyle}" />
+
+                                            <!-- Sidebar : Filter_Options -->
+                                            <ui:ToggleSwitch
+                                                IsOn="{Binding SortFilter.IsSortAscending}"
+                                                OffContent="{DynamicResource Sort_Desc}"
+                                                OnContent="{DynamicResource Sort_Asc}" />
+                                            <ui:ToggleSwitch
+                                                Margin="0,0,0,4"
+                                                IsOn="{Binding SortFilter.ShowMismatchOnly}"
+                                                OffContent="{DynamicResource Option_MismatchOnly}"
+                                                OnContent="{DynamicResource Option_MismatchOnly}"
+                                                ToolTip="{DynamicResource Tip_MismatchOnly}" />
+                                            <Button
+                                                Command="{Binding SortFilter.ReorderNumberCommand}"
+                                                Content="{DynamicResource Btn_ReorderIndex}"
+                                                Style="{StaticResource SidebarButtonStyle}" />
                                         </StackPanel>
                                     </StackPanel>
                                 </DataTemplate>
                             </Setter.Value>
                         </Setter>
                         <Style.Triggers>
-                            <!-- App Status : Converting -->
-                            <DataTrigger Binding="{Binding CurrentStatus}" Value="Converting">
+                            <!-- Sidebar : Trigger_Converting -->
+                            <DataTrigger
+                                Binding="{Binding CurrentStatus}"
+                                Value="Converting">
                                 <Setter Property="ContentTemplate">
                                     <Setter.Value>
                                         <DataTemplate>
-                                            <StackPanel Orientation="Vertical" Margin="4">
-                                                <TextBlock Text="{DynamicResource Status_Processing}" FontSize="14" FontWeight="SemiBold" Foreground="{DynamicResource SystemControlForegroundAccentBrush}" Margin="0,0,0,16" />
+                                            <StackPanel
+                                                Margin="4"
+                                                Orientation="Vertical">
+                                                <!-- Sidebar : Converting_Status -->
+                                                <TextBlock
+                                                    Margin="0,0,0,16"
+                                                    FontSize="14"
+                                                    FontWeight="SemiBold"
+                                                    Foreground="{DynamicResource SystemControlForegroundAccentBrush}"
+                                                    Text="{DynamicResource Status_Processing}" />
 
-                                                <TextBlock Text="{Binding Conversion.CurrentFileName}" ToolTip="{Binding Conversion.CurrentFileName}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" Margin="0,0,0,8" />
-                                                <ProgressBar Minimum="0" Maximum="100" Value="{Binding Conversion.ConvertProgressPercent}" Height="6" Margin="0,0,0,8" />
+                                                <TextBlock
+                                                    Margin="0,0,0,8"
+                                                    FontWeight="SemiBold"
+                                                    Text="{Binding Conversion.CurrentFileName}"
+                                                    TextTrimming="CharacterEllipsis"
+                                                    ToolTip="{Binding Conversion.CurrentFileName}" />
+                                                <ProgressBar
+                                                    Height="6"
+                                                    Margin="0,0,0,8"
+                                                    Maximum="100"
+                                                    Minimum="0"
+                                                    Value="{Binding Conversion.ConvertProgressPercent}" />
 
+                                                <!-- Sidebar : Converting_Details -->
                                                 <Grid Margin="0,0,0,24">
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="*" />
@@ -133,17 +193,28 @@
                                                     </Grid.ColumnDefinitions>
 
                                                     <TextBlock Grid.Column="0">
-                                                        <Run Text="{Binding Conversion.ProcessedCount}" FontWeight="SemiBold" Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}" />
-                                                        <Run Text="/" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
-                                                        <Run Text="{Binding Conversion.TotalConvertCount}" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                                                        <Run
+                                                            FontWeight="SemiBold"
+                                                            Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}"
+                                                            Text="{Binding Conversion.ProcessedCount}" />
+                                                        <Run
+                                                            Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                                            Text="/" />
+                                                        <Run
+                                                            Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                                            Text="{Binding Conversion.TotalConvertCount}" />
                                                     </TextBlock>
 
-                                                    <TextBlock Grid.Column="1" Foreground="#FF5555">
+                                                    <TextBlock
+                                                        Grid.Column="1"
+                                                        Foreground="#FF5555">
                                                         <TextBlock.Style>
                                                             <Style TargetType="TextBlock">
                                                                 <Setter Property="Visibility" Value="Collapsed" />
                                                                 <Style.Triggers>
-                                                                    <DataTrigger Binding="{Binding Conversion.HasFailures}" Value="True">
+                                                                    <DataTrigger
+                                                                        Binding="{Binding Conversion.HasFailures}"
+                                                                        Value="True">
                                                                         <Setter Property="Visibility" Value="Visible" />
                                                                     </DataTrigger>
                                                                 </Style.Triggers>
@@ -151,38 +222,54 @@
                                                         </TextBlock.Style>
                                                         <Run Text="{DynamicResource Status_Error}" />
                                                         <Run Text=" " />
-                                                        <Run Text="{Binding Conversion.FailCount}" FontWeight="SemiBold" />
+                                                        <Run
+                                                            FontWeight="SemiBold"
+                                                            Text="{Binding Conversion.FailCount}" />
                                                     </TextBlock>
                                                 </Grid>
-                                                <Button Content="{DynamicResource Btn_Cancel}"
-                                                        Command="{Binding Conversion.CancelConvertCommand}"
-                                                        Style="{StaticResource SidebarButtonStyle}"
-                                                        Foreground="#FF5555" />
+                                                <Button
+                                                    Command="{Binding Conversion.CancelConvertCommand}"
+                                                    Content="{DynamicResource Btn_Cancel}"
+                                                    Foreground="#FF5555"
+                                                    Style="{StaticResource SidebarButtonStyle}" />
                                             </StackPanel>
                                         </DataTemplate>
                                     </Setter.Value>
                                 </Setter>
                             </DataTrigger>
-                            <!-- App Status : ListManager -->
-                            <DataTrigger Binding="{Binding CurrentStatus}" Value="ListManager">
+                            <!-- Sidebar : Trigger_ListManager -->
+                            <DataTrigger
+                                Binding="{Binding CurrentStatus}"
+                                Value="ListManager">
                                 <Setter Property="ContentTemplate">
                                     <Setter.Value>
                                         <DataTemplate>
                                             <StackPanel Orientation="Vertical">
-                                                <!-- 나가기 버튼 (최상단) -->
-                                                <Button Content="{DynamicResource Btn_Back}"
-                                                        Command="{Binding ListManager.ExitListManagerCommand}"
-                                                        Style="{StaticResource SidebarButtonStyle}"
-                                                        Margin="0,0,0,12" />
+                                                <!-- Sidebar : Back_Button -->
+                                                <Button
+                                                    Margin="0,0,0,12"
+                                                    Command="{Binding ListManager.ExitListManagerCommand}"
+                                                    Content="{DynamicResource Btn_Back}"
+                                                    Style="{StaticResource SidebarButtonStyle}" />
 
-                                                <!-- 헤더 타이틀 -->
-                                                <TextBlock Text="{DynamicResource ListManager_Title}" FontSize="14" FontWeight="SemiBold" Foreground="{DynamicResource SystemControlForegroundAccentBrush}" Margin="0,0,0,12" />
+                                                <TextBlock
+                                                    Margin="0,0,0,12"
+                                                    FontSize="14"
+                                                    FontWeight="SemiBold"
+                                                    Foreground="{DynamicResource SystemControlForegroundAccentBrush}"
+                                                    Text="{DynamicResource ListManager_Title}" />
 
-                                                <!-- 확장자 선택 안내 -->
-                                                <TextBlock Text="{DynamicResource ListManager_Desc}" FontSize="11" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" Margin="0,0,0,8" TextWrapping="Wrap" />
+                                                <TextBlock
+                                                    Margin="0,0,0,8"
+                                                    FontSize="11"
+                                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                                    Text="{DynamicResource ListManager_Desc}"
+                                                    TextWrapping="Wrap" />
 
-                                                <!-- 포맷별 확장자 태그 (다중 선택) -->
-                                                <ItemsControl ItemsSource="{Binding ListManager.ExtensionTags}" Margin="0,0,0,8">
+                                                <!-- Sidebar : Extension_Tags_Group -->
+                                                <ItemsControl
+                                                    Margin="0,0,0,8"
+                                                    ItemsSource="{Binding ListManager.ExtensionTags}">
                                                     <ItemsControl.ItemsPanel>
                                                         <ItemsPanelTemplate>
                                                             <WrapPanel Orientation="Horizontal" />
@@ -190,38 +277,41 @@
                                                     </ItemsControl.ItemsPanel>
                                                     <ItemsControl.ItemTemplate>
                                                         <DataTemplate>
-                                                            <ToggleButton Content="{Binding Format}"
-                                                                          IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                                          Margin="0,0,4,4"
-                                                                          Padding="8,3"
-                                                                          FontSize="11" />
+                                                            <ToggleButton
+                                                                Margin="0,0,4,4"
+                                                                Padding="8,3"
+                                                                FontSize="11"
+                                                                Content="{Binding Format}"
+                                                                IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                                         </DataTemplate>
                                                     </ItemsControl.ItemTemplate>
                                                 </ItemsControl>
 
                                                 <Separator Margin="0,4,0,8" />
 
-                                                <!-- 미지원 파일 체크박스 -->
-                                                <CheckBox Content="{DynamicResource ListManager_Unsupported}"
-                                                          IsChecked="{Binding ListManager.RemoveUnsupported, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                          FontWeight="SemiBold"
-                                                          Foreground="#FF5555"
-                                                          Margin="0,0,0,8" />
+                                                <!-- Sidebar : List_Cleaning_Options -->
+                                                <CheckBox
+                                                    Margin="0,0,0,8"
+                                                    Content="{DynamicResource ListManager_Unsupported}"
+                                                    FontWeight="SemiBold"
+                                                    Foreground="#FF5555"
+                                                    IsChecked="{Binding ListManager.RemoveUnsupported, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-                                                <!-- 적용 버튼 -->
-                                                <Button Content="{DynamicResource Btn_RemoveSelected}"
-                                                        Command="{Binding ListManager.RemoveSelectedCommand}"
-                                                        Style="{StaticResource SidebarButtonStyle}"
-                                                        Margin="0,0,0,4" />
+                                                <Button
+                                                    Margin="0,0,0,4"
+                                                    Command="{Binding ListManager.RemoveSelectedCommand}"
+                                                    Content="{DynamicResource Btn_RemoveSelected}"
+                                                    Style="{StaticResource SidebarButtonStyle}" />
 
                                                 <Separator Margin="0,4,0,8" />
 
-                                                <!-- 목록 전부 제거 -->
-                                                <Button Content="{DynamicResource Btn_ListClear}"
-                                                        Command="{Binding ListManager.RemoveAllListCommand}"
-                                                        Foreground="#FF5555"
-                                                        Style="{StaticResource SidebarButtonStyle}"
-                                                        Margin="0,0,0,8" />
+                                                <!-- Sidebar : Clear_All -->
+                                                <Button
+                                                    Margin="0,0,0,8"
+                                                    Command="{Binding ListManager.RemoveAllListCommand}"
+                                                    Content="{DynamicResource Btn_ListClear}"
+                                                    Foreground="#FF5555"
+                                                    Style="{StaticResource SidebarButtonStyle}" />
                                             </StackPanel>
                                         </DataTemplate>
                                     </Setter.Value>

@@ -12,15 +12,24 @@
         <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
             <ui:SimpleStackPanel Margin="20" Spacing="16">
 
-                <!-- 1. 일반 설정 그룹 -->
+                <!-- AppSetting : General_Group -->
                 <StackPanel>
-                    <TextBlock Text="{DynamicResource Setting_App_General}"
-                               FontSize="16" FontWeight="SemiBold" Margin="0,0,0,12"/>
+                    <!-- AppSetting : General_Title -->
+                    <TextBlock
+                        Margin="0,0,0,12"
+                        FontSize="16"
+                        FontWeight="SemiBold"
+                        Text="{DynamicResource Setting_App_General}" />
 
-                    <Border Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
-                            BorderBrush="{DynamicResource SystemControlBackgroundBaseLowBrush}"
-                            BorderThickness="1" CornerRadius="4" Padding="16">
-                        <ui:SimpleStackPanel Spacing="12" HorizontalAlignment="Stretch">
+                    <Border
+                        Padding="16"
+                        Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+                        BorderBrush="{DynamicResource SystemControlBackgroundBaseLowBrush}"
+                        BorderThickness="1"
+                        CornerRadius="4">
+                        <ui:SimpleStackPanel
+                            HorizontalAlignment="Stretch"
+                            Spacing="12">
                             <!-- 언어 설정 -->
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -33,12 +42,13 @@
                                                Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
                                                Text="{DynamicResource Setting_App_LanguageDesc}"/>
                                 </StackPanel>
-                                <ComboBox Grid.Column="1"
-                                          Width="120"
-                                          VerticalAlignment="Center"
-                                          DisplayMemberPath="Display"
-                                          ItemsSource="{Binding Languages}"
-                                          SelectedItem="{Binding SelectedLanguage, Mode=TwoWay}"/>
+                                <ComboBox
+                                    Grid.Column="1"
+                                    Width="120"
+                                    VerticalAlignment="Center"
+                                    DisplayMemberPath="Display"
+                                    ItemsSource="{Binding Languages}"
+                                    SelectedItem="{Binding SelectedLanguage, Mode=TwoWay}" />
                             </Grid>
 
                             <Separator />
@@ -55,24 +65,33 @@
                                                Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
                                                Text="{DynamicResource Setting_App_DelConfirmDesc}"/>
                                 </StackPanel>
-                                <ui:ToggleSwitch Grid.Column="1"
-                                                 HorizontalAlignment="Right"
-                                                 VerticalAlignment="Center"
-                                                 IsOn="{Binding ConfirmDeletion, Mode=TwoWay}"
-                                                 OnContent="" OffContent=""/>
+                                <ui:ToggleSwitch
+                                    Grid.Column="1"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Center"
+                                    IsOn="{Binding ConfirmDeletion, Mode=TwoWay}"
+                                    OffContent=""
+                                    OnContent="" />
                             </Grid>
                         </ui:SimpleStackPanel>
                     </Border>
                 </StackPanel>
 
-                <!-- 2. 정보 그룹 -->
+                <!-- AppSetting : Info_Group -->
                 <StackPanel>
-                    <TextBlock Text="{DynamicResource Setting_App_Info}"
-                               FontSize="16" FontWeight="SemiBold" Margin="0,0,0,12"/>
+                    <!-- AppSetting : Info_Title -->
+                    <TextBlock
+                        Margin="0,0,0,12"
+                        FontSize="16"
+                        FontWeight="SemiBold"
+                        Text="{DynamicResource Setting_App_Info}" />
 
-                    <Border Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
-                            BorderBrush="{DynamicResource SystemControlBackgroundBaseLowBrush}"
-                            BorderThickness="1" CornerRadius="4" Padding="16">
+                    <Border
+                        Padding="16"
+                        Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+                        BorderBrush="{DynamicResource SystemControlBackgroundBaseLowBrush}"
+                        BorderThickness="1"
+                        CornerRadius="4">
                         <ui:SimpleStackPanel Spacing="12">
                             <!-- 버전 정보 -->
                             <Grid>
@@ -80,8 +99,11 @@
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="{DynamicResource Setting_App_Version}" FontWeight="Medium" />
-                                <TextBlock Grid.Column="1" Text="{Binding AppVersion}" FontWeight="SemiBold" />
+                                <TextBlock FontWeight="Medium" Text="{DynamicResource Setting_App_Version}" />
+                                <TextBlock
+                                    Grid.Column="1"
+                                    FontWeight="SemiBold"
+                                    Text="{Binding AppVersion}" />
                             </Grid>
                         </ui:SimpleStackPanel>
                     </Border>

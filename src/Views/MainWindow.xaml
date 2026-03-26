@@ -6,50 +6,59 @@
         xmlns:controls="clr-namespace:PixConvert.Views.Controls"
         xmlns:viewModels="clr-namespace:PixConvert.ViewModels"
         xmlns:ui="http://schemas.modernwpf.com/2019"
-        mc:Ignorable="d"
-        ui:WindowHelper.UseModernWindowStyle="True"
-        WindowStartupLocation="CenterScreen"
-        Width="960"
-        MinWidth="720"
-        Height="600"
-        MinHeight="540"
-        Title="{DynamicResource App_Title}">
+    mc:Ignorable="d"
+    Title="{DynamicResource App_Title}"
+    Width="960"
+    Height="600"
+    MinWidth="720"
+    MinHeight="540"
+    ui:WindowHelper.UseModernWindowStyle="True"
+    WindowStartupLocation="CenterScreen">
 
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </Window.Resources>
 
+    <!-- Window : Root_Grid -->
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="36" />  <!-- 헤더 영역 높이 -->
-            <RowDefinition Height="*" />   <!-- 메인 콘텐츠 영역 -->
+            <!-- Window : Header_Row -->
+            <RowDefinition Height="36" />
+            <!-- Window : Main_Content_Row -->
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <!-- 헤더 섹션 -->
+        <!-- Window : Header_Section -->
         <controls:HeaderControl Grid.Row="0" />
 
-        <!-- 메인 섹션 -->
-        <Grid Grid.Row="1" Margin="6">
+        <!-- Window : Main_Section -->
+        <Grid
+            Grid.Row="1"
+            Margin="6">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />  <!-- 좌측 사이드바 너비 (내부 크기에 따라 가변) -->
-                <ColumnDefinition Width="*" />    <!-- 우측 파일 목록 영역 -->
+                <!-- Window : Sidebar_Column -->
+                <ColumnDefinition Width="Auto" />
+                <!-- Window : FileList_Column -->
+                <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <!-- 좌측 사이드바 -->
-            <controls:SidebarControl Grid.Column="0"/>
+            <!-- Window : Sidebar_Section -->
+            <controls:SidebarControl Grid.Column="0" />
 
-            <!-- 파일 목록 -->
+            <!-- Window : FileList_Section -->
             <controls:FileListControl
-                    Grid.Column="1"
-                    Margin="6,0,0,0"
-                    Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
-                    BorderBrush="{DynamicResource SystemControlBackgroundBaseMediumBrush}"
-                    BorderThickness="1"
-                    DataContext="{Binding FileList}" />
+                Grid.Column="1"
+                Margin="6,0,0,0"
+                Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+                BorderBrush="{DynamicResource SystemControlBackgroundBaseMediumBrush}"
+                BorderThickness="1"
+                DataContext="{Binding FileList}" />
         </Grid>
 
-        <!-- 스낵바 알림 레이어 (가장 위에 표시) -->
-        <controls:SnackbarControl Grid.Row="0" Grid.RowSpan="3"
-                                 DataContext="{Binding Snackbar}" />
+        <!-- Window : Snackbar_Overlay -->
+        <controls:SnackbarControl
+            Grid.Row="0"
+            Grid.RowSpan="2"
+            DataContext="{Binding Snackbar}" />
     </Grid>
 </Window>

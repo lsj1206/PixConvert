@@ -8,38 +8,42 @@
              mc:Ignorable="d">
 
     <UserControl.Resources>
-        <!-- 파일 리스트 스타일 -->
-        <SolidColorBrush x:Key="ItemHoverBackground" Color="#E5F3FF"/>
-        <SolidColorBrush x:Key="ItemSelectedBackground" Color="#CCE8FF"/>
-        <SolidColorBrush x:Key="TextSecondary" Color="#666666"/>
-        <SolidColorBrush x:Key="AccentColor" Color="#0078D4"/>
+        <!-- FileList : Item_Brushes -->
+        <SolidColorBrush x:Key="ItemHoverBackground" Color="#E5F3FF" />
+        <SolidColorBrush x:Key="ItemSelectedBackground" Color="#CCE8FF" />
+        <SolidColorBrush x:Key="TextSecondary" Color="#666666" />
+        <SolidColorBrush x:Key="AccentColor" Color="#0078D4" />
 
-        <!-- ListViewItem 스타일 -->
-        <Style x:Key="FileItemContainerStyle" TargetType="ListViewItem">
-            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="Margin" Value="0,1"/>
-            <Setter Property="BorderThickness" Value="0,0,0,1"/>
-            <Setter Property="Padding" Value="4,6"/>
+        <!-- FileList : Item_ContainerStyle -->
+        <Style
+            x:Key="FileItemContainerStyle"
+            TargetType="ListViewItem">
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Margin" Value="0,1" />
+            <Setter Property="BorderThickness" Value="0,0,0,1" />
+            <Setter Property="Padding" Value="4,6" />
             <Setter Property="Template">
                 <Setter.Value>
-                    <!-- 파일 템플릿 -->
+                    <!-- FileList : Item_Template -->
                     <ControlTemplate TargetType="ListViewItem">
-                        <Border x:Name="bd"
-                                SnapsToDevicePixels="true"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="4">
-                            <GridViewRowPresenter VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                                  SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                        <Border
+                            x:Name="ItemBorder"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="4"
+                            SnapsToDevicePixels="True">
+                            <GridViewRowPresenter
+                                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="bd" Property="Background" Value="{StaticResource ItemHoverBackground}"/>
+                                <Setter TargetName="ItemBorder" Property="Background" Value="{StaticResource ItemHoverBackground}" />
                             </Trigger>
                             <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="bd" Property="Background" Value="{StaticResource ItemSelectedBackground}"/>
+                                <Setter TargetName="ItemBorder" Property="Background" Value="{StaticResource ItemSelectedBackground}" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -49,96 +53,112 @@
     </UserControl.Resources>
 
     <Grid>
-        <ListView x:Name="FileListView"
-                  BorderThickness="0"
-                  Background="Transparent"
-                  SelectionMode="Extended"
-                  ScrollViewer.CanContentScroll="True"
-                  ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                  ItemsSource="{Binding Items}"
-                  ItemContainerStyle="{StaticResource FileItemContainerStyle}"
-                  AllowDrop="True"
-                  KeyDown="ListView_KeyDown"
-                  Drop="FileListView_Drop"
-                  DragLeave="FileListView_DragLeave"
-                  MouseMove="FileListView_MouseMove"
-                  GridViewColumnHeader.Click="Header_Click"
-                  PreviewDragOver="FileListView_PreviewDragOver"
-                  PreviewMouseLeftButtonDown="FileListView_PreviewMouseLeftButtonDown"
-                  PreviewMouseLeftButtonUp="FileListView_PreviewMouseLeftButtonUp"
-                  VirtualizingPanel.IsVirtualizing="True"
-                  VirtualizingPanel.VirtualizationMode="Recycling"
-                  VirtualizingPanel.CacheLength="20,20"
-                  VirtualizingPanel.CacheLengthUnit="Item">
+        <ListView
+            x:Name="FileListView"
+            AllowDrop="True"
+            Background="Transparent"
+            BorderThickness="0"
+            DragLeave="FileListView_DragLeave"
+            Drop="FileListView_Drop"
+            GridViewColumnHeader.Click="Header_Click"
+            ItemContainerStyle="{StaticResource FileItemContainerStyle}"
+            ItemsSource="{Binding Items}"
+            KeyDown="ListView_KeyDown"
+            MouseMove="FileListView_MouseMove"
+            PreviewDragOver="FileListView_PreviewDragOver"
+            PreviewMouseLeftButtonDown="FileListView_PreviewMouseLeftButtonDown"
+            PreviewMouseLeftButtonUp="FileListView_PreviewMouseLeftButtonUp"
+            ScrollViewer.CanContentScroll="True"
+            ScrollViewer.HorizontalScrollBarVisibility="Auto"
+            SelectionMode="Extended"
+            VirtualizingPanel.CacheLength="20,20"
+            VirtualizingPanel.CacheLengthUnit="Item"
+            VirtualizingPanel.IsVirtualizing="True"
+            VirtualizingPanel.VirtualizationMode="Recycling">
             <ListView.View>
-                <!-- GridView -->
+                <!-- FileList : GridView_Main -->
                 <GridView>
                     <GridView.ColumnHeaderContainerStyle>
-                        <!-- 헤더 스타일 -->
+                        <!-- FileList : Header_Style -->
                         <Style TargetType="GridViewColumnHeader">
-                            <Setter Property="Background" Value="Transparent"/>
-                            <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
-                            <Setter Property="Padding" Value="10,5"/>
-                            <Setter Property="HorizontalContentAlignment" Value="Left"/>
-                            <Setter Property="FontWeight" Value="SemiBold"/>
+                            <Setter Property="Background" Value="Transparent" />
+                            <Setter Property="Foreground" Value="{StaticResource TextSecondary}" />
+                            <Setter Property="Padding" Value="10,5" />
+                            <Setter Property="HorizontalContentAlignment" Value="Left" />
+                            <Setter Property="FontWeight" Value="SemiBold" />
                         </Style>
                     </GridView.ColumnHeaderContainerStyle>
 
-                    <!-- 번호 -->
+                    <!-- FileList : Column_Index -->
                     <GridViewColumn Width="60">
                         <GridViewColumn.Header>
-                            <GridViewColumnHeader Content="{DynamicResource List_Index}" Tag="AddIndex"/>
+                            <GridViewColumnHeader
+                                Content="{DynamicResource List_Index}"
+                                Tag="AddIndex" />
                         </GridViewColumn.Header>
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock HorizontalAlignment="Center"
-                                           Foreground="{StaticResource TextSecondary}"
-                                           Text="{Binding AddIndex}" />
+                                <TextBlock
+                                    HorizontalAlignment="Center"
+                                    Foreground="{DynamicResource TextSecondary}"
+                                    Text="{Binding AddIndex}" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
-                    <!-- 파일명 -->
+                    <!-- FileList : Column_Name -->
                     <GridViewColumn Width="250">
                         <GridViewColumn.Header>
-                            <GridViewColumnHeader Content="{DynamicResource List_Name}" Tag="NameIndex"/>
+                            <GridViewColumnHeader
+                                Content="{DynamicResource List_Name}"
+                                Tag="NameIndex" />
                         </GridViewColumn.Header>
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock TextTrimming="CharacterEllipsis" Text="{Binding Name}" />
+                                <TextBlock
+                                    Text="{Binding Name}"
+                                    TextTrimming="CharacterEllipsis" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
-                    <!-- 확장자 -->
+                    <!-- FileList : Column_Extension -->
                     <GridViewColumn Width="62">
                         <GridViewColumn.Header>
-                            <GridViewColumnHeader Content="{DynamicResource List_Extension}" Tag="Extension"/>
+                            <GridViewColumnHeader
+                                Content="{DynamicResource List_Extension}"
+                                Tag="Extension" />
                         </GridViewColumn.Header>
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Foreground="{StaticResource TextSecondary}"
-                                           Text="{Binding Extension}" />
+                                <TextBlock
+                                    Foreground="{DynamicResource TextSecondary}"
+                                    Text="{Binding Extension}" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
-                    <!-- 파일 시그니처(포맷) -->
+                    <!-- FileList : Column_Signature -->
                     <GridViewColumn Width="68">
                         <GridViewColumn.Header>
-                            <GridViewColumnHeader Content="{DynamicResource List_Signature}" Tag="Signature"/>
+                            <GridViewColumnHeader
+                                Content="{DynamicResource List_Signature}"
+                                Tag="Signature" />
                         </GridViewColumn.Header>
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding FileSignature}">
                                     <TextBlock.Style>
-                                        <Style TargetType="TextBlock">
-                                            <!-- 기본 색상 -->
-                                            <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
+                                        <Style
+                                            BasedOn="{StaticResource {x:Type TextBlock}}"
+                                            TargetType="TextBlock">
+                                            <Setter Property="Foreground" Value="{DynamicResource TextSecondary}" />
                                             <Style.Triggers>
-                                                <!-- 확장자-포맷 불일치 시 빨간색 표시 -->
-                                                <DataTrigger Binding="{Binding IsMismatch}" Value="True">
-                                                    <Setter Property="Foreground" Value="#FF4444"/>
+                                                <!-- FileList : Signature_Mismatch_Trigger -->
+                                                <DataTrigger
+                                                    Binding="{Binding IsMismatch}"
+                                                    Value="True">
+                                                    <Setter Property="Foreground" Value="#FF4444" />
                                                 </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
@@ -148,111 +168,143 @@
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
-                    <!-- 상태 -->
+                    <!-- FileList : Column_Status -->
                     <GridViewColumn Width="70">
                         <GridViewColumn.Header>
-                            <GridViewColumnHeader Content="{DynamicResource List_Status}"/>
+                            <GridViewColumnHeader Content="{DynamicResource List_Status}" />
                         </GridViewColumn.Header>
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <Grid Margin="-6,0">
-                                    <!-- 배경 게이지 (ProgressBar) -->
-                                    <ProgressBar x:Name="StatusProgressBar"
-                                                 Value="{Binding Progress}"
-                                                 Minimum="0" Maximum="100"
-                                                 BorderThickness="0"
-                                                 Background="Transparent"
-                                                 Foreground="#1A4CAF50"
-                                                 IsHitTestVisible="False"
-                                                 VerticalAlignment="Stretch"/>
+                                    <!-- FileList : Status_ProgressBar -->
+                                    <ProgressBar
+                                        x:Name="StatusProgressBar"
+                                        VerticalAlignment="Stretch"
+                                        Background="Transparent"
+                                        BorderThickness="0"
+                                        Foreground="#1A4CAF50"
+                                        IsHitTestVisible="False"
+                                        Maximum="100"
+                                        Minimum="0"
+                                        Value="{Binding Progress}" />
 
-                                    <!-- 텍스트 -->
-                                    <TextBlock x:Name="StatusLabel"
-                                               Text="{Binding StatusText}"
-                                               HorizontalAlignment="Center"
-                                               VerticalAlignment="Center"
-                                               FontSize="11"
-                                               FontWeight="SemiBold"
-                                               Foreground="{StaticResource TextSecondary}"/>
+                                    <!-- FileList : Status_Label -->
+                                    <TextBlock
+                                        x:Name="StatusLabel"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        FontSize="11"
+                                        FontWeight="SemiBold"
+                                        Foreground="{DynamicResource TextSecondary}"
+                                        Text="{Binding StatusText}" />
                                 </Grid>
                                 <DataTemplate.Triggers>
-                                    <!-- Processing: 겨우 시작 된 상태 -->
-                                    <DataTrigger Binding="{Binding Status}" Value="Processing">
-                                        <Setter TargetName="StatusProgressBar" Property="Foreground" Value="#334CAF50"/>
-                                        <Setter TargetName="StatusLabel" Property="Foreground" Value="#2E7D32"/>
+                                    <!-- FileList : Status_Trigger_Processing -->
+                                    <DataTrigger
+                                        Binding="{Binding Status}"
+                                        Value="Processing">
+                                        <Setter TargetName="StatusProgressBar" Property="Foreground" Value="#334CAF50" />
+                                        <Setter TargetName="StatusLabel" Property="Foreground" Value="#2E7D32" />
                                     </DataTrigger>
-                                    <!-- Success: 완료, 진한 연두색 -->
-                                    <DataTrigger Binding="{Binding Status}" Value="Success">
-                                        <Setter TargetName="StatusProgressBar" Property="Foreground" Value="#4D4CAF50"/>
-                                        <Setter TargetName="StatusLabel" Property="Foreground" Value="#1B5E20"/>
+                                    <!-- FileList : Status_Trigger_Success -->
+                                    <DataTrigger
+                                        Binding="{Binding Status}"
+                                        Value="Success">
+                                        <Setter TargetName="StatusProgressBar" Property="Foreground" Value="#4D4CAF50" />
+                                        <Setter TargetName="StatusLabel" Property="Foreground" Value="#1B5E20" />
                                     </DataTrigger>
-                                    <!-- Error: 주황색 -->
-                                    <DataTrigger Binding="{Binding Status}" Value="Error">
-                                        <Setter TargetName="StatusProgressBar" Property="Foreground" Value="#4DFFC107"/>
-                                        <Setter TargetName="StatusLabel" Property="Foreground" Value="#F57F17"/>
+                                    <!-- FileList : Status_Trigger_Error -->
+                                    <DataTrigger
+                                        Binding="{Binding Status}"
+                                        Value="Error">
+                                        <Setter TargetName="StatusProgressBar" Property="Foreground" Value="#4DFFC107" />
+                                        <Setter TargetName="StatusLabel" Property="Foreground" Value="#F57F17" />
                                     </DataTrigger>
-                                    <!-- Skipped: 회색 -->
-                                    <DataTrigger Binding="{Binding Status}" Value="Skipped">
-                                        <Setter TargetName="StatusLabel" Property="Foreground" Value="#9E9E9E"/>
+                                    <!-- FileList : Status_Trigger_Skipped -->
+                                    <DataTrigger
+                                        Binding="{Binding Status}"
+                                        Value="Skipped">
+                                        <Setter TargetName="StatusLabel" Property="Foreground" Value="#9E9E9E" />
                                     </DataTrigger>
-                                    <!-- Unsupported: 회색 -->
-                                    <DataTrigger Binding="{Binding Status}" Value="Unsupported">
-                                        <Setter TargetName="StatusLabel" Property="Foreground" Value="#9E9E9E"/>
+                                    <!-- FileList : Status_Trigger_Unsupported -->
+                                    <DataTrigger
+                                        Binding="{Binding Status}"
+                                        Value="Unsupported">
+                                        <Setter TargetName="StatusLabel" Property="Foreground" Value="#9E9E9E" />
                                     </DataTrigger>
                                 </DataTemplate.Triggers>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
-                    <!-- 파일 크기 -->
+                    <!-- FileList : Column_Size -->
                     <GridViewColumn Width="80">
                         <GridViewColumn.Header>
-                            <GridViewColumnHeader Content="{DynamicResource List_Size}" Tag="Size"/>
+                            <GridViewColumnHeader
+                                Content="{DynamicResource List_Size}"
+                                Tag="Size" />
                         </GridViewColumn.Header>
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Foreground="{StaticResource TextSecondary}"
-                                           Text="{Binding DisplaySize}" />
+                                <TextBlock
+                                    Foreground="{DynamicResource TextSecondary}"
+                                    Text="{Binding DisplaySize}" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
-                    <!-- 경로 -->
+                    <!-- FileList : Column_Path -->
                     <GridViewColumn Width="300">
                         <GridViewColumn.Header>
-                            <GridViewColumnHeader Content="{DynamicResource List_Path}" Tag="PathIndex"/>
+                            <GridViewColumnHeader
+                                Content="{DynamicResource List_Path}"
+                                Tag="PathIndex" />
                         </GridViewColumn.Header>
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Foreground="#999999"
-                                           TextTrimming="CharacterEllipsis"
-                                           Text="{Binding Directory}"
-                                           ToolTip="{Binding Path}" />
+                                <TextBlock
+                                    Foreground="#999999"
+                                    Text="{Binding Directory}"
+                                    TextTrimming="CharacterEllipsis"
+                                    ToolTip="{Binding Path}" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-
-
                 </GridView>
             </ListView.View>
         </ListView>
 
-        <!-- 드롭 위치 표시선 -->
-        <Canvas x:Name="DragAdornerCanvas" IsHitTestVisible="False">
-            <Border x:Name="DropIndicator"
-                    HorizontalAlignment="Stretch"
-                    Width="{Binding ActualWidth, ElementName=FileListView}"
-                    Height="1"
-                    CornerRadius="1.5"
-                    Visibility="Collapsed">
+        <!-- FileList : Drag_Drop_Indicator -->
+        <Canvas
+            x:Name="DragAdornerCanvas"
+            IsHitTestVisible="False">
+            <Border
+                x:Name="DropIndicator"
+                Width="{Binding ActualWidth, ElementName=FileListView}"
+                Height="1"
+                CornerRadius="1.5"
+                HorizontalAlignment="Stretch"
+                Visibility="Collapsed">
                 <Border.Effect>
-                    <DropShadowEffect Color="#0078D4" BlurRadius="4" ShadowDepth="0" Opacity="0.6"/>
+                    <DropShadowEffect
+                        BlurRadius="4"
+                        Opacity="0.6"
+                        ShadowDepth="0"
+                        Color="#0078D4" />
                 </Border.Effect>
                 <Border.Background>
-                    <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
-                        <GradientStop Color="#0078D4" Offset="0" />
-                        <GradientStop Color="#0078D4" Offset="0.85" />
-                        <GradientStop Color="Transparent" Offset="1" />
+                    <LinearGradientBrush
+                        StartPoint="0,0.5"
+                        EndPoint="1,0.5">
+                        <GradientStop
+                            Offset="0"
+                            Color="#0078D4" />
+                        <GradientStop
+                            Offset="0.85"
+                            Color="#0078D4" />
+                        <GradientStop
+                            Offset="1"
+                            Color="Transparent" />
                     </LinearGradientBrush>
                 </Border.Background>
             </Border>

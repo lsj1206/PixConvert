@@ -1,12 +1,14 @@
-<Application x:Class="PixConvert.App"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:PixConvert"
-             xmlns:ui="http://schemas.modernwpf.com/2019"
-             xmlns:converters="clr-namespace:PixConvert.Converters">
+<Application
+    x:Class="PixConvert.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="clr-namespace:PixConvert.Converters"
+    xmlns:local="clr-namespace:PixConvert"
+    xmlns:ui="http://schemas.modernwpf.com/2019">
 
     <Application.Resources>
         <ResourceDictionary>
+            <!-- App : Global_Merged_Dictionaries -->
             <ResourceDictionary.MergedDictionaries>
                 <ui:ThemeResources />
                 <ui:XamlControlsResources />
@@ -14,6 +16,8 @@
                 <ResourceDictionary Source="Resources/Icons/help.xaml" />
                 <ResourceDictionary Source="Resources/Languages/Lang.Serilog.xaml" />
             </ResourceDictionary.MergedDictionaries>
+
+            <!-- App : Global_Converters -->
             <converters:AppStatusToVisibilityConverter x:Key="AppStatusToVisibilityConverter" />
             <converters:AppStatusToInverseBooleanConverter x:Key="AppStatusToInverseBooleanConverter" />
             <converters:UpperCaseConverter x:Key="UpperCaseConverter" />

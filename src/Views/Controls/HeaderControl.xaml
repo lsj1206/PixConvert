@@ -7,122 +7,151 @@
              xmlns:local="clr-namespace:PixConvert"
              mc:Ignorable="d">
 
-    <!-- 상단 정보 -->
-    <Border Padding="10,5"
-            BorderThickness="0,0,0,1"
-            Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
-            BorderBrush="{DynamicResource SystemControlBackgroundBaseMediumBrush}">
+    <!-- Header : Main_Container -->
+    <Border
+        Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+        BorderBrush="{DynamicResource SystemControlBackgroundBaseMediumBrush}"
+        BorderThickness="0,0,0,1"
+        Padding="10,5">
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="186"/>   <!-- 좌측: 빈공간 -->
-                <ColumnDefinition Width="240" />  <!-- 중앙: 상태 대시보드 -->
-                <ColumnDefinition Width="*" />    <!-- 중앙: 프로세스 CPU/RAM 사용량 -->
-                <ColumnDefinition Width="Auto" /> <!-- 우측: 버전 정보 -->
+                <ColumnDefinition Width="186" /> <!-- Header : Left_Space -->
+                <ColumnDefinition Width="240" /> <!-- Header : Status_Dashboard -->
+                <ColumnDefinition Width="*" />   <!-- Header : Resource_Dashboard -->
+                <ColumnDefinition Width="Auto" /> <!-- Header : Version_Info -->
             </Grid.ColumnDefinitions>
 
-            <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="12,0">
-                <ComboBox ItemsSource="{Binding Header.AllStatus}"
-                          SelectedItem="{Binding Header.SelectedStatus, Mode=TwoWay}"
-                          Width="130"
-                          FontSize="11" />
+            <!-- Header : Filter_ComboBox -->
+            <StackPanel
+                Grid.Column="0"
+                Margin="12,0"
+                VerticalAlignment="Center">
+                <ComboBox
+                    Width="130"
+                    FontSize="11"
+                    ItemsSource="{Binding Header.AllStatus}"
+                    SelectedItem="{Binding Header.SelectedStatus, Mode=TwoWay}" />
             </StackPanel>
 
-            <!-- 상태 대시보드 -->
-            <StackPanel Grid.Column="1"
-                        Orientation="Horizontal"
-                        VerticalAlignment="Center">
-                <!-- 합계 -->
-                <StackPanel Orientation="Horizontal" Margin="0,0,32,0">
-                    <TextBlock Text="{DynamicResource Status_Total}"
-                               FontSize="13"
-                               Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
-                               VerticalAlignment="Center"
-                               Margin="0,0,8,0"/>
-                    <TextBlock Text="{Binding Header.TotalCount}"
-                               FontSize="13"
-                               FontWeight="SemiBold"
-                               Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}"
-                               VerticalAlignment="Center" />
+            <!-- Header : Status_Dashboard_Group -->
+            <StackPanel
+                Grid.Column="1"
+                VerticalAlignment="Center"
+                Orientation="Horizontal">
+                <!-- Header : Total_Status -->
+                <StackPanel
+                    Margin="0,0,32,0"
+                    Orientation="Horizontal">
+                    <TextBlock
+                        Margin="0,0,8,0"
+                        VerticalAlignment="Center"
+                        FontSize="13"
+                        Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                        Text="{DynamicResource Status_Total}" />
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        FontSize="13"
+                        FontWeight="SemiBold"
+                        Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}"
+                        Text="{Binding Header.TotalCount}" />
                 </StackPanel>
-                <!-- 미지원 -->
+                <!-- Header : Unknown_Status -->
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="{DynamicResource Status_Unknown}"
-                               FontSize="13"
-                               Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
-                               VerticalAlignment="Center"
-                               Margin="0,0,8,0"/>
-                    <TextBlock Text="{Binding Header.UnsupportedCount}"
-                               FontSize="13"
-                               FontWeight="SemiBold"
-                               Foreground="#FF5555"
-                               VerticalAlignment="Center" />
+                    <TextBlock
+                        Margin="0,0,8,0"
+                        VerticalAlignment="Center"
+                        FontSize="13"
+                        Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                        Text="{DynamicResource Status_Unknown}" />
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        FontSize="13"
+                        FontWeight="SemiBold"
+                        Foreground="#FF5555"
+                        Text="{Binding Header.UnsupportedCount}" />
                 </StackPanel>
             </StackPanel>
 
-            <StackPanel Grid.Column="2"
-                        Orientation="Horizontal"
-                        VerticalAlignment="Center">
-                <!-- 리소스 대시보드 (앱 리소스 지표) -->
-                <StackPanel Orientation="Horizontal" Margin="80,0,0,0">
-                    <!-- CPU -->
-                    <StackPanel Orientation="Horizontal" Margin="0,0,32,0">
-                        <ui:FontIcon Margin="0,0,4,0"
-                                     VerticalAlignment="Center"
-                                     FontSize="13"
-                                     Foreground="{DynamicResource SystemControlForegroundAccentBrush}"
-                                     Glyph="&#xE950;"/>
-                        <TextBlock VerticalAlignment="Center"
-                                   Margin="0,0,6,0"
-                                   FontSize="13"
-                                   Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
-                                   Text="CPU" />
-                        <TextBlock VerticalAlignment="Center"
-                                   FontSize="13"
-                                   FontWeight="Bold"
-                                   Text="{Binding Header.CpuUsageText}"/>
+            <!-- Header : Resource_Dashboard_Group -->
+            <StackPanel
+                Grid.Column="2"
+                VerticalAlignment="Center"
+                Orientation="Horizontal">
+                <!-- Header : Resource_Indicators -->
+                <StackPanel
+                    Margin="80,0,0,0"
+                    Orientation="Horizontal">
+                    <!-- Header : Cpu_Usage -->
+                    <StackPanel
+                        Margin="0,0,32,0"
+                        Orientation="Horizontal">
+                        <ui:FontIcon
+                            Margin="0,0,4,0"
+                            VerticalAlignment="Center"
+                            FontSize="13"
+                            Foreground="{DynamicResource SystemControlForegroundAccentBrush}"
+                            Glyph="&#xE950;" />
+                        <TextBlock
+                            Margin="0,0,6,0"
+                            VerticalAlignment="Center"
+                            FontSize="13"
+                            Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                            Text="CPU" />
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            FontSize="13"
+                            FontWeight="Bold"
+                            Text="{Binding Header.CpuUsageText}" />
                     </StackPanel>
 
-                    <!-- RAM -->
+                    <!-- Header : Ram_Usage -->
                     <StackPanel Orientation="Horizontal">
-                        <ui:FontIcon Margin="0,0,4,0"
-                                     VerticalAlignment="Center"
-                                     FontSize="12"
-                                     Foreground="{DynamicResource SystemControlForegroundAccentBrush}"
-                                     Glyph="&#xE964;"/>
-                        <TextBlock VerticalAlignment="Center"
-                                   Margin="0,0,6,0"
-                                   FontSize="13"
-                                   Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
-                                   Text="RAM"/>
-                        <TextBlock VerticalAlignment="Center"
-                                   FontSize="13"
-                                   FontWeight="SemiBold"
-                                   Text="{Binding Header.MemoryUsageText}"/>
+                        <ui:FontIcon
+                            Margin="0,0,4,0"
+                            VerticalAlignment="Center"
+                            FontSize="12"
+                            Foreground="{DynamicResource SystemControlForegroundAccentBrush}"
+                            Glyph="&#xE964;" />
+                        <TextBlock
+                            Margin="0,0,6,0"
+                            VerticalAlignment="Center"
+                            FontSize="13"
+                            Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                            Text="RAM" />
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            FontSize="13"
+                            FontWeight="SemiBold"
+                            Text="{Binding Header.MemoryUsageText}" />
                     </StackPanel>
                 </StackPanel>
             </StackPanel>
 
-            <StackPanel Grid.Column="3"
-                        Orientation="Horizontal"
-                        VerticalAlignment="Center">
+            <!-- Header : Utilities_Group -->
+            <StackPanel
+                Grid.Column="3"
+                VerticalAlignment="Center"
+                Orientation="Horizontal">
+                <!-- Header : Version_Text -->
+                <TextBlock
+                    Margin="0,0,4,0"
+                    VerticalAlignment="Center"
+                    FontSize="14"
+                    FontWeight="Normal"
+                    Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                    Text="{x:Static local:App.Version}" />
 
-                <!-- 버전 정보 -->
-                <TextBlock VerticalAlignment="Center"
-                           Margin="0,0,4,0"
-                           FontSize="14"
-                           FontWeight="Normal"
-                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
-                           Text="{x:Static local:App.Version}"/>
-
-                <!-- 설정 버튼 -->
-                <Button Margin="0"
-                        Padding="0"
-                        BorderThickness="0"
-                        Background="Transparent"
-                        Command="{Binding Header.ShowAppSettingCommand}">
-                    <ui:FontIcon Glyph="&#xE713;"
-                                 FontSize="16"
-                                 Foreground="{DynamicResource SystemControlForegroundAccentBrush}"/>
+                <!-- Header : Settings_Button -->
+                <Button
+                    Margin="0"
+                    Padding="0"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Command="{Binding Header.ShowAppSettingCommand}">
+                    <ui:FontIcon
+                        FontSize="16"
+                        Foreground="{DynamicResource SystemControlForegroundAccentBrush}"
+                        Glyph="&#xE713;" />
                 </Button>
             </StackPanel>
         </Grid>
