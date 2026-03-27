@@ -60,39 +60,38 @@
                                 <DataTemplate>
                                     <StackPanel Orientation="Vertical">
                                         <!-- Sidebar : File_Operations_Group -->
-                                        <StackPanel Orientation="Vertical">
-                                            <Button
-                                                Command="{Binding FileInput.AddFilesCommand}"
-                                                Content="{DynamicResource Btn_AddFile}"
-                                                Style="{StaticResource SidebarButtonStyle}" />
-                                            <Button
-                                                Command="{Binding FileInput.AddFolderCommand}"
-                                                Content="{DynamicResource Btn_AddFolder}"
-                                                Style="{StaticResource SidebarButtonStyle}" />
-
-                                            <Separator Margin="0,0,0,8" />
-
-                                            <!-- Sidebar : Conversion_Group -->
-                                            <Button
-                                                Command="{Binding Conversion.OpenConvertSettingCommand}"
-                                                Content="{DynamicResource Btn_ConvertSetting}"
-                                                Style="{StaticResource SidebarButtonStyle}" />
-                                            <Button
-                                                Command="{Binding Conversion.ConvertFilesCommand}"
-                                                Content="{DynamicResource Btn_Convert}"
-                                                Foreground="{DynamicResource SystemControlForegroundAccentBrush}"
-                                                Style="{StaticResource SidebarButtonStyle}" />
-                                        </StackPanel>
+                                        <Button
+                                            Command="{Binding FileInput.AddFilesCommand}"
+                                            Content="{DynamicResource Btn_AddFile}"
+                                            Style="{StaticResource SidebarButtonStyle}" />
+                                        <Button
+                                            Command="{Binding FileInput.AddFolderCommand}"
+                                            Content="{DynamicResource Btn_AddFolder}"
+                                            Style="{StaticResource SidebarButtonStyle}" />
 
                                         <Separator Margin="0,0,0,8" />
 
-                                        <!-- Sidebar : Sort_Filter_Group -->
-                                        <StackPanel Orientation="Vertical">
-                                            <Button
-                                                Command="{Binding ListManager.EnterListManagerCommand}"
-                                                Content="{DynamicResource Btn_ListManager}"
-                                                Style="{StaticResource SidebarButtonStyle}" />
+                                        <!-- Sidebar : Conversion_Group -->
+                                        <Button
+                                            Command="{Binding Conversion.OpenConvertSettingCommand}"
+                                            Content="{DynamicResource Btn_ConvertSetting}"
+                                            Style="{StaticResource SidebarButtonStyle}" />
+                                        <Button
+                                            Command="{Binding Conversion.ConvertFilesCommand}"
+                                            Content="{DynamicResource Btn_Convert}"
+                                            Foreground="{DynamicResource SystemControlForegroundAccentBrush}"
+                                            Style="{StaticResource SidebarButtonStyle}" />
 
+                                        <Separator Margin="0,0,0,8" />
+
+                                        <!-- Sidebar : ListManager_Group -->
+                                        <Button
+                                            Command="{Binding ListManager.EnterListManagerCommand}"
+                                            Content="{DynamicResource Btn_ListManager}"
+                                            Style="{StaticResource SidebarButtonStyle}" />
+
+                                        <!-- Sidebar : Sorting_Group -->
+                                        <StackPanel Orientation="Vertical">
                                             <TextBlock
                                                 Margin="0,0,0,4"
                                                 VerticalAlignment="Center"
@@ -161,38 +160,45 @@
                                 <Setter Property="ContentTemplate">
                                     <Setter.Value>
                                         <DataTemplate>
-                                            <StackPanel
-                                                Margin="4"
-                                                Orientation="Vertical">
+                                            <StackPanel Orientation="Vertical">
                                                 <!-- Sidebar : Converting_Status -->
+                                                <Button
+                                                    Command="{Binding Conversion.CancelConvertCommand}"
+                                                    Content="{DynamicResource Btn_Cancel}"
+                                                    Foreground="#FF5555"
+                                                    Style="{StaticResource SidebarButtonStyle}" />
+                                                <Button
+                                                    Command="{Binding Conversion.CancelConvertCommand}"
+                                                    Content="{DynamicResource Btn_Cancel}"
+                                                    Foreground="#FF5555"
+                                                    Style="{StaticResource SidebarButtonStyle}" />
+
+                                                <Separator Margin="0,0,0,8" />
+
                                                 <TextBlock
-                                                    Margin="0,0,0,16"
                                                     FontSize="14"
                                                     FontWeight="SemiBold"
                                                     Foreground="{DynamicResource SystemControlForegroundAccentBrush}"
-                                                    Text="{DynamicResource Status_Processing}" />
-
-                                                <TextBlock
-                                                    Margin="0,0,0,8"
-                                                    FontWeight="SemiBold"
-                                                    Text="{Binding Conversion.CurrentFileName}"
-                                                    TextTrimming="CharacterEllipsis"
-                                                    ToolTip="{Binding Conversion.CurrentFileName}" />
-                                                <ProgressBar
-                                                    Height="6"
-                                                    Margin="0,0,0,8"
-                                                    Maximum="100"
-                                                    Minimum="0"
-                                                    Value="{Binding Conversion.ConvertProgressPercent}" />
+                                                    Text="{DynamicResource Converting_Title}" />
 
                                                 <!-- Sidebar : Converting_Details -->
-                                                <Grid Margin="0,0,0,24">
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="*" />
-                                                        <ColumnDefinition Width="Auto" />
-                                                    </Grid.ColumnDefinitions>
+                                                <Grid Margin="0,0,0,8">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="*" />
+                                                        <RowDefinition Height="*" />
+                                                        <RowDefinition Height="Auto" />
+                                                    </Grid.RowDefinitions>
 
-                                                    <TextBlock Grid.Column="0">
+                                                    <ProgressBar Grid.Row="0"
+                                                        Height="6"
+                                                        Margin="0,4,0,0"
+                                                        Maximum="100"
+                                                        Minimum="0"
+                                                        Value="{Binding Conversion.ConvertProgressPercent}" />
+
+                                                    <TextBlock
+                                                        Grid.Row="1"
+                                                        TextAlignment="Right">
                                                         <Run
                                                             FontWeight="SemiBold"
                                                             Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}"
@@ -206,7 +212,8 @@
                                                     </TextBlock>
 
                                                     <TextBlock
-                                                        Grid.Column="1"
+                                                        Grid.Row="2"
+                                                        TextAlignment="Right"
                                                         Foreground="#FF5555">
                                                         <TextBlock.Style>
                                                             <Style TargetType="TextBlock">
@@ -220,18 +227,23 @@
                                                                 </Style.Triggers>
                                                             </Style>
                                                         </TextBlock.Style>
-                                                        <Run Text="{DynamicResource Status_Error}" />
-                                                        <Run Text=" " />
+                                                        <Run Text="{DynamicResource Converting_FailCount}" />
+                                                        <Run Text=":" />
                                                         <Run
                                                             FontWeight="SemiBold"
-                                                            Text="{Binding Conversion.FailCount}" />
+                                                            Text="{Binding Conversion.FailCount}"
+                                                             />
                                                     </TextBlock>
                                                 </Grid>
-                                                <Button
-                                                    Command="{Binding Conversion.CancelConvertCommand}"
-                                                    Content="{DynamicResource Btn_Cancel}"
-                                                    Foreground="#FF5555"
-                                                    Style="{StaticResource SidebarButtonStyle}" />
+
+                                                <Separator Margin="0,0,0,8"/>
+
+                                                <TextBlock
+                                                    Margin="0,0,0,8"
+                                                    FontWeight="SemiBold"
+                                                    Text="{Binding Conversion.CurrentFileName}"
+                                                    TextTrimming="CharacterEllipsis"
+                                                    ToolTip="{Binding Conversion.CurrentFileName}" />
                                             </StackPanel>
                                         </DataTemplate>
                                     </Setter.Value>
@@ -247,14 +259,11 @@
                                             <StackPanel Orientation="Vertical">
                                                 <!-- Sidebar : Back_Button -->
                                                 <Button
-                                                    Margin="0,0,0,8"
                                                     Command="{Binding ListManager.ExitListManagerCommand}"
                                                     Content="{DynamicResource Btn_Back}"
                                                     Style="{StaticResource SidebarButtonStyle}" />
-
                                                 <!-- Sidebar : Clear_All -->
                                                 <Button
-                                                    Margin="0,0,0,12"
                                                     Command="{Binding ListManager.RemoveAllListCommand}"
                                                     Content="{DynamicResource Btn_ListClear}"
                                                     Foreground="#FF5555"
@@ -263,7 +272,6 @@
                                                 <Separator Margin="0,0,0,8" />
 
                                                 <TextBlock
-                                                    Margin="0,0,0,4"
                                                     FontSize="14"
                                                     FontWeight="SemiBold"
                                                     Foreground="{DynamicResource SystemControlForegroundAccentBrush}"

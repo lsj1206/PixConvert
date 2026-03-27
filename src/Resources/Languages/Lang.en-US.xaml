@@ -60,6 +60,10 @@
     <sys:String x:Key="ListManager_Unsupported">Unsupported</sys:String>
     <sys:String x:Key="Btn_ClearSelected">Clear Selected</sys:String>
 
+    <!-- Sidebar : Converting -->
+    <sys:String x:Key="Converting_Title">Converting</sys:String>
+    <sys:String x:Key="Converting_FailCount">Failed</sys:String>
+
     <!-- Convert Setting : Preset -->
     <sys:String x:Key="Setting_PresetList">Select Preset</sys:String>
     <sys:String x:Key="Setting_PresetName">Rename</sys:String>

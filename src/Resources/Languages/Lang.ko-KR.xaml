@@ -60,6 +60,10 @@
     <sys:String x:Key="ListManager_Unsupported">미지원 파일</sys:String>
     <sys:String x:Key="Btn_ClearSelected">선택 제거</sys:String>
 
+    <!-- 사이드바 : 변환 중 -->
+    <sys:String x:Key="Converting_Title">변환 중</sys:String>
+    <sys:String x:Key="Converting_FailCount">실패</sys:String>
+
     <!-- 변환 설정 : 프리셋 -->
     <sys:String x:Key="Setting_PresetList">프리셋 선택</sys:String>
     <sys:String x:Key="Setting_PresetName">이름 변경</sys:String>
