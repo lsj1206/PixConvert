@@ -63,6 +63,8 @@
     <!-- Sidebar : Converting -->
     <sys:String x:Key="Converting_Title">Converting</sys:String>
     <sys:String x:Key="Converting_FailCount">Failed</sys:String>
+    <sys:String x:Key="Converting_Cpu">CPU Usage</sys:String>
+    <sys:String x:Key="Converting_Format">Target Format</sys:String>
 
     <!-- Convert Setting : Preset -->
     <sys:String x:Key="Setting_PresetList">Select Preset</sys:String>
@@ -101,10 +103,11 @@
 
     <!-- Convert Setting : CPU Usage -->
     <sys:String x:Key="Setting_CpuUsage">CPU Workload (Performance)</sys:String>
-    <sys:String x:Key="Setting_Cpu_Max">Max: Use All Core</sys:String>
-    <sys:String x:Key="Setting_Cpu_Optimal">Optimal: 70~80% Usage</sys:String>
-    <sys:String x:Key="Setting_Cpu_Half">Half: 50% Usage</sys:String>
-    <sys:String x:Key="Setting_Cpu_Min">Minimum: 10%</sys:String>
+    <sys:String x:Key="Setting_Cpu_Max">Max: 90%</sys:String>
+    <sys:String x:Key="Setting_Cpu_Optimal">Optimal: 75%</sys:String>
+    <sys:String x:Key="Setting_Cpu_Half">Half: 50%</sys:String>
+    <sys:String x:Key="Setting_Cpu_Low">Low: 25%</sys:String>
+    <sys:String x:Key="Setting_Cpu_Minimum">Minimum: Single Core</sys:String>
 
     <!-- Snackbar -->
     <sys:String x:Key="Msg_AddFile">{0:N0} file(s) added</sys:String>

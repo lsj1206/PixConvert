@@ -307,7 +307,11 @@
                         IsSelected="{Binding CpuUsage, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Half}"
                         Tag="Half" />
                     <ComboBoxItem
-                        Content="{DynamicResource Setting_Cpu_Min}"
+                        Content="{DynamicResource Setting_Cpu_Low}"
+                        IsSelected="{Binding CpuUsage, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Low}"
+                        Tag="Low" />
+                    <ComboBoxItem
+                        Content="{DynamicResource Setting_Cpu_Minimum}"
                         IsSelected="{Binding CpuUsage, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Minimum}"
                         Tag="Minimum" />
                 </ComboBox>

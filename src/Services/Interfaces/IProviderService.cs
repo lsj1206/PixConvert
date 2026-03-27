@@ -10,6 +10,11 @@ namespace PixConvert.Services.Interfaces;
 public interface IProviderService
 {
     /// <summary>
+    /// 엔진의 이름 (예: SkiaSharp, NetVips)을 가져옵니다.
+    /// </summary>
+    string Name { get; }
+
+    /// <summary>
     /// 지정된 설정에 따라 파일을 변환합니다.
     /// </summary>
     /// <param name="file">변환할 파일 정보</param>

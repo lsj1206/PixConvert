@@ -167,19 +167,53 @@
                                                     Content="{DynamicResource Btn_Cancel}"
                                                     Foreground="#FF5555"
                                                     Style="{StaticResource SidebarButtonStyle}" />
-                                                <Button
-                                                    Command="{Binding Conversion.CancelConvertCommand}"
-                                                    Content="{DynamicResource Btn_Cancel}"
-                                                    Foreground="#FF5555"
-                                                    Style="{StaticResource SidebarButtonStyle}" />
 
                                                 <Separator Margin="0,0,0,8" />
 
                                                 <TextBlock
+                                                    Margin="0,0,0,4"
                                                     FontSize="14"
                                                     FontWeight="SemiBold"
                                                     Foreground="{DynamicResource SystemControlForegroundAccentBrush}"
                                                     Text="{DynamicResource Converting_Title}" />
+
+                                                <!-- Sidebar : Job Summary -->
+                                                <Grid Margin="0,0,0,8">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="*" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="Auto" />
+                                                        <RowDefinition Height="Auto" />
+                                                    </Grid.RowDefinitions>
+
+                                                    <TextBlock
+                                                        Grid.Row="0" Grid.Column="0"
+                                                        FontSize="11"
+                                                        Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                                        Text="{DynamicResource Converting_Cpu}" />
+                                                    <TextBlock
+                                                        Grid.Row="0" Grid.Column="1"
+                                                        Margin="8,0,0,0"
+                                                        HorizontalAlignment="Right"
+                                                        FontSize="11"
+                                                        FontWeight="SemiBold"
+                                                        Text="{Binding Conversion.CurrentCpuUsage}" />
+
+                                                    <TextBlock
+                                                        Grid.Row="1" Grid.Column="0"
+                                                        FontSize="11"
+                                                        Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                                        Text="{DynamicResource Converting_Format}" />
+                                                    <TextBlock
+                                                        Grid.Row="1" Grid.Column="1"
+                                                        Margin="8,0,0,0"
+                                                        HorizontalAlignment="Right"
+                                                        FontSize="11"
+                                                        FontWeight="SemiBold"
+                                                        Text="{Binding Conversion.CurrentTargetFormat}" />
+                                                </Grid>
 
                                                 <!-- Sidebar : Converting_Details -->
                                                 <Grid Margin="0,0,0,8">
@@ -238,12 +272,36 @@
 
                                                 <Separator Margin="0,0,0,8"/>
 
-                                                <TextBlock
-                                                    Margin="0,0,0,8"
-                                                    FontWeight="SemiBold"
-                                                    Text="{Binding Conversion.CurrentFileName}"
-                                                    TextTrimming="CharacterEllipsis"
-                                                    ToolTip="{Binding Conversion.CurrentFileName}" />
+                                                <!-- Sidebar : Active_Process_List -->
+                                                <ItemsControl ItemsSource="{Binding Conversion.ActiveProcesses}">
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <Grid Margin="0,0,0,4">
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="*" />
+                                                                    <ColumnDefinition Width="Auto" />
+                                                                </Grid.ColumnDefinitions>
+                                                                <TextBlock
+                                                                    Grid.Column="0"
+                                                                    FontSize="11"
+                                                                    Text="{Binding FileName}"
+                                                                    TextTrimming="CharacterEllipsis"
+                                                                    ToolTip="{Binding FileName}" />
+                                                                <Border
+                                                                    Grid.Column="1"
+                                                                    Margin="4,0,0,0"
+                                                                    Padding="4,1"
+                                                                    Background="{DynamicResource SystemControlBackgroundBaseLowBrush}"
+                                                                    CornerRadius="2">
+                                                                    <TextBlock
+                                                                        FontSize="9"
+                                                                        Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                                                        Text="{Binding EngineName}" />
+                                                                </Border>
+                                                            </Grid>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
                                             </StackPanel>
                                         </DataTemplate>
                                     </Setter.Value>

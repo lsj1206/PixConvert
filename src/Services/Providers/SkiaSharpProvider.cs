@@ -18,6 +18,8 @@ public class SkiaSharpProvider : IProviderService, IDisposable
     private readonly ILanguageService _languageService;
     private readonly ILogger<SkiaSharpProvider> _logger;
 
+    public string Name => "SkiaSharp";
+
     public SkiaSharpProvider(ILanguageService languageService, ILogger<SkiaSharpProvider> logger)
     {
         _languageService = languageService;

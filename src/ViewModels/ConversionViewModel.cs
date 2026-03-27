@@ -5,6 +5,8 @@ using Microsoft.Extensions.Logging;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
+using System.Collections.ObjectModel;
+using System.Windows.Data;
 using PixConvert.Models;
 using PixConvert.Services;
 using PixConvert.Services.Interfaces;
@@ -23,6 +25,20 @@ public partial class ConversionViewModel : ViewModelBase
     private readonly EngineSelector _engineSelector;
     private readonly Func<ConvertSettingViewModel> _convertSettingVmFactory;
     private CancellationTokenSource? _convertCts;
+    private readonly object _processesLock = new();
+
+    /// <summary>현재 활발하게 변환 중인 파일 정보를 담는 모델입니다.</summary>
+    public partial class ActiveProcess : ObservableObject
+    {
+        [ObservableProperty] private string _fileName = string.Empty;
+        [ObservableProperty] private string _engineName = string.Empty;
+    }
+
+    /// <summary>현재 병렬로 처리 중인 파일 목록 (UI 표시용)</summary>
+    public ObservableCollection<ActiveProcess> ActiveProcesses { get; } = new();
+
+    [ObservableProperty] private string _currentCpuUsage = string.Empty;
+    [ObservableProperty] private string _currentTargetFormat = string.Empty;
 
     [ObservableProperty] private int _convertProgressPercent;
     [ObservableProperty] private string _currentFileName = string.Empty;
@@ -53,6 +69,9 @@ public partial class ConversionViewModel : ViewModelBase
         _fileList = fileList;
         _engineSelector = engineSelector;
         _convertSettingVmFactory = convertSettingVmFactory;
+
+        // UI 스레드 외에서도 컬렉션 업데이트가 가능하도록 동기화 활성화
+        BindingOperations.EnableCollectionSynchronization(ActiveProcesses, _processesLock);
 
         OpenConvertSettingCommand = new AsyncRelayCommand(OpenConvertSettingAsync, () => CurrentStatus != AppStatus.Converting);
         ConvertFilesCommand = new AsyncRelayCommand(ConvertFilesAsync, () => CurrentStatus != AppStatus.Converting);
@@ -131,12 +150,13 @@ public partial class ConversionViewModel : ViewModelBase
             var settings = GetCurrentSettings();
             string presetName = _presetService.Config.LastSelectedPresetName ?? string.Empty;
 
-            // CPU 사용량에 따른 병렬도 결정 (Defect 2)
+            int procCount = Environment.ProcessorCount;
             int maxDegree = settings.CpuUsage switch
             {
-                CpuUsageOption.Max     => Environment.ProcessorCount,
-                CpuUsageOption.Optimal => Math.Max(1, Environment.ProcessorCount * 3 / 4),
-                CpuUsageOption.Half    => Math.Max(1, Environment.ProcessorCount / 2),
+                CpuUsageOption.Max     => procCount <= 12 ? Math.Max(1, procCount - 1) : procCount - 2,
+                CpuUsageOption.Optimal => Math.Max(1, procCount * 3 / 4),
+                CpuUsageOption.Half    => Math.Max(1, procCount / 2),
+                CpuUsageOption.Low     => Math.Max(1, procCount / 4),
                 CpuUsageOption.Minimum => 1,
                 _                      => 1
             };
@@ -154,6 +174,18 @@ public partial class ConversionViewModel : ViewModelBase
             // ── 1. 일괄 변환 시작 로그 ───────────────────────────────────
             _logger.LogInformation(GetString("Log_Conversion_BatchStart"), activeFiles.Count);
 
+            // 요약 정보 설정 (Step 1,3 고도화)
+            CurrentCpuUsage = GetString($"Setting_Cpu_{settings.CpuUsage}");
+
+            bool hasStandard = activeFiles.Any(f => !f.IsAnimation);
+            bool hasAnimation = activeFiles.Any(f => f.IsAnimation);
+            if (hasStandard && hasAnimation)
+                CurrentTargetFormat = $"{settings.StandardTargetFormat} / {settings.AnimationTargetFormat}";
+            else if (hasAnimation)
+                CurrentTargetFormat = settings.AnimationTargetFormat;
+            else
+                CurrentTargetFormat = settings.StandardTargetFormat;
+
             long lastUpdateTicks = DateTime.UtcNow.Ticks;
 
             await Parallel.ForEachAsync(activeFiles, parallelOptions, async (item, token) =>
@@ -161,7 +193,20 @@ public partial class ConversionViewModel : ViewModelBase
                 // 개별 파일 처리 시작
                 item.Status = FileConvertStatus.Processing;
                 item.Progress = 0;
-                CurrentFileName = System.IO.Path.GetFileName(item.Path);
+
+                var provider = _engineSelector.GetProvider(item, settings);
+                var activeProcess = new ActiveProcess
+                {
+                    FileName = System.IO.Path.GetFileName(item.Path),
+                    EngineName = provider.Name
+                };
+
+                lock (_processesLock)
+                {
+                    ActiveProcesses.Add(activeProcess);
+                }
+
+                CurrentFileName = activeProcess.FileName;
 
                 // 진행 상황 임시 알림 (너무 잦은 업데이트 방지)
                 long currentTicks = DateTime.UtcNow.Ticks;
@@ -180,7 +225,6 @@ public partial class ConversionViewModel : ViewModelBase
 
                 try
                 {
-                    var provider = _engineSelector.GetProvider(item, settings);
                     await provider.ConvertAsync(item, settings, session, token);
                 }
                 catch (OperationCanceledException)
@@ -205,6 +249,16 @@ public partial class ConversionViewModel : ViewModelBase
                     TotalConvertCount = totalConvertCount;
                     FailCount = currentFailCount;
                     OnPropertyChanged(nameof(HasFailures));
+
+                    // 작업 완료된 항목 제거
+                    var target = ActiveProcesses.FirstOrDefault(p => p.FileName == System.IO.Path.GetFileName(item.Path));
+                    if (target != null)
+                    {
+                        lock (_processesLock)
+                        {
+                            ActiveProcesses.Remove(target);
+                        }
+                    }
 
                     // UI 스레드 부하 방지: 퍼센트가 변경되었거나 최후의 1개일 때만 업데이트 수행
                     if (newPercent != ConvertProgressPercent || currentProcessed == totalConvertCount)
@@ -266,6 +320,12 @@ public partial class ConversionViewModel : ViewModelBase
             TotalConvertCount = 0;
             FailCount = 0;
             CurrentFileName = string.Empty;
+            CurrentCpuUsage = string.Empty;
+            CurrentTargetFormat = string.Empty;
+            lock (_processesLock)
+            {
+                ActiveProcesses.Clear();
+            }
             OnPropertyChanged(nameof(HasFailures));
             _convertCts?.Dispose();
             _convertCts = null;

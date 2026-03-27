@@ -19,6 +19,8 @@ public class NetVipsProvider : IProviderService, IDisposable
     private readonly ILogger<NetVipsProvider> _logger;
     private bool _isDisposed;
 
+    public string Name => "NetVips";
+
     public NetVipsProvider(ILanguageService languageService, ILogger<NetVipsProvider> logger)
     {
         _languageService = languageService;

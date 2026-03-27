@@ -60,7 +60,7 @@ public enum OutputFolderStrategy { NoFolder, CreateFolder }
 public enum BackgroundColorOption { White, Black, Custom }
 
 /// <summary>CPU 점유율 정책</summary>
-public enum CpuUsageOption { Max, Optimal, Half, Minimum }
+public enum CpuUsageOption { Max, Optimal, Half, Low, Minimum }
 
 /// <summary>중복 파일 처리 방침</summary>
 public enum OverwritePolicy { Overwrite, Suffix, Skip }

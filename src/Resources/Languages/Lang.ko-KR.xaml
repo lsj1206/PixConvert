@@ -63,6 +63,8 @@
     <!-- 사이드바 : 변환 중 -->
     <sys:String x:Key="Converting_Title">변환 중</sys:String>
     <sys:String x:Key="Converting_FailCount">실패</sys:String>
+    <sys:String x:Key="Converting_Cpu">CPU 설정</sys:String>
+    <sys:String x:Key="Converting_Format">대상 포맷</sys:String>
 
     <!-- 변환 설정 : 프리셋 -->
     <sys:String x:Key="Setting_PresetList">프리셋 선택</sys:String>
@@ -101,10 +103,11 @@
 
     <!-- 변환 설정 : CPU 사용량 -->
     <sys:String x:Key="Setting_CpuUsage">CPU 작업 부하 (성능 제어)</sys:String>
-    <sys:String x:Key="Setting_Cpu_Max">최대: 모든 코어 사용</sys:String>
-    <sys:String x:Key="Setting_Cpu_Optimal">최적: 70~80%</sys:String>
+    <sys:String x:Key="Setting_Cpu_Max">최대: 90%</sys:String>
+    <sys:String x:Key="Setting_Cpu_Optimal">최적: 75%</sys:String>
     <sys:String x:Key="Setting_Cpu_Half">절반: 50%</sys:String>
-    <sys:String x:Key="Setting_Cpu_Min">최소: 10%</sys:String>
+    <sys:String x:Key="Setting_Cpu_Low">낮음: 25%</sys:String>
+    <sys:String x:Key="Setting_Cpu_Minimum">최소: 싱글 코어</sys:String>
 
     <!-- 스낵바 -->
     <sys:String x:Key="Msg_AddFile">{0:N0}개의 파일을 추가했습니다.</sys:String>
