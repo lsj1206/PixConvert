@@ -54,11 +54,11 @@
 
     <!-- 사이드바 : 목록 관리 -->
     <sys:String x:Key="Btn_Back">나가기</sys:String>
-    <sys:String x:Key="Btn_ListClear">목록 전부 제거</sys:String>
-    <sys:String x:Key="ListManager_Title">목록 관리</sys:String>
+    <sys:String x:Key="Btn_ListClear">목록 청소</sys:String>
+    <sys:String x:Key="ListManager_Title">목록 관리자</sys:String>
     <sys:String x:Key="ListManager_Desc">제거할 포맷을 선택하세요.</sys:String>
     <sys:String x:Key="ListManager_Unsupported">미지원 파일</sys:String>
-    <sys:String x:Key="Btn_RemoveSelected">선택 제거</sys:String>
+    <sys:String x:Key="Btn_ClearSelected">선택 제거</sys:String>
 
     <!-- 변환 설정 : 프리셋 -->
     <sys:String x:Key="Setting_PresetList">프리셋 선택</sys:String>

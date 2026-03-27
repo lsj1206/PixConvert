@@ -28,7 +28,7 @@ public partial class ListManagerViewModel : ViewModelBase
 
     public IRelayCommand EnterListManagerCommand { get; }
     public IRelayCommand ExitListManagerCommand { get; }
-    public IRelayCommand RemoveSelectedCommand { get; }
+    public IRelayCommand ClearSelectedCommand { get; }
     public IAsyncRelayCommand RemoveAllListCommand { get; }
     public IAsyncRelayCommand<System.Collections.IList> DeleteFilesCommand { get; }
 
@@ -46,7 +46,7 @@ public partial class ListManagerViewModel : ViewModelBase
 
         EnterListManagerCommand = new RelayCommand(EnterListManager, () => CurrentStatus == AppStatus.Idle);
         ExitListManagerCommand = new RelayCommand(ExitListManager, () => CurrentStatus == AppStatus.ListManager);
-        RemoveSelectedCommand = new RelayCommand(RemoveSelected, () => CurrentStatus == AppStatus.ListManager);
+        ClearSelectedCommand = new RelayCommand(ClearSelected, () => CurrentStatus == AppStatus.ListManager);
         RemoveAllListCommand = new AsyncRelayCommand(RemoveAllListAsync, () => CurrentStatus == AppStatus.ListManager);
         DeleteFilesCommand = new AsyncRelayCommand<System.Collections.IList>(DeleteFilesAsync, _ => CurrentStatus == AppStatus.Idle || CurrentStatus == AppStatus.ListManager);
     }
@@ -55,7 +55,7 @@ public partial class ListManagerViewModel : ViewModelBase
     {
         EnterListManagerCommand.NotifyCanExecuteChanged();
         ExitListManagerCommand.NotifyCanExecuteChanged();
-        RemoveSelectedCommand.NotifyCanExecuteChanged();
+        ClearSelectedCommand.NotifyCanExecuteChanged();
         RemoveAllListCommand.NotifyCanExecuteChanged();
         DeleteFilesCommand.NotifyCanExecuteChanged();
 
@@ -74,8 +74,7 @@ public partial class ListManagerViewModel : ViewModelBase
         var signatures = _fileList.Items
             .Where(i => i.Status != FileConvertStatus.Unsupported && i.FileSignature != "-")
             .Select(i => i.FileSignature)
-            .Distinct()
-            .OrderBy(s => s);
+            .Distinct();
 
         foreach (var sig in signatures)
             FormatTags.Add(new FormatTagViewModel(sig));
@@ -85,7 +84,7 @@ public partial class ListManagerViewModel : ViewModelBase
 
     private void ExitListManager() => RequestStatus(AppStatus.Idle);
 
-    private void RemoveSelected()
+    private void ClearSelected()
     {
         var extsToRemove = FormatTags
             .Where(t => t.IsSelected)

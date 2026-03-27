@@ -54,11 +54,11 @@
 
     <!-- Sidebar : List Manager -->
     <sys:String x:Key="Btn_Back">Exit</sys:String>
-    <sys:String x:Key="Btn_ListClear">Remove All List</sys:String>
+    <sys:String x:Key="Btn_ListClear">Clear All Items</sys:String>
     <sys:String x:Key="ListManager_Title">List Manager</sys:String>
     <sys:String x:Key="ListManager_Desc">Select Format to remove.</sys:String>
     <sys:String x:Key="ListManager_Unsupported">Unsupported</sys:String>
-    <sys:String x:Key="Btn_RemoveSelected">Remove Selected</sys:String>
+    <sys:String x:Key="Btn_ClearSelected">Clear Selected</sys:String>
 
     <!-- Convert Setting : Preset -->
     <sys:String x:Key="Setting_PresetList">Select Preset</sys:String>
