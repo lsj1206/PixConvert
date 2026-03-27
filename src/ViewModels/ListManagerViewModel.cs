@@ -111,7 +111,7 @@ public partial class ListManagerViewModel : ViewModelBase
 
         bool confirmed = await _dialogService.ShowConfirmationAsync(
             GetString("Dlg_Ask_ClearList"),
-            GetString("Dlg_Title_ClearList"));
+            "Dlg_Title_ClearList");
 
         if (confirmed)
         {
@@ -136,7 +136,7 @@ public partial class ListManagerViewModel : ViewModelBase
             if (ConfirmDeletion)
             {
                 string message = count == 1 ? GetString("Dlg_Ask_DeleteSingle") : string.Format(GetString("Dlg_Ask_DeleteMulti"), count);
-                if (!await _dialogService.ShowConfirmationAsync(message, GetString("Dlg_Title_DeleteConfirm"))) return;
+                if (!await _dialogService.ShowConfirmationAsync(message, "Dlg_Title_DeleteConfirm")) return;
             }
 
             _fileList.RemoveItems(itemsToDelete);

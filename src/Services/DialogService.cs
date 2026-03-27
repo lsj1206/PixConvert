@@ -1,5 +1,6 @@
 using System;
 using System.Windows;
+using System.Windows.Controls;
 using System.Threading.Tasks;
 using ModernWpf.Controls;
 
@@ -21,14 +22,11 @@ public class DialogService : IDialogService
     /// 예/아니오 선택이 필요한 확인 창을 표시합니다.
     /// 경고 메시지가 전달되면 2단(기본+노란색 경고 텍스트)으로 구성하여 렌더링합니다.
     /// </summary>
-    public async Task<bool> ShowConfirmationAsync(string message, string title, string? warningMessage = null)
+    public async Task<bool> ShowConfirmationAsync(string message, string titleKey, string? warningMessage = null)
     {
         // 현재 활성화된 메인 윈도우를 찾아 다이얼로그의 부모로 설정합니다.
         var window = Application.Current.MainWindow;
         if (window == null) return false;
-
-        if (string.IsNullOrEmpty(title))
-            title = _languageService.GetString("Dlg_Confirm");
 
         object dialogContent = message;
 
@@ -58,13 +56,15 @@ public class DialogService : IDialogService
 
         var dialog = new ContentDialog
         {
-            Title = title,
             Content = dialogContent,
-            PrimaryButtonText = _languageService.GetString("Dlg_No"),
-            CloseButtonText = _languageService.GetString("Dlg_Yes"),
             DefaultButton = ContentDialogButton.Close,
             Owner = window
         };
+
+        // 실시간 다국어 반영을 위해 리소스 레퍼런스 설정
+        dialog.SetResourceReference(ContentDialog.TitleProperty, string.IsNullOrEmpty(titleKey) ? "Dlg_Confirm" : titleKey);
+        dialog.SetResourceReference(ContentDialog.PrimaryButtonTextProperty, "Dlg_No");
+        dialog.SetResourceReference(ContentDialog.CloseButtonTextProperty, "Dlg_Yes");
 
         var result = await dialog.ShowAsync();
         return result == ContentDialogResult.None;
@@ -73,20 +73,25 @@ public class DialogService : IDialogService
     /// <summary>
     /// 커스텀 UI 요소를 본문으로 하는 다이얼로그를 표시합니다.
     /// </summary>
-    public async Task<bool> ShowCustomDialogAsync(object content, string title, string? primaryText = null, string? closeText = null)
+    public async Task<bool> ShowCustomDialogAsync(object content, string titleKey, string? primaryKey = null, string? closeKey = null)
     {
         var window = Application.Current.MainWindow;
         if (window == null) return false;
 
         var dialog = new ContentDialog
         {
-            Title = title,
             Content = content,
-            PrimaryButtonText = closeText ?? _languageService.GetString("Dlg_Close"),
-            CloseButtonText = primaryText,
             DefaultButton = ContentDialogButton.Close,
             Owner = window
         };
+
+        // 실시간 다국어 반영을 위해 리소스 레퍼런스 설정
+        dialog.SetResourceReference(ContentDialog.TitleProperty, titleKey);
+        
+        if (!string.IsNullOrEmpty(primaryKey))
+            dialog.SetResourceReference(ContentDialog.PrimaryButtonTextProperty, primaryKey);
+            
+        dialog.SetResourceReference(ContentDialog.CloseButtonTextProperty, closeKey ?? "Dlg_Close");
 
         var contentWidth = GetPreferredContentWidth(content);
         if (contentWidth > 0)

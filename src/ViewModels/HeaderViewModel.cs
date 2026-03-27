@@ -118,8 +118,8 @@ public partial class HeaderViewModel : ViewModelBase
 
         await _dialogService.ShowCustomDialogAsync(
             view,
-            GetString("Dlg_Title_AppSetting"),
+            "Dlg_Title_AppSetting",
             null,
-            GetString("Dlg_Confirm"));
+            "Dlg_Confirm");
     }
 }

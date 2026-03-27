@@ -80,9 +80,9 @@ public partial class ConversionViewModel : ViewModelBase
 
         bool isSaved = await _dialogService.ShowCustomDialogAsync(
             view,
-            GetString("Btn_ConvertSetting"),
-            GetString("Dlg_Confirm"),
-            GetString("Dlg_Cancel"));
+            "Btn_ConvertSetting",
+            "Dlg_Confirm",
+            "Dlg_Cancel");
 
         if (isSaved)
         {
@@ -107,7 +107,7 @@ public partial class ConversionViewModel : ViewModelBase
 
         bool isConfirmed = await _dialogService.ShowConfirmationAsync(
             string.Format(GetString("Dlg_Ask_Convert"), availableCount),
-            GetString("Dlg_Title_Convert"));
+            "Dlg_Title_Convert");
 
         if (!isConfirmed) return;
 
@@ -280,7 +280,7 @@ public partial class ConversionViewModel : ViewModelBase
     {
         bool confirmed = await _dialogService.ShowConfirmationAsync(
             GetString("Dlg_Ask_CancelConvert"),
-            GetString("Dlg_Title_CancelConvert"),
+            "Dlg_Title_CancelConvert",
             GetString("Dlg_Warn_CancelConvert"));
 
         if (!confirmed) return;

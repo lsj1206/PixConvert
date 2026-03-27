@@ -8,18 +8,19 @@ public interface IDialogService
     /// <summary>
     /// 사용자에게 확인(예/아니오) 대화 상자를 표시합니다.
     /// </summary>
-    /// <param name="message">표시할 메시지 내용</param>
-    /// <param name="title">대화 상자 제목</param>
-    Task<bool> ShowConfirmationAsync(string message, string title, string? warningMessage = null);
+    /// <param name="message">표시할 메시지 내용 (이미 번역된 문자열)</param>
+    /// <param name="titleKey">대화 상자 제목 리소스 키</param>
+    /// <param name="warningMessage">경고 메시지 내용 (이미 번역된 문자열)</param>
+    Task<bool> ShowConfirmationAsync(string message, string titleKey, string? warningMessage = null);
 
     /// <summary>
     /// 커스텀 UI 요소를 본문으로 하는 다이얼로그를 표시합니다.
     /// </summary>
     /// <param name="content">다이얼로그 본문에 표시할 요소 (예: UserControl)</param>
-    /// <param name="title">다이얼로그 제목</param>
-    /// <param name="primaryText">주요 작업 버튼 텍스트 (예: 저장)</param>
-    /// <param name="closeText">닫기 버튼 텍스트 (예: 취소)</param>
+    /// <param name="titleKey">다이얼로그 제목 리소스 키</param>
+    /// <param name="primaryKey">주요 작업 버튼 텍스트 리소스 키 (예: Dlg_Confirm)</param>
+    /// <param name="closeKey">닫기 버튼 텍스트 리소스 키 (예: Dlg_Cancel)</param>
     /// <returns>주요 작업 버튼을 눌러 창이 닫혔는지 여부를 반환합니다.</returns>
-    Task<bool> ShowCustomDialogAsync(object content, string title, string? primaryText = null, string? closeText = null);
+    Task<bool> ShowCustomDialogAsync(object content, string titleKey, string? primaryKey = null, string? closeKey = null);
 }
 
