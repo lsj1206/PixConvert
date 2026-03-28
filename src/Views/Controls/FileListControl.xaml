@@ -55,6 +55,7 @@
     <Grid>
         <ListView
             x:Name="FileListView"
+            Padding="0,0,12,16"
             AllowDrop="True"
             Background="Transparent"
             BorderThickness="0"
