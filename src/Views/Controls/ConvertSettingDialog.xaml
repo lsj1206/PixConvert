@@ -265,14 +265,14 @@
                 <StackPanel Margin="0,0,0,16">
                     <RadioButton
                         Margin="0,0,0,8"
-                        Content="{DynamicResource Setting_OutputStrategy_None}"
+                        Content="{DynamicResource Setting_OutputStrategy_NoFolder}"
                         GroupName="OutputStrategyGroup"
                         IsChecked="{Binding FolderStrategy, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=NoFolder}" />
                     <StackPanel Orientation="Horizontal">
                         <RadioButton
                             Margin="0,0,12,0"
                             VerticalAlignment="Center"
-                            Content="{DynamicResource Setting_OutputStrategy_Folder}"
+                            Content="{DynamicResource Setting_OutputStrategy_CreateFolder}"
                             GroupName="OutputStrategyGroup"
                             IsChecked="{Binding FolderStrategy, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=CreateFolder}" />
 

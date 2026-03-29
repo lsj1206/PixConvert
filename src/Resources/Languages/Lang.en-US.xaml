@@ -65,6 +65,12 @@
     <sys:String x:Key="Converting_FailCount">Failed</sys:String>
     <sys:String x:Key="Converting_Cpu">CPU Usage</sys:String>
     <sys:String x:Key="Converting_Format">Target Format</sys:String>
+    <sys:String x:Key="Converting_Quality">Quality</sys:String>
+    <sys:String x:Key="Converting_BgColor">Background Color</sys:String>
+    <sys:String x:Key="Converting_KeepExif">Keep EXIF</sys:String>
+    <sys:String x:Key="Converting_Overwrite">Duplicate Files</sys:String>
+    <sys:String x:Key="Converting_SaveStrategy">Save Strategy</sys:String>
+    <sys:String x:Key="Converting_SaveLocation">Save Location</sys:String>
 
     <!-- Convert Setting : Preset -->
     <sys:String x:Key="Setting_PresetList">Select Preset</sys:String>
@@ -97,8 +103,8 @@
     <sys:String x:Key="Setting_OutputLocation_Same">Same as Original Folder</sys:String>
     <sys:String x:Key="Setting_OutputLocation_Custom">Custom Path</sys:String>
     <sys:String x:Key="Setting_OutputStrategy">File Save Method</sys:String>
-    <sys:String x:Key="Setting_OutputStrategy_None">File Only</sys:String>
-    <sys:String x:Key="Setting_OutputStrategy_Folder">Create Folder</sys:String>
+    <sys:String x:Key="Setting_OutputStrategy_NoFolder">File Only</sys:String>
+    <sys:String x:Key="Setting_OutputStrategy_CreateFolder">Create Folder</sys:String>
     <sys:String x:Key="Btn_Browse">Browse...</sys:String>
 
     <!-- Convert Setting : CPU Usage -->

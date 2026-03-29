@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -39,6 +40,13 @@ public partial class ConversionViewModel : ViewModelBase
 
     [ObservableProperty] private string _currentCpuUsage = string.Empty;
     [ObservableProperty] private string _currentTargetFormat = string.Empty;
+    [ObservableProperty] private string _currentQuality = string.Empty;
+    [ObservableProperty] private string _currentBgColor = string.Empty;
+    [ObservableProperty] private string _currentKeepExif = string.Empty;
+    [ObservableProperty] private string _currentOverwritePolicy = string.Empty;
+    [ObservableProperty] private string _currentSaveStrategy = string.Empty;
+    [ObservableProperty] private string _currentSaveLocation = string.Empty;
+    [ObservableProperty] private string _currentSaveLocationTooltip = string.Empty;
 
     [ObservableProperty] private int _convertProgressPercent;
     [ObservableProperty] private string _currentFileName = string.Empty;
@@ -174,17 +182,8 @@ public partial class ConversionViewModel : ViewModelBase
             // ── 1. 일괄 변환 시작 로그 ───────────────────────────────────
             _logger.LogInformation(GetString("Log_Conversion_BatchStart"), activeFiles.Count);
 
-            // 요약 정보 설정 (Step 1,3 고도화)
-            CurrentCpuUsage = GetString($"Setting_Cpu_{settings.CpuUsage}");
-
-            bool hasStandard = activeFiles.Any(f => !f.IsAnimation);
-            bool hasAnimation = activeFiles.Any(f => f.IsAnimation);
-            if (hasStandard && hasAnimation)
-                CurrentTargetFormat = $"{settings.StandardTargetFormat} / {settings.AnimationTargetFormat}";
-            else if (hasAnimation)
-                CurrentTargetFormat = settings.AnimationTargetFormat;
-            else
-                CurrentTargetFormat = settings.StandardTargetFormat;
+            // 요약 정보 출력
+            UpdateSidebarJobSummary(settings, activeFiles);
 
             long lastUpdateTicks = DateTime.UtcNow.Ticks;
 
@@ -357,5 +356,49 @@ public partial class ConversionViewModel : ViewModelBase
     {
         var preset = _presetService.Config.Presets.FirstOrDefault(p => p.Name == _presetService.Config.LastSelectedPresetName);
         return preset?.Settings ?? new ConvertSettings();
+    }
+
+    /// <summary>
+    /// 사이드바에 표시되는 상태 및 요약 정보(CPU, 포맷, 경로 등)를 갱신합니다.
+    /// </summary>
+    private void UpdateSidebarJobSummary(ConvertSettings settings, System.Collections.Generic.List<FileItem> activeFiles)
+    {
+        CurrentCpuUsage = GetString($"Setting_Cpu_{settings.CpuUsage}");
+
+        bool hasStandard = activeFiles.Any(f => !f.IsAnimation);
+        bool hasAnimation = activeFiles.Any(f => f.IsAnimation);
+        if (hasStandard && hasAnimation)
+            CurrentTargetFormat = $"{settings.StandardTargetFormat} / {settings.AnimationTargetFormat}";
+        else if (hasAnimation)
+            CurrentTargetFormat = settings.AnimationTargetFormat;
+        else
+            CurrentTargetFormat = settings.StandardTargetFormat;
+
+        CurrentQuality = $"{settings.Quality}%";
+        CurrentBgColor = settings.BgColorOption == BackgroundColorOption.Custom
+            ? settings.CustomBackgroundColor
+            : GetString($"Bg_{settings.BgColorOption}");
+        CurrentKeepExif = settings.KeepExif ? GetString("Dlg_Yes") : GetString("Dlg_No");
+        CurrentOverwritePolicy = GetString($"Setting_Overwrite_{settings.OverwriteSide}");
+        CurrentSaveStrategy = settings.FolderStrategy == OutputFolderStrategy.CreateFolder
+            ? settings.OutputSubFolderName
+            : GetString($"Setting_OutputStrategy_{settings.FolderStrategy}");
+
+        if (settings.OutputLocation == OutputLocationType.SameAsOriginal)
+        {
+            string sameText = GetString("Setting_OutputLocation_Same");
+            CurrentSaveLocation = sameText.StartsWith("...") ? sameText : $"...{sameText}";
+            CurrentSaveLocationTooltip = string.Empty;
+        }
+        else
+        {
+            string targetPath = settings.CustomOutputPath.TrimEnd(System.IO.Path.DirectorySeparatorChar, System.IO.Path.AltDirectorySeparatorChar);
+            string folderName = System.IO.Path.GetFileName(targetPath);
+            if (string.IsNullOrEmpty(folderName))
+                folderName = settings.CustomOutputPath;
+
+            CurrentSaveLocation = $"...{folderName}";
+            CurrentSaveLocationTooltip = settings.CustomOutputPath;
+        }
     }
 }

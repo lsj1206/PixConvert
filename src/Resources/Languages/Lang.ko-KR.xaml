@@ -65,6 +65,12 @@
     <sys:String x:Key="Converting_FailCount">실패</sys:String>
     <sys:String x:Key="Converting_Cpu">CPU 설정</sys:String>
     <sys:String x:Key="Converting_Format">대상 포맷</sys:String>
+    <sys:String x:Key="Converting_Quality">품질</sys:String>
+    <sys:String x:Key="Converting_BgColor">배경색</sys:String>
+    <sys:String x:Key="Converting_KeepExif">EXIF 보존</sys:String>
+    <sys:String x:Key="Converting_Overwrite">중복 파일</sys:String>
+    <sys:String x:Key="Converting_SaveStrategy">저장 방식</sys:String>
+    <sys:String x:Key="Converting_SaveLocation">저장 위치</sys:String>
 
     <!-- 변환 설정 : 프리셋 -->
     <sys:String x:Key="Setting_PresetList">프리셋 선택</sys:String>
@@ -97,8 +103,8 @@
     <sys:String x:Key="Setting_OutputLocation_Same">원본 파일과 동일 위치</sys:String>
     <sys:String x:Key="Setting_OutputLocation_Custom">사용자 지정 경로</sys:String>
     <sys:String x:Key="Setting_OutputStrategy">파일 저장 방식</sys:String>
-    <sys:String x:Key="Setting_OutputStrategy_None">파일만 생성</sys:String>
-    <sys:String x:Key="Setting_OutputStrategy_Folder">폴더 생성</sys:String>
+    <sys:String x:Key="Setting_OutputStrategy_NoFolder">파일만 생성</sys:String>
+    <sys:String x:Key="Setting_OutputStrategy_CreateFolder">폴더 생성</sys:String>
     <sys:String x:Key="Btn_Browse">찾기...</sys:String>
 
     <!-- 변환 설정 : CPU 사용량 -->
