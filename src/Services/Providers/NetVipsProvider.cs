@@ -33,7 +33,7 @@ public class NetVipsProvider : IProviderService, IDisposable
 
         // ── 1. 출력 경로 결정 ──────────────────────────────────────────────
         string basePath = OutputPathResolver.Resolve(file, settings);
-        var (outputPath, isCollision) = OutputPathResolver.ApplyOverwritePolicy(basePath, settings.OverwriteSide, session, file.Path);
+        var (outputPath, isCollision) = OutputPathResolver.ApplyOverwritePolicy(basePath, settings.OverwritePolicy, session, file.Path);
 
         if (isCollision && outputPath is not null)
         {
@@ -97,7 +97,7 @@ public class NetVipsProvider : IProviderService, IDisposable
         }
 
         using var image = Image.NewFromFile(file.Path, access: Enums.Access.Sequential, kwargs: loaderOptions);
-        
+
         token.ThrowIfCancellationRequested();
 
         // ── 3. 배경 합성 (알파 미지원 포맷 대응) ──────────────────────────

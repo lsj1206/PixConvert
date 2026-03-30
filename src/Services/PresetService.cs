@@ -189,10 +189,10 @@ public class PresetService : IPresetService
 
         // 5. 열거형(Enum: CPU 사용량 설정, 경로, 배경색, 덮어쓰기 여부) 옵션이 유효한지 확인
         if (!Enum.IsDefined(typeof(CpuUsageOption), settings.CpuUsage) ||
-            !Enum.IsDefined(typeof(OutputLocationType), settings.OutputLocation) ||
-            !Enum.IsDefined(typeof(OutputFolderStrategy), settings.FolderStrategy) ||
+            !Enum.IsDefined(typeof(SaveLocationType), settings.SaveLocation) ||
+            !Enum.IsDefined(typeof(SaveFolderMethod), settings.FolderMethod) ||
             !Enum.IsDefined(typeof(BackgroundColorOption), settings.BgColorOption) ||
-            !Enum.IsDefined(typeof(OverwritePolicy), settings.OverwriteSide))
+            !Enum.IsDefined(typeof(OverwritePolicy), settings.OverwritePolicy))
         {
             _logger.LogError(_languageService.GetString("Log_Preset_InvalidEnum"));
             errorMessageKey = "Msg_Error_ConfigInvalid";
@@ -200,7 +200,7 @@ public class PresetService : IPresetService
         }
 
         // 6. 사용자 지정 출력 경로(Custom) 선택 시 경로가 비어 있는지 확인
-        if (settings.OutputLocation == OutputLocationType.Custom && string.IsNullOrWhiteSpace(settings.CustomOutputPath))
+        if (settings.SaveLocation == SaveLocationType.Custom && string.IsNullOrWhiteSpace(settings.CustomOutputPath))
         {
             _logger.LogError(_languageService.GetString("Log_Preset_EmptyCustomPath"));
             errorMessageKey = "Msg_Error_ConfigInvalid";
@@ -208,7 +208,7 @@ public class PresetService : IPresetService
         }
 
         // 7. 하위 폴더 생성 선택 시 폴더 이름 유효성 검사
-        if (settings.FolderStrategy == OutputFolderStrategy.CreateFolder)
+        if (settings.FolderMethod == SaveFolderMethod.CreateFolder)
         {
             if (string.IsNullOrWhiteSpace(settings.OutputSubFolderName))
             {

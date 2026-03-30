@@ -36,10 +36,10 @@ internal static class OutputPathResolver
         string ext = FormatToExtension.TryGetValue(targetFormat, out var e) ? e : targetFormat.ToLower();
 
         // 1. 기본 위치 결정
-        string baseDir = settings.OutputLocation switch
+        string baseDir = settings.SaveLocation switch
         {
-            OutputLocationType.SameAsOriginal => file.Directory,
-            OutputLocationType.Custom => settings.CustomOutputPath,
+            SaveLocationType.SameAsOriginal => file.Directory,
+            SaveLocationType.Custom => settings.CustomOutputPath,
             _ => file.Directory
         };
 
@@ -49,7 +49,7 @@ internal static class OutputPathResolver
 
         // 2. 폴더 생성 전략 적용
         string outputDir = baseDir;
-        if (settings.FolderStrategy == OutputFolderStrategy.CreateFolder)
+        if (settings.FolderMethod == SaveFolderMethod.CreateFolder)
         {
             // 토큰 치환 없이 설정된 이름을 그대로 사용 (v3 단순화)
             string subFolderName = string.IsNullOrWhiteSpace(settings.OutputSubFolderName)
@@ -70,8 +70,8 @@ internal static class OutputPathResolver
     /// </summary>
     /// <returns>(최종 출력 경로, 동일 세션 내 충돌 여부). Skip 조건이면 Path는 null.</returns>
     public static (string? Path, bool IsCollision) ApplyOverwritePolicy(
-        string basePath, 
-        OverwritePolicy policy, 
+        string basePath,
+        OverwritePolicy policy,
         ConversionSession session,
         string originalPath)
     {

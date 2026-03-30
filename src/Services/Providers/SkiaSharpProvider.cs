@@ -32,7 +32,7 @@ public class SkiaSharpProvider : IProviderService, IDisposable
 
         // ── 1. 출력 경로 결정 ──────────────────────────────────────────────
         string basePath = OutputPathResolver.Resolve(file, settings);
-        var (outputPath, isCollision) = OutputPathResolver.ApplyOverwritePolicy(basePath, settings.OverwriteSide, session, file.Path);
+        var (outputPath, isCollision) = OutputPathResolver.ApplyOverwritePolicy(basePath, settings.OverwritePolicy, session, file.Path);
 
         if (isCollision && outputPath is not null)
         {

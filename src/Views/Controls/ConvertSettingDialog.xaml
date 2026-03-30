@@ -195,7 +195,7 @@
                     Content="{DynamicResource Setting_KeepExif}"
                     IsChecked="{Binding KeepExif}" />
 
-                <!-- ConvertSetting : Overwrite_Group -->
+                <!-- ConvertSetting : OverwritePolicy_Group -->
                 <TextBlock
                     Margin="0,0,0,4"
                     Text="{DynamicResource Setting_OverwritePolicy}" />
@@ -204,29 +204,29 @@
                         Margin="0,0,16,0"
                         Content="{DynamicResource Setting_Overwrite_Suffix}"
                         GroupName="OverwriteGroup"
-                        IsChecked="{Binding OverwriteSide, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Suffix}" />
+                        IsChecked="{Binding OverwritePolicy, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Suffix}" />
                     <RadioButton
                         Margin="0,0,16,0"
                         Content="{DynamicResource Setting_Overwrite_Skip}"
                         GroupName="OverwriteGroup"
-                        IsChecked="{Binding OverwriteSide, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Skip}" />
+                        IsChecked="{Binding OverwritePolicy, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Skip}" />
                     <RadioButton
                         Content="{DynamicResource Setting_Overwrite_Overwrite}"
                         GroupName="OverwriteGroup"
-                        IsChecked="{Binding OverwriteSide, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Overwrite}" />
+                        IsChecked="{Binding OverwritePolicy, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Overwrite}" />
                 </WrapPanel>
 
-                <!-- ConvertSetting : OutputLocation_Group -->
+                <!-- ConvertSetting : SaveLocation_Group -->
                 <TextBlock
                     Margin="0,0,0,8"
                     FontWeight="SemiBold"
-                    Text="{DynamicResource Setting_OutputLocation}" />
+                    Text="{DynamicResource Setting_SaveLocation}" />
                 <StackPanel Margin="0,0,0,16">
                     <RadioButton
                         Margin="0,0,0,8"
-                        Content="{DynamicResource Setting_OutputLocation_Same}"
-                        GroupName="OutputLocationGroup"
-                        IsChecked="{Binding OutputLocation, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=SameAsOriginal}" />
+                        Content="{DynamicResource Setting_SaveLocation_Same}"
+                        GroupName="SaveLocationGroup"
+                        IsChecked="{Binding SaveLocation, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=SameAsOriginal}" />
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
@@ -237,15 +237,15 @@
                         <RadioButton
                             Margin="0,0,8,0"
                             VerticalAlignment="Center"
-                            Content="{DynamicResource Setting_OutputLocation_Custom}"
-                            GroupName="OutputLocationGroup"
-                            IsChecked="{Binding OutputLocation, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Custom}" />
+                            Content="{DynamicResource Setting_SaveLocation_Custom}"
+                            GroupName="SaveLocationGroup"
+                            IsChecked="{Binding SaveLocation, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Custom}" />
                         <TextBox
                             Grid.Column="1"
                             Margin="0,0,8,0"
                             MinWidth="220"
                             VerticalAlignment="Center"
-                            IsEnabled="{Binding OutputLocation, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Custom}"
+                            IsEnabled="{Binding SaveLocation, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Custom}"
                             IsReadOnly="True"
                             Text="{Binding CustomOutputPath, Mode=TwoWay}" />
                         <Button
@@ -253,34 +253,34 @@
                             VerticalAlignment="Center"
                             Command="{Binding ChangeOutputPathCommand}"
                             Content="{DynamicResource Btn_Browse}"
-                            IsEnabled="{Binding OutputLocation, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Custom}" />
+                            IsEnabled="{Binding SaveLocation, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Custom}" />
                     </Grid>
                 </StackPanel>
 
-                <!-- ConvertSetting : Strategy_Group -->
+                <!-- ConvertSetting : SaveMethod_Group -->
                 <TextBlock
                     Margin="0,0,0,8"
                     FontWeight="SemiBold"
-                    Text="{DynamicResource Setting_OutputStrategy}" />
+                    Text="{DynamicResource Setting_SaveMethod}" />
                 <StackPanel Margin="0,0,0,16">
                     <RadioButton
                         Margin="0,0,0,8"
-                        Content="{DynamicResource Setting_OutputStrategy_NoFolder}"
-                        GroupName="OutputStrategyGroup"
-                        IsChecked="{Binding FolderStrategy, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=NoFolder}" />
+                        Content="{DynamicResource Setting_SaveMethod_NoFolder}"
+                        GroupName="SaveMethodGroup"
+                        IsChecked="{Binding FolderMethod, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=NoFolder}" />
                     <StackPanel Orientation="Horizontal">
                         <RadioButton
                             Margin="0,0,12,0"
                             VerticalAlignment="Center"
-                            Content="{DynamicResource Setting_OutputStrategy_CreateFolder}"
-                            GroupName="OutputStrategyGroup"
-                            IsChecked="{Binding FolderStrategy, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=CreateFolder}" />
+                            Content="{DynamicResource Setting_SaveMethod_CreateFolder}"
+                            GroupName="SaveMethodGroup"
+                            IsChecked="{Binding FolderMethod, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=CreateFolder}" />
 
                         <ctrls:FilterTextBox
                             MinWidth="160"
                             Filter="InvalidSpecial"
                             FilterMode="Block"
-                            IsEnabled="{Binding FolderStrategy, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=CreateFolder}"
+                            IsEnabled="{Binding FolderMethod, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=CreateFolder}"
                             Text="{Binding OutputSubFolderName, UpdateSourceTrigger=PropertyChanged}" />
                     </StackPanel>
                 </StackPanel>

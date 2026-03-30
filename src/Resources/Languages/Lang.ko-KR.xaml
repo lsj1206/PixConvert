@@ -63,13 +63,14 @@
     <!-- 사이드바 : 변환 중 -->
     <sys:String x:Key="Converting_Title">변환 중</sys:String>
     <sys:String x:Key="Converting_FailCount">실패</sys:String>
+
     <sys:String x:Key="Converting_Cpu">CPU 설정</sys:String>
     <sys:String x:Key="Converting_Format">대상 포맷</sys:String>
     <sys:String x:Key="Converting_Quality">품질</sys:String>
     <sys:String x:Key="Converting_BgColor">배경색</sys:String>
     <sys:String x:Key="Converting_KeepExif">EXIF 보존</sys:String>
-    <sys:String x:Key="Converting_Overwrite">중복 파일</sys:String>
-    <sys:String x:Key="Converting_SaveStrategy">저장 방식</sys:String>
+    <sys:String x:Key="Converting_Duplicates">중복 파일</sys:String>
+    <sys:String x:Key="Converting_SaveMethod">저장 방식</sys:String>
     <sys:String x:Key="Converting_SaveLocation">저장 위치</sys:String>
 
     <!-- 변환 설정 : 프리셋 -->
@@ -83,8 +84,6 @@
     <!-- 변환 설정 -->
     <sys:String x:Key="Setting_GroupStandard">일반 이미지 변환 포맷</sys:String>
     <sys:String x:Key="Setting_GroupAnimation">애니메이션 이미지 변환 포맷</sys:String>
-    <sys:String x:Key="Setting_OtherOptions">세부 옵션</sys:String>
-    <sys:String x:Key="Setting_TargetFormat">변환 포맷</sys:String>
     <sys:String x:Key="Setting_Quality">품질</sys:String>
     <sys:String x:Key="Setting_BackgroundColor">배경 색상(투명 이미지용)</sys:String>
     <sys:String x:Key="Setting_KeepExif">메타데이터(EXIF) 보존</sys:String>
@@ -94,21 +93,23 @@
     <sys:String x:Key="Bg_Black">검은색</sys:String>
     <sys:String x:Key="Bg_Custom">사용자 지정(HEX)</sys:String>
 
-    <!-- 변환 설정 : 덮어쓰기, 경로 -->
-    <sys:String x:Key="Setting_OverwritePolicy">중복 파일 처리</sys:String>
+    <!-- 변환 설정 : 중복 파일 정책 -->
+    <sys:String x:Key="Setting_OverwritePolicy">중복 파일 정책</sys:String>
     <sys:String x:Key="Setting_Overwrite_Overwrite">덮어쓰기</sys:String>
-    <sys:String x:Key="Setting_Overwrite_Suffix">접미사 추가 (추천)</sys:String>
+    <sys:String x:Key="Setting_Overwrite_Suffix">접미사 추가</sys:String>
     <sys:String x:Key="Setting_Overwrite_Skip">건너뛰기</sys:String>
-    <sys:String x:Key="Setting_OutputLocation">파일 저장 위치</sys:String>
-    <sys:String x:Key="Setting_OutputLocation_Same">원본 파일과 동일 위치</sys:String>
-    <sys:String x:Key="Setting_OutputLocation_Custom">사용자 지정 경로</sys:String>
-    <sys:String x:Key="Setting_OutputStrategy">파일 저장 방식</sys:String>
-    <sys:String x:Key="Setting_OutputStrategy_NoFolder">파일만 생성</sys:String>
-    <sys:String x:Key="Setting_OutputStrategy_CreateFolder">폴더 생성</sys:String>
+    <!-- 변환 설정 : 저장 위치 -->
+    <sys:String x:Key="Setting_SaveLocation">저장 위치</sys:String>
+    <sys:String x:Key="Setting_SaveLocation_Same">원본 위치</sys:String>
+    <sys:String x:Key="Setting_SaveLocation_Custom">사용자 지정</sys:String>
     <sys:String x:Key="Btn_Browse">찾기...</sys:String>
+    <!-- 변환 설정 : 저장 방식 -->
+    <sys:String x:Key="Setting_SaveMethod">저장 방식</sys:String>
+    <sys:String x:Key="Setting_SaveMethod_NoFolder">파일만 저장</sys:String>
+    <sys:String x:Key="Setting_SaveMethod_CreateFolder">폴더에 저장</sys:String>
 
     <!-- 변환 설정 : CPU 사용량 -->
-    <sys:String x:Key="Setting_CpuUsage">CPU 작업 부하 (성능 제어)</sys:String>
+    <sys:String x:Key="Setting_CpuUsage">CPU 사용량</sys:String>
     <sys:String x:Key="Setting_Cpu_Max">최대: 90%</sys:String>
     <sys:String x:Key="Setting_Cpu_Optimal">최적: 75%</sys:String>
     <sys:String x:Key="Setting_Cpu_Half">절반: 50%</sys:String>

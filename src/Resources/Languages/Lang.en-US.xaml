@@ -63,14 +63,15 @@
     <!-- Sidebar : Converting -->
     <sys:String x:Key="Converting_Title">Converting</sys:String>
     <sys:String x:Key="Converting_FailCount">Failed</sys:String>
+
     <sys:String x:Key="Converting_Cpu">CPU Usage</sys:String>
     <sys:String x:Key="Converting_Format">Target Format</sys:String>
     <sys:String x:Key="Converting_Quality">Quality</sys:String>
-    <sys:String x:Key="Converting_BgColor">Background Color</sys:String>
+    <sys:String x:Key="Converting_BgColor">Background</sys:String>
     <sys:String x:Key="Converting_KeepExif">Keep EXIF</sys:String>
-    <sys:String x:Key="Converting_Overwrite">Duplicate Files</sys:String>
-    <sys:String x:Key="Converting_SaveStrategy">Save Strategy</sys:String>
-    <sys:String x:Key="Converting_SaveLocation">Save Location</sys:String>
+    <sys:String x:Key="Converting_Duplicates">Duplicates</sys:String>
+    <sys:String x:Key="Converting_SaveMethod">Save Method</sys:String>
+    <sys:String x:Key="Converting_SaveLocation">Save to...</sys:String>
 
     <!-- Convert Setting : Preset -->
     <sys:String x:Key="Setting_PresetList">Select Preset</sys:String>
@@ -83,32 +84,32 @@
     <!-- Convert Setting -->
     <sys:String x:Key="Setting_GroupStandard">Standard Image Format</sys:String>
     <sys:String x:Key="Setting_GroupAnimation">Animation Image Format</sys:String>
-    <sys:String x:Key="Setting_OtherOptions">Detail</sys:String>
-    <sys:String x:Key="Setting_TargetFormat">Target Format</sys:String>
     <sys:String x:Key="Setting_Quality">Quality</sys:String>
     <sys:String x:Key="Setting_BackgroundColor">Background Color(Transparency)</sys:String>
-    <sys:String x:Key="Setting_KeepExif">Preserve Metadata(EXIF)</sys:String>
+    <sys:String x:Key="Setting_KeepExif">Keep Metadata(EXIF)</sys:String>
 
     <!-- Convert Setting : BgColor -->
     <sys:String x:Key="Bg_White">White</sys:String>
     <sys:String x:Key="Bg_Black">Black</sys:String>
     <sys:String x:Key="Bg_Custom">Custom(HEX)</sys:String>
 
-    <!-- Convert Setting : Overwrite, Path -->
+    <!-- Convert Setting : Duplicate File Policy -->
     <sys:String x:Key="Setting_OverwritePolicy">Duplicate File Policy</sys:String>
-    <sys:String x:Key="Setting_Overwrite_Overwrite">Overwrite</sys:String>
-    <sys:String x:Key="Setting_Overwrite_Suffix">Add Suffix (Rec.)</sys:String>
+    <sys:String x:Key="Setting_Overwrite_Suffix">Add Suffix</sys:String>
     <sys:String x:Key="Setting_Overwrite_Skip">Skip</sys:String>
-    <sys:String x:Key="Setting_OutputLocation">File Save Location</sys:String>
-    <sys:String x:Key="Setting_OutputLocation_Same">Same as Original Folder</sys:String>
-    <sys:String x:Key="Setting_OutputLocation_Custom">Custom Path</sys:String>
-    <sys:String x:Key="Setting_OutputStrategy">File Save Method</sys:String>
-    <sys:String x:Key="Setting_OutputStrategy_NoFolder">File Only</sys:String>
-    <sys:String x:Key="Setting_OutputStrategy_CreateFolder">Create Folder</sys:String>
+    <sys:String x:Key="Setting_Overwrite_Overwrite">Overwrite</sys:String>
+    <!-- Convert Setting : Save Location -->
+    <sys:String x:Key="Setting_SaveLocation">Save Location</sys:String>
+    <sys:String x:Key="Setting_SaveLocation_Same">Same as Original</sys:String>
+    <sys:String x:Key="Setting_SaveLocation_Custom">Custom Path</sys:String>
     <sys:String x:Key="Btn_Browse">Browse...</sys:String>
+    <!-- Convert Setting : Save Method -->
+    <sys:String x:Key="Setting_SaveMethod">Save Method</sys:String>
+    <sys:String x:Key="Setting_SaveMethod_NoFolder">File Only</sys:String>
+    <sys:String x:Key="Setting_SaveMethod_CreateFolder">Create Folder</sys:String>
 
     <!-- Convert Setting : CPU Usage -->
-    <sys:String x:Key="Setting_CpuUsage">CPU Workload (Performance)</sys:String>
+    <sys:String x:Key="Setting_CpuUsage">CPU Usage</sys:String>
     <sys:String x:Key="Setting_Cpu_Max">Max: 90%</sys:String>
     <sys:String x:Key="Setting_Cpu_Optimal">Optimal: 75%</sys:String>
     <sys:String x:Key="Setting_Cpu_Half">Half: 50%</sys:String>

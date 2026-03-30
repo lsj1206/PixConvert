@@ -411,7 +411,7 @@ public class PresetServiceTests
     }
 
     /// <summary>
-    /// 시나리오: OutputLocation이 Custom인데 CustomOutputPath가 비어있는 경우.
+    /// 시나리오: SaveLocation이 Custom인데 CustomOutputPath가 비어있는 경우.
     /// 검증 목표: 유효성 검사가 실패(false)하고 적절한 로그 메시지 키를 사용하는지 확인.
     /// </summary>
     [Fact]
@@ -419,11 +419,11 @@ public class PresetServiceTests
     {
         // Arrange
         _presetService.Config.Presets.Clear();
-        var settings = new ConvertSettings 
-        { 
+        var settings = new ConvertSettings
+        {
             StandardTargetFormat = "JPEG",
             AnimationTargetFormat = "GIF",
-            OutputLocation = OutputLocationType.Custom,
+            SaveLocation = SaveLocationType.Custom,
             CustomOutputPath = "" // 빈 값
         };
         _presetService.Config.Presets.Add(new ConvertPreset { Name = "Test", Settings = settings });
@@ -438,18 +438,18 @@ public class PresetServiceTests
     }
 
     /// <summary>
-    /// 시나리오: FolderStrategy가 CreateFolder인데 OutputSubFolderName이 비어있는 경우.
+    /// 시나리오: FolderMethod가 CreateFolder인데 OutputSubFolderName이 비어있는 경우.
     /// </summary>
     [Fact]
     public void ValidPresetData_WhenSubFolderNameIsEmpty_ShouldReturnFalse()
     {
         // Arrange
         _presetService.Config.Presets.Clear();
-        var settings = new ConvertSettings 
-        { 
+        var settings = new ConvertSettings
+        {
             StandardTargetFormat = "JPEG",
             AnimationTargetFormat = "GIF",
-            FolderStrategy = OutputFolderStrategy.CreateFolder,
+            FolderMethod = SaveFolderMethod.CreateFolder,
             OutputSubFolderName = "" // 빈 값
         };
         _presetService.Config.Presets.Add(new ConvertPreset { Name = "Test", Settings = settings });
@@ -470,11 +470,11 @@ public class PresetServiceTests
     {
         // Arrange
         _presetService.Config.Presets.Clear();
-        var settings = new ConvertSettings 
-        { 
+        var settings = new ConvertSettings
+        {
             StandardTargetFormat = "JPEG",
             AnimationTargetFormat = "GIF",
-            FolderStrategy = OutputFolderStrategy.CreateFolder,
+            FolderMethod = SaveFolderMethod.CreateFolder,
             OutputSubFolderName = "Invalid/Folder?Name" // 슬래시, 물음표 등 포함
         };
         _presetService.Config.Presets.Add(new ConvertPreset { Name = "Test", Settings = settings });

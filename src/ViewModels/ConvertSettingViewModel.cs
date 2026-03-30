@@ -38,9 +38,9 @@ public partial class ConvertSettingViewModel : ViewModelBase
     [ObservableProperty] private BackgroundColorOption _bgColorOption = BackgroundColorOption.White;
     [ObservableProperty] private string _customBackgroundColor = "#FFFFFF";
     [ObservableProperty] private bool _keepExif = false;
-    [ObservableProperty] private OverwritePolicy _overwriteSide = OverwritePolicy.Suffix;
-    [ObservableProperty] private OutputLocationType _outputLocation = OutputLocationType.SameAsOriginal;
-    [ObservableProperty] private OutputFolderStrategy _folderStrategy = OutputFolderStrategy.CreateFolder;
+    [ObservableProperty] private OverwritePolicy _OverwritePolicy = OverwritePolicy.Suffix;
+    [ObservableProperty] private SaveLocationType _SaveLocation = SaveLocationType.SameAsOriginal;
+    [ObservableProperty] private SaveFolderMethod _FolderMethod = SaveFolderMethod.CreateFolder;
     [ObservableProperty] private string _outputSubFolderName = "PixConvert";
     [ObservableProperty] private string _customOutputPath = string.Empty;
     [ObservableProperty] private CpuUsageOption _cpuUsage = CpuUsageOption.Optimal;
@@ -71,8 +71,8 @@ public partial class ConvertSettingViewModel : ViewModelBase
     // Enum 목록 바인딩용
     public BackgroundColorOption[] BgColorOptions { get; } = (BackgroundColorOption[])System.Enum.GetValues(typeof(BackgroundColorOption));
     public OverwritePolicy[] OverwritePolicies { get; } = (OverwritePolicy[])System.Enum.GetValues(typeof(OverwritePolicy));
-    public OutputLocationType[] OutputLocationTypes { get; } = (OutputLocationType[])System.Enum.GetValues(typeof(OutputLocationType));
-    public OutputFolderStrategy[] FolderStrategies { get; } = (OutputFolderStrategy[])System.Enum.GetValues(typeof(OutputFolderStrategy));
+    public SaveLocationType[] SaveLocationTypes { get; } = (SaveLocationType[])System.Enum.GetValues(typeof(SaveLocationType));
+    public SaveFolderMethod[] FolderStrategies { get; } = (SaveFolderMethod[])System.Enum.GetValues(typeof(SaveFolderMethod));
     public CpuUsageOption[] CpuUsageOptions { get; } = (CpuUsageOption[])System.Enum.GetValues(typeof(CpuUsageOption));
 
     // --- 명령 ---
@@ -182,9 +182,9 @@ public partial class ConvertSettingViewModel : ViewModelBase
         BgColorOption = s.BgColorOption;
         CustomBackgroundColor = s.CustomBackgroundColor ?? "#FFFFFF";
         KeepExif = s.KeepExif;
-        OverwriteSide = s.OverwriteSide;
-        OutputLocation = s.OutputLocation;
-        FolderStrategy = s.FolderStrategy;
+        OverwritePolicy = s.OverwritePolicy;
+        SaveLocation = s.SaveLocation;
+        FolderMethod = s.FolderMethod;
         OutputSubFolderName = s.OutputSubFolderName ?? "PixConvert";
         CustomOutputPath = s.CustomOutputPath ?? string.Empty;
         CpuUsage = s.CpuUsage;
@@ -206,9 +206,9 @@ public partial class ConvertSettingViewModel : ViewModelBase
         s.BgColorOption = BgColorOption;
         s.CustomBackgroundColor = CustomBackgroundColor;
         s.KeepExif = KeepExif;
-        s.OverwriteSide = OverwriteSide;
-        s.OutputLocation = OutputLocation;
-        s.FolderStrategy = FolderStrategy;
+        s.OverwritePolicy = OverwritePolicy;
+        s.SaveLocation = SaveLocation;
+        s.FolderMethod = FolderMethod;
         s.OutputSubFolderName = OutputSubFolderName;
         s.CustomOutputPath = CustomOutputPath;
         s.CpuUsage = CpuUsage;

@@ -9,7 +9,7 @@ public class ConvertSettings
     public int Quality { get; set; } = 85;
 
     /// <summary>동일한 이름의 파일이 존재할 경우 처리 방침</summary>
-    public OverwritePolicy OverwriteSide { get; set; } = OverwritePolicy.Suffix;
+    public OverwritePolicy OverwritePolicy { get; set; } = OverwritePolicy.Suffix;
 
     /// <summary>EXIF 메타데이터 보존 여부</summary>
     public bool KeepExif { get; set; } = false;
@@ -35,10 +35,10 @@ public class ConvertSettings
     // --- 출력 및 성능 옵션 (Step 2 상세화) ---
 
     /// <summary>출력 저장 위치 방식</summary>
-    public OutputLocationType OutputLocation { get; set; } = OutputLocationType.SameAsOriginal;
+    public SaveLocationType SaveLocation { get; set; } = SaveLocationType.SameAsOriginal;
 
     /// <summary>하위 폴더 생성 정책</summary>
-    public OutputFolderStrategy FolderStrategy { get; set; } = OutputFolderStrategy.CreateFolder;
+    public SaveFolderMethod FolderMethod { get; set; } = SaveFolderMethod.CreateFolder;
 
     /// <summary>하위 폴더 이름 (필터/토큰 지원)</summary>
     public string OutputSubFolderName { get; set; } = "PixConvert";
@@ -51,10 +51,10 @@ public class ConvertSettings
 }
 
 /// <summary>출력 저장 위치 유형</summary>
-public enum OutputLocationType { SameAsOriginal, Custom }
+public enum SaveLocationType { SameAsOriginal, Custom }
 
 /// <summary>하위 폴더 생성 전략</summary>
-public enum OutputFolderStrategy { NoFolder, CreateFolder }
+public enum SaveFolderMethod { NoFolder, CreateFolder }
 
 /// <summary>배경색 결정 방식</summary>
 public enum BackgroundColorOption { White, Black, Custom }

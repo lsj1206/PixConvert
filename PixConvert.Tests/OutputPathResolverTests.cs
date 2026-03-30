@@ -26,8 +26,8 @@ public class OutputPathResolverTests
         // Arrange
         var settings = new ConvertSettings
         {
-            OutputLocation = OutputLocationType.SameAsOriginal,
-            FolderStrategy = OutputFolderStrategy.NoFolder,
+            SaveLocation = SaveLocationType.SameAsOriginal,
+            FolderMethod = SaveFolderMethod.NoFolder,
             StandardTargetFormat = "JPEG"
         };
 
@@ -44,8 +44,8 @@ public class OutputPathResolverTests
         // Arrange
         var settings = new ConvertSettings
         {
-            OutputLocation = OutputLocationType.SameAsOriginal,
-            FolderStrategy = OutputFolderStrategy.CreateFolder,
+            SaveLocation = SaveLocationType.SameAsOriginal,
+            FolderMethod = SaveFolderMethod.CreateFolder,
             OutputSubFolderName = "Converted",
             StandardTargetFormat = "PNG"
         };
@@ -63,9 +63,9 @@ public class OutputPathResolverTests
         // Arrange
         var settings = new ConvertSettings
         {
-            OutputLocation = OutputLocationType.Custom,
+            SaveLocation = SaveLocationType.Custom,
             CustomOutputPath = @"D:\Output",
-            FolderStrategy = OutputFolderStrategy.NoFolder,
+            FolderMethod = SaveFolderMethod.NoFolder,
             StandardTargetFormat = "WEBP"
         };
 
@@ -82,9 +82,9 @@ public class OutputPathResolverTests
         // Arrange
         var settings = new ConvertSettings
         {
-            OutputLocation = OutputLocationType.Custom,
+            SaveLocation = SaveLocationType.Custom,
             CustomOutputPath = @"D:\Output",
-            FolderStrategy = OutputFolderStrategy.CreateFolder,
+            FolderMethod = SaveFolderMethod.CreateFolder,
             OutputSubFolderName = "MyPix",
             StandardTargetFormat = "AVIF"
         };
@@ -102,9 +102,9 @@ public class OutputPathResolverTests
         // Arrange
         var settings = new ConvertSettings
         {
-            OutputLocation = OutputLocationType.Custom,
+            SaveLocation = SaveLocationType.Custom,
             CustomOutputPath = "", // Empty
-            FolderStrategy = OutputFolderStrategy.NoFolder,
+            FolderMethod = SaveFolderMethod.NoFolder,
             StandardTargetFormat = "JPEG"
         };
 
@@ -121,8 +121,8 @@ public class OutputPathResolverTests
         // Arrange - v3에서는 토큰 치환을 하지 않으므로 {yyyy}가 그대로 나와야 함
         var settings = new ConvertSettings
         {
-            OutputLocation = OutputLocationType.SameAsOriginal,
-            FolderStrategy = OutputFolderStrategy.CreateFolder,
+            SaveLocation = SaveLocationType.SameAsOriginal,
+            FolderMethod = SaveFolderMethod.CreateFolder,
             OutputSubFolderName = "Pix_{yyyy}",
             StandardTargetFormat = "JPEG"
         };

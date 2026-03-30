@@ -75,11 +75,11 @@ public class NetVipsProviderTests : IDisposable
     {
         // Arrange
         var file = new FileItem { Path = _inputPath, FileSignature = "PNG" };
-        var settings = new ConvertSettings 
-        { 
-            StandardTargetFormat = "AVIF", 
-            OutputLocation = OutputLocationType.SameAsOriginal,
-            FolderStrategy = OutputFolderStrategy.NoFolder
+        var settings = new ConvertSettings
+        {
+            StandardTargetFormat = "AVIF",
+            SaveLocation = SaveLocationType.SameAsOriginal,
+            FolderMethod = SaveFolderMethod.NoFolder
         };
 
         // Act
@@ -94,17 +94,17 @@ public class NetVipsProviderTests : IDisposable
     [Fact]
     public async Task ConvertAsync_WhenTargetIsBmp_ShouldAttemptConversion()
     {
-        // [의도] NetVips는 현재 환경에서 BMP 쓰기를 지원하지 않지만, 
-        // 향후 라이브러리 업데이트나 환경 변화로 지원될 가능성을 열어두기 위해 
+        // [의도] NetVips는 현재 환경에서 BMP 쓰기를 지원하지 않지만,
+        // 향후 라이브러리 업데이트나 환경 변화로 지원될 가능성을 열어두기 위해
         // 명시적인 금지 대신 시도는 허용하되 상태(Success/Error) 기반으로 검증합니다.
-        
+
         // Arrange
         var file = new FileItem { Path = _inputPath, FileSignature = "PNG" };
-        var settings = new ConvertSettings 
-        { 
-            StandardTargetFormat = "BMP", 
-            OutputLocation = OutputLocationType.SameAsOriginal,
-            FolderStrategy = OutputFolderStrategy.NoFolder
+        var settings = new ConvertSettings
+        {
+            StandardTargetFormat = "BMP",
+            SaveLocation = SaveLocationType.SameAsOriginal,
+            FolderMethod = SaveFolderMethod.NoFolder
         };
 
         // Act
@@ -130,11 +130,11 @@ public class NetVipsProviderTests : IDisposable
         // Arrange
         string gifPath = CreateAnimatedGif(2); // 2프레임 GIF 생성
         var file = new FileItem { Path = gifPath, FileSignature = "GIF", IsAnimation = true };
-        var settings = new ConvertSettings 
-        { 
-            AnimationTargetFormat = "WEBP", 
-            OutputLocation = OutputLocationType.SameAsOriginal,
-            FolderStrategy = OutputFolderStrategy.NoFolder
+        var settings = new ConvertSettings
+        {
+            AnimationTargetFormat = "WEBP",
+            SaveLocation = SaveLocationType.SameAsOriginal,
+            FolderMethod = SaveFolderMethod.NoFolder
         };
 
         // Act
@@ -157,11 +157,11 @@ public class NetVipsProviderTests : IDisposable
     {
         // Arrange: 투명 배경 PNG 준비 (이미 생성됨: _inputPath)
         var file = new FileItem { Path = _inputPath, FileSignature = "PNG" };
-        var settings = new ConvertSettings 
-        { 
-            StandardTargetFormat = "JPEG", 
-            OutputLocation = OutputLocationType.SameAsOriginal,
-            FolderStrategy = OutputFolderStrategy.NoFolder,
+        var settings = new ConvertSettings
+        {
+            StandardTargetFormat = "JPEG",
+            SaveLocation = SaveLocationType.SameAsOriginal,
+            FolderMethod = SaveFolderMethod.NoFolder,
             BgColorOption = BackgroundColorOption.Black // 검은색으로 합성
         };
 
@@ -187,7 +187,7 @@ public class NetVipsProviderTests : IDisposable
         cts.Cancel(); // 즉시 취소
 
         // Act & Assert
-        await Assert.ThrowsAsync<OperationCanceledException>(async () => 
+        await Assert.ThrowsAsync<OperationCanceledException>(async () =>
             await _provider.ConvertAsync(file, settings, new ConversionSession(), cts.Token));
     }
 
@@ -211,7 +211,7 @@ public class NetVipsProviderTests : IDisposable
     private string CreateAnimatedGif(int framesCount)
     {
         string path = Path.Combine(_testDir, "animated.gif");
-        
+
         var frames = new NetVips.Image[framesCount];
         for (int i = 0; i < framesCount; i++)
         {
@@ -220,7 +220,7 @@ public class NetVipsProviderTests : IDisposable
 
         // Arrayjoin은 프레임들을 수직으로 이어붙임
         using var combined = NetVips.Image.Arrayjoin(frames, across: 1);
-        
+
         // 확장자를 통해 자동으로 gifsave가 호출됨
         combined.WriteToFile(path);
 

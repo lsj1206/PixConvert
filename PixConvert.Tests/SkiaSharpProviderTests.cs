@@ -67,9 +67,9 @@ public class SkiaSharpProviderTests : IDisposable
         var settings = new ConvertSettings
         {
             StandardTargetFormat = format,
-            OutputLocation = OutputLocationType.SameAsOriginal,
-            FolderStrategy = OutputFolderStrategy.NoFolder,
-            OverwriteSide = OverwritePolicy.Overwrite
+            SaveLocation = SaveLocationType.SameAsOriginal,
+            FolderMethod = SaveFolderMethod.NoFolder,
+            OverwritePolicy = OverwritePolicy.Overwrite
         };
 
         // Act
@@ -89,9 +89,9 @@ public class SkiaSharpProviderTests : IDisposable
         var settings = new ConvertSettings
         {
             StandardTargetFormat = "JPEG",
-            OutputLocation = OutputLocationType.SameAsOriginal,
-            FolderStrategy = OutputFolderStrategy.NoFolder,
-            OverwriteSide = OverwritePolicy.Suffix
+            SaveLocation = SaveLocationType.SameAsOriginal,
+            FolderMethod = SaveFolderMethod.NoFolder,
+            OverwritePolicy = OverwritePolicy.Suffix
         };
 
         // 이미 파일이 존재하는 상황 시뮬레이션
@@ -115,9 +115,9 @@ public class SkiaSharpProviderTests : IDisposable
         var settings = new ConvertSettings
         {
             StandardTargetFormat = "JPEG",
-            OutputLocation = OutputLocationType.SameAsOriginal,
-            FolderStrategy = OutputFolderStrategy.NoFolder,
-            OverwriteSide = OverwritePolicy.Skip
+            SaveLocation = SaveLocationType.SameAsOriginal,
+            FolderMethod = SaveFolderMethod.NoFolder,
+            OverwritePolicy = OverwritePolicy.Skip
         };
 
         string basePath = Path.Combine(_testDir, "input.jpg");
@@ -141,8 +141,8 @@ public class SkiaSharpProviderTests : IDisposable
         {
             StandardTargetFormat = "JPEG",
             BgColorOption = BackgroundColorOption.Black, // 검은색 배경 합성
-            OutputLocation = OutputLocationType.SameAsOriginal,
-            FolderStrategy = OutputFolderStrategy.NoFolder
+            SaveLocation = SaveLocationType.SameAsOriginal,
+            FolderMethod = SaveFolderMethod.NoFolder
         };
 
         // Act
@@ -169,8 +169,8 @@ public class SkiaSharpProviderTests : IDisposable
         var settings = new ConvertSettings
         {
             StandardTargetFormat = "WEBP",
-            OutputLocation = OutputLocationType.SameAsOriginal,
-            FolderStrategy = OutputFolderStrategy.NoFolder
+            SaveLocation = SaveLocationType.SameAsOriginal,
+            FolderMethod = SaveFolderMethod.NoFolder
         };
 
         // Act
@@ -227,8 +227,8 @@ public class SkiaSharpProviderTests : IDisposable
             StandardTargetFormat = "JPEG",
             BgColorOption = BackgroundColorOption.Custom,
             CustomBackgroundColor = "#FF00FF", // Magenta
-            OutputLocation = OutputLocationType.SameAsOriginal,
-            FolderStrategy = OutputFolderStrategy.NoFolder
+            SaveLocation = SaveLocationType.SameAsOriginal,
+            FolderMethod = SaveFolderMethod.NoFolder
         };
 
         // Act
@@ -253,10 +253,10 @@ public class SkiaSharpProviderTests : IDisposable
         var settings = new ConvertSettings
         {
             StandardTargetFormat = "JPEG",
-            OutputLocation = OutputLocationType.SameAsOriginal,
-            FolderStrategy = OutputFolderStrategy.CreateFolder,
+            SaveLocation = SaveLocationType.SameAsOriginal,
+            FolderMethod = SaveFolderMethod.CreateFolder,
             OutputSubFolderName = $"PixConvert_{DateTime.Today:yyyy-MM-dd}",
-            OverwriteSide = OverwritePolicy.Overwrite
+            OverwritePolicy = OverwritePolicy.Overwrite
         };
 
         // Act
@@ -283,8 +283,8 @@ public class SkiaSharpProviderTests : IDisposable
             StandardTargetFormat = "BMP",
             BgColorOption = BackgroundColorOption.Custom,
             CustomBackgroundColor = "#0000FF", // 파란색 배경 합성
-            OutputLocation = OutputLocationType.SameAsOriginal,
-            FolderStrategy = OutputFolderStrategy.NoFolder
+            SaveLocation = SaveLocationType.SameAsOriginal,
+            FolderMethod = SaveFolderMethod.NoFolder
         };
 
         // Act

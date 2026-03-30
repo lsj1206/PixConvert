@@ -70,7 +70,7 @@ public partial class ConversionViewModel : ViewModelBase
     [ObservableProperty] private string _currentBgColor = string.Empty;
     [ObservableProperty] private string _currentKeepExif = string.Empty;
     [ObservableProperty] private string _currentOverwritePolicy = string.Empty;
-    [ObservableProperty] private string _currentSaveStrategy = string.Empty;
+    [ObservableProperty] private string _currentSaveMethod = string.Empty;
     [ObservableProperty] private string _currentSaveLocation = string.Empty;
     [ObservableProperty] private string _currentSaveLocationTooltip = string.Empty;
 
@@ -417,14 +417,14 @@ public partial class ConversionViewModel : ViewModelBase
             ? settings.CustomBackgroundColor
             : GetString($"Bg_{settings.BgColorOption}");
         CurrentKeepExif = settings.KeepExif ? GetString("Dlg_Yes") : GetString("Dlg_No");
-        CurrentOverwritePolicy = GetString($"Setting_Overwrite_{settings.OverwriteSide}");
-        CurrentSaveStrategy = settings.FolderStrategy == OutputFolderStrategy.CreateFolder
+        CurrentOverwritePolicy = GetString($"Setting_Overwrite_{settings.OverwritePolicy}");
+        CurrentSaveMethod = settings.FolderMethod == SaveFolderMethod.CreateFolder
             ? settings.OutputSubFolderName
-            : GetString($"Setting_OutputStrategy_{settings.FolderStrategy}");
+            : GetString($"Setting_SaveMethod_{settings.FolderMethod}");
 
-        if (settings.OutputLocation == OutputLocationType.SameAsOriginal)
+        if (settings.SaveLocation == SaveLocationType.SameAsOriginal)
         {
-            string sameText = GetString("Setting_OutputLocation_Same");
+            string sameText = GetString("Setting_SaveLocation_Same");
             CurrentSaveLocation = sameText.StartsWith("...") ? sameText : $"...{sameText}";
             CurrentSaveLocationTooltip = string.Empty;
         }
