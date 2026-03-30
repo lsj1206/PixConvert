@@ -82,6 +82,10 @@ public partial class ConvertSettingViewModel : ViewModelBase
     public IRelayCommand RenamePresetCommand { get; }
     public IRelayCommand ChangeOutputPathCommand { get; }
 
+
+    /// <summary>
+    /// ConvertSettingViewModel의 새 인스턴스를 초기화합니다.
+    /// </summary>
     public ConvertSettingViewModel(
         ILanguageService languageService,
         ILogger<ConvertSettingViewModel> logger,
@@ -226,7 +230,9 @@ public partial class ConvertSettingViewModel : ViewModelBase
     /// </summary>
     private void CopyPreset()
     {
-        if (SelectedPreset == null) return;
+        if (SelectedPreset == null)
+            return;
+
         string newName = $"{SelectedPreset.Name}_Copy";
         _presetService.CopyPreset(SelectedPreset.Name, newName);
         OnPropertyChanged(nameof(Presets));
@@ -238,7 +244,9 @@ public partial class ConvertSettingViewModel : ViewModelBase
     /// </summary>
     private void RemovePreset()
     {
-        if (SelectedPreset == null) return;
+        if (SelectedPreset == null)
+            return;
+
         _presetService.RemovePreset(SelectedPreset.Name);
         OnPropertyChanged(nameof(Presets));
         SelectedPreset = Presets.FirstOrDefault();
@@ -249,7 +257,9 @@ public partial class ConvertSettingViewModel : ViewModelBase
     /// </summary>
     private void RenamePreset()
     {
-        if (SelectedPreset == null || string.IsNullOrWhiteSpace(PresetNameEdit)) return;
+        if (SelectedPreset == null || string.IsNullOrWhiteSpace(PresetNameEdit))
+            return;
+
         string oldName = SelectedPreset.Name;
         _presetService.RenamePreset(oldName, PresetNameEdit);
         OnPropertyChanged(nameof(Presets));
@@ -267,9 +277,7 @@ public partial class ConvertSettingViewModel : ViewModelBase
         };
 
         if (dialog.ShowDialog() == true)
-        {
             CustomOutputPath = dialog.FolderName;
-        }
     }
 }
 

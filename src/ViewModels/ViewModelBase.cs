@@ -18,7 +18,9 @@ public abstract partial class ViewModelBase : ObservableObject, IRecipient<AppSt
     [ObservableProperty]
     private AppStatus _currentStatus = AppStatus.Idle;
 
-
+    /// <summary>
+    /// ViewModelBase의 새 인스턴스를 초기화하며 필요한 서비스와 서브 뷰모델들을 구성합니다.
+    /// </summary>
     protected ViewModelBase(ILanguageService languageService, ILogger logger)
     {
         _languageService = languageService;

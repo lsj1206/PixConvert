@@ -35,6 +35,9 @@ public partial class SortFilterViewModel : ViewModelBase
     /// <summary>특정 컬럼 클릭 시 정렬을 수행하는 명령</summary>
     public IRelayCommand<SortType> SortByColumnCommand { get; }
 
+    /// <summary>
+    /// SortFilterViewModel의 새 인스턴스를 초기화하며 필요한 서비스와 서브 뷰모델들을 구성합니다.
+    /// </summary>
     public SortFilterViewModel(
         ILogger<SortFilterViewModel> logger,
         ILanguageService languageService,
@@ -108,12 +111,10 @@ public partial class SortFilterViewModel : ViewModelBase
     /// </summary>
     private async Task ReorderNumberAsync()
     {
-        if (_fileList.Items.Count == 0) return;
+        if (_fileList.Items.Count == 0)
+            return;
 
-        if (await _dialogService.ShowConfirmationAsync(
-            GetString("Dlg_Ask_ReorderIndex"),
-            "Dlg_Title_ReorderIndex",
-            GetString("Dlg_Warn_ReorderIndex")))
+        if (await _dialogService.ShowConfirmationAsync(GetString("Dlg_Ask_ReorderIndex"), "Dlg_Title_ReorderIndex", GetString("Dlg_Warn_ReorderIndex")))
         {
             RequestStatus(AppStatus.Processing);
             try

@@ -10,6 +10,9 @@ namespace PixConvert.ViewModels;
 /// </summary>
 public partial class SnackbarViewModel : ViewModelBase
 {
+    /// <summary>
+    /// SnackbarViewModel의 새 인스턴스를 초기화하며 필요한 서비스와 서브 뷰모델들을 구성합니다.
+    /// </summary>
     public SnackbarViewModel(ILanguageService languageService, ILogger<SnackbarViewModel> logger)
         : base(languageService, logger)
     {

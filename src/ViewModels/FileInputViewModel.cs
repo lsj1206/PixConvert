@@ -27,6 +27,9 @@ public partial class FileInputViewModel : ViewModelBase
     /// <summary>폴더를 선택하여 내부의 파일들을 목록에 추가하는 명령</summary>
     public IAsyncRelayCommand AddFolderCommand { get; }
 
+    /// <summary>
+    /// FileInputViewModel의 새 인스턴스를 초기화합니다.
+    /// </summary>
     public FileInputViewModel(
         ILogger<FileInputViewModel> logger,
         ILanguageService languageService,
@@ -98,29 +101,18 @@ public partial class FileInputViewModel : ViewModelBase
 
             // 진행률 보고 대리자 구성
             var progress = new Progress<FileProcessingProgress>(p =>
-            {
-                _snackbarService.UpdateProgress(string.Format(GetString("Msg_LoadingFileProgress"), p.CurrentIndex, p.TotalCount));
-            });
+                _snackbarService.UpdateProgress(string.Format(GetString("Msg_LoadingFileProgress"), p.CurrentIndex, p.TotalCount)));
 
             // 1. 서비스 엔진을 통해 파일 스캔 및 객체 생성
-            var result = await _fileAnalyzerService.ProcessPathsAsync(
-                paths,
-                10000,
-                _fileList.Items.Count,
-                _fileList.PathSet,
-                progress);
+            var result = await _fileAnalyzerService.ProcessPathsAsync(paths, 10000, _fileList.Items.Count, _fileList.PathSet, progress);
 
             // 2. 추가 가능한 파일이 없는 경우 결과 처리
             if (result.SuccessCount == 0 && (result.IgnoredCount > 0 || result.DuplicateCount > 0))
             {
                 if (result.IgnoredCount > 0)
-                {
                     _snackbarService.Show(GetString("Msg_LimitReached"), SnackbarType.Error);
-                }
                 else
-                {
                     _snackbarService.Show(GetString("Msg_NoNewFiles"), SnackbarType.Error);
-                }
                 return;
             }
 
@@ -130,17 +122,11 @@ public partial class FileInputViewModel : ViewModelBase
                 AddFilesToList(result.NewItems);
 
                 if (result.IgnoredCount > 0)
-                {
                     _snackbarService.Show(string.Format(GetString("Msg_AddWithLimit"), result.SuccessCount, result.IgnoredCount), SnackbarType.Warning);
-                }
                 else if (result.DuplicateCount > 0)
-                {
                     _snackbarService.Show(string.Format(GetString("Msg_AddWithDuplicate"), result.SuccessCount, result.DuplicateCount), SnackbarType.Warning);
-                }
                 else
-                {
                     _snackbarService.Show(string.Format(GetString("Msg_AddFile"), result.SuccessCount), SnackbarType.Success);
-                }
             }
         }
         catch (Exception ex)

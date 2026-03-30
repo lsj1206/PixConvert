@@ -39,6 +39,9 @@ public partial class AppSettingViewModel : ViewModelBase
         }
     }
 
+    /// <summary>
+    /// AppSettingViewModel의 새 인스턴스를 초기화합니다.
+    /// </summary>
     public AppSettingViewModel(
         ILanguageService languageService,
         ILogger<AppSettingViewModel> logger,
@@ -52,11 +55,12 @@ public partial class AppSettingViewModel : ViewModelBase
         SelectedLanguage = Languages.FirstOrDefault(l => l.Code == currentLang) ?? Languages[0];
     }
 
+    /// <summary>
+    /// 선택된 언어가 변경되었을 때 호출되는 메서드
+    /// </summary>
     partial void OnSelectedLanguageChanged(LanguageOption value)
     {
         if (value != null && _languageService.GetCurrentLanguage() != value.Code)
-        {
             _languageService.ChangeLanguage(value.Code);
-        }
     }
 }

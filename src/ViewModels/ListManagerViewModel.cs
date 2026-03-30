@@ -32,6 +32,9 @@ public partial class ListManagerViewModel : ViewModelBase
     public IAsyncRelayCommand RemoveAllListCommand { get; }
     public IAsyncRelayCommand<System.Collections.IList> DeleteFilesCommand { get; }
 
+    /// <summary>
+    /// ListManagerViewModel의 새 인스턴스를 초기화합니다.
+    /// </summary>
     public ListManagerViewModel(
         ILogger<ListManagerViewModel> logger,
         ILanguageService languageService,
@@ -51,6 +54,9 @@ public partial class ListManagerViewModel : ViewModelBase
         DeleteFilesCommand = new AsyncRelayCommand<System.Collections.IList>(DeleteFilesAsync, _ => CurrentStatus == AppStatus.Idle || CurrentStatus == AppStatus.ListManager);
     }
 
+    /// <summary>
+    /// 상태가 변경되었을 때 호출되는 메서드
+    /// </summary>
     protected override void OnStatusChanged(AppStatus newStatus)
     {
         EnterListManagerCommand.NotifyCanExecuteChanged();
@@ -66,6 +72,9 @@ public partial class ListManagerViewModel : ViewModelBase
         }
     }
 
+    /// <summary>
+    /// 목록 관리 모드로 진입합니다.
+    /// </summary>
     private void EnterListManager()
     {
         FormatTags.Clear();
@@ -82,8 +91,14 @@ public partial class ListManagerViewModel : ViewModelBase
         RequestStatus(AppStatus.ListManager);
     }
 
+    /// <summary>
+    /// 목록 관리 모드를 종료합니다.
+    /// </summary>
     private void ExitListManager() => RequestStatus(AppStatus.Idle);
 
+    /// <summary>
+    /// 선택된 파일들을 목록에서 제거합니다.
+    /// </summary>
     private void ClearSelected()
     {
         var extsToRemove = FormatTags
@@ -105,6 +120,9 @@ public partial class ListManagerViewModel : ViewModelBase
         EnterListManager(); // 목록 갱신 후 태그 재초기화
     }
 
+    /// <summary>
+    /// 모든 파일들을 목록에서 제거합니다.
+    /// </summary>
     private async Task RemoveAllListAsync()
     {
         if (_fileList.Items.Count == 0) return;
@@ -122,6 +140,9 @@ public partial class ListManagerViewModel : ViewModelBase
         }
     }
 
+    /// <summary>
+    /// 선택된 태그와 일치하는 포맷 파일들을 목록에서 제거합니다.
+    /// </summary>
     private async Task DeleteFilesAsync(System.Collections.IList? items)
     {
         if (items == null || items.Count == 0) return;

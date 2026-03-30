@@ -37,8 +37,11 @@ public class FileListViewModel : ViewModelBase
     /// <summary>다음에 추가될 아이템의 기본 순번</summary>
     private int _nextAddIndex = 1;
 
+    /// <summary>
+    /// FileListViewModel의 새 인스턴스를 초기화합니다.
+    /// </summary>
     public FileListViewModel(ILanguageService languageService, ILogger<FileListViewModel> logger)
-        : base(languageService, logger)
+    : base(languageService, logger)
     {
         Items = new ReadOnlyObservableCollection<FileItem>(_items);
 

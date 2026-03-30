@@ -22,9 +22,27 @@ public partial class HeaderViewModel : ViewModelBase
     private readonly Func<AppSettingViewModel> _settingsFactory;
     private readonly DispatcherTimer _resourceTimer;
 
+    /// <summary>목록의 전체 파일 수 (FileList 위임)</summary>
+    public int TotalCount => _fileList.TotalCount;
+
+    /// <summary>미지원(시그니처 미판별) 파일 수 (FileList 위임)</summary>
+    public int UnsupportedCount => _fileList.UnsupportedCount;
+
+    // --- 시스템 리소스 모니터링 ---
+    [ObservableProperty] private string _cpuUsageText = "0%";
+    [ObservableProperty] private string _memoryUsageText = "0 MB";
     // CPU 계산용 필드
     private DateTime _lastCpuCheckTime = DateTime.UtcNow;
     private TimeSpan _lastTotalProcessorTime = TimeSpan.Zero;
+
+    // --- 테스트용 상태 제어 ---
+    public AppStatus[] AllStatus => Enum.GetValues<AppStatus>();
+
+    public AppStatus SelectedStatus
+    {
+        get => CurrentStatus;
+        set => RequestStatus(value);
+    }
 
     /// <summary>
     /// HeaderViewModel의 새 인스턴스를 초기화하며 필요한 서비스를 주입받고 초기 상태를 설정합니다.
@@ -60,25 +78,6 @@ public partial class HeaderViewModel : ViewModelBase
         _resourceTimer.Start();
     }
 
-    /// <summary>목록의 전체 파일 수 (FileList 위임)</summary>
-    public int TotalCount => _fileList.TotalCount;
-
-    /// <summary>미지원(시그니처 미판별) 파일 수 (FileList 위임)</summary>
-    public int UnsupportedCount => _fileList.UnsupportedCount;
-
-    // --- 시스템 리소스 모니터링 ---
-    [ObservableProperty] private string _cpuUsageText = "0%";
-    [ObservableProperty] private string _memoryUsageText = "0 MB";
-
-    // --- 테스트용 상태 제어 ---
-    public AppStatus[] AllStatus => Enum.GetValues<AppStatus>();
-
-    public AppStatus SelectedStatus
-    {
-        get => CurrentStatus;
-        set => RequestStatus(value);
-    }
-
     private void UpdateResourceUsage()
     {
         try
@@ -90,7 +89,7 @@ public partial class HeaderViewModel : ViewModelBase
             var currentCpuTime = process.TotalProcessorTime;
             var elapsedMs = (currentTime - _lastCpuCheckTime).TotalMilliseconds;
 
-            if (elapsedMs > 500) // 최소 0.5초 간격 유지
+            if (elapsedMs > 1000) // 최소 1초 간격 유지
             {
                 var cpuDeltaMs = (currentCpuTime - _lastTotalProcessorTime).TotalMilliseconds;
                 double cpuUsage = (cpuDeltaMs / elapsedMs / Environment.ProcessorCount) * 100;
