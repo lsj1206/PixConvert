@@ -131,27 +131,18 @@
                 <ComboBox
                     Width="200"
                     HorizontalAlignment="Left"
-                    SelectedItem="{Binding CpuUsage}">
+                    SelectedValuePath="Tag"
+                    SelectedValue="{Binding CpuUsage}">
                     <ComboBoxItem
-                        Content="{DynamicResource Setting_Cpu_Max}"
-                        IsSelected="{Binding CpuUsage, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Max}"
-                        Tag="Max" />
+                        Content="{DynamicResource Setting_Cpu_Max}" Tag="Max" />
                     <ComboBoxItem
-                        Content="{DynamicResource Setting_Cpu_Optimal}"
-                        IsSelected="{Binding CpuUsage, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Optimal}"
-                        Tag="Optimal" />
+                        Content="{DynamicResource Setting_Cpu_Optimal}" Tag="Optimal" />
                     <ComboBoxItem
-                        Content="{DynamicResource Setting_Cpu_Half}"
-                        IsSelected="{Binding CpuUsage, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Half}"
-                        Tag="Half" />
+                        Content="{DynamicResource Setting_Cpu_Half}" Tag="Half" />
                     <ComboBoxItem
-                        Content="{DynamicResource Setting_Cpu_Low}"
-                        IsSelected="{Binding CpuUsage, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Low}"
-                        Tag="Low" />
+                        Content="{DynamicResource Setting_Cpu_Low}" Tag="Low" />
                     <ComboBoxItem
-                        Content="{DynamicResource Setting_Cpu_Minimum}"
-                        IsSelected="{Binding CpuUsage, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Minimum}"
-                        Tag="Minimum" />
+                        Content="{DynamicResource Setting_Cpu_Minimum}" Tag="Minimum" />
                 </ComboBox>
             </StackPanel>
 
