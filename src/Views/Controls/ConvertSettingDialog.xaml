@@ -27,12 +27,10 @@
         <StackPanel
             Margin="14,14,14,14"
             Orientation="Vertical">
-
             <!-- ConvertSetting : Preset_Group -->
             <StackPanel
                 Margin="0,0,0,6"
                 Orientation="Horizontal">
-                <!-- ConvertSetting : Preset_List -->
                 <ComboBox
                     Margin="0,0,8,0"
                     Width="220"
@@ -40,23 +38,19 @@
                     DisplayMemberPath="Name"
                     ItemsSource="{Binding Presets}"
                     SelectedItem="{Binding SelectedPreset}" />
-
-                <!-- ConvertSetting : Preset_NameEdit -->
                 <ctrls:FilterTextBox
                     Width="200"
                     Margin="0,0,4,0"
                     ui:ControlHelper.Header="{DynamicResource Setting_PresetName}"
                     Filter="None"
                     Text="{Binding PresetNameEdit, UpdateSourceTrigger=PropertyChanged}" />
-
-                <!-- ConvertSetting : Preset_Apply -->
                 <Button
                     Width="60"
                     VerticalAlignment="Bottom"
                     Command="{Binding RenamePresetCommand}"
                     Content="{DynamicResource Btn_PresetApply}" />
             </StackPanel>
-
+            <!-- ConvertSetting : Preset_Buttons -->
             <StackPanel
                 Margin="0,0,0,8"
                 Orientation="Horizontal">
@@ -124,7 +118,7 @@
 
             <Separator Margin="0,0,0,8" />
 
-            <!-- ConvertSetting : Cpu_Group -->
+            <!-- ConvertSetting : CpuUsage_Group -->
             <StackPanel
                 Margin="0,8,0,8"
                 Orientation="Horizontal">
@@ -200,7 +194,7 @@
                     IsChecked="{Binding KeepExif}" />
             </StackPanel>
 
-            <!-- ConvertSetting : Color_Group (BackgroundColor) -->
+            <!-- ConvertSetting : BackgroundColor_Group -->
             <StackPanel Margin="0,8,0,8">
                 <TextBlock
                     Margin="0,0,0,4"
@@ -281,7 +275,7 @@
                             GroupName="SaveMethodGroup"
                             IsChecked="{Binding FolderMethod, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=CreateFolder}" />
                         <ctrls:FilterTextBox
-                            Width="120"
+                            Width="160"
                             Filter="InvalidSpecial"
                             FilterMode="Block"
                             IsEnabled="{Binding FolderMethod, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=CreateFolder}"
