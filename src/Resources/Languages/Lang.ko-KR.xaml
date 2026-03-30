@@ -91,7 +91,7 @@
     <!-- 변환 설정 : 배경색 -->
     <sys:String x:Key="Bg_White">흰색</sys:String>
     <sys:String x:Key="Bg_Black">검은색</sys:String>
-    <sys:String x:Key="Bg_Custom">사용자 지정(HEX)</sys:String>
+    <sys:String x:Key="Bg_Custom">#FFFFFF (HEX)</sys:String>
 
     <!-- 변환 설정 : 중복 파일 정책 -->
     <sys:String x:Key="Setting_OverwritePolicy">중복 파일 정책</sys:String>

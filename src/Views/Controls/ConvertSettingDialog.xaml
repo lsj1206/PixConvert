@@ -169,15 +169,14 @@
                         Minimum="1"
                         Value="{Binding Quality}" />
                     <ctrls:FilterTextBox
-                        Width="30"
                         VerticalAlignment="Center"
+                        IsBlank="90"
                         Filter="Digits"
                         FilterMode="Allow"
                         FilterMaxLength="3"
-                        IsBlank="90"
                         Text="{Binding Quality, UpdateSourceTrigger=PropertyChanged}"
-                        TextAlignment="Right"
-                        ui:TextBoxHelper.IsDeleteButtonVisible="False" />
+                        ui:TextBoxHelper.IsDeleteButtonVisible="False"
+                        ui:ControlHelper.PlaceholderText="90" />
                 </StackPanel>
             </StackPanel>
 
@@ -226,7 +225,8 @@
                             Filter="HexColor"
                             FilterMode="Allow"
                             IsEnabled="{Binding BgColorOption, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Custom}"
-                            Text="{Binding CustomBackgroundColor, UpdateSourceTrigger=PropertyChanged}" />
+                            Text="{Binding CustomBackgroundColor, UpdateSourceTrigger=PropertyChanged}"
+                            ui:ControlHelper.PlaceholderText="{DynamicResource Bg_Custom}"/>
                     </StackPanel>
                 </StackPanel>
             </StackPanel>
@@ -270,9 +270,7 @@
                         IsChecked="{Binding FolderMethod, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=NoFolder}" />
                     <StackPanel Orientation="Horizontal">
                         <RadioButton
-                            Margin="0,0,6,0"
-                            MinWidth="114"
-                            Content="{DynamicResource Setting_SaveMethod_CreateFolder}"
+                            MinWidth="32"
                             GroupName="SaveMethodGroup"
                             IsChecked="{Binding FolderMethod, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=CreateFolder}" />
                         <ctrls:FilterTextBox
@@ -280,7 +278,8 @@
                             Filter="InvalidSpecial"
                             FilterMode="Block"
                             IsEnabled="{Binding FolderMethod, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=CreateFolder}"
-                            Text="{Binding OutputSubFolderName, UpdateSourceTrigger=PropertyChanged}"/>
+                            Text="{Binding OutputSubFolderName, UpdateSourceTrigger=PropertyChanged}"
+                            ui:ControlHelper.PlaceholderText="{DynamicResource Setting_SaveMethod_CreateFolder}"/>
                     </StackPanel>
                 </StackPanel>
             </StackPanel>
