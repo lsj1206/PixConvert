@@ -6,8 +6,8 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="http://schemas.modernwpf.com/2019"
-    Width="600"
-    MinWidth="600"
+    Width="540"
+    MinWidth="540"
     mc:Ignorable="d">
 
     <UserControl.Resources>
@@ -21,277 +21,121 @@
         </Style>
     </UserControl.Resources>
 
-    <Grid>
-        <ScrollViewer
-            MaxHeight="600"
-            HorizontalScrollBarVisibility="Disabled"
-            VerticalScrollBarVisibility="Auto">
+    <ScrollViewer
+        HorizontalScrollBarVisibility="Disabled"
+        VerticalScrollBarVisibility="Auto">
+        <StackPanel
+            Margin="14,14,14,14"
+            Orientation="Vertical">
+
+            <!-- ConvertSetting : Preset_Group -->
             <StackPanel
-                Margin="25,14,25,14"
-                Orientation="Vertical">
+                Margin="0,0,0,6"
+                Orientation="Horizontal">
+                <!-- ConvertSetting : Preset_List -->
+                <ComboBox
+                    Margin="0,0,8,0"
+                    Width="220"
+                    ui:ControlHelper.Header="{DynamicResource Setting_PresetList}"
+                    DisplayMemberPath="Name"
+                    ItemsSource="{Binding Presets}"
+                    SelectedItem="{Binding SelectedPreset}" />
 
-                <!-- ConvertSetting : Preset_Group -->
-                <Grid Margin="0,0,0,8">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*" />
-                        <ColumnDefinition Width="2.6*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
+                <!-- ConvertSetting : Preset_NameEdit -->
+                <ctrls:FilterTextBox
+                    Width="200"
+                    Margin="0,0,4,0"
+                    ui:ControlHelper.Header="{DynamicResource Setting_PresetName}"
+                    Filter="None"
+                    Text="{Binding PresetNameEdit, UpdateSourceTrigger=PropertyChanged}" />
 
-                    <!-- ConvertSetting : Preset_List -->
-                    <ComboBox
-                        Margin="0,0,8,0"
-                        HorizontalAlignment="Stretch"
-                        ui:ControlHelper.Header="{DynamicResource Setting_PresetList}"
-                        DisplayMemberPath="Name"
-                        ItemsSource="{Binding Presets}"
-                        SelectedItem="{Binding SelectedPreset}" />
+                <!-- ConvertSetting : Preset_Apply -->
+                <Button
+                    Width="60"
+                    VerticalAlignment="Bottom"
+                    Command="{Binding RenamePresetCommand}"
+                    Content="{DynamicResource Btn_PresetApply}" />
+            </StackPanel>
 
-                    <!-- ConvertSetting : Preset_NameEdit -->
-                    <ctrls:FilterTextBox
-                        Grid.Column="1"
-                        Margin="0,0,8,0"
-                        ui:ControlHelper.Header="{DynamicResource Setting_PresetName}"
-                        Filter="None"
-                        Text="{Binding PresetNameEdit, UpdateSourceTrigger=PropertyChanged}" />
+            <StackPanel
+                Margin="0,0,0,8"
+                Orientation="Horizontal">
+                <Button
+                    Margin="0,0,8,0"
+                    Command="{Binding CreatePresetCommand}"
+                    Content="{DynamicResource Btn_PresetCreate}" />
+                <Button
+                    Margin="0,0,8,0"
+                    Command="{Binding CopyPresetCommand}"
+                    Content="{DynamicResource Btn_PresetCopy}" />
+                <Button
+                    Command="{Binding RemovePresetCommand}"
+                    Content="{DynamicResource Btn_PresetDelete}"
+                    Foreground="{DynamicResource SystemControlErrorTextForegroundBrush}" />
+            </StackPanel>
 
-                    <!-- ConvertSetting : Preset_Apply -->
-                    <Button
-                        Grid.Column="2"
-                        VerticalAlignment="Bottom"
-                        Command="{Binding RenamePresetCommand}"
-                        Content="{DynamicResource Btn_PresetApply}" />
-                </Grid>
+            <Separator Margin="0,0,0,8" />
 
-                <WrapPanel Margin="0,0,0,16">
-                    <Button
-                        Margin="0,0,8,0"
-                        Command="{Binding CreatePresetCommand}"
-                        Content="{DynamicResource Btn_PresetCreate}" />
-                    <Button
-                        Margin="0,0,8,0"
-                        Command="{Binding CopyPresetCommand}"
-                        Content="{DynamicResource Btn_PresetCopy}" />
-                    <Button
-                        Command="{Binding RemovePresetCommand}"
-                        Content="{DynamicResource Btn_PresetDelete}"
-                        Foreground="{DynamicResource SystemControlErrorTextForegroundBrush}" />
-                </WrapPanel>
+            <!-- ConvertSetting : Standard_Group -->
+            <TextBlock
+                Margin="0,0,0,4"
+                FontWeight="SemiBold"
+                Text="{DynamicResource Setting_GroupStandard}" />
+            <ItemsControl
+                Margin="0,0,0,4"
+                ItemsSource="{Binding StandardTargetTags}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <ToggleButton
+                            Style="{DynamicResource FormatTagStyle}"
+                            Content="{Binding Format, Converter={StaticResource UpperCaseConverter}}"
+                            IsChecked="{Binding IsSelected}" />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
 
-                <Separator Margin="0,0,0,16" />
+            <!-- ConvertSetting : Animation_Group -->
+            <TextBlock
+                Margin="0,0,0,4"
+                FontWeight="SemiBold"
+                Text="{DynamicResource Setting_GroupAnimation}" />
+            <ItemsControl
+                Margin="0,0,0,8"
+                ItemsSource="{Binding AnimationTargetTags}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <ToggleButton
+                            Style="{DynamicResource FormatTagStyle}"
+                            Content="{Binding Format, Converter={StaticResource UpperCaseConverter}}"
+                            IsChecked="{Binding IsSelected}" />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
 
-                <!-- ConvertSetting : Standard_Group -->
-                <TextBlock
-                    Margin="0,0,0,8"
-                    FontWeight="SemiBold"
-                    Text="{DynamicResource Setting_GroupStandard}" />
-                <ItemsControl
-                    Margin="0,0,0,16"
-                    ItemsSource="{Binding StandardTargetTags}">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <WrapPanel Orientation="Horizontal" />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <ToggleButton
-                                Style="{DynamicResource FormatTagStyle}"
-                                Content="{Binding Format, Converter={StaticResource UpperCaseConverter}}"
-                                IsChecked="{Binding IsSelected}" />
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+            <Separator Margin="0,0,0,8" />
 
-                <!-- ConvertSetting : Animation_Group -->
-                <TextBlock
-                    Margin="0,0,0,8"
-                    FontWeight="SemiBold"
-                    Text="{DynamicResource Setting_GroupAnimation}" />
-                <ItemsControl
-                    Margin="0,0,0,16"
-                    ItemsSource="{Binding AnimationTargetTags}">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <WrapPanel Orientation="Horizontal" />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <ToggleButton
-                                Style="{DynamicResource FormatTagStyle}"
-                                Content="{Binding Format, Converter={StaticResource UpperCaseConverter}}"
-                                IsChecked="{Binding IsSelected}" />
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-
-                <Separator Margin="0,0,0,16" />
-
-                <!-- ConvertSetting : Quality_Group -->
-                <StackPanel
-                    Margin="0,0,0,16"
-                    HorizontalAlignment="Left"
-                    IsEnabled="{Binding IsLossyFormat}">
-                    <TextBlock
-                        Margin="0,0,0,4"
-                        Text="{DynamicResource Setting_Quality}" />
-                    <Grid Width="420">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <Slider
-                            Margin="0,0,12,0"
-                            Maximum="100"
-                            Minimum="1"
-                            Value="{Binding Quality}" />
-                        <TextBlock
-                            Grid.Column="1"
-                            Width="30"
-                            VerticalAlignment="Center"
-                            Text="{Binding Quality}"
-                            TextAlignment="Right" />
-                    </Grid>
-                </StackPanel>
-
-                <!-- ConvertSetting : Color_Group (BackgroundColor) -->
-                <StackPanel
-                    Margin="0,0,0,12"
-                    Orientation="Horizontal">
-                    <TextBlock
-                        Margin="0,0,12,0"
-                        VerticalAlignment="Center"
-                        Text="{DynamicResource Setting_BackgroundColor}" />
-                    <ComboBox
-                        Width="180"
-                        Margin="0,0,12,0"
-                        VerticalAlignment="Center"
-                        SelectedItem="{Binding BgColorOption}">
-                        <ComboBoxItem
-                            Content="{DynamicResource Bg_White}"
-                            IsSelected="{Binding BgColorOption, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=White}"
-                            Tag="White" />
-                        <ComboBoxItem
-                            Content="{DynamicResource Bg_Black}"
-                            IsSelected="{Binding BgColorOption, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Black}"
-                            Tag="Black" />
-                        <ComboBoxItem
-                            Content="{DynamicResource Bg_Custom}"
-                            IsSelected="{Binding BgColorOption, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Custom}"
-                            Tag="Custom" />
-                    </ComboBox>
-
-                    <ctrls:FilterTextBox
-                        Width="120"
-                        VerticalAlignment="Center"
-                        Filter="HexColor"
-                        IsEnabled="{Binding BgColorOption, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Custom}"
-                        Text="{Binding CustomBackgroundColor, UpdateSourceTrigger=PropertyChanged}" />
-                </StackPanel>
-
-                <CheckBox
-                    Margin="0,0,0,16"
-                    Content="{DynamicResource Setting_KeepExif}"
-                    IsChecked="{Binding KeepExif}" />
-
-                <!-- ConvertSetting : OverwritePolicy_Group -->
+            <!-- ConvertSetting : Cpu_Group -->
+            <StackPanel
+                Margin="0,8,0,8"
+                Orientation="Horizontal">
                 <TextBlock
                     Margin="0,0,0,4"
-                    Text="{DynamicResource Setting_OverwritePolicy}" />
-                <WrapPanel Margin="0,0,0,16">
-                    <RadioButton
-                        Margin="0,0,16,0"
-                        Content="{DynamicResource Setting_Overwrite_Suffix}"
-                        GroupName="OverwriteGroup"
-                        IsChecked="{Binding OverwritePolicy, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Suffix}" />
-                    <RadioButton
-                        Margin="0,0,16,0"
-                        Content="{DynamicResource Setting_Overwrite_Skip}"
-                        GroupName="OverwriteGroup"
-                        IsChecked="{Binding OverwritePolicy, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Skip}" />
-                    <RadioButton
-                        Content="{DynamicResource Setting_Overwrite_Overwrite}"
-                        GroupName="OverwriteGroup"
-                        IsChecked="{Binding OverwritePolicy, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Overwrite}" />
-                </WrapPanel>
-
-                <!-- ConvertSetting : SaveLocation_Group -->
-                <TextBlock
-                    Margin="0,0,0,8"
+                    Width="90"
+                    VerticalAlignment="Center"
                     FontWeight="SemiBold"
-                    Text="{DynamicResource Setting_SaveLocation}" />
-                <StackPanel Margin="0,0,0,16">
-                    <RadioButton
-                        Margin="0,0,0,8"
-                        Content="{DynamicResource Setting_SaveLocation_Same}"
-                        GroupName="SaveLocationGroup"
-                        IsChecked="{Binding SaveLocation, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=SameAsOriginal}" />
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-
-                        <RadioButton
-                            Margin="0,0,8,0"
-                            VerticalAlignment="Center"
-                            Content="{DynamicResource Setting_SaveLocation_Custom}"
-                            GroupName="SaveLocationGroup"
-                            IsChecked="{Binding SaveLocation, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Custom}" />
-                        <TextBox
-                            Grid.Column="1"
-                            Margin="0,0,8,0"
-                            MinWidth="220"
-                            VerticalAlignment="Center"
-                            IsEnabled="{Binding SaveLocation, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Custom}"
-                            IsReadOnly="True"
-                            Text="{Binding CustomOutputPath, Mode=TwoWay}" />
-                        <Button
-                            Grid.Column="2"
-                            VerticalAlignment="Center"
-                            Command="{Binding ChangeOutputPathCommand}"
-                            Content="{DynamicResource Btn_Browse}"
-                            IsEnabled="{Binding SaveLocation, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Custom}" />
-                    </Grid>
-                </StackPanel>
-
-                <!-- ConvertSetting : SaveMethod_Group -->
-                <TextBlock
-                    Margin="0,0,0,8"
-                    FontWeight="SemiBold"
-                    Text="{DynamicResource Setting_SaveMethod}" />
-                <StackPanel Margin="0,0,0,16">
-                    <RadioButton
-                        Margin="0,0,0,8"
-                        Content="{DynamicResource Setting_SaveMethod_NoFolder}"
-                        GroupName="SaveMethodGroup"
-                        IsChecked="{Binding FolderMethod, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=NoFolder}" />
-                    <StackPanel Orientation="Horizontal">
-                        <RadioButton
-                            Margin="0,0,12,0"
-                            VerticalAlignment="Center"
-                            Content="{DynamicResource Setting_SaveMethod_CreateFolder}"
-                            GroupName="SaveMethodGroup"
-                            IsChecked="{Binding FolderMethod, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=CreateFolder}" />
-
-                        <ctrls:FilterTextBox
-                            MinWidth="160"
-                            Filter="InvalidSpecial"
-                            FilterMode="Block"
-                            IsEnabled="{Binding FolderMethod, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=CreateFolder}"
-                            Text="{Binding OutputSubFolderName, UpdateSourceTrigger=PropertyChanged}" />
-                    </StackPanel>
-                </StackPanel>
-
-                <!-- ConvertSetting : Cpu_Group -->
-                <TextBlock
-                    Margin="0,0,0,4"
                     Text="{DynamicResource Setting_CpuUsage}" />
                 <ComboBox
-                    Width="240"
-                    Margin="0,0,0,16"
+                    Width="200"
                     HorizontalAlignment="Left"
                     SelectedItem="{Binding CpuUsage}">
                     <ComboBoxItem
@@ -315,8 +159,169 @@
                         IsSelected="{Binding CpuUsage, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Minimum}"
                         Tag="Minimum" />
                 </ComboBox>
-
             </StackPanel>
-        </ScrollViewer>
-    </Grid>
+
+            <!-- ConvertSetting : Quality_Group -->
+            <StackPanel
+                Margin="0,8,0,8"
+                Orientation="Horizontal"
+                IsEnabled="{Binding IsLossyFormat}">
+                <TextBlock
+                    Margin="0,0,0,4"
+                    Width="90"
+                    VerticalAlignment="Center"
+                    FontWeight="SemiBold"
+                    Text="{DynamicResource Setting_Quality}" />
+                <StackPanel Orientation="Horizontal">
+                    <Slider
+                        Margin="0,0,8,0"
+                        Width="300"
+                        Maximum="100"
+                        Minimum="1"
+                        Value="{Binding Quality}" />
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        Text="{Binding Quality}"
+                        TextAlignment="Right" />
+                </StackPanel>
+            </StackPanel>
+
+            <!-- ConvertSetting : KeepExif_Group -->
+            <StackPanel
+                    Margin="0,8,0,8"
+                    Orientation="Horizontal">
+                <TextBlock
+                    Margin="0,0,8,4"
+                    VerticalAlignment="Center"
+                    FontWeight="SemiBold"
+                    Text="{DynamicResource Setting_KeepExif}" />
+                <CheckBox
+                    VerticalAlignment="Center"
+                    IsChecked="{Binding KeepExif}" />
+            </StackPanel>
+
+            <!-- ConvertSetting : Color_Group (BackgroundColor) -->
+            <StackPanel Margin="0,8,0,8">
+                <TextBlock
+                    Margin="0,0,0,4"
+                    FontWeight="SemiBold"
+                    Text="{DynamicResource Setting_BackgroundColor}" />
+                <StackPanel
+                    Margin="0,0,0,8"
+                    Orientation="Horizontal">
+                    <RadioButton
+                        VerticalAlignment="Center"
+                        Content="{DynamicResource Bg_White}"
+                        GroupName="BgColorGroup"
+                        IsChecked="{Binding BgColorOption, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=White}" />
+                    <RadioButton
+                        VerticalAlignment="Center"
+                        Content="{DynamicResource Bg_Black}"
+                        GroupName="BgColorGroup"
+                        IsChecked="{Binding BgColorOption, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Black}" />
+                    <StackPanel Orientation="Horizontal">
+                        <RadioButton
+                            MinWidth="32"
+                            VerticalAlignment="Center"
+                            GroupName="BgColorGroup"
+                            IsChecked="{Binding BgColorOption, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Custom}" />
+                        <ctrls:FilterTextBox
+                            Width="120"
+                            VerticalAlignment="Center"
+                            Filter="HexColor"
+                            FilterMode="Allow"
+                            IsEnabled="{Binding BgColorOption, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Custom}"
+                            Text="{Binding CustomBackgroundColor, UpdateSourceTrigger=PropertyChanged}" />
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
+
+            <!-- ConvertSetting : OverwritePolicy_Group -->
+            <StackPanel Margin="0,8,0,8">
+                <TextBlock
+                    Margin="0,0,0,4"
+                    FontWeight="SemiBold"
+                    Text="{DynamicResource Setting_OverwritePolicy}" />
+                <StackPanel
+                    Margin="0,0,0,8"
+                    Orientation="Horizontal">
+                    <RadioButton
+                        Content="{DynamicResource Setting_Overwrite_Suffix}"
+                        GroupName="OverwriteGroup"
+                        IsChecked="{Binding OverwritePolicy, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Suffix}" />
+                    <RadioButton
+                        Content="{DynamicResource Setting_Overwrite_Skip}"
+                        GroupName="OverwriteGroup"
+                        IsChecked="{Binding OverwritePolicy, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Skip}" />
+                    <RadioButton
+                        Content="{DynamicResource Setting_Overwrite_Overwrite}"
+                        GroupName="OverwriteGroup"
+                        IsChecked="{Binding OverwritePolicy, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Overwrite}" />
+                </StackPanel>
+            </StackPanel>
+
+            <!-- ConvertSetting : SaveMethod_Group -->
+            <StackPanel Margin="0,8,0,8">
+                <TextBlock
+                    Margin="0,0,0,4"
+                    FontWeight="SemiBold"
+                    Text="{DynamicResource Setting_SaveMethod}" />
+                <StackPanel
+                    Margin="0,0,0,8"
+                    Orientation="Horizontal">
+                    <RadioButton
+                        Content="{DynamicResource Setting_SaveMethod_NoFolder}"
+                        GroupName="SaveMethodGroup"
+                        IsChecked="{Binding FolderMethod, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=NoFolder}" />
+                    <StackPanel Orientation="Horizontal">
+                        <RadioButton
+                            Margin="0,0,6,0"
+                            MinWidth="114"
+                            Content="{DynamicResource Setting_SaveMethod_CreateFolder}"
+                            GroupName="SaveMethodGroup"
+                            IsChecked="{Binding FolderMethod, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=CreateFolder}" />
+                        <ctrls:FilterTextBox
+                            Width="120"
+                            Filter="InvalidSpecial"
+                            FilterMode="Block"
+                            IsEnabled="{Binding FolderMethod, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=CreateFolder}"
+                            Text="{Binding OutputSubFolderName, UpdateSourceTrigger=PropertyChanged}" />
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
+
+            <!-- ConvertSetting : SaveLocation_Group -->
+            <StackPanel Margin="0,8,0,8">
+                <TextBlock
+                    Margin="0,0,0,4"
+                    FontWeight="SemiBold"
+                    Text="{DynamicResource Setting_SaveLocation}" />
+                <RadioButton
+                    Margin="0,0,0,4"
+                    Content="{DynamicResource Setting_SaveLocation_Same}"
+                    GroupName="SaveLocationGroup"
+                    IsChecked="{Binding SaveLocation, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=SameAsOriginal}" />
+                <StackPanel Orientation="Horizontal">
+                    <RadioButton
+                        VerticalAlignment="Center"
+                        Content="{DynamicResource Setting_SaveLocation_Custom}"
+                        GroupName="SaveLocationGroup"
+                        IsChecked="{Binding SaveLocation, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Custom}" />
+                    <TextBox
+                        Margin="0,0,4,0"
+                        Width="280"
+                        VerticalAlignment="Center"
+                        IsEnabled="{Binding SaveLocation, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Custom}"
+                        IsReadOnly="True"
+                        Text="{Binding CustomOutputPath, Mode=TwoWay}" />
+                    <Button
+                        Width="80"
+                        VerticalAlignment="Center"
+                        Command="{Binding ChangeOutputPathCommand}"
+                        Content="{DynamicResource Btn_Browse}"
+                        IsEnabled="{Binding SaveLocation, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Custom}" />
+                </StackPanel>
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
 </UserControl>

@@ -85,7 +85,7 @@
     <sys:String x:Key="Setting_GroupStandard">일반 이미지 변환 포맷</sys:String>
     <sys:String x:Key="Setting_GroupAnimation">애니메이션 이미지 변환 포맷</sys:String>
     <sys:String x:Key="Setting_Quality">품질</sys:String>
-    <sys:String x:Key="Setting_BackgroundColor">배경 색상(투명 이미지용)</sys:String>
+    <sys:String x:Key="Setting_BackgroundColor">배경 색(투명 이미지용)</sys:String>
     <sys:String x:Key="Setting_KeepExif">메타데이터(EXIF) 보존</sys:String>
 
     <!-- 변환 설정 : 배경색 -->
