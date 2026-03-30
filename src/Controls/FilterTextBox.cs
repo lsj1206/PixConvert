@@ -130,6 +130,22 @@ public class FilterTextBox : TextBox
             typeof(FilterTextBox),
             new PropertyMetadata(0, OnFilterPropertyChanged));
 
+    /// <summary>
+    /// 빈 값(Blank)일 때 자동으로 채워질 기본값
+    /// </summary>
+    public string? IsBlank
+    {
+        get => (string?)GetValue(IsBlankProperty);
+        set => SetValue(IsBlankProperty, value);
+    }
+
+    public static readonly DependencyProperty IsBlankProperty =
+        DependencyProperty.Register(
+            nameof(IsBlank),
+            typeof(string),
+            typeof(FilterTextBox),
+            new PropertyMetadata(null));
+
     #endregion
 
     #region 생성자
@@ -145,6 +161,22 @@ public class FilterTextBox : TextBox
     public FilterTextBox()
     {
         TextChanged += OnTextChanged;
+    }
+
+    #endregion
+
+    #region 오버라이드
+
+    protected override void OnLostFocus(RoutedEventArgs e)
+    {
+        base.OnLostFocus(e);
+
+        // 포커스를 잃었을 때 내용이 비어있고 IsBlank 값이 설정되어 있다면 자동 보정
+        if (string.IsNullOrWhiteSpace(Text) && !string.IsNullOrEmpty(IsBlank))
+        {
+            Text = IsBlank;
+            ApplyFilter();
+        }
     }
 
     #endregion
