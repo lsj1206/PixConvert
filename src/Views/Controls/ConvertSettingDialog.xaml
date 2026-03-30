@@ -22,10 +22,14 @@
     </UserControl.Resources>
 
     <ScrollViewer
+        Focusable="True"
+        Background="Transparent"
+        MouseDown="ScrollViewer_MouseDown"
         HorizontalScrollBarVisibility="Disabled"
         VerticalScrollBarVisibility="Auto">
         <StackPanel
             Margin="14,14,14,14"
+            Background="Transparent"
             Orientation="Vertical">
             <!-- ConvertSetting : Preset_Group -->
             <StackPanel
@@ -164,10 +168,16 @@
                         Maximum="100"
                         Minimum="1"
                         Value="{Binding Quality}" />
-                    <TextBlock
+                    <ctrls:FilterTextBox
+                        Width="30"
                         VerticalAlignment="Center"
-                        Text="{Binding Quality}"
-                        TextAlignment="Right" />
+                        Filter="Digits"
+                        FilterMode="Allow"
+                        FilterMaxLength="3"
+                        IsBlank="90"
+                        Text="{Binding Quality, UpdateSourceTrigger=PropertyChanged}"
+                        TextAlignment="Right"
+                        ui:TextBoxHelper.IsDeleteButtonVisible="False" />
                 </StackPanel>
             </StackPanel>
 
@@ -270,7 +280,7 @@
                             Filter="InvalidSpecial"
                             FilterMode="Block"
                             IsEnabled="{Binding FolderMethod, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=CreateFolder}"
-                            Text="{Binding OutputSubFolderName, UpdateSourceTrigger=PropertyChanged}" />
+                            Text="{Binding OutputSubFolderName, UpdateSourceTrigger=PropertyChanged}"/>
                     </StackPanel>
                 </StackPanel>
             </StackPanel>

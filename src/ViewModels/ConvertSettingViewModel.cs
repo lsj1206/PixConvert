@@ -37,6 +37,17 @@ public partial class ConvertSettingViewModel : ViewModelBase
     [ObservableProperty] private int _quality = 85;
     [ObservableProperty] private BackgroundColorOption _bgColorOption = BackgroundColorOption.White;
     [ObservableProperty] private string _customBackgroundColor = "#FFFFFF";
+
+    partial void OnQualityChanged(int value)
+    {
+        // 1~100 범위로 강제 보정 (0 -> 1, 100 초과 -> 100)
+        int coerced = System.Math.Clamp(value, 1, 100);
+        if (value != coerced)
+        {
+            Quality = coerced;
+        }
+    }
+
     [ObservableProperty] private bool _keepExif = false;
     [ObservableProperty] private OverwritePolicy _OverwritePolicy = OverwritePolicy.Suffix;
     [ObservableProperty] private SaveLocationType _SaveLocation = SaveLocationType.SameAsOriginal;
