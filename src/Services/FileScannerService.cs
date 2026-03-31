@@ -135,11 +135,9 @@ public class FileScannerService : IFileScannerService
         if (bytesRead >= 12 &&
             header[4] == 0x66 && header[5] == 0x74 && header[6] == 0x79 && header[7] == 0x70 &&
             header[8] == 0x61 && header[9] == 0x76 && header[10] == 0x69 &&
-            (header[11] == 0x66 || header[11] == 0x73))
+            header[11] == 0x66) // 'avif' (정지 이미지) 브랜드만 지원
         {
-            // brand가 'avis'(sequence) 인 경우 애니메이션(움짤)으로 간주
-            bool isAnim = header[11] == 0x73;
-            return ("AVIF", isAnim);
+            return ("AVIF", false);
         }
 
         return ("-", false);

@@ -26,24 +26,29 @@ public class EngineSelector
     /// <summary>
     /// 지정된 파일 아이템에 적합한 변환 서비스 구현체를 반환합니다
     /// 라우팅 정책:
-    ///   - NetVips: GIF(애니메이션), AVIF(고압축), WebP-Animated(Step 4 구현 예정)
-    ///   - SkiaSharp: JPEG, PNG, BMP, WEBP(정지)
+    ///   - NetVips: GIF-Animated, WebP-Animated, AVIF-Static(고압축)
+    ///   - SkiaSharp: JPEG, PNG, BMP, WEBP-Static
     /// </summary>
     /// <param name="file">변환할 파일 아이템</param>
     /// <param name="settings">변환 설정 (출력 포맷 판단에 사용)</param>
     /// <returns>선택된 변환 서비스 공급자</returns>
     public IProviderService GetProvider(FileItem file, ConvertSettings settings)
     {
-        // 1. 애니메이션 파일(GIF, WebP-Animated, AVIF-Sequence)은 NetVips로 라우팅
+        // 실제 적용될 출력 포맷: 애니메이션 파일은 AnimationTargetFormat, 정지 이미지는 StandardTargetFormat
+        string targetFormat = file.IsAnimation
+            ? settings.AnimationTargetFormat
+            : settings.StandardTargetFormat;
+
+        // 1. 애니메이션 파일(GIF, WebP-Animated)은 NetVips로 라우팅
         if (file.IsAnimation)
             return _netVips;
 
         // 2. AVIF (입력 또는 출력)는 NetVips로 라우팅 (고압축 포맷 지원)
         if (file.FileSignature.Equals("AVIF", StringComparison.OrdinalIgnoreCase) ||
-            settings.StandardTargetFormat.Equals("AVIF", StringComparison.OrdinalIgnoreCase))
+            targetFormat.Equals("AVIF", StringComparison.OrdinalIgnoreCase))
             return _netVips;
 
-        // 4. 나머지 정지 이미지(JPEG, PNG, WEBP-Static)는 SkiaSharp
+        // 3. 나머지 정지 이미지(JPEG, PNG, WEBP-Static)는 SkiaSharp
         return _skiaSharp;
     }
 }

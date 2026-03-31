@@ -70,7 +70,7 @@ public partial class ConvertSettingViewModel : ViewModelBase
             string std = StandardTargetFormat?.ToUpperInvariant() ?? "";
             string ani = AnimationTargetFormat?.ToUpperInvariant() ?? "";
             bool stdLossy = std is "JPEG" or "WEBP" or "AVIF";
-            bool aniLossy = ani is "WEBP" or "AVIF";
+            bool aniLossy = ani is "WEBP";
             return stdLossy || aniLossy;
         }
     }
@@ -126,7 +126,7 @@ public partial class ConvertSettingViewModel : ViewModelBase
     private void InitializeTags()
     {
         string[] standardTargets = ["JPEG", "PNG", "BMP", "WEBP", "AVIF"];
-        string[] animationTargets = ["GIF", "WEBP", "AVIF"];
+        string[] animationTargets = ["GIF", "WEBP"];
 
         foreach (var f in standardTargets)
         {

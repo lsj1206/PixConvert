@@ -299,12 +299,10 @@ public class FileScannerServiceTests : IDisposable
 
     /// <summary>
     /// 시나리오: AVIF Sequence 포맷 헤더(ftyp avis)를 가진 파일. (애니메이션 AVIF)
-    /// 검증 목표: 바이트 11이 's'(73 = avis)인 경우도 "AVIF"로 통일 판별하는지 확인.
-    ///            avis(Animated VI deo Sequence)는 avif의 애니메이션 확장 포맷이므로
-    ///            동일한 AVIF 그룹으로 처리해야 합니다.
+    /// 검증 목표: 현재 Ani-AVIF는 지원하지 않으므로 미지원 포맷("-")으로 판별되는지 확인.
     /// </summary>
     [Fact]
-    public async Task AnalyzeSignatureAsync_GivenAvisHeader_ShouldReturnAvif()
+    public async Task AnalyzeSignatureAsync_GivenAvisHeader_ShouldReturnUnsupported()
     {
         // Arrange: 'avif'(0x66)가 아닌 'avis'(0x73)로 끝나는 헤더
         string path = Path.Combine(_tempDirectory, "fake_avis.png");
@@ -316,9 +314,9 @@ public class FileScannerServiceTests : IDisposable
         // Act
         var (result, isAnim) = await _fileScannerService.AnalyzeSignatureAsync(path);
 
-        // Assert: avis도 AVIF 그룹으로 통일 처리 + 애니메이션 판별 확인
-        Assert.Equal("AVIF", result);
-        Assert.True(isAnim);
+        // Assert: 현재 전략상 avis는 미지원 처리되어야 함
+        Assert.Equal("-", result);
+        Assert.False(isAnim);
     }
 
     /// <summary>

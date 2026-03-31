@@ -11,7 +11,7 @@ namespace PixConvert.Services.Providers;
 
 /// <summary>
 /// NetVips 엔진을 사용하는 애니메이션 및 고압축 이미지 변환 공급자입니다.
-/// 애니메이션(GIF, WebP, AVIF)의 모든 프레임을 보존하며, libvips의 고성능 인코더를 활용합니다.
+/// 애니메이션(GIF, WebP)의 모든 프레임을 보존하며, libvips의 고성능 인코더를 활용합니다.
 /// </summary>
 public class NetVipsProvider : IProviderService, IDisposable
 {
@@ -87,11 +87,10 @@ public class NetVipsProvider : IProviderService, IDisposable
             ? settings.AnimationTargetFormat
             : settings.StandardTargetFormat;
 
-        // n: -1 -> 애니메이션 이미지의 모든 프레임을 로드 (GIF, WebP, AVIF 등에서만 지원)
+        // n: -1 -> 애니메이션 이미지의 모든 프레임을 로드 (GIF, WebP 등에서만 지원)
         // access: Sequential -> 메모리 사용량 최소화
         var loaderOptions = new VOption();
-        string sig = file.FileSignature.ToLowerInvariant();
-        if (file.IsAnimation || sig is "gif" or "webp" or "avif")
+        if (file.IsAnimation)
         {
             loaderOptions.Add("n", -1);
         }
@@ -148,10 +147,11 @@ public class NetVipsProvider : IProviderService, IDisposable
                 options.Add("strip", true);
                 break;
             case "AVIF":
-                // AVIF 옵션이 환경(libheif 버전 등)에 따라 Q/quality 지원 여부가 상이하므로 기본값 사용
                 options.Add("compression", Enums.ForeignHeifCompression.Av1);
+                options.Add("Q", settings.Quality);
+                // libvips의 heifsave는 정지 이미지 저장 시 이 옵션들을 사용함
                 break;
-            // GIF, WEBP 등 애니메이션 포맷은 확장자와 함께 n-pages 메타데이터가 있으면 자동으로 애니메이션으로 저장됨
+            // GIF, WEBP: WriteToFile 시 확장자 기반으로 n-pages 메타데이터를 자동 참조하여 애니메이션 저장됨
         }
 
         // WriteToFile은 파일 확장자에 따라 적절한 save 오퍼레이션을 선택하고 options를 전달함

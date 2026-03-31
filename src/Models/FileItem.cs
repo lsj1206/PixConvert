@@ -70,7 +70,7 @@ public partial class FileItem : ObservableObject
     [ObservableProperty]
     private string fileSignature = "-";
 
-    /// <summary>애니메이션 포함 여부 (GIF, WebP-Ani, AVIF-Seq)</summary>
+    /// <summary>애니메이션 포함 여부 (GIF, WebP-Ani)</summary>
     [ObservableProperty]
     private bool isAnimation = false;
 
@@ -93,7 +93,7 @@ public partial class FileItem : ObservableObject
     public void RefreshStatusText() => OnPropertyChanged(nameof(StatusText));
 
     /// <summary>
-    /// 안전하게 애플리케이션 리소스를 조회합니다. 
+    /// 안전하게 애플리케이션 리소스를 조회합니다.
     /// 유닛 테스트 환경(App.Current가 null)에서도 크래시가 발생하지 않도록 설계되었습니다.
     /// </summary>
     private string SafeGetResource(string key)

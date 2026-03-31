@@ -65,10 +65,10 @@ public class EngineSelectorTests
     {
         // Arrange: 애니메이션 플래그가 설정된 파일 (GIF, WebP-Ani, AVIF-Seq 등 공통)
         var file = new FileItem { Path = "test.img", FileSignature = "ANY", IsAnimation = true };
- 
+
         // Act
         var provider = _selector.GetProvider(file, new ConvertSettings());
- 
+
         // Assert: 애니메이션은 항상 NetVips
         Assert.IsType<NetVipsProvider>(provider);
     }
@@ -187,15 +187,13 @@ public class EngineSelectorTests
     [Theory]
     [InlineData("avif")]
     [InlineData("AVIF")]
-    public void GetProvider_WhenSignatureIsAvif_ShouldAlwaysReturnNetVipsRegardlessOfAnimationFlag(string signature)
+    public void GetProvider_WhenSignatureIsAvif_ShouldAlwaysReturnNetVips(string signature)
     {
-        // Arrange: AVIF는 정지/애니메이션 무관하게 NetVips (고압축 포맷 지원)
-        var fileStatic = new FileItem { Path = "static.avif", FileSignature = signature, IsAnimation = false };
-        var fileAnim = new FileItem { Path = "anim.avif", FileSignature = signature, IsAnimation = true };
+        // Arrange: AVIF는 정지 이미지 변환 시 NetVips 사용
+        var file = new FileItem { Path = "static.avif", FileSignature = signature, IsAnimation = false };
 
         // Act & Assert
-        Assert.IsType<NetVipsProvider>(_selector.GetProvider(fileStatic, new ConvertSettings()));
-        Assert.IsType<NetVipsProvider>(_selector.GetProvider(fileAnim, new ConvertSettings()));
+        Assert.IsType<NetVipsProvider>(_selector.GetProvider(file, new ConvertSettings()));
     }
 
     // ─────────────────────────────────────────────────
@@ -230,20 +228,6 @@ public class EngineSelectorTests
         // Arrange
         var file = new FileItem { Path = "test.webp", FileSignature = "WEBP", IsAnimation = true };
         var settings = new ConvertSettings { AnimationTargetFormat = "GIF" };
-
-        // Act
-        var provider = _selector.GetProvider(file, settings);
-
-        // Assert
-        Assert.IsType<NetVipsProvider>(provider);
-    }
-
-    [Fact]
-    public void GetProvider_WhenAnimationFileAndTargetIsAvif_ShouldReturnNetVips()
-    {
-        // Arrange
-        var file = new FileItem { Path = "dummy.gif", IsAnimation = true };
-        var settings = new ConvertSettings { AnimationTargetFormat = "AVIF" };
 
         // Act
         var provider = _selector.GetProvider(file, settings);
