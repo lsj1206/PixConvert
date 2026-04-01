@@ -187,14 +187,21 @@ public class PresetService : IPresetService
             return false;
         }
 
-        // 5. 열거형(Enum: CPU 사용량 설정, 경로, 배경색, 덮어쓰기 여부) 옵션이 유효한지 확인
+        // 5. 열거형(Enum: CPU 사용량 설정, 경로, 덮어쓰기 여부) 옵션 및 배경색 HEX 유효성 확인
         if (!Enum.IsDefined(typeof(CpuUsageOption), settings.CpuUsage) ||
             !Enum.IsDefined(typeof(SaveLocationType), settings.SaveLocation) ||
             !Enum.IsDefined(typeof(SaveFolderMethod), settings.FolderMethod) ||
-            !Enum.IsDefined(typeof(BackgroundColorOption), settings.BgColorOption) ||
             !Enum.IsDefined(typeof(OverwritePolicy), settings.OverwritePolicy))
         {
             _logger.LogError(_languageService.GetString("Log_Preset_InvalidEnum"));
+            errorMessageKey = "Msg_Error_ConfigInvalid";
+            return false;
+        }
+
+        // 배경색 HEX 포맷 검증 (#RRGGBB 또는 #AARRGGBB)
+        if (string.IsNullOrWhiteSpace(settings.BackgroundColor) || !System.Text.RegularExpressions.Regex.IsMatch(settings.BackgroundColor, "^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{8})$"))
+        {
+            _logger.LogError(_languageService.GetString("Log_Preset_InvalidBgColor"), settings.BackgroundColor);
             errorMessageKey = "Msg_Error_ConfigInvalid";
             return false;
         }

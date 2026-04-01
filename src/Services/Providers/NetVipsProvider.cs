@@ -160,13 +160,7 @@ public class NetVipsProvider : IProviderService, IDisposable
 
     private static double[] ParseBackgroundColor(ConvertSettings settings)
     {
-        return settings.BgColorOption switch
-        {
-            BackgroundColorOption.White  => new[] { 255.0, 255.0, 255.0 },
-            BackgroundColorOption.Black  => new[] { 0.0, 0.0, 0.0 },
-            BackgroundColorOption.Custom => TryParseHexToArray(settings.CustomBackgroundColor),
-            _                           => new[] { 255.0, 255.0, 255.0 }
-        };
+        return TryParseHexToArray(settings.BackgroundColor ?? "#FFFFFF");
     }
 
     private static double[] TryParseHexToArray(string hex)

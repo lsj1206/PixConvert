@@ -460,11 +460,9 @@ public partial class ConversionViewModel : ViewModelBase
         else
             CurrentTargetFormat = settings.StandardTargetFormat;
 
-        CurrentQuality = $"{settings.Quality}%";
-        CurrentBgColor = settings.BgColorOption == BackgroundColorOption.Custom
-            ? settings.CustomBackgroundColor
-            : GetString($"Bg_{settings.BgColorOption}");
-        CurrentKeepExif = settings.KeepExif ? GetString("Dlg_Yes") : GetString("Dlg_No");
+        CurrentQuality = $"{settings.Quality}";
+        CurrentBgColor = settings.BackgroundColor;
+        CurrentKeepExif = settings.KeepExif ? "O" : "X";
         CurrentOverwritePolicy = GetString($"Setting_Overwrite_{settings.OverwritePolicy}");
         CurrentSaveMethod = settings.FolderMethod == SaveFolderMethod.CreateFolder
             ? settings.OutputSubFolderName

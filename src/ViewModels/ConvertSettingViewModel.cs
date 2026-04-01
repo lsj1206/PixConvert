@@ -10,6 +10,9 @@ using PixConvert.Services.Interfaces;
 
 namespace PixConvert.ViewModels;
 
+/// <summary>배경색 선택 프리셋 (UI 바인딩용)</summary>
+public enum BackgroundColorOption { White, Black, Custom }
+
 /// <summary>
 /// 변환 설정 및 프리셋 관리 기능(설계도 반영)을 담당하는 뷰모델입니다.
 /// </summary>
@@ -190,8 +193,16 @@ public partial class ConvertSettingViewModel : ViewModelBase
         StandardTargetFormat = s.StandardTargetFormat ?? "JPEG";
         AnimationTargetFormat = s.AnimationTargetFormat ?? "GIF";
         Quality = s.Quality;
-        BgColorOption = s.BgColorOption;
-        CustomBackgroundColor = s.CustomBackgroundColor ?? "#FFFFFF";
+        
+        // BackgroundColor (HEX) -> UI Preset Mapping
+        CustomBackgroundColor = s.BackgroundColor ?? "#FFFFFF";
+        if (CustomBackgroundColor.Equals("#FFFFFF", StringComparison.OrdinalIgnoreCase))
+            BgColorOption = BackgroundColorOption.White;
+        else if (CustomBackgroundColor.Equals("#000000", StringComparison.OrdinalIgnoreCase))
+            BgColorOption = BackgroundColorOption.Black;
+        else
+            BgColorOption = BackgroundColorOption.Custom;
+
         KeepExif = s.KeepExif;
         OverwritePolicy = s.OverwritePolicy;
         SaveLocation = s.SaveLocation;
@@ -214,8 +225,15 @@ public partial class ConvertSettingViewModel : ViewModelBase
         s.StandardTargetFormat = StandardTargetFormat;
         s.AnimationTargetFormat = AnimationTargetFormat;
         s.Quality = Quality;
-        s.BgColorOption = BgColorOption;
-        s.CustomBackgroundColor = CustomBackgroundColor;
+
+        // UI Preset -> BackgroundColor (HEX) Mapping
+        s.BackgroundColor = BgColorOption switch
+        {
+            BackgroundColorOption.White => "#FFFFFF",
+            BackgroundColorOption.Black => "#000000",
+            _ => CustomBackgroundColor
+        };
+
         s.KeepExif = KeepExif;
         s.OverwritePolicy = OverwritePolicy;
         s.SaveLocation = SaveLocation;

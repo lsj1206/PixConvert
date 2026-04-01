@@ -175,13 +175,7 @@ public class SkiaSharpProvider : IProviderService, IDisposable
     /// <summary>설정에서 배경색 SKColor를 파싱합니다.</summary>
     private static SKColor ParseBackgroundColor(ConvertSettings settings)
     {
-        return settings.BgColorOption switch
-        {
-            BackgroundColorOption.White  => SKColors.White,
-            BackgroundColorOption.Black  => SKColors.Black,
-            BackgroundColorOption.Custom => TryParseHexColor(settings.CustomBackgroundColor),
-            _                           => SKColors.White
-        };
+        return TryParseHexColor(settings.BackgroundColor ?? "#FFFFFF");
     }
 
     /// <summary>
