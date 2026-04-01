@@ -4,7 +4,7 @@ using System.Windows.Controls;
 using System.ComponentModel;
 using PixConvert.ViewModels;
 
-namespace PixConvert.Views.Controls;
+namespace PixConvert.Views.Layouts;
 
 /// <summary>
 /// 알림 메시지(스낵바)의 시각적 애니메이션과 상태를 제어하는 컨트롤의 코드 비하인드 클래스입니다.

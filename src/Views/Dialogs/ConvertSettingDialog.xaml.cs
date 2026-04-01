@@ -2,7 +2,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Controls;
 
-namespace PixConvert.Views.Controls;
+namespace PixConvert.Views.Dialogs;
 
 /// <summary>
 /// ConvertSettingDialog.xaml에 대한 상호 작용 논리입니다.

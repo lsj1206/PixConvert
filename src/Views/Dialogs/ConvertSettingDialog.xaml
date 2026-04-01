@@ -1,5 +1,5 @@
 <UserControl
-    x:Class="PixConvert.Views.Controls.ConvertSettingDialog"
+    x:Class="PixConvert.Views.Dialogs.ConvertSettingDialog"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:ctrls="clr-namespace:PixConvert.Controls"

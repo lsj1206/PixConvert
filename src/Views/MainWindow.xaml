@@ -3,8 +3,10 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:controls="clr-namespace:PixConvert.Views.Controls"
+        xmlns:layouts="clr-namespace:PixConvert.Views.Layouts"
+        xmlns:lists="clr-namespace:PixConvert.Views.Lists"
         xmlns:viewModels="clr-namespace:PixConvert.ViewModels"
+        xmlns:converters="clr-namespace:PixConvert.Converters"
         xmlns:ui="http://schemas.modernwpf.com/2019"
     mc:Ignorable="d"
     Title="{DynamicResource App_Title}"
@@ -17,6 +19,7 @@
 
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <converters:MultiStatusVisibilityConverter x:Key="MultiStatusVisibilityConverter" />
     </Window.Resources>
 
     <!-- Window : Root_Grid -->
@@ -29,7 +32,7 @@
         </Grid.RowDefinitions>
 
         <!-- Window : Header_Section -->
-        <controls:HeaderControl Grid.Row="0" />
+        <layouts:HeaderControl Grid.Row="0" />
 
         <!-- Window : Main_Section -->
         <Grid
@@ -43,20 +46,31 @@
             </Grid.ColumnDefinitions>
 
             <!-- Window : Sidebar_Section -->
-            <controls:SidebarControl Grid.Column="0" />
+            <layouts:SidebarControl Grid.Column="0" />
 
             <!-- Window : FileList_Section -->
-            <controls:FileListControl
+            <lists:FileListControl
                 Grid.Column="1"
                 Margin="6,0,0,0"
                 Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
                 BorderBrush="{DynamicResource SystemControlBackgroundBaseMediumBrush}"
                 BorderThickness="1"
-                DataContext="{Binding FileList}" />
+                DataContext="{Binding FileList}"
+                Visibility="{Binding CurrentStatus, Converter={StaticResource MultiStatusVisibilityConverter}, ConverterParameter=!Converting}" />
+
+            <!-- Window : Converting_List_Section -->
+            <lists:ConvertingListControl
+                Grid.Column="1"
+                Margin="6,0,0,0"
+                Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+                BorderBrush="{DynamicResource SystemControlBackgroundBaseMediumBrush}"
+                BorderThickness="1"
+                DataContext="{Binding Conversion}"
+                Visibility="{Binding CurrentStatus, Converter={StaticResource MultiStatusVisibilityConverter}, ConverterParameter=Converting}" />
         </Grid>
 
         <!-- Window : Snackbar_Overlay -->
-        <controls:SnackbarControl
+        <layouts:SnackbarControl
             Grid.Row="0"
             Grid.RowSpan="2"
             DataContext="{Binding Snackbar}" />

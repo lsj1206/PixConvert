@@ -113,7 +113,7 @@ public partial class HeaderViewModel : ViewModelBase
     private async Task ShowAppSettingAsync()
     {
         var vm = _settingsFactory();
-        var view = new Views.Controls.AppSettingDialog { DataContext = vm };
+        var view = new Views.Dialogs.AppSettingDialog { DataContext = vm };
 
         await _dialogService.ShowCustomDialogAsync(
             view,

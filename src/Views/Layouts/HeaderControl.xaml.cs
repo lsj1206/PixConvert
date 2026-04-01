@@ -1,6 +1,6 @@
 using System.Windows.Controls;
 
-namespace PixConvert.Views.Controls;
+namespace PixConvert.Views.Layouts;
 
 /// <summary>
 /// 애플리케이션의 최상단 헤더 영역을 담당하는 사용자 정의 컨트롤입니다.

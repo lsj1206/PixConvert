@@ -8,7 +8,7 @@ using PixConvert.Models;
 using PixConvert.Services;
 using PixConvert.ViewModels;
 
-namespace PixConvert.Views.Controls;
+namespace PixConvert.Views.Lists;
 
 /// <summary>
 /// 파일 목록을 표시하고 관리(드래그 앤 드롭, 삭제 등)하는 컨트롤의 코드 비하인드 클래스입니다.
