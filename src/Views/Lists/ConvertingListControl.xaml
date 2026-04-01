@@ -1,0 +1,63 @@
+<UserControl x:Class="PixConvert.Views.Lists.ConvertingListControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:PixConvert.Views.Lists"
+             mc:Ignorable="d"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <SolidColorBrush x:Key="TextSecondary" Color="#666666" />
+    </UserControl.Resources>
+
+    <Grid>
+        <ListView
+            x:Name="ConvertingListView"
+            Padding="0,0,12,16"
+            Background="Transparent"
+            BorderThickness="0"
+            ItemsSource="{Binding ActiveProcesses}"
+            ScrollViewer.CanContentScroll="True"
+            ScrollViewer.HorizontalScrollBarVisibility="Auto"
+            VirtualizingPanel.CacheLength="20,20"
+            VirtualizingPanel.CacheLengthUnit="Item"
+            VirtualizingPanel.IsVirtualizing="True"
+            VirtualizingPanel.VirtualizationMode="Recycling">
+            <ListView.View>
+                <GridView>
+                    <GridView.ColumnHeaderContainerStyle>
+                        <Style TargetType="GridViewColumnHeader">
+                            <Setter Property="Background" Value="Transparent" />
+                            <Setter Property="Foreground" Value="{StaticResource TextSecondary}" />
+                            <Setter Property="Padding" Value="10,5" />
+                            <Setter Property="HorizontalContentAlignment" Value="Left" />
+                            <Setter Property="FontWeight" Value="SemiBold" />
+                        </Style>
+                    </GridView.ColumnHeaderContainerStyle>
+
+                    <GridViewColumn Width="250">
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader Content="File Name" />
+                        </GridViewColumn.Header>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding FileName}" TextTrimming="CharacterEllipsis"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <GridViewColumn Width="150">
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader Content="Engine" />
+                        </GridViewColumn.Header>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding EngineName}" Foreground="{StaticResource TextSecondary}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+    </Grid>
+</UserControl>
