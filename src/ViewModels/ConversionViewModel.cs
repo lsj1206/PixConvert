@@ -1,14 +1,16 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Diagnostics;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using CommunityToolkit.Mvvm.Input;
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Messaging;
+using System.Windows.Data;
+using System.Windows.Threading;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Windows.Data;
+using Microsoft.Extensions.Logging;
+using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
+using CommunityToolkit.Mvvm.ComponentModel;
 using PixConvert.Models;
 using PixConvert.Services;
 using PixConvert.Services.Interfaces;
@@ -28,6 +30,8 @@ public partial class ConversionViewModel : ViewModelBase
     private readonly Func<ConvertSettingViewModel> _convertSettingVmFactory;
     private CancellationTokenSource? _convertCts;
     private readonly object _processesLock = new();
+    private readonly Stopwatch _stopwatch = new();
+    private readonly DispatcherTimer _timer;
 
     /// <summary>현재 활발하게 변환 중인 파일 정보를 담는 모델입니다.</summary>
     public partial class ActiveProcess : ObservableObject
@@ -79,6 +83,7 @@ public partial class ConversionViewModel : ViewModelBase
     [ObservableProperty] private int _processedCount;
     [ObservableProperty] private int _totalConvertCount;
     [ObservableProperty] private int _failCount;
+    [ObservableProperty] private string _convertingTime = "00:00:00";
 
     public bool HasFailures => FailCount > 0;
 
@@ -106,6 +111,16 @@ public partial class ConversionViewModel : ViewModelBase
         _fileList = fileList;
         _engineSelector = engineSelector;
         _convertSettingVmFactory = convertSettingVmFactory;
+
+        _timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(200) };
+        _timer.Tick += (s, e) =>
+        {
+            var elapsed = _stopwatch.Elapsed;
+            ConvertingTime = string.Format("{0:00}:{1:00}:{2:00}",
+                (int)elapsed.TotalHours,
+                elapsed.Minutes,
+                elapsed.Seconds);
+        };
 
         // UI 스레드 외에서도 컬렉션 업데이트가 가능하도록 동기화 활성화
         BindingOperations.EnableCollectionSynchronization(ActiveProcesses, _processesLock);
@@ -171,6 +186,10 @@ public partial class ConversionViewModel : ViewModelBase
 
             _logger.LogInformation(GetString("Log_Conversion_BatchStart"), context.ActiveFiles.Count);
             UpdateSidebarJobSummary(settings, context.ActiveFiles);
+
+            _stopwatch.Restart();
+            ConvertingTime = "00:00:00";
+            _timer.Start();
 
             await Parallel.ForEachAsync(context.ActiveFiles, parallelOptions,
                 (item, token) => ProcessSingleFileAsync(item, settings, session, context, token));
@@ -324,6 +343,9 @@ public partial class ConversionViewModel : ViewModelBase
     /// </summary>
     private void NotifyCompletionResult(bool isCancelled, ConversionContext context)
     {
+        _timer.Stop();
+        _stopwatch.Stop();
+
         if (isCancelled)
         {
             _snackbarService.Show(GetString("Msg_Convert_Cancelled"), SnackbarType.Info);

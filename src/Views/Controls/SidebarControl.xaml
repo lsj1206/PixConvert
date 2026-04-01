@@ -177,12 +177,23 @@
 
                                                         <Separator Margin="0,0,0,8" />
 
-                                                        <TextBlock
-                                                            Margin="0,0,0,4"
-                                                            FontSize="14"
-                                                            FontWeight="SemiBold"
-                                                            Foreground="{DynamicResource SystemControlForegroundAccentBrush}"
-                                                            Text="{DynamicResource Converting_Title}" />
+                                                        <DockPanel LastChildFill="False">
+                                                            <TextBlock
+                                                                DockPanel.Dock="Left"
+                                                                Margin="0,0,0,4"
+                                                                FontSize="14"
+                                                                FontWeight="SemiBold"
+                                                                Foreground="{DynamicResource SystemControlForegroundAccentBrush}"
+                                                                Text="{DynamicResource Converting_Title}" />
+                                                            <TextBlock
+                                                                DockPanel.Dock="Right"
+                                                                Margin="0,0,0,4"
+                                                                VerticalAlignment="Bottom"
+                                                                FontSize="12"
+                                                                FontWeight="Medium"
+                                                                Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                                                Text="{Binding Conversion.ConvertingTime}" />
+                                                        </DockPanel>
 
                                                         <!-- Sidebar : Converting_Details -->
                                                         <Grid Margin="0,0,0,8">
