@@ -169,11 +169,23 @@
                                                 <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                                                     <StackPanel Orientation="Vertical">
                                                         <!-- Sidebar : Converting_Status -->
-                                                        <Button
-                                                            Command="{Binding Conversion.CancelConvertCommand}"
-                                                            Content="{DynamicResource Btn_Cancel}"
-                                                            Foreground="#FF5555"
-                                                            Style="{StaticResource SidebarButtonStyle}" />
+                                                        <Button>
+                                                            <Button.Style>
+                                                                <Style TargetType="Button" BasedOn="{StaticResource SidebarButtonStyle}">
+                                                                    <Setter Property="Content" Value="{DynamicResource Btn_Cancel}" />
+                                                                    <Setter Property="Command" Value="{Binding Conversion.CancelConvertCommand}" />
+                                                                    <Setter Property="Foreground" Value="#FF5555" />
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding Conversion.IsConversionCompleted}" Value="True">
+                                                                            <Setter Property="Content" Value="{DynamicResource Dlg_Confirm}" />
+                                                                            <Setter Property="Command" Value="{Binding Conversion.ConfirmCompletionCommand}" />
+                                                                            <Setter Property="Background" Value="{DynamicResource SystemControlForegroundAccentBrush}" />
+                                                                            <Setter Property="Foreground" Value="Azure" />
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </Button.Style>
+                                                        </Button>
 
                                                         <Separator Margin="0,0,0,8" />
 

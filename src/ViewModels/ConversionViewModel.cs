@@ -84,12 +84,14 @@ public partial class ConversionViewModel : ViewModelBase
     [ObservableProperty] private int _totalConvertCount;
     [ObservableProperty] private int _failCount;
     [ObservableProperty] private string _convertingTime = "00:00:00";
+    [ObservableProperty] private bool _isConversionCompleted;
 
     public bool HasFailures => FailCount > 0;
 
     public IAsyncRelayCommand OpenConvertSettingCommand { get; }
     public IAsyncRelayCommand ConvertFilesCommand { get; }
     public IAsyncRelayCommand CancelConvertCommand { get; }
+    public IRelayCommand ConfirmCompletionCommand { get; }
 
     /// <summary>
     /// ConversionViewModel의 새 인스턴스를 초기화하며 필요한 서비스와 서브 뷰모델들을 구성합니다.
@@ -127,7 +129,8 @@ public partial class ConversionViewModel : ViewModelBase
 
         OpenConvertSettingCommand = new AsyncRelayCommand(OpenConvertSettingAsync, () => CurrentStatus != AppStatus.Converting);
         ConvertFilesCommand = new AsyncRelayCommand(ConvertFilesAsync, () => CurrentStatus != AppStatus.Converting);
-        CancelConvertCommand = new AsyncRelayCommand(CancelConvertAsync, () => CurrentStatus == AppStatus.Converting);
+        CancelConvertCommand = new AsyncRelayCommand(CancelConvertAsync, () => CurrentStatus == AppStatus.Converting && !IsConversionCompleted);
+        ConfirmCompletionCommand = new RelayCommand(ConfirmCompletion, () => IsConversionCompleted);
     }
 
     /// <summary>
@@ -139,6 +142,7 @@ public partial class ConversionViewModel : ViewModelBase
         OpenConvertSettingCommand.NotifyCanExecuteChanged();
         ConvertFilesCommand.NotifyCanExecuteChanged();
         CancelConvertCommand.NotifyCanExecuteChanged();
+        ConfirmCompletionCommand.NotifyCanExecuteChanged();
     }
 
     /// <summary>
@@ -176,6 +180,10 @@ public partial class ConversionViewModel : ViewModelBase
         _convertCts = new CancellationTokenSource();
         var cts = _convertCts;
 
+        IsConversionCompleted = false;
+        ConfirmCompletionCommand.NotifyCanExecuteChanged();
+        CancelConvertCommand.NotifyCanExecuteChanged();
+
         using var session = new ConversionSession();
 
         try
@@ -194,16 +202,24 @@ public partial class ConversionViewModel : ViewModelBase
             await Parallel.ForEachAsync(context.ActiveFiles, parallelOptions,
                 (item, token) => ProcessSingleFileAsync(item, settings, session, context, token));
 
+            IsConversionCompleted = true;
+            ConfirmCompletionCommand.NotifyCanExecuteChanged();
+            CancelConvertCommand.NotifyCanExecuteChanged();
+
             NotifyCompletionResult(cts.IsCancellationRequested, context);
         }
         catch (OperationCanceledException)
         {
             RestorePendingFiles();
             _snackbarService.Show(GetString("Msg_Convert_Cancelled"), SnackbarType.Info);
+            ResetConversionState();
         }
         finally
         {
-            ResetConversionState();
+            if (!IsConversionCompleted)
+            {
+                ResetConversionState();
+            }
         }
     }
 
@@ -377,6 +393,10 @@ public partial class ConversionViewModel : ViewModelBase
     /// </summary>
     private void ResetConversionState()
     {
+        IsConversionCompleted = false;
+        ConfirmCompletionCommand.NotifyCanExecuteChanged();
+        CancelConvertCommand.NotifyCanExecuteChanged();
+
         ConvertProgressPercent = 0;
         ProcessedCount = 0;
         TotalConvertCount = 0;
@@ -389,6 +409,12 @@ public partial class ConversionViewModel : ViewModelBase
         _convertCts?.Dispose();
         _convertCts = null;
         RequestStatus(AppStatus.Idle);
+    }
+
+    /// </summary>
+    private void ConfirmCompletion()
+    {
+        ResetConversionState();
     }
 
     /// <summary>
