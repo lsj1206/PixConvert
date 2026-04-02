@@ -20,9 +20,6 @@ public enum FileConvertStatus
     /// <summary>변환 도중 오류가 발생한 상태</summary>
     Error,
 
-    /// <summary>변환을 지원하지 않는 파일(시그니처 미판별 등)</summary>
-    Unsupported,
-
     /// <summary>Skip 정책으로 변환이 의도적으로 생략된 상태</summary>
     Skipped
 }
@@ -70,13 +67,17 @@ public partial class FileItem : ObservableObject
     [ObservableProperty]
     private bool isAnimation = false;
 
+    /// <summary>파일 지원 여부 (기본값 true, 분석 성공 시 false로 변경)</summary>
+    [ObservableProperty]
+    private bool isUnsupported = true;
+
     /// <summary>목록에 추가된 순번</summary>
     [ObservableProperty]
     private int? addIndex;
 
     /// <summary>현재 파일의 변환 상태</summary>
     [ObservableProperty]
-    private FileConvertStatus status = FileConvertStatus.Unsupported;
+    private FileConvertStatus status = FileConvertStatus.Pending;
 
     /// <summary>변환 진행률 (0~100)</summary>
     [ObservableProperty]
@@ -118,7 +119,7 @@ public partial class FileItem : ObservableObject
         ("jpeg", "jpg"),
     ];
 
-    /// <summary>확장자와 시그니처 포맷이 불일치하는지 여부</summary>
+    /// <summary>확장자와 시그니처 포맷이 불일치하는지 여부 (동의어 제외)</summary>
     public bool IsMismatch =>
         FileSignature != "-" &&
         !string.Equals(Extension, FileSignature, StringComparison.OrdinalIgnoreCase) &&
@@ -136,14 +137,7 @@ public partial class FileItem : ObservableObject
         OnPropertyChanged(nameof(IsMismatch));
 
         // 시그니처가 없으면 미지원 상태로 설정
-        if (value == "-")
-        {
-            Status = FileConvertStatus.Unsupported;
-        }
-        else if (Status == FileConvertStatus.Unsupported)
-        {
-            Status = FileConvertStatus.Pending;
-        }
+        IsUnsupported = (value == "-");
     }
 
     /// <summary>현재 Path를 기반으로 파일의 세부 구성 정보를 파싱합니다.</summary>

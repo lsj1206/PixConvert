@@ -81,7 +81,7 @@ public partial class ListManagerViewModel : ViewModelBase
         RemoveUnsupported = false;
 
         var signatures = _fileList.Items
-            .Where(i => i.Status != FileConvertStatus.Unsupported && i.FileSignature != "-")
+            .Where(i => !i.IsUnsupported)
             .Select(i => i.FileSignature)
             .Distinct();
 
@@ -107,8 +107,8 @@ public partial class ListManagerViewModel : ViewModelBase
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
         var itemsToRemove = _fileList.Items.Where(i =>
-            (RemoveUnsupported && i.Status == FileConvertStatus.Unsupported) ||
-            (i.FileSignature != "-" && extsToRemove.Contains(i.FileSignature))
+            (RemoveUnsupported && i.IsUnsupported) ||
+            (!i.IsUnsupported && extsToRemove.Contains(i.FileSignature))
         ).ToList();
 
         if (itemsToRemove.Count > 0)

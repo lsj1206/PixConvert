@@ -57,7 +57,7 @@ public partial class ConversionViewModel : ViewModelBase
         public ConversionContext(FileListViewModel fileList, IPresetService presetService)
         {
             ActiveFiles = fileList.Items
-                .Where(item => item.Status != FileConvertStatus.Unsupported)
+                .Where(item => !item.IsUnsupported)
                 .ToList();
             TotalCount = ActiveFiles.Count;
             PresetName = presetService.Config.LastSelectedPresetName ?? string.Empty;
@@ -371,6 +371,7 @@ public partial class ConversionViewModel : ViewModelBase
             return;
         }
 
+        // context.ActiveFiles는 이미 시작 시점에 1개 이상임이 보장됨 (ValidateBeforeConvertAsync)
         int successCount = context.ActiveFiles.Count(i => i.Status == FileConvertStatus.Success);
         int skippedCount = context.ActiveFiles.Count(i => i.Status == FileConvertStatus.Skipped);
 

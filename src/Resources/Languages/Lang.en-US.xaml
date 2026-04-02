@@ -24,7 +24,6 @@
     <sys:String x:Key="Status_Processing">Converting</sys:String>
     <sys:String x:Key="Status_Success">Success</sys:String>
     <sys:String x:Key="Status_Error">Error</sys:String>
-    <sys:String x:Key="Status_Unsupported">N/A</sys:String>
     <sys:String x:Key="Status_Skipped">Skipped</sys:String>
 
     <!-- Sidebar : Button -->

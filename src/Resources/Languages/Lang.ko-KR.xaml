@@ -24,7 +24,6 @@
     <sys:String x:Key="Status_Processing">변환 중</sys:String>
     <sys:String x:Key="Status_Success">완료</sys:String>
     <sys:String x:Key="Status_Error">실패</sys:String>
-    <sys:String x:Key="Status_Unsupported">미지원</sys:String>
     <sys:String x:Key="Status_Skipped">건너뜀</sys:String>
 
     <!-- 사이드바 : 버튼 -->

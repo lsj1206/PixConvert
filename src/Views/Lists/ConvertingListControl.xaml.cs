@@ -25,7 +25,7 @@ public partial class ConvertingListControl : UserControl
     {
         if (e.Item is FileItem item)
         {
-            e.Accepted = item.Status != FileConvertStatus.Unsupported;
+            e.Accepted = !item.IsUnsupported;
         }
     }
 

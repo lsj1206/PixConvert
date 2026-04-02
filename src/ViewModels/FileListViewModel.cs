@@ -32,7 +32,7 @@ public class FileListViewModel : ViewModelBase
     public int TotalCount => Items.Count;
 
     /// <summary>미지원(시그니처 미판별) 파일 수</summary>
-    public int UnsupportedCount => Items.Count(x => x.FileSignature == "-");
+    public int UnsupportedCount => Items.Count(x => x.IsUnsupported);
 
     /// <summary>다음에 추가될 아이템의 기본 순번</summary>
     private int _nextAddIndex = 1;
