@@ -55,22 +55,10 @@ public class NetVipsProvider : IProviderService, IDisposable
             Directory.CreateDirectory(outputDir);
 
         // ── 2. 실제 변환 프로세스 격리 (Task.Run) ─────────────────────────
-        // 10% 단위로 UI를 업데이트하고 100% 노이즈를 필터링하도록 설계된 Progress 핸들러
-        int lastReported = 0;
-        var progressHandler = new Progress<int>(p =>
-        {
-            // libvips의 중간 posteval(100%) 시그널을 무시하고, 10% 간격으로만 UI 갱신
-            if (p < 100 && (p >= lastReported + 10))
-            {
-                file.Progress = p;
-                lastReported = p;
-            }
-        });
-
         // libvips의 동기 I/O 및 내부 스레드 관리를 .NET 스레드풀의 특정 스레드로 격리하여 보호합니다.
         try
         {
-            await Task.Run(() => ExecuteConversion(file, settings, outputPath, progressHandler, token), token);
+            await Task.Run(() => ExecuteConversion(file, settings, outputPath, token), token);
 
             // 변환 완료 후 결과 파일 크기 측정
             if (System.IO.File.Exists(outputPath))
@@ -99,7 +87,7 @@ public class NetVipsProvider : IProviderService, IDisposable
     /// <summary>
     /// 실제 변환 로직을 수행하는 내부 동기 메서드입니다. (Task.Run 내부에서 실행)
     /// </summary>
-    private void ExecuteConversion(FileItem file, ConvertSettings settings, string outputPath, IProgress<int> progress, CancellationToken token)
+    private void ExecuteConversion(FileItem file, ConvertSettings settings, string outputPath, CancellationToken token)
     {
         token.ThrowIfCancellationRequested();
 
@@ -137,9 +125,6 @@ public class NetVipsProvider : IProviderService, IDisposable
         // ── 4. 포맷별 전용 세이버(Saver) 호출 ──────────────────────────────
         try
         {
-            // --- 진행률 연동 활성화 (최종 작업 객체인 workImage에 바인딩) ---
-            workImage.SetProgress(progress, token);
-
             SaveWithFormat(workImage, outputPath, targetFormat, settings);
         }
         finally
