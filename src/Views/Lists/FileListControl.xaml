@@ -132,30 +132,54 @@
                                         TextTrimming="CharacterEllipsis"
                                         VerticalAlignment="Center" />
 
-                                    <!-- FileList : Animation_Badge -->
-                                    <Border
-                                        Grid.Column="1"
-                                        Margin="6,0,0,0"
-                                        Padding="4,1"
-                                        VerticalAlignment="Center"
-                                        Background="#E1BEE7"
-                                        CornerRadius="4">
-                                        <Border.Style>
-                                            <Style TargetType="Border">
-                                                <Setter Property="Visibility" Value="Collapsed" />
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding IsAnimation}" Value="True">
-                                                        <Setter Property="Visibility" Value="Visible" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </Border.Style>
-                                        <TextBlock
-                                            FontSize="9"
-                                            FontWeight="Bold"
-                                            Foreground="#6A1B9A"
-                                            Text="ANI" />
-                                    </Border>
+                                    <!-- FileList : Tags_Container -->
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                        <!-- FileList : Animation_Badge -->
+                                        <Border
+                                            Margin="6,0,0,0"
+                                            Padding="4,1"
+                                            Background="#E1BEE7"
+                                            CornerRadius="4">
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsAnimation}" Value="True">
+                                                            <Setter Property="Visibility" Value="Visible" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+                                            <TextBlock
+                                                FontSize="9"
+                                                FontWeight="Bold"
+                                                Foreground="#6A1B9A"
+                                                Text="ANI" />
+                                        </Border>
+
+                                        <!-- FileList : Unsupported_Badge (N/A) -->
+                                        <Border
+                                            Margin="6,0,0,0"
+                                            Padding="4,1"
+                                            Background="#FFEBEE"
+                                            CornerRadius="4">
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Status}" Value="Unsupported">
+                                                            <Setter Property="Visibility" Value="Visible" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+                                            <TextBlock
+                                                FontSize="9"
+                                                FontWeight="Bold"
+                                                Foreground="#C62828"
+                                                Text="N/A" />
+                                        </Border>
+                                    </StackPanel>
                                 </Grid>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
