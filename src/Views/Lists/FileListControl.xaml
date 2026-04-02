@@ -8,6 +8,9 @@
              mc:Ignorable="d">
 
     <UserControl.Resources>
+        <!-- Converters -->
+        <converters:FileSizeConverter x:Key="FileSizeConverter" />
+
         <!-- FileList : Item_Brushes -->
         <SolidColorBrush x:Key="ItemHoverBackground" Color="#E5F3FF" />
         <SolidColorBrush x:Key="ItemSelectedBackground" Color="#CCE8FF" />
@@ -215,7 +218,7 @@
                             <DataTemplate>
                                 <TextBlock
                                     Foreground="{DynamicResource TextSecondary}"
-                                    Text="{Binding DisplaySize}" />
+                                    Text="{Binding Size, Converter={StaticResource FileSizeConverter}}" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

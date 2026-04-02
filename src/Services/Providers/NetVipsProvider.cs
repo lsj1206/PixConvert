@@ -59,6 +59,13 @@ public class NetVipsProvider : IProviderService, IDisposable
         try
         {
             await Task.Run(() => ExecuteConversion(file, settings, outputPath, token), token);
+
+            // 변환 완료 후 결과 파일 크기 측정
+            if (System.IO.File.Exists(outputPath))
+            {
+                file.OutputSize = new System.IO.FileInfo(outputPath).Length;
+            }
+
             file.Progress = 100;
             file.OutputPath = outputPath;
             file.Status = FileConvertStatus.Success;

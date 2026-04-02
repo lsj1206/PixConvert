@@ -62,10 +62,6 @@ public partial class FileItem : ObservableObject
     [ObservableProperty]
     private long size;
 
-    /// <summary>읽기 쉬운 단위로 변환된 파일 크기</summary>
-    [ObservableProperty]
-    private string displaySize = string.Empty;
-
     /// <summary>파일 시그니처</summary>
     [ObservableProperty]
     private string fileSignature = "-";
@@ -93,6 +89,10 @@ public partial class FileItem : ObservableObject
 
     /// <summary>변환 성공 후 생성된 결과 파일의 이름</summary>
     public string OutputName => string.IsNullOrEmpty(OutputPath) ? string.Empty : System.IO.Path.GetFileName(OutputPath);
+
+    /// <summary>변환 성공 후 생성된 결과 파일의 바이트 크기</summary>
+    [ObservableProperty]
+    private long outputSize;
 
     /// <summary>지역화된 상태 텍스트를 가져옵니다. (안전한 제3방식)</summary>
     public string StatusText => SafeGetResource($"Status_{Status}");

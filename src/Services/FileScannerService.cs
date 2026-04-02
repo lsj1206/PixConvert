@@ -12,9 +12,6 @@ namespace PixConvert.Services;
 /// </summary>
 public class FileScannerService : IFileScannerService
 {
-    // 파일 크기 단위 정의
-    private static readonly string[] SizeSuffixes = ["B", "KB", "MB", "GB", "TB"];
-
     private readonly ILogger<FileScannerService> _logger;
     private readonly ILanguageService _languageService;
 
@@ -73,7 +70,6 @@ public class FileScannerService : IFileScannerService
                 {
                     Path = path,
                     Size = length,
-                    DisplaySize = FormatFileSize(length),
                     FileSignature = signature,
                     IsAnimation = isAnim,
                     AddIndex = null
@@ -200,22 +196,5 @@ public class FileScannerService : IFileScannerService
                 }
             }
         }
-    }
-
-    /// <summary>
-    /// 파일 바이트 크기를 사람이 읽기 쉬운 단위(KB, MB 등)로 변환합니다.
-    /// </summary>
-    /// <param name="bytes">바이트 단위의 파일 크기</param>
-    /// <returns>단위가 포함된 문자열 (예: 1.5 MB)</returns>
-    private static string FormatFileSize(long bytes)
-    {
-        if (bytes <= 0) return "0 B";
-
-        // 로그 함수를 이용하여 단위 인덱스 계산
-        int i = (int)Math.Log(bytes, 1024);
-        i = Math.Min(i, SizeSuffixes.Length - 1);
-
-        double readable = bytes / Math.Pow(1024, i);
-        return $"{readable:0.#} {SizeSuffixes[i]}";
     }
 }

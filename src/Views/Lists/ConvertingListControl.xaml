@@ -16,6 +16,9 @@
 
         <!-- Converter for Status Text -->
         <converters:EnumToBoolConverter x:Key="EnumToBoolConverter" />
+        <converters:FileSizeConverter x:Key="FileSizeConverter" />
+        <converters:SizeRatioConverter x:Key="SizeRatioConverter" />
+        <converters:SizeRatioStateConverter x:Key="SizeRatioStateConverter" />
 
         <!-- FileList : Item_ContainerStyle -->
         <Style x:Key="FileItemContainerStyle" TargetType="ListViewItem">
@@ -143,14 +146,14 @@
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
-                    <!-- Column : Size -->
+                    <!-- Column : Size (Original) -->
                     <GridViewColumn Width="80">
                         <GridViewColumn.Header>
                             <GridViewColumnHeader Content="{DynamicResource List_Size}" />
                         </GridViewColumn.Header>
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Foreground="{DynamicResource TextSecondary}" Text="{Binding DisplaySize}" />
+                                <TextBlock Foreground="{DynamicResource TextSecondary}" Text="{Binding Size, Converter={StaticResource FileSizeConverter}}" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
@@ -215,6 +218,78 @@
                                     <DataTrigger Binding="{Binding Status}" Value="Error">
                                         <Setter TargetName="StatusProgressBar" Property="Foreground" Value="#4DFFC107" />
                                         <Setter TargetName="StatusLabel" Property="Foreground" Value="#F57F17" />
+                                    </DataTrigger>
+                                </DataTemplate.Triggers>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <!-- Column : Resized -->
+                    <GridViewColumn Width="120">
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader Content="{DynamicResource List_Resized}" />
+                        </GridViewColumn.Header>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Grid x:Name="ResizedContainer" VerticalAlignment="Center" Visibility="Collapsed">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Grid.Column="0" VerticalAlignment="Center" FontSize="11"
+                                               Text="{Binding OutputSize, Converter={StaticResource FileSizeConverter}}"
+                                               Foreground="{DynamicResource TextSecondary}" />
+
+                                    <Border x:Name="RatioBadge" Grid.Column="1" Margin="6,0,0,0" Padding="4,1" VerticalAlignment="Center"
+                                            HorizontalAlignment="Left" CornerRadius="4">
+                                        <TextBlock x:Name="RatioText" FontSize="9" FontWeight="Bold">
+                                            <TextBlock.Text>
+                                                <MultiBinding Converter="{StaticResource SizeRatioConverter}">
+                                                    <Binding Path="Size" />
+                                                    <Binding Path="OutputSize" />
+                                                </MultiBinding>
+                                            </TextBlock.Text>
+                                        </TextBlock>
+                                    </Border>
+                                </Grid>
+                                <DataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding Status}" Value="Success">
+                                        <Setter TargetName="ResizedContainer" Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+
+                                    <!-- Ratio Status Triggers -->
+                                    <DataTrigger Value="Success">
+                                        <DataTrigger.Binding>
+                                            <MultiBinding Converter="{StaticResource SizeRatioStateConverter}">
+                                                <Binding Path="Size" />
+                                                <Binding Path="OutputSize" />
+                                            </MultiBinding>
+                                        </DataTrigger.Binding>
+                                        <Setter TargetName="RatioBadge" Property="Background" Value="#E8F5E9" />
+                                        <Setter TargetName="RatioText" Property="Foreground" Value="#2E7D32" />
+                                    </DataTrigger>
+
+                                    <DataTrigger Value="Warning">
+                                        <DataTrigger.Binding>
+                                            <MultiBinding Converter="{StaticResource SizeRatioStateConverter}">
+                                                <Binding Path="Size" />
+                                                <Binding Path="OutputSize" />
+                                            </MultiBinding>
+                                        </DataTrigger.Binding>
+                                        <Setter TargetName="RatioBadge" Property="Background" Value="#FFF3E0" />
+                                        <Setter TargetName="RatioText" Property="Foreground" Value="#E65100" />
+                                    </DataTrigger>
+
+                                    <DataTrigger Value="Error">
+                                        <DataTrigger.Binding>
+                                            <MultiBinding Converter="{StaticResource SizeRatioStateConverter}">
+                                                <Binding Path="Size" />
+                                                <Binding Path="OutputSize" />
+                                            </MultiBinding>
+                                        </DataTrigger.Binding>
+                                        <Setter TargetName="RatioBadge" Property="Background" Value="#FFEBEE" />
+                                        <Setter TargetName="RatioText" Property="Foreground" Value="#C62828" />
                                     </DataTrigger>
                                 </DataTemplate.Triggers>
                             </DataTemplate>

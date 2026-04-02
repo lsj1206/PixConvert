@@ -14,9 +14,10 @@
     <sys:String x:Key="List_Name">Name</sys:String>
     <sys:String x:Key="List_Extension">Ext.</sys:String>
     <sys:String x:Key="List_Signature">Format</sys:String>
-    <sys:String x:Key="List_Progress">Progress</sys:String>
     <sys:String x:Key="List_Size">Size</sys:String>
     <sys:String x:Key="List_Path">Path</sys:String>
+    <sys:String x:Key="List_Progress">Progress</sys:String>
+    <sys:String x:Key="List_Resized">Resized</sys:String>
 
     <!-- List : Status -->
     <sys:String x:Key="Status_Pending">Ready</sys:String>
