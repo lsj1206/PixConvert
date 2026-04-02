@@ -57,43 +57,49 @@ public partial class FileItem : ObservableObject
 
     /// <summary>바이트 단위의 파일 크기</summary>
     [ObservableProperty]
-    private long size;
+    private long _size;
 
     /// <summary>파일 시그니처</summary>
     [ObservableProperty]
-    private string fileSignature = "-";
+    private string _fileSignature = "-";
 
     /// <summary>애니메이션 포함 여부 (GIF, WebP-Ani)</summary>
     [ObservableProperty]
-    private bool isAnimation = false;
+    private bool _isAnimation = false;
 
     /// <summary>파일 지원 여부 (기본값 true, 분석 성공 시 false로 변경)</summary>
     [ObservableProperty]
-    private bool isUnsupported = true;
+    private bool _isUnsupported = true;
+
+    /// <summary>확장자와 시그니처 포맷이 불일치하는지 여부 (동의어 제외)</summary>
+    public bool IsMismatch =>
+        FileSignature != "-" &&
+        !string.Equals(Extension, FileSignature, StringComparison.OrdinalIgnoreCase) &&
+        !Synonyms.Contains((Extension, FileSignature.ToLower()));
 
     /// <summary>목록에 추가된 순번</summary>
     [ObservableProperty]
-    private int? addIndex;
+    private int? _addIndex;
 
     /// <summary>현재 파일의 변환 상태</summary>
     [ObservableProperty]
-    private FileConvertStatus status = FileConvertStatus.Pending;
+    private FileConvertStatus _status = FileConvertStatus.Pending;
 
     /// <summary>변환 진행률 (0~100)</summary>
     [ObservableProperty]
-    private double progress = 0;
+    private double _progress = 0;
 
     /// <summary>변환 성공 후 생성된 결과 파일의 전체 경로</summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(OutputName))]
-    private string? outputPath;
+    private string? _outputPath;
 
     /// <summary>변환 성공 후 생성된 결과 파일의 이름</summary>
     public string OutputName => string.IsNullOrEmpty(OutputPath) ? string.Empty : System.IO.Path.GetFileName(OutputPath);
 
     /// <summary>변환 성공 후 생성된 결과 파일의 바이트 크기</summary>
     [ObservableProperty]
-    private long outputSize;
+    private long _outputSize;
 
     /// <summary>지역화된 상태 텍스트를 가져옵니다. (안전한 제3방식)</summary>
     public string StatusText => SafeGetResource($"Status_{Status}");
@@ -110,20 +116,6 @@ public partial class FileItem : ObservableObject
         if (System.Windows.Application.Current == null) return key;
         return System.Windows.Application.Current.TryFindResource(key) as string ?? key;
     }
-
-    /// <summary>확장자 동의어 쌍 테이블 (양방향 등록).</summary>
-    private static readonly HashSet<(string, string)> Synonyms =
-    [
-        // jpg와 jpeg는 동일 포맷의 다른 표기
-        ("jpg", "jpeg"),
-        ("jpeg", "jpg"),
-    ];
-
-    /// <summary>확장자와 시그니처 포맷이 불일치하는지 여부 (동의어 제외)</summary>
-    public bool IsMismatch =>
-        FileSignature != "-" &&
-        !string.Equals(Extension, FileSignature, StringComparison.OrdinalIgnoreCase) &&
-        !Synonyms.Contains((Extension, FileSignature.ToLower()));
 
     /// <summary>Status 변경 시 StatusText 동기화 알림</summary>
     partial void OnStatusChanged(FileConvertStatus value)
@@ -155,4 +147,12 @@ public partial class FileItem : ObservableObject
         OnPropertyChanged(nameof(Name));
         OnPropertyChanged(nameof(Extension));
     }
+
+    /// <summary>확장자 동의어 쌍 테이블 (양방향 등록).</summary>
+    private static readonly HashSet<(string, string)> Synonyms =
+    [
+        // jpg와 jpeg는 동일 포맷의 다른 표기
+        ("jpg", "jpeg"),
+        ("jpeg", "jpg"),
+    ];
 }
