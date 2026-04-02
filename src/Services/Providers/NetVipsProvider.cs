@@ -60,6 +60,7 @@ public class NetVipsProvider : IProviderService, IDisposable
         {
             await Task.Run(() => ExecuteConversion(file, settings, outputPath, token), token);
             file.Progress = 100;
+            file.OutputPath = outputPath;
             file.Status = FileConvertStatus.Success;
         }
         catch (OperationCanceledException)

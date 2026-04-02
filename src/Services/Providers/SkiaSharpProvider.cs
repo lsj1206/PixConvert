@@ -121,6 +121,7 @@ public class SkiaSharpProvider : IProviderService, IDisposable
                 }
 
                 file.Progress = 100;
+                file.OutputPath = outputPath;
                 file.Status = FileConvertStatus.Success;
             }
             catch (Exception)

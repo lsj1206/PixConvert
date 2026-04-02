@@ -86,6 +86,14 @@ public partial class FileItem : ObservableObject
     [ObservableProperty]
     private double progress = 0;
 
+    /// <summary>변환 성공 후 생성된 결과 파일의 전체 경로</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(OutputName))]
+    private string? outputPath;
+
+    /// <summary>변환 성공 후 생성된 결과 파일의 이름</summary>
+    public string OutputName => string.IsNullOrEmpty(OutputPath) ? string.Empty : System.IO.Path.GetFileName(OutputPath);
+
     /// <summary>지역화된 상태 텍스트를 가져옵니다. (안전한 제3방식)</summary>
     public string StatusText => SafeGetResource($"Status_{Status}");
 

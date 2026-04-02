@@ -68,6 +68,9 @@ public partial class ConversionViewModel : ViewModelBase
     /// <summary>현재 병렬로 처리 중인 파일 목록 (UI 표시용)</summary>
     public ObservableCollection<ActiveProcess> ActiveProcesses { get; } = new();
 
+    /// <summary>전체 원본 파일 목록에 대한 접근 (리스트 UI 렌더링용)</summary>
+    public ReadOnlyObservableCollection<FileItem> Items => _fileList.Items;
+
     [ObservableProperty] private string _currentCpuUsage = string.Empty;
     [ObservableProperty] private string _currentTargetFormat = string.Empty;
     [ObservableProperty] private string _currentQuality = string.Empty;
