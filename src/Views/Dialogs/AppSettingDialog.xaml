@@ -46,9 +46,11 @@
                                     Grid.Column="1"
                                     Width="120"
                                     VerticalAlignment="Center"
-                                    DisplayMemberPath="Display"
-                                    ItemsSource="{Binding Languages}"
-                                    SelectedItem="{Binding SelectedLanguage, Mode=TwoWay}" />
+                                    SelectedValue="{Binding CurrentLanguageCode, Mode=TwoWay}"
+                                    SelectedValuePath="Tag">
+                                    <ComboBoxItem Content="English" Tag="en-US" />
+                                    <ComboBoxItem Content="한국어" Tag="ko-KR" />
+                                </ComboBox>
                             </Grid>
 
                             <Separator />

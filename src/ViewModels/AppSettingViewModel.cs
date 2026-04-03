@@ -1,8 +1,10 @@
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using PixConvert.Models;
 using PixConvert.Services;
+using PixConvert.Services.Interfaces;
 
 namespace PixConvert.ViewModels;
 
@@ -11,19 +13,13 @@ namespace PixConvert.ViewModels;
 /// </summary>
 public partial class AppSettingViewModel : ViewModelBase
 {
+    private readonly ISettingService _settingService;
     private readonly ListManagerViewModel _listManager;
 
     [ObservableProperty] private string _appVersion = App.Version;
 
-    /// <summary>애플리케이션에서 지원하는 언어 목록</summary>
-    public ObservableCollection<LanguageOption> Languages { get; } =
-    [
-        new() { Display = "English", Code = "en-US" },
-        new() { Display = "한국어", Code = "ko-KR" }
-    ];
-
-    /// <summary>현재 선택된 언어 옵션</summary>
-    [ObservableProperty] private LanguageOption _selectedLanguage;
+    /// <summary>현재 선택된 언어 코드 (en-US, ko-KR 등)</summary>
+    [ObservableProperty] private string _currentLanguageCode;
 
     /// <summary>파일 삭제 시 확인 메시지 표시 여부 (ListManagerViewModel 연동)</summary>
     public bool ConfirmDeletion
@@ -33,8 +29,10 @@ public partial class AppSettingViewModel : ViewModelBase
         {
             if (_listManager.ConfirmDeletion != value)
             {
+                _settingService.Settings.ConfirmDeletion = value;
                 _listManager.ConfirmDeletion = value;
                 OnPropertyChanged();
+                _ = SaveSettingsAsync();
             }
         }
     }
@@ -45,22 +43,35 @@ public partial class AppSettingViewModel : ViewModelBase
     public AppSettingViewModel(
         ILanguageService languageService,
         ILogger<AppSettingViewModel> logger,
+        ISettingService settingService,
         ListManagerViewModel listManager)
         : base(languageService, logger)
     {
+        _settingService = settingService;
         _listManager = listManager;
 
-        // 초기 언어 설정 동기화 (현재 적용된 언어 기준)
-        var currentLang = _languageService.GetCurrentLanguage();
-        SelectedLanguage = Languages.FirstOrDefault(l => l.Code == currentLang) ?? Languages[0];
+        // 저장된 설정으로 초기값 동기화
+        _listManager.ConfirmDeletion = _settingService.Settings.ConfirmDeletion;
+
+        // 저장된 언어로 초기값 설정
+        CurrentLanguageCode = _languageService.GetCurrentLanguage();
     }
 
     /// <summary>
-    /// 선택된 언어가 변경되었을 때 호출되는 메서드
+    /// 현재 언어 코드가 변경되었을 때 호출되는 메서드
     /// </summary>
-    partial void OnSelectedLanguageChanged(LanguageOption value)
+    partial void OnCurrentLanguageCodeChanged(string value)
     {
-        if (value != null && _languageService.GetCurrentLanguage() != value.Code)
-            _languageService.ChangeLanguage(value.Code);
+        if (!string.IsNullOrEmpty(value) && _languageService.GetCurrentLanguage() != value)
+        {
+            _languageService.ChangeLanguage(value);
+            _settingService.Settings.Language = value;
+            _ = SaveSettingsAsync();
+        }
     }
+
+    /// <summary>
+    /// 현재 설정 상태를 settings.json에 저장합니다.
+    /// </summary>
+    private Task SaveSettingsAsync() => _settingService.SaveAsync();
 }

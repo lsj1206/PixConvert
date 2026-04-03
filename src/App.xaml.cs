@@ -35,7 +35,7 @@ public partial class App : Application
         string baseDir = AppDomain.CurrentDomain.BaseDirectory;
         string logFilePath = System.IO.Path.Combine(baseDir, "logs", "pixconvert_log_.txt");
 
-#if DEBUG
+    #if DEBUG
         // 개발 환경(DEBUG)에서는 src와 동일한 레벨(프로젝트 최상위)의 logs 폴더로 지정
         var dir = new System.IO.DirectoryInfo(baseDir);
         while (dir != null && dir.Name != "src")
@@ -46,9 +46,9 @@ public partial class App : Application
         {
             logFilePath = System.IO.Path.Combine(dir.Parent.FullName, "logs", "pixconvert_log_.txt");
         }
-#endif
+    #endif
 
-        // 1. Serilog 전역 로거 구성 (DI 조립 전 발생하는 치명적 에러 캐치용)
+        // 1. Serilog 전역 로거 구성 (DI 조립 전 발생하는 에러 체크)
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Information()
             .WriteTo.Async(a => a.File(logFilePath,
@@ -56,17 +56,17 @@ public partial class App : Application
                 retainedFileCountLimit: 7))
             .CreateLogger();
 
-        // 2. 글로벌 예외 방어벽 구축
-        SetupGlobalExceptionHandling();
+        // 2. 예외 방어벽
+        SetupExceptionHandling();
 
         // 3. 서비스 구성
         Services = ConfigureServices();
     }
 
     /// <summary>
-    /// 처리되지 않은 모든 전역 예외를 잡아 로깅하고 앱의 강제 종료를 방어합니다.
+    /// 처리되지 않은 전역 예외를 잡아 로깅하고 앱의 강제 종료를 방어합니다.
     /// </summary>
-    private void SetupGlobalExceptionHandling()
+    private void SetupExceptionHandling()
     {
         // UI 스레드 예외
         this.DispatcherUnhandledException += (s, e) =>
@@ -96,24 +96,23 @@ public partial class App : Application
     /// <returns>구성된 서비스 제공자 인스턴스</returns>
     private static IServiceProvider ConfigureServices()
     {
+        // 서비스 컬렉션 생성
         var services = new ServiceCollection();
 
         // [Logging] Serilog DI 등록
-        services.AddLogging(loggingBuilder =>
-        {
-            loggingBuilder.AddSerilog(dispose: true);
-        });
+        services.AddLogging(loggingBuilder => loggingBuilder.AddSerilog(dispose: true));
 
         // [Services] 싱글톤 서비스 등록
         services.AddSingleton<IWindowService, WindowService>();
-        services.AddSingleton<IPresetService, PresetService>();
         services.AddSingleton<IDialogService, DialogService>();
         services.AddSingleton<ISnackbarService, SnackbarService>();
-        services.AddSingleton<IFileScannerService, FileScannerService>();
-        services.AddSingleton<ISortingService, SortingService>();
         services.AddSingleton<ILanguageService, LanguageService>();
-        services.AddSingleton<IDriveInfoService, DriveInfoService>(); // 추가
+        services.AddSingleton<ISettingService, SettingService>();
+        services.AddSingleton<IPresetService, PresetService>();
+        services.AddSingleton<IDriveInfoService, DriveInfoService>();
+        services.AddSingleton<IFileScannerService, FileScannerService>();
         services.AddSingleton<IFileAnalyzerService, FileAnalyzerService>();
+        services.AddSingleton<ISortingService, SortingService>();
 
         // [Conversion Engine] 변환 엔진 관련 서비스 등록
         services.AddSingleton<SkiaSharpProvider>();
@@ -122,20 +121,19 @@ public partial class App : Application
 
         // [ViewModel] 화면 상태 관리 뷰모델 등록
         services.AddTransient<MainViewModel>();
+        services.AddSingleton<HeaderViewModel>();
         services.AddSingleton<SnackbarViewModel>();
         services.AddSingleton<FileListViewModel>();
-        services.AddSingleton<SortFilterViewModel>(); // 정렬/필터 상태
+        services.AddSingleton<SortFilterViewModel>();
 
         // [ViewModel] 사이드바 3분할 뷰모델 등록
         services.AddSingleton<FileInputViewModel>();
         services.AddSingleton<ConversionViewModel>();
         services.AddSingleton<ListManagerViewModel>();
-        services.AddSingleton<HeaderViewModel>(); // 추가
 
         // 다이얼로그 전용 뷰모델 및 팩토리 패턴 등록
         services.AddTransient<ConvertSettingViewModel>();
         services.AddTransient<Func<ConvertSettingViewModel>>(sp => () => sp.GetRequiredService<ConvertSettingViewModel>());
-
         services.AddTransient<AppSettingViewModel>();
         services.AddTransient<Func<AppSettingViewModel>>(sp => () => sp.GetRequiredService<AppSettingViewModel>());
 
@@ -148,7 +146,7 @@ public partial class App : Application
     /// <summary>
     /// 애플리케이션이 시작될 때 호출되며, 테마 설정과 메인 윈도우 표시를 수행합니다.
     /// </summary>
-    protected override void OnStartup(StartupEventArgs e)
+    protected override async void OnStartup(StartupEventArgs e)
     {
         try
         {
@@ -156,12 +154,9 @@ public partial class App : Application
 
             Log.Information(GetLogString("Log_App_Start"));
 
-            // ModernWpf 테마를 Light(밝게) 모드로 설정
-            ThemeManager.Current.ApplicationTheme = ApplicationTheme.Light;
-
-            // 기존 언어 설정 초기화 (시스템 언어 적용)
-            var langService = Services.GetRequiredService<ILanguageService>();
-            langService.ChangeLanguage(langService.GetSystemLanguage());
+            // 설정 파일 로드 및 설정 적용
+            var settingService = Services.GetRequiredService<ISettingService>();
+            await settingService.InitializeAsync();
 
             // 메인 윈도우 생성 및 뷰모델 연결 후 표시
             var mainWindow = Services.GetRequiredService<MainWindow>();
@@ -177,6 +172,9 @@ public partial class App : Application
         }
     }
 
+    /// <summary>
+    /// 애플리케이션이 종료될 때 호출되며, 리소스를 정리합니다.
+    /// </summary>
     protected override void OnExit(ExitEventArgs e)
     {
         Log.Information(GetLogString("Log_App_End"));

@@ -55,6 +55,14 @@
     <system:String x:Key="Log_Preset_SubFolderEmpty">[PresetService] 하위 폴더 이름이 비어있습니다.</system:String>
     <system:String x:Key="Log_Preset_SubFolderInvalid">[PresetService] 하위 폴더 이름에 부적절한 문자가 포함됨: {Name}</system:String>
 
+    <!-- SettingService.cs -->
+    <system:String x:Key="Log_Setting_FileNotFound">[SettingService] 설정 파일이 존재하지 않아 기본값을 생성합니다.</system:String>
+    <system:String x:Key="Log_Setting_FileEmpty">[SettingService] 설정 파일이 비어있어 기본값을 사용합니다.</system:String>
+    <system:String x:Key="Log_Setting_FileLoadSuccess">[SettingService] 설정 파일 로드 완료.</system:String>
+    <system:String x:Key="Log_Setting_FileLoadError">[SettingService] 설정 로드 중 오류 발생. 기본값을 사용합니다.</system:String>
+    <system:String x:Key="Log_Setting_FileSaveSuccess">[SettingService] 설정 저장 완료.</system:String>
+    <system:String x:Key="Log_Setting_FileSaveError">[SettingService] 설정 저장 중 오류 발생.</system:String>
+
     <!-- SnackbarService.cs -->
     <system:String x:Key="Log_Snackbar_ShowError">[SnackbarService] Show 처리 중 예외 발생</system:String>
     <system:String x:Key="Log_Snackbar_ShowProgressError">[SnackbarService] ShowProgress 처리 중 예외 발생</system:String>
