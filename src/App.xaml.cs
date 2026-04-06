@@ -158,6 +158,10 @@ public partial class App : Application
             var settingService = Services.GetRequiredService<ISettingService>();
             await settingService.InitializeAsync();
 
+            // 프리셋 로드
+            var presetService = Services.GetRequiredService<IPresetService>();
+            await presetService.InitializeAsync();
+
             // 메인 윈도우 생성 및 뷰모델 연결 후 표시
             var mainWindow = Services.GetRequiredService<MainWindow>();
             mainWindow.DataContext = Services.GetRequiredService<MainViewModel>();

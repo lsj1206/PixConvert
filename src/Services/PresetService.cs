@@ -20,6 +20,8 @@ public class PresetService : IPresetService
 
     public PresetConfig Config { get; private set; } = new();
 
+    public ConvertPreset? ActivePreset { get; private set; }
+
     private readonly ILanguageService _languageService;
 
     public PresetService(ILogger<PresetService> logger, ILanguageService languageService)
@@ -27,7 +29,7 @@ public class PresetService : IPresetService
         _logger = logger;
         _languageService = languageService;
 
-        // %AppData%/PixConvert/settings.json 경로 설정
+        // %AppData%/PixConvert/presets.json 경로 설정
         string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
         string folder = Path.Combine(appData, "PixConvert");
 
@@ -38,9 +40,9 @@ public class PresetService : IPresetService
     }
 
     /// <summary>
-    /// 설정 파일을 비동기적으로 로드합니다. 파일이 없거나 오류 발생 시 기본값을 사용합니다.
+    /// 앱 시작 시 프리셋 파일을 로드하여 변환에 직접 사용할 ActivePreset을 초기화합니다.
     /// </summary>
-    public async Task LoadAsync()
+    public async Task InitializeAsync()
     {
         try
         {
@@ -48,108 +50,87 @@ public class PresetService : IPresetService
             {
                 _logger.LogInformation(_languageService.GetString("Log_Preset_FileNotFound"));
                 Config = CreateDefaultConfig();
+                ActivePreset = null;
                 return;
             }
 
             string json = await File.ReadAllTextAsync(_configPath);
             var loaded = JsonSerializer.Deserialize<PresetConfig>(json);
 
-            if (loaded == null)
+            if (loaded == null || loaded.Presets == null)
             {
                 _logger.LogWarning(_languageService.GetString("Log_Preset_FileEmpty"));
                 Config = CreateDefaultConfig();
+                ActivePreset = null;
+                return;
+            }
+
+            Config = loaded;
+
+            // 로드된 데이터에서 LastSelectedPresetName을 찾아 ActivePreset으로 바인딩
+            var active = Config.Presets.FirstOrDefault(p => p.Name == Config.LastSelectedPresetName);
+            if (active != null)
+            {
+                ActivePreset = active;
+                _logger.LogInformation(_languageService.GetString("Log_Preset_FileLoadSuccess") + $" (Active: {active.Name})");
             }
             else
             {
-                Config = loaded;
-                // ValidPresetFile 내부에서 구조 이상 감지 시 로그 및 자동 복구 처리
-                if (!ValidPresetFile())
-                    _ = SaveAsync(); // 복구된 설정 즉시 파일에 반영
-                _logger.LogInformation(_languageService.GetString("Log_Preset_FileLoadSuccess"));
+                _logger.LogWarning(_languageService.GetString("Log_Preset_NotFoundSelected"), Config.LastSelectedPresetName);
+                ActivePreset = null;
             }
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, _languageService.GetString("Log_Preset_FileLoadError"));
+            // 파싱 실패 또는 오류 발생 시 사용자의 원본 데이터가 증발하지 않도록 백업 수행
+            try
+            {
+                if (File.Exists(_configPath))
+                {
+                    string backupPath = _configPath + ".bak";
+                    File.Copy(_configPath, backupPath, true);
+                    _logger.LogWarning("손상된 프리셋 파일을 백업했습니다: {BackupPath}", backupPath);
+                }
+            }
+            catch { /* 백업 실패 예외는 진행을 위해 무시 */ }
             Config = CreateDefaultConfig();
+            ActivePreset = null;
         }
     }
 
     /// <summary>
     /// 현재 설정을 파일에 비동기적으로 저장합니다.
     /// </summary>
-    /// <returns>저장 성공 시 true, 실패 시 false. 알림 처리는 호출자(ViewModel)에서 수행합니다.</returns>
+    /// <returns>저장 성공 시 true, 실패 시 false.</returns>
     public async Task<bool> SaveAsync()
     {
         try
         {
+            // 저장 전 디렉토리 존재 보장
+            string? directory = Path.GetDirectoryName(_configPath);
+            if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+                Directory.CreateDirectory(directory);
+
             var options = new JsonSerializerOptions { WriteIndented = true };
             string json = JsonSerializer.Serialize(Config, options);
             await File.WriteAllTextAsync(_configPath, json);
             _logger.LogInformation(_languageService.GetString("Log_Preset_FileSaveSuccess"));
-            return true; // 저장 성공
+            return true;
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, _languageService.GetString("Log_Preset_FileSaveError"));
-            return false; // 저장 실패
+            return false;
         }
     }
 
-
     /// <summary>
-    /// 프리셋(presets.json) 파일 구조의 무결성을 검증하고, 오류가 있다면 기본값으로 복원합니다.
+    /// 전달받은 변환 설정 값(데이터)이 올바른지 논리적 유효성을 검사합니다.
     /// </summary>
-    /// <returns>구조 변경이 발생하지 않았다면 true, 복구를 수행했다면 false 반환</returns>
-    public bool ValidPresetFile()
-    {
-        _logger.LogInformation(_languageService.GetString("Log_Preset_ValidFileStart"));
-        bool isModified = false;
-
-        // 1. 프리셋 리스트 자체가 존재하지 않는 경우 복구
-        if (Config.Presets == null)
-        {
-            _logger.LogWarning(_languageService.GetString("Log_Preset_ListNull"));
-            Config.Presets = new();
-            isModified = true;
-        }
-
-        // 2. 프리셋 리스트가 비어있는 경우 기본 프리셋 생성
-        if (Config.Presets.Count == 0)
-        {
-            _logger.LogWarning(_languageService.GetString("Log_Preset_ListEmpty"));
-            Config.Presets.Add(new ConvertPreset { Name = "Preset_1", Settings = new ConvertSettings() });
-            Config.LastSelectedPresetName = "Preset_1";
-            isModified = true;
-        }
-
-        // 3. 마지막으로 선택된 프리셋 이름이 리스트에 존재하지 않을 경우 첫 번째 항목으로 재지정
-        if (!Config.Presets.Any(p => p.Name == Config.LastSelectedPresetName))
-        {
-            _logger.LogWarning(_languageService.GetString("Log_Preset_NotFoundSelected"), Config.LastSelectedPresetName);
-            Config.LastSelectedPresetName = Config.Presets.First().Name;
-            isModified = true;
-        }
-
-        if (isModified)
-            _logger.LogWarning(_languageService.GetString("Log_Preset_StructureModified"));
-        else
-            _logger.LogInformation(_languageService.GetString("Log_Preset_StructureValid"));
-
-        // 배열이 수정되지 않고 완벽하게 일치해야만 true(정상 통과)를 반환
-        return !isModified;
-    }
-
-    /// <summary>
-    /// 현재 선택된 프리셋의 실제 변환 설정 값(데이터)이 올바른지 논리적 유효성을 미리 검사합니다.
-    /// </summary>
-    /// <param name="errorMessageKey">오류 발생 시 UI(스낵바)에 출력할 다국어 메시지 키</param>
-    /// <returns>검증 성공 시 true, 규격 미달 시 false 반환</returns>
-    public bool ValidPresetData(out string errorMessageKey)
+    public bool ValidPresetData(ConvertSettings settings, out string errorMessageKey)
     {
         _logger.LogInformation(_languageService.GetString("Log_Preset_ValidDataStart"));
-        var currentPreset = Config.Presets.FirstOrDefault(p => p.Name == Config.LastSelectedPresetName);
-        var settings = currentPreset?.Settings;
 
         // 1. 설정 객체 자체가 Null인지 확인
         if (settings == null)
@@ -159,7 +140,7 @@ public class PresetService : IPresetService
             return false;
         }
 
-        // 2. 변환 품질(Quality) 범위가 1~100 사이를 벗어났는지 확인
+        // 2. 변환 품질(Quality) 범위 확인
         if (settings.Quality < 1 || settings.Quality > 100)
         {
             _logger.LogError(_languageService.GetString("Log_Preset_InvalidQuality"), settings.Quality);
@@ -171,7 +152,7 @@ public class PresetService : IPresetService
         var allowedStandard = new[] { "JPEG", "PNG", "BMP", "WEBP", "AVIF" };
         var allowedAnimation = new[] { "GIF", "WEBP" };
 
-        // 3. 일반 이미지 변환 목표 확장자가 규격(리스트)에 맞는지 확인
+        // 3. 일반 이미지 변환 목표 확장자 확인
         if (string.IsNullOrEmpty(settings.StandardTargetFormat) || !allowedStandard.Contains(settings.StandardTargetFormat, StringComparer.OrdinalIgnoreCase))
         {
             _logger.LogError(_languageService.GetString("Log_Preset_InvalidStdFormat"), settings.StandardTargetFormat);
@@ -187,7 +168,7 @@ public class PresetService : IPresetService
             return false;
         }
 
-        // 5. 열거형(Enum: CPU 사용량 설정, 경로, 덮어쓰기 여부) 옵션 및 배경색 HEX 유효성 확인
+        // 5. 열거형 옵션 및 배경색 HEX 유효성 확인
         if (!Enum.IsDefined(typeof(CpuUsageOption), settings.CpuUsage) ||
             !Enum.IsDefined(typeof(SaveLocationType), settings.SaveLocation) ||
             !Enum.IsDefined(typeof(SaveFolderMethod), settings.FolderMethod) ||
@@ -206,7 +187,7 @@ public class PresetService : IPresetService
             return false;
         }
 
-        // 6. 사용자 지정 출력 경로(Custom) 선택 시 경로가 비어 있는지 확인
+        // 6. 사용자 지정 출력 경로 확인
         if (settings.SaveLocation == SaveLocationType.Custom && string.IsNullOrWhiteSpace(settings.CustomOutputPath))
         {
             _logger.LogError(_languageService.GetString("Log_Preset_EmptyCustomPath"));
@@ -214,7 +195,7 @@ public class PresetService : IPresetService
             return false;
         }
 
-        // 7. 하위 폴더 생성 선택 시 폴더 이름 유효성 검사
+        // 7. 하위 폴더 이름 유효성 검사
         if (settings.FolderMethod == SaveFolderMethod.CreateFolder)
         {
             if (string.IsNullOrWhiteSpace(settings.OutputSubFolderName))
@@ -224,7 +205,6 @@ public class PresetService : IPresetService
                 return false;
             }
 
-            // 파일명/폴더명에 사용할 수 없는 문자 포함 여부 체크 (v3: 토큰 예외 없이 전체 금지 문자 체크)
             var invalidChars = Path.GetInvalidFileNameChars();
             if (settings.OutputSubFolderName.IndexOfAny(invalidChars) >= 0)
             {
@@ -237,6 +217,28 @@ public class PresetService : IPresetService
         _logger.LogInformation(_languageService.GetString("Log_Preset_DataValid"));
         errorMessageKey = string.Empty;
         return true;
+    }
+
+    /// <summary>
+    /// 활성 프리셋을 갱신합니다.
+    /// </summary>
+    public void UpdateActivePreset(ConvertPreset preset)
+    {
+        ActivePreset = preset;
+        Config.LastSelectedPresetName = preset.Name;
+    }
+
+
+    /// <summary>
+    /// 프리셋 설정 파일(JSON)을 완전히 처음부터 새로 만들어야 하거나, 손상되었을 때 호출되는 기본 초기화 메서드입니다.
+    /// </summary>
+    private PresetConfig CreateDefaultConfig()
+    {
+        var config = new PresetConfig();
+        // 기본 1번 프리셋 하나를 세팅하여 프로그램 안정성을 확보
+        config.Presets.Add(new ConvertPreset { Name = "Preset_1", Settings = new ConvertSettings() });
+        config.LastSelectedPresetName = "Preset_1";
+        return config;
     }
 
     /// <summary>
@@ -294,18 +296,6 @@ public class PresetService : IPresetService
                 Settings = CopySettings(source.Settings)
             });
         }
-    }
-
-    /// <summary>
-    /// 프리셋 설정 파일(JSON)을 완전히 처음부터 새로 만들어야 하거나, 손상되었을 때 호출되는 기본 초기화 메서드입니다.
-    /// </summary>
-    private PresetConfig CreateDefaultConfig()
-    {
-        var config = new PresetConfig();
-        // 기본 1번 프리셋 하나를 세팅하여 프로그램 안정성을 확보
-        config.Presets.Add(new ConvertPreset { Name = "Preset_1", Settings = new ConvertSettings() });
-        config.LastSelectedPresetName = "Preset_1";
-        return config;
     }
 
     /// <summary>

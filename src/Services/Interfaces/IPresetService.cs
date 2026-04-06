@@ -9,21 +9,23 @@ namespace PixConvert.Services.Interfaces;
 /// </summary>
 public interface IPresetService
 {
+    /// <summary>현재 활성화된 프리셋 정보입니다. (로드 실패 시 null)</summary>
+    ConvertPreset? ActivePreset { get; }
+
     /// <summary>현재 로드된 설정 객체입니다.</summary>
     PresetConfig Config { get; }
 
-    /// <summary>설정 파일을 읽어 Config 객체를 초기화합니다.</summary>
-    Task LoadAsync();
+    /// <summary>앱 시작 시 프리셋 파일을 읽어 비동기적으로 초기화합니다.</summary>
+    Task InitializeAsync();
 
     /// <summary>현재 Config 객체의 상태를 설정 파일로 저장합니다. 성공 시 true, 실패 시 false를 반환합니다.</summary>
     Task<bool> SaveAsync();
 
-    /// <summary>현재 구조의 무결성을 검사하고 이상 시 기본값으로 복구합니다. 정상이면 true를 반환합니다.</summary>
-    bool ValidPresetFile();
+    /// <summary>전달받은 설정을 검증합니다.</summary>
+    bool ValidPresetData(ConvertSettings settings, out string errorMessageKey);
 
-    /// <summary>현재 선택된 프리셋의 설정 값들을 검증합니다.</summary>
-    bool ValidPresetData(out string errorMessageKey);
-
+    /// <summary>활성 프리셋을 갱신합니다.</summary>
+    void UpdateActivePreset(ConvertPreset preset);
 
     /// <summary>신규 프리셋을 생성합니다.</summary>
     void AddPreset(string name, ConvertSettings settings);

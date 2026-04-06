@@ -71,6 +71,26 @@
 
                                         <Separator Margin="0,0,0,8" />
 
+                                        <!-- Sidebar : ActivePreset_Info -->
+                                        <TextBlock
+                                            Text="{Binding Conversion.ActivePresetName}"
+                                            ToolTip="{Binding Conversion.ActivePresetTooltip}"
+                                            TextTrimming="CharacterEllipsis"
+                                            FontWeight="SemiBold"
+                                            HorizontalAlignment="Center"
+                                            Margin="0,0,0,6">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Conversion.IsActivePresetValid}" Value="False">
+                                                            <Setter Property="Foreground" Value="#FF5555" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+
                                         <!-- Sidebar : Conversion_Group -->
                                         <Button
                                             Command="{Binding Conversion.OpenConvertSettingCommand}"

@@ -54,13 +54,13 @@ public partial class ConversionViewModel : ViewModelBase
         /// <summary>Interlocked 연산에 사용되는 마지막 진행 알림 시각 (Ticks)</summary>
         public long LastUpdateTicks;
 
-        public ConversionContext(FileListViewModel fileList, IPresetService presetService)
+        public ConversionContext(FileListViewModel fileList, string presetName)
         {
             ActiveFiles = fileList.Items
                 .Where(item => !item.IsUnsupported)
                 .ToList();
             TotalCount = ActiveFiles.Count;
-            PresetName = presetService.Config.LastSelectedPresetName ?? string.Empty;
+            PresetName = presetName;
             LastUpdateTicks = DateTime.UtcNow.Ticks;
         }
     }
@@ -88,6 +88,10 @@ public partial class ConversionViewModel : ViewModelBase
     [ObservableProperty] private int _failCount;
     [ObservableProperty] private string _convertingTime = "00:00:00";
     [ObservableProperty] private bool _isConversionCompleted;
+
+    [ObservableProperty] private string _activePresetName = string.Empty;
+    [ObservableProperty] private string _activePresetTooltip = string.Empty;
+    [ObservableProperty] private bool _isActivePresetValid;
 
     public bool HasFailures => FailCount > 0;
 
@@ -134,6 +138,39 @@ public partial class ConversionViewModel : ViewModelBase
         ConvertFilesCommand = new AsyncRelayCommand(ConvertFilesAsync, () => CurrentStatus != AppStatus.Converting);
         CancelConvertCommand = new AsyncRelayCommand(CancelConvertAsync, () => CurrentStatus == AppStatus.Converting && !IsConversionCompleted);
         ConfirmCompletionCommand = new RelayCommand(ConfirmCompletion, () => IsConversionCompleted);
+
+        // 초기 프리셋 상태 반영
+        RefreshActivePresetUI();
+    }
+
+    /// <summary>
+    /// 현재 활성 프리셋의 상태를 UI 프로퍼티에 반영합니다.
+    /// </summary>
+    private void RefreshActivePresetUI()
+    {
+        var active = _presetService.ActivePreset;
+        if (active != null)
+        {
+            ActivePresetName = active.Name;
+            IsActivePresetValid = true;
+
+            var s = active.Settings;
+            ActivePresetTooltip =
+                $"Format: {s.StandardTargetFormat} / {s.AnimationTargetFormat}\n" +
+                $"Quality: {s.Quality}\n" +
+                $"CPU: {s.CpuUsage}\n" +
+                $"BG: {s.BackgroundColor}\n" +
+                $"EXIF: {(s.KeepExif ? "Keep" : "Strip")}\n" +
+                $"Overwrite: {s.OverwritePolicy}\n" +
+                $"Folder: {(s.FolderMethod == SaveFolderMethod.CreateFolder ? s.OutputSubFolderName : "None")}\n" +
+                $"Path: {(s.SaveLocation == SaveLocationType.SameAsOriginal ? "Original" : s.CustomOutputPath)}";
+        }
+        else
+        {
+            ActivePresetName = "Empty";
+            ActivePresetTooltip = string.Empty;
+            IsActivePresetValid = false;
+        }
     }
 
     /// <summary>
@@ -153,8 +190,6 @@ public partial class ConversionViewModel : ViewModelBase
     /// </summary>
     private async Task OpenConvertSettingAsync()
     {
-        await _presetService.LoadAsync();
-
         var vm = _convertSettingVmFactory();
         var view = new PixConvert.Views.Dialogs.ConvertSettingDialog { DataContext = vm };
 
@@ -165,9 +200,19 @@ public partial class ConversionViewModel : ViewModelBase
             vm.SyncToSettings();
             bool saved = await _presetService.SaveAsync();
             if (saved)
+            {
                 _snackbarService.Show(GetString("Msg_Preset_SaveSuccess"), SnackbarType.Success);
+                // 다이얼로그에서 마지막으로 선택된 프리셋을 활성 프리셋으로 갱신
+                if (vm.SelectedPreset != null)
+                {
+                    _presetService.UpdateActivePreset(vm.SelectedPreset);
+                    RefreshActivePresetUI();
+                }
+            }
             else
+            {
                 _snackbarService.Show(GetString("Msg_Preset_SaveError"), SnackbarType.Error);
+            }
         }
     }
 
@@ -191,8 +236,9 @@ public partial class ConversionViewModel : ViewModelBase
 
         try
         {
-            var settings = GetCurrentSettings();
-            var context = new ConversionContext(_fileList, _presetService);
+            // ValidateBeforeConvertAsync에서 이미 null 체크 완료
+            var settings = _presetService.ActivePreset!.Settings;
+            var context = new ConversionContext(_fileList, _presetService.ActivePreset.Name);
             var parallelOptions = BuildParallelOptions(settings.CpuUsage, cts.Token);
 
             _logger.LogInformation(GetString("Log_Conversion_BatchStart"), context.ActiveFiles.Count);
@@ -243,7 +289,16 @@ public partial class ConversionViewModel : ViewModelBase
         if (!isConfirmed)
             return false;
 
-        if (!_presetService.ValidPresetData(out string errorKey))
+        // 프리셋 존재 여부 확인 (ActivePreset == null이면 Empty 상태)
+        if (_presetService.ActivePreset == null)
+        {
+            // 우선 한국어 텍스트로 표시 (이후 다국어 리소스 필요시 Msg_Error_EmptyPreset 등으로 분리 가능)
+            _snackbarService.Show("활성화된 프리셋이 없습니다. (Empty)", SnackbarType.Error);
+            return false;
+        }
+
+        // 프리셋 데이터 유효성 검사 (자동 보정 없이 에러만 표시)
+        if (!_presetService.ValidPresetData(_presetService.ActivePreset.Settings, out string errorKey))
         {
             _snackbarService.Show(GetString(errorKey), SnackbarType.Error);
             return false;
@@ -436,15 +491,6 @@ public partial class ConversionViewModel : ViewModelBase
         _logger.LogInformation("[ConversionViewModel] CancelConvertAsync triggered!");
         _convertCts?.Cancel();
         _snackbarService.ShowProgress(GetString("Msg_Convert_Cancelling"));
-    }
-
-    /// <summary>
-    /// 현재 선택된 프리셋의 설정 객체를 안전하게 가져옵니다.
-    /// </summary>
-    private ConvertSettings GetCurrentSettings()
-    {
-        var preset = _presetService.Config.Presets.FirstOrDefault(p => p.Name == _presetService.Config.LastSelectedPresetName);
-        return preset?.Settings ?? new ConvertSettings();
     }
 
     /// <summary>
