@@ -263,7 +263,7 @@
                                                                 Foreground="#FF5555">
                                                                 <TextBlock.Style>
                                                                     <Style TargetType="TextBlock">
-                                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                                        <Setter Property="Visibility" Value="Hidden" />
                                                                         <Style.Triggers>
                                                                             <DataTrigger
                                                                                 Binding="{Binding Conversion.HasFailures}"
@@ -277,43 +277,44 @@
                                                                 <Run Text=":" />
                                                                 <Run
                                                                     FontWeight="SemiBold"
-                                                                    Text="{Binding Conversion.FailCount}"
-                                                                     />
+                                                                    Text="{Binding Conversion.FailCount}" />
                                                             </TextBlock>
                                                         </Grid>
 
                                                         <Separator Margin="0,0,0,8"/>
 
                                                         <!-- Sidebar : Active_Process_List -->
-                                                        <ItemsControl ItemsSource="{Binding Conversion.ActiveProcesses}">
-                                                            <ItemsControl.ItemTemplate>
-                                                                <DataTemplate>
-                                                                    <Grid Margin="0,0,0,4">
-                                                                        <Grid.ColumnDefinitions>
-                                                                            <ColumnDefinition Width="*" />
-                                                                            <ColumnDefinition Width="Auto" />
-                                                                        </Grid.ColumnDefinitions>
-                                                                        <TextBlock
-                                                                            Grid.Column="0"
-                                                                            FontSize="11"
-                                                                            Text="{Binding FileName}"
-                                                                            TextTrimming="CharacterEllipsis"
-                                                                            ToolTip="{Binding FileName}" />
-                                                                        <Border
-                                                                            Grid.Column="1"
-                                                                            Margin="4,0,0,0"
-                                                                            Padding="4,1"
-                                                                            Background="{DynamicResource SystemControlBackgroundBaseLowBrush}"
-                                                                            CornerRadius="2">
+                                                        <ScrollViewer MaxHeight="200" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled">
+                                                            <ItemsControl ItemsSource="{Binding Conversion.ActiveProcesses}">
+                                                                <ItemsControl.ItemTemplate>
+                                                                    <DataTemplate>
+                                                                        <Grid Margin="0,0,0,4">
+                                                                            <Grid.ColumnDefinitions>
+                                                                                <ColumnDefinition Width="*" />
+                                                                                <ColumnDefinition Width="Auto" />
+                                                                            </Grid.ColumnDefinitions>
                                                                             <TextBlock
-                                                                                FontSize="9"
-                                                                                Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
-                                                                                Text="{Binding EngineName}" />
-                                                                        </Border>
-                                                                    </Grid>
-                                                                </DataTemplate>
-                                                            </ItemsControl.ItemTemplate>
-                                                        </ItemsControl>
+                                                                                Grid.Column="0"
+                                                                                FontSize="11"
+                                                                                Text="{Binding FileName}"
+                                                                                TextTrimming="CharacterEllipsis"
+                                                                                ToolTip="{Binding FileName}" />
+                                                                            <Border
+                                                                                Grid.Column="1"
+                                                                                Margin="4,0,0,0"
+                                                                                Padding="4,1"
+                                                                                Background="{DynamicResource SystemControlBackgroundBaseLowBrush}"
+                                                                                CornerRadius="2">
+                                                                                <TextBlock
+                                                                                    FontSize="9"
+                                                                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                                                                    Text="{Binding EngineName}" />
+                                                                            </Border>
+                                                                        </Grid>
+                                                                    </DataTemplate>
+                                                                </ItemsControl.ItemTemplate>
+                                                            </ItemsControl>
+                                                        </ScrollViewer>
                                                     </StackPanel>
                                                 </ScrollViewer>
 
