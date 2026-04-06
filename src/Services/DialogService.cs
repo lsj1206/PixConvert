@@ -57,16 +57,18 @@ public class DialogService : IDialogService
         var dialog = new ContentDialog
         {
             Content = dialogContent,
-            DefaultButton = ContentDialogButton.Close,
+            DefaultButton = ContentDialogButton.Close, // Close 버튼을 파란색(Primary)으로 만듦
             Owner = window
         };
 
-        // 실시간 다국어 반영을 위해 리소스 레퍼런스 설정
+        // 좌측(PrimaryButton, 회색) -> 아니오
+        // 우측(CloseButton, 파란색) -> 예
         dialog.SetResourceReference(ContentDialog.TitleProperty, string.IsNullOrEmpty(titleKey) ? "Dlg_Confirm" : titleKey);
         dialog.SetResourceReference(ContentDialog.PrimaryButtonTextProperty, "Dlg_No");
         dialog.SetResourceReference(ContentDialog.CloseButtonTextProperty, "Dlg_Yes");
 
         var result = await dialog.ShowAsync();
+        // CloseButton(우측 파란색)을 눌렀을 때가 승인(true)
         return result == ContentDialogResult.None;
     }
 
@@ -81,17 +83,21 @@ public class DialogService : IDialogService
         var dialog = new ContentDialog
         {
             Content = content,
-            DefaultButton = ContentDialogButton.Close,
+            DefaultButton = ContentDialogButton.Close, // Close 버튼을 파란색(Primary)으로 만듦
             Owner = window
         };
 
         // 실시간 다국어 반영을 위해 리소스 레퍼런스 설정
         dialog.SetResourceReference(ContentDialog.TitleProperty, titleKey);
-        
+
+        // 좌측(PrimaryButton, 취소)
+        dialog.SetResourceReference(ContentDialog.PrimaryButtonTextProperty, closeKey ?? "Dlg_Cancel");
+
+        // 우측(CloseButton, 확인)
         if (!string.IsNullOrEmpty(primaryKey))
-            dialog.SetResourceReference(ContentDialog.PrimaryButtonTextProperty, primaryKey);
-            
-        dialog.SetResourceReference(ContentDialog.CloseButtonTextProperty, closeKey ?? "Dlg_Close");
+            dialog.SetResourceReference(ContentDialog.CloseButtonTextProperty, primaryKey);
+        else
+            dialog.SetResourceReference(ContentDialog.CloseButtonTextProperty, "Dlg_Confirm");
 
         var contentWidth = GetPreferredContentWidth(content);
         if (contentWidth > 0)
@@ -100,6 +106,7 @@ public class DialogService : IDialogService
         }
 
         var result = await dialog.ShowAsync();
+        // CloseButton(우측 파란색)을 눌렀을 때가 승인(true)
         return result == ContentDialogResult.None;
     }
 
