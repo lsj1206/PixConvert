@@ -103,7 +103,11 @@ public class NetVipsProvider : IProviderService, IDisposable
             loaderOptions.Add("n", -1);
         }
 
-        using var image = Image.NewFromFile(file.Path, access: Enums.Access.Sequential, kwargs: loaderOptions);
+        var accessMode = file.FileSignature.Equals("BMP", StringComparison.OrdinalIgnoreCase)
+            ? Enums.Access.Random
+            : Enums.Access.Sequential;
+
+        using var image = Image.NewFromFile(file.Path, access: accessMode, kwargs: loaderOptions);
 
         token.ThrowIfCancellationRequested();
 
@@ -143,6 +147,9 @@ public class NetVipsProvider : IProviderService, IDisposable
 
         switch (targetFormat.ToUpperInvariant())
         {
+            case "BMP":
+                SaveAsBmpViaSkia(image, outputPath);
+                return;
             case "JPEG":
                 options.Add("Q", settings.Quality);
                 options.Add("strip", true);
@@ -164,6 +171,40 @@ public class NetVipsProvider : IProviderService, IDisposable
 
         // WriteToFile은 파일 확장자에 따라 적절한 save 오퍼레이션을 선택하고 options를 전달함
         image.WriteToFile(outputPath, options);
+    }
+
+    private static void SaveAsBmpViaSkia(Image vipsImage, string outputPath)
+    {
+        // 알파 채널 제거 (BMP는 알파 미지원)
+        var flat = vipsImage.HasAlpha() ? vipsImage.Flatten() : vipsImage;
+
+        // NetVips 픽셀 버퍼 (RGB 8-bit packed) → SKBitmap (Rgb888x) 변환
+        byte[] pixels = flat.WriteToMemory();
+        int w = flat.Width;
+        int h = flat.Height;
+
+        var info = new SkiaSharp.SKImageInfo(w, h, SkiaSharp.SKColorType.Rgb888x, SkiaSharp.SKAlphaType.Opaque);
+        using var skBitmap = new SkiaSharp.SKBitmap(info);
+
+        byte[] dstBytes = new byte[w * h * 4];
+        var srcSpan = pixels.AsSpan();
+
+        int totalPixels = w * h;
+        for (int i = 0; i < totalPixels; i++)
+        {
+            int srcOff = i * 3;
+            int dstOff = i * 4;
+            dstBytes[dstOff]     = srcSpan[srcOff + 2]; // B
+            dstBytes[dstOff + 1] = srcSpan[srcOff + 1]; // G
+            dstBytes[dstOff + 2] = srcSpan[srcOff];     // R
+            dstBytes[dstOff + 3] = 255;                 // X
+        }
+        
+        System.Runtime.InteropServices.Marshal.Copy(dstBytes, 0, skBitmap.GetPixels(), dstBytes.Length);
+
+        BmpEncoder.SaveAsync(skBitmap, outputPath).GetAwaiter().GetResult();
+
+        if (flat != vipsImage) flat.Dispose();
     }
 
     private static double[] ParseBackgroundColor(ConvertSettings settings)
