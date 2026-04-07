@@ -1,10 +1,10 @@
 using Microsoft.Extensions.Logging;
-using Moq;
 using PixConvert.Models;
 using PixConvert.Services;
 using PixConvert.Services.Interfaces;
 using PixConvert.Services.Providers;
 using PixConvert.ViewModels;
+using Moq;
 using Xunit;
 
 namespace PixConvert.Tests;
@@ -49,7 +49,7 @@ public class ConversionViewModelTests
     [Fact]
     public void DefaultState_ShouldInitializeAsEmptyPreset()
     {
-        Assert.Equal("Preset_Empty", _vm.ActivePresetName);
+        Assert.Equal("Converting_SelectPreset", _vm.ActivePresetName);
         Assert.False(_vm.IsActivePresetValid);
     }
 

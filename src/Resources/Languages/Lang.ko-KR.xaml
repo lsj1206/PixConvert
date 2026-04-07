@@ -78,7 +78,6 @@
     <sys:String x:Key="Converting_Duplicates">중복 파일</sys:String>
     <sys:String x:Key="Converting_SaveMethod">저장 방식</sys:String>
     <sys:String x:Key="Converting_SaveLocation">저장 위치</sys:String>
-    <sys:String x:Key="Converting_SelectPreset">Empty</sys:String>
 
     <!-- 변환 설정 : 프리셋 -->
     <sys:String x:Key="Setting_PresetList">프리셋 선택</sys:String>
