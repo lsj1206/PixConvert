@@ -90,7 +90,6 @@ public partial class ConversionViewModel : ViewModelBase
     [ObservableProperty] private bool _isConversionCompleted;
 
     [ObservableProperty] private string _activePresetName = string.Empty;
-    [ObservableProperty] private string _activePresetTooltip = string.Empty;
     [ObservableProperty] private bool _isActivePresetValid;
 
     public bool HasFailures => FailCount > 0;
@@ -155,20 +154,10 @@ public partial class ConversionViewModel : ViewModelBase
             IsActivePresetValid = true;
 
             var s = active.Settings;
-            ActivePresetTooltip =
-                $"Format: {s.StandardTargetFormat} / {s.AnimationTargetFormat}\n" +
-                $"Quality: {s.Quality}\n" +
-                $"CPU: {s.CpuUsage}\n" +
-                $"BG: {s.BackgroundColor}\n" +
-                $"EXIF: {(s.KeepExif ? "Keep" : "Strip")}\n" +
-                $"Overwrite: {s.OverwritePolicy}\n" +
-                $"Folder: {(s.FolderMethod == SaveFolderMethod.CreateFolder ? s.OutputSubFolderName : "None")}\n" +
-                $"Path: {(s.SaveLocation == SaveLocationType.SameAsOriginal ? "Original" : s.CustomOutputPath)}";
         }
         else
         {
-            ActivePresetName = "Empty";
-            ActivePresetTooltip = string.Empty;
+            ActivePresetName = GetString("Converting_SelectPreset");
             IsActivePresetValid = false;
         }
     }
@@ -292,8 +281,7 @@ public partial class ConversionViewModel : ViewModelBase
         // 프리셋 존재 여부 확인 (ActivePreset == null이면 Empty 상태)
         if (_presetService.ActivePreset == null)
         {
-            // 우선 한국어 텍스트로 표시 (이후 다국어 리소스 필요시 Msg_Error_EmptyPreset 등으로 분리 가능)
-            _snackbarService.Show("활성화된 프리셋이 없습니다. (Empty)", SnackbarType.Error);
+            _snackbarService.Show(GetString("Msg_Error_EmptyPreset"), SnackbarType.Error);
             return false;
         }
 

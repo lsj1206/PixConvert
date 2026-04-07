@@ -49,9 +49,8 @@ public class ConversionViewModelTests
     [Fact]
     public void DefaultState_ShouldInitializeAsEmptyPreset()
     {
-        Assert.Equal("Empty", _vm.ActivePresetName);
+        Assert.Equal("Preset_Empty", _vm.ActivePresetName);
         Assert.False(_vm.IsActivePresetValid);
-        Assert.Equal(string.Empty, _vm.ActivePresetTooltip);
     }
 
     [Fact]

@@ -154,7 +154,7 @@
                                                 FontSize="9"
                                                 FontWeight="Bold"
                                                 Foreground="#6A1B9A"
-                                                Text="ANI" />
+                                                Text="{DynamicResource List_Badge_Ani}" />
                                         </Border>
 
                                         <!-- FileList : Unsupported_Badge (N/A) -->

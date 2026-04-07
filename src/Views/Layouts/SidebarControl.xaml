@@ -74,7 +74,6 @@
                                         <!-- Sidebar : ActivePreset_Info -->
                                         <TextBlock
                                             Text="{Binding Conversion.ActivePresetName}"
-                                            ToolTip="{Binding Conversion.ActivePresetTooltip}"
                                             TextTrimming="CharacterEllipsis"
                                             FontWeight="SemiBold"
                                             HorizontalAlignment="Center"

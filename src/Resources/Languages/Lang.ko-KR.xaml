@@ -8,6 +8,8 @@
     <!-- 헤더 : 대시보드 -->
     <sys:String x:Key="Status_Total">파일 합계</sys:String>
     <sys:String x:Key="Status_Unknown">미지원 파일</sys:String>
+    <sys:String x:Key="Header_Label_Cpu">CPU</sys:String>
+    <sys:String x:Key="Header_Label_Ram">RAM</sys:String>
 
     <!-- 리스트 : 항목 -->
     <sys:String x:Key="List_Index">번호</sys:String>
@@ -25,6 +27,9 @@
     <sys:String x:Key="Status_Success">완료</sys:String>
     <sys:String x:Key="Status_Error">실패</sys:String>
     <sys:String x:Key="Status_Skipped">건너뜀</sys:String>
+
+    <!-- 리스트 : 뱃지 -->
+    <sys:String x:Key="List_Badge_Ani">ANI</sys:String>
 
     <!-- 사이드바 : 버튼 -->
     <sys:String x:Key="Btn_AddFile">파일 추가</sys:String>
@@ -63,7 +68,8 @@
     <!-- 사이드바 : 변환 중 -->
     <sys:String x:Key="Converting_Title">변환 중</sys:String>
     <sys:String x:Key="Converting_FailCount">실패</sys:String>
-
+    <!-- 사이드바 : 변환중 옵션 -->
+    <sys:String x:Key="Converting_SelectPreset">Empty</sys:String>
     <sys:String x:Key="Converting_Cpu">CPU 설정</sys:String>
     <sys:String x:Key="Converting_Format">대상 포맷</sys:String>
     <sys:String x:Key="Converting_Quality">품질</sys:String>
@@ -72,6 +78,7 @@
     <sys:String x:Key="Converting_Duplicates">중복 파일</sys:String>
     <sys:String x:Key="Converting_SaveMethod">저장 방식</sys:String>
     <sys:String x:Key="Converting_SaveLocation">저장 위치</sys:String>
+    <sys:String x:Key="Converting_SelectPreset">Empty</sys:String>
 
     <!-- 변환 설정 : 프리셋 -->
     <sys:String x:Key="Setting_PresetList">프리셋 선택</sys:String>
@@ -145,6 +152,7 @@
     <!-- 스낵바 : 공용 에러 -->
     <sys:String x:Key="Msg_Error_Occurred">작업 중 오류 발생: {0}</sys:String>
     <sys:String x:Key="Msg_Error_ConfigInvalid">변환 설정에 문제가 있습니다. 다시 설정해주세요.</sys:String>
+    <sys:String x:Key="Msg_Error_EmptyPreset">활성화된 프리셋이 없습니다.</sys:String>
 
     <!-- 다이얼로그 -->
     <sys:String x:Key="Err_Fatal_Title">시작 오류</sys:String>

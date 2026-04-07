@@ -96,7 +96,7 @@
                             VerticalAlignment="Center"
                             FontSize="13"
                             Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
-                            Text="CPU" />
+                            Text="{DynamicResource Header_Label_Cpu}" />
                         <TextBlock
                             VerticalAlignment="Center"
                             FontSize="13"
@@ -117,7 +117,7 @@
                             VerticalAlignment="Center"
                             FontSize="13"
                             Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
-                            Text="RAM" />
+                            Text="{DynamicResource Header_Label_Ram}" />
                         <TextBlock
                             VerticalAlignment="Center"
                             FontSize="13"

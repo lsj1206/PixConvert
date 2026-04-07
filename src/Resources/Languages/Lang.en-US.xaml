@@ -8,6 +8,8 @@
     <!-- Header : Dashboard -->
     <sys:String x:Key="Status_Total">Total</sys:String>
     <sys:String x:Key="Status_Unknown">Unsupported</sys:String>
+    <sys:String x:Key="Header_Label_Cpu">CPU</sys:String>
+    <sys:String x:Key="Header_Label_Ram">RAM</sys:String>
 
     <!-- List : Item -->
     <sys:String x:Key="List_Index">Index</sys:String>
@@ -25,6 +27,9 @@
     <sys:String x:Key="Status_Success">Success</sys:String>
     <sys:String x:Key="Status_Error">Error</sys:String>
     <sys:String x:Key="Status_Skipped">Skipped</sys:String>
+
+    <!-- List : Badge-->
+    <sys:String x:Key="List_Badge_Ani">ANI</sys:String>
 
     <!-- Sidebar : Button -->
     <sys:String x:Key="Btn_AddFile">Add File</sys:String>
@@ -63,7 +68,8 @@
     <!-- Sidebar : Converting -->
     <sys:String x:Key="Converting_Title">Converting</sys:String>
     <sys:String x:Key="Converting_FailCount">Failed</sys:String>
-
+    <!-- Sidebar : Converting Option-->
+    <sys:String x:Key="Converting_SelectPreset">Empty</sys:String>
     <sys:String x:Key="Converting_Cpu">CPU Usage</sys:String>
     <sys:String x:Key="Converting_Format">Target Format</sys:String>
     <sys:String x:Key="Converting_Quality">Quality</sys:String>
@@ -145,6 +151,7 @@
     <!-- Snackbar : Common Error -->
     <sys:String x:Key="Msg_Error_Occurred">Error: {0}</sys:String>
     <sys:String x:Key="Msg_Error_ConfigInvalid">Invalid conversion settings. Please reconfigure.</sys:String>
+    <sys:String x:Key="Msg_Error_EmptyPreset">No active preset.</sys:String>
 
     <!-- Dialog -->
     <sys:String x:Key="Err_Fatal_Title">Startup Error</sys:String>
