@@ -103,13 +103,13 @@ public class NetVipsProvider : IProviderService, IDisposable
             loaderOptions.Add("n", -1);
         }
 
-        var accessMode = file.FileSignature.Equals("BMP", StringComparison.OrdinalIgnoreCase)
-            ? Enums.Access.Random
-            : Enums.Access.Sequential;
+        Image image = file.FileSignature.Equals("BMP", StringComparison.OrdinalIgnoreCase)
+            ? LoadBmpViaSkia(file.Path)
+            : Image.NewFromFile(file.Path, access: Enums.Access.Sequential, kwargs: loaderOptions);
 
-        using var image = Image.NewFromFile(file.Path, access: accessMode, kwargs: loaderOptions);
-
-        token.ThrowIfCancellationRequested();
+        try
+        {
+            token.ThrowIfCancellationRequested();
 
         // ── 3. 배경 합성 (알파 미지원 포맷 대응) ──────────────────────────
         bool targetSupportsAlpha = targetFormat is "PNG" or "WEBP" or "AVIF" or "GIF";
@@ -127,14 +127,19 @@ public class NetVipsProvider : IProviderService, IDisposable
         token.ThrowIfCancellationRequested();
 
         // ── 4. 포맷별 전용 세이버(Saver) 호출 ──────────────────────────────
-        try
-        {
-            SaveWithFormat(workImage, outputPath, targetFormat, settings);
+            try
+            {
+                SaveWithFormat(workImage, outputPath, targetFormat, settings);
+            }
+            finally
+            {
+                // 합성 등으로 생성된 중간 객체 해제
+                if (isNewImage) workImage.Dispose();
+            }
         }
         finally
         {
-            // 합성 등으로 생성된 중간 객체 해제
-            if (isNewImage) workImage.Dispose();
+            image.Dispose();
         }
     }
 
@@ -238,6 +243,36 @@ public class NetVipsProvider : IProviderService, IDisposable
         }
         catch { /* Fallback to white */ }
         return new[] { 255.0, 255.0, 255.0 };
+    }
+
+    private static Image LoadBmpViaSkia(string path)
+    {
+        using var stream = new System.IO.FileStream(path, System.IO.FileMode.Open, System.IO.FileAccess.Read, System.IO.FileShare.Read);
+        using var skBitmap = SkiaSharp.SKBitmap.Decode(stream);
+        
+        if (skBitmap == null)
+            throw new InvalidOperationException($"SkiaSharp failed to decode BMP for NetVips: {path}");
+
+        int w = skBitmap.Width;
+        int h = skBitmap.Height;
+
+        // Opaque BMP 처리를 위해 RGB 3밴드 확보
+        byte[] rgbPixels = new byte[w * h * 3];
+
+        using var srcBitmap = skBitmap.Copy(SkiaSharp.SKColorType.Rgba8888);
+        var span = srcBitmap.GetPixelSpan();
+
+        int total = w * h;
+        for (int i = 0; i < total; i++)
+        {
+            int srcOff = i * 4;
+            int dstOff = i * 3;
+            rgbPixels[dstOff]     = span[srcOff];     // R
+            rgbPixels[dstOff + 1] = span[srcOff + 1]; // G
+            rgbPixels[dstOff + 2] = span[srcOff + 2]; // B
+        }
+
+        return Image.NewFromMemory(rgbPixels, w, h, 3, Enums.BandFormat.Uchar);
     }
 
     public void Dispose()
