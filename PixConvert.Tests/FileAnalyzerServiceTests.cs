@@ -163,4 +163,72 @@ public class FileAnalyzerServiceTests
             if (Directory.Exists(realTempFolder)) Directory.Delete(realTempFolder);
         }
     }
+
+    [Fact]
+    public async Task ProcessPathsAsync_MixedDrives_ShouldQueryParallelismByFirstSeenDriveOrder()
+    {
+        // Arrange: D -> C -> D -> E 순서로 입력
+        var paths = new[]
+        {
+            @"D:\d1.png",
+            @"C:\c1.png",
+            @"D:\d2.png",
+            @"E:\e1.png"
+        };
+
+        var queriedPaths = new List<string>();
+        _mockDriveInfo
+            .Setup(x => x.GetOptimalParallelismAsync(It.IsAny<string>()))
+            .Callback<string>(p => queriedPaths.Add(p))
+            .ReturnsAsync(1);
+
+        _mockScanner
+            .Setup(s => s.CreateFileItemAsync(It.IsAny<string>()))
+            .ReturnsAsync((string p) => new FileItem { Path = p });
+
+        // Act
+        var result = await _service.ProcessPathsAsync(paths, maxItemCount: 100, currentCount: 0);
+
+        // Assert: 드라이브 그룹 대표 경로가 최초 등장 순서대로 조회되는지 확인
+        Assert.Equal(new[] { @"D:\d1.png", @"C:\c1.png", @"E:\e1.png" }, queriedPaths);
+        Assert.Equal(4, result.SuccessCount);
+
+        // 결과 목록 순서도 입력 순서를 유지해야 함
+        Assert.Equal(paths, result.NewItems.Select(x => x.Path).ToArray());
+    }
+
+    [Fact]
+    public async Task ProcessPathsAsync_SingleDrive_ShouldQueryParallelismOnlyOnce()
+    {
+        // Arrange: 모두 C 드라이브
+        var paths = new[]
+        {
+            @"C:\a.png",
+            @"C:\b.png",
+            @"C:\c.png"
+        };
+
+        int queryCount = 0;
+        string? firstQueryPath = null;
+        _mockDriveInfo
+            .Setup(x => x.GetOptimalParallelismAsync(It.IsAny<string>()))
+            .Callback<string>(p =>
+            {
+                queryCount++;
+                firstQueryPath ??= p;
+            })
+            .ReturnsAsync(1);
+
+        _mockScanner
+            .Setup(s => s.CreateFileItemAsync(It.IsAny<string>()))
+            .ReturnsAsync((string p) => new FileItem { Path = p });
+
+        // Act
+        var result = await _service.ProcessPathsAsync(paths, maxItemCount: 100, currentCount: 0);
+
+        // Assert
+        Assert.Equal(1, queryCount);
+        Assert.Equal(@"C:\a.png", firstQueryPath);
+        Assert.Equal(3, result.SuccessCount);
+    }
 }

@@ -191,30 +191,63 @@ public class FileAnalyzerService : IFileAnalyzerService
         int count = filePaths.Count;
         if (count == 0) return new List<FileItem>();
 
-        int parallelism = await _driveInfoService.GetOptimalParallelismAsync(filePaths[0]);
-        // TODO: 혼합 드라이브(예: SSD + USB) 배치 시 드라이브별 병렬도 최적화 검토 필요
-        var options = new ParallelOptions { MaxDegreeOfParallelism = parallelism };
         var items = new FileItem?[count];
         int processedCount = 0;
 
-        await Parallel.ForEachAsync(
-            Enumerable.Range(0, count),
-            options,
-            async (i, ct) =>
+        // 드라이브 루트의 "최초 등장 순서"대로 그룹을 구성한다.
+        // 예: D:, C:, D:, E: 입력이면 처리 순서는 D -> C -> E
+        var groups = new List<DrivePathGroup>();
+        var groupMap = new Dictionary<string, DrivePathGroup>(StringComparer.OrdinalIgnoreCase);
+
+        for (int i = 0; i < count; i++)
+        {
+            string root = Path.GetPathRoot(filePaths[i]) ?? string.Empty;
+            if (!groupMap.TryGetValue(root, out var group))
             {
-                items[i] = await _fileScannerService.CreateFileItemAsync(filePaths[i]);
-                int current = Interlocked.Increment(ref processedCount);
-                if (progress != null && (current % 100 == 0 || current == count))
+                group = new DrivePathGroup(root);
+                groupMap[root] = group;
+                groups.Add(group);
+            }
+            group.Indices.Add(i);
+        }
+
+        // 그룹은 순차 처리, 그룹 내부는 병렬 처리
+        foreach (var group in groups)
+        {
+            int representativeIndex = group.Indices[0];
+            int parallelism = await _driveInfoService.GetOptimalParallelismAsync(filePaths[representativeIndex]);
+            var options = new ParallelOptions { MaxDegreeOfParallelism = parallelism };
+
+            await Parallel.ForEachAsync(
+                group.Indices,
+                options,
+                async (i, ct) =>
                 {
-                    progress.Report(new FileProcessingProgress
+                    items[i] = await _fileScannerService.CreateFileItemAsync(filePaths[i]);
+                    int current = Interlocked.Increment(ref processedCount);
+                    if (progress != null && (current % 100 == 0 || current == count))
                     {
-                        CurrentIndex = baseOffset + current,
-                        TotalCount = baseOffset + count
-                    });
-                }
-            });
+                        progress.Report(new FileProcessingProgress
+                        {
+                            CurrentIndex = baseOffset + current,
+                            TotalCount = baseOffset + count
+                        });
+                    }
+                });
+        }
 
         return items.Where(item => item != null).ToList()!;
+    }
+
+    private sealed class DrivePathGroup
+    {
+        public string Root { get; }
+        public List<int> Indices { get; } = new();
+
+        public DrivePathGroup(string root)
+        {
+            Root = root;
+        }
     }
 
 }
