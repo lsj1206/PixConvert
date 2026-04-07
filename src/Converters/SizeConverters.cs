@@ -75,7 +75,7 @@ public class SizeRatioStateConverter : IMultiValueConverter
 
             double ratio = ((double)newSize - oldSize) / oldSize * 100;
 
-            if (ratio <= 0) return "Success";
+            if (ratio < 0.05) return "Success";
             if (ratio <= 100) return "Warning";
             return "Error";
         }
