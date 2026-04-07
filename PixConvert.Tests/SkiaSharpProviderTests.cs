@@ -140,7 +140,7 @@ public class SkiaSharpProviderTests : IDisposable
         var settings = new ConvertSettings
         {
             StandardTargetFormat = "JPEG",
-            BgColorOption = BackgroundColorOption.Black, // 검은색 배경 합성
+            BackgroundColor = "#000000", // 검은색 배경 합성
             SaveLocation = SaveLocationType.SameAsOriginal,
             FolderMethod = SaveFolderMethod.NoFolder
         };
@@ -225,8 +225,7 @@ public class SkiaSharpProviderTests : IDisposable
         var settings = new ConvertSettings
         {
             StandardTargetFormat = "JPEG",
-            BgColorOption = BackgroundColorOption.Custom,
-            CustomBackgroundColor = "#FF00FF", // Magenta
+            BackgroundColor = "#FF00FF", // Magenta
             SaveLocation = SaveLocationType.SameAsOriginal,
             FolderMethod = SaveFolderMethod.NoFolder
         };
@@ -281,8 +280,7 @@ public class SkiaSharpProviderTests : IDisposable
         var settings = new ConvertSettings
         {
             StandardTargetFormat = "BMP",
-            BgColorOption = BackgroundColorOption.Custom,
-            CustomBackgroundColor = "#0000FF", // 파란색 배경 합성
+            BackgroundColor = "#0000FF", // 파란색 배경 합성
             SaveLocation = SaveLocationType.SameAsOriginal,
             FolderMethod = SaveFolderMethod.NoFolder
         };

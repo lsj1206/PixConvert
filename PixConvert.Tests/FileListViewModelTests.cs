@@ -356,7 +356,7 @@ public class FileListViewModelTests
         mockSort.Setup(s => s.Sort(It.IsAny<IEnumerable<FileItem>>(), It.IsAny<SortType>(), It.IsAny<bool>()))
                 .Returns(new List<FileItem> { itemNotInList });
 
-        string notifiedProperty = null;
+        string? notifiedProperty = null;
         _vm.PropertyChanged += (s, e) => notifiedProperty = e.PropertyName;
 
         // Act & Assert
@@ -365,7 +365,10 @@ public class FileListViewModelTests
         
         // 2. _isSorting이 false로 복구되었는지 Reflection으로 직접 검증
         var field = typeof(FileListViewModel).GetField("_isSorting", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        var isSortingValue = (bool)field.GetValue(_vm);
+        Assert.NotNull(field);
+        var rawValue = field!.GetValue(_vm);
+        Assert.NotNull(rawValue);
+        var isSortingValue = (bool)rawValue;
         Assert.False(isSortingValue);
 
         // 3. finally 블록에서 통계 갱신(OnPropertyChanged)이 호출되었는지 확인

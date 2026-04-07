@@ -162,7 +162,7 @@ public class NetVipsProviderTests : IDisposable
             StandardTargetFormat = "JPEG",
             SaveLocation = SaveLocationType.SameAsOriginal,
             FolderMethod = SaveFolderMethod.NoFolder,
-            BgColorOption = BackgroundColorOption.Black // 검은색으로 합성
+            BackgroundColor = "#000000" // 검은색으로 합성
         };
 
         // Act
