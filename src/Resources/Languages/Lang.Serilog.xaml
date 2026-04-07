@@ -33,23 +33,18 @@
     <!-- PresetService.cs -->
     <system:String x:Key="Log_Preset_FileNotFound">[PresetService] 설정 파일이 존재하지 않아 기본값을 생성합니다.</system:String>
     <system:String x:Key="Log_Preset_FileEmpty">[PresetService] 설정 파일이 비어있어 기본값을 사용합니다.</system:String>
-    <system:String x:Key="Log_Preset_FileCorrupted">[PresetService] 설정 파일 구조가 일부 손상되어 복구되었습니다.</system:String>
     <system:String x:Key="Log_Preset_FileLoadSuccess">[PresetService] 설정 파일 로드 완료.</system:String>
     <system:String x:Key="Log_Preset_FileLoadError">[PresetService] 설정 로드 중 오류 발생. 기본값을 사용합니다.</system:String>
     <system:String x:Key="Log_Preset_FileSaveSuccess">[PresetService] 설정 저장 완료.</system:String>
     <system:String x:Key="Log_Preset_FileSaveError">[PresetService] 설정 저장 중 오류 발생.</system:String>
-    <system:String x:Key="Log_Preset_ValidFileStart">[PresetService] 프리셋 파일 구조 무결성 검증을 시작합니다.</system:String>
-    <system:String x:Key="Log_Preset_ListNull">[PresetService] 프리셋 리스트가 null입니다. 새 리스트를 생성합니다.</system:String>
-    <system:String x:Key="Log_Preset_ListEmpty">[PresetService] 프리셋 리스트가 비어있습니다. 기본 프리셋을 추가합니다.</system:String>
     <system:String x:Key="Log_Preset_NotFoundSelected">[PresetService] 선택된 프리셋 이름 '{LastSelectedPresetName}'이(가) 리스트에 존재하지 않습니다. 첫 번째 프리셋으로 재지정합니다.</system:String>
-    <system:String x:Key="Log_Preset_StructureModified">[PresetService] 프리셋 파일 구조가 수정되었습니다.</system:String>
-    <system:String x:Key="Log_Preset_StructureValid">[PresetService] 프리셋 파일 구조 검증 완료 (이상 없음).</system:String>
     <system:String x:Key="Log_Preset_ValidDataStart">[PresetService] 현재 프리셋 데이터 유효성 검증을 시작합니다.</system:String>
     <system:String x:Key="Log_Preset_SettingsNull">[PresetService] 현재 선택된 프리셋의 설정(Settings)이 null입니다.</system:String>
     <system:String x:Key="Log_Preset_InvalidQuality">[PresetService] 지원하지 않는 Quality 값입니다: {Quality}. 1~100 사이여야 합니다.</system:String>
     <system:String x:Key="Log_Preset_InvalidStdFormat">[PresetService] 지원하지 않는 StandardTargetFormat 값입니다: {Format}</system:String>
     <system:String x:Key="Log_Preset_InvalidAnimFormat">[PresetService] 지원하지 않는 AnimationTargetFormat 값입니다: {Format}</system:String>
     <system:String x:Key="Log_Preset_InvalidEnum">[PresetService] 열거형(Enum) 설정 값 중 지원하지 않는 값이 포함되어 있습니다.</system:String>
+    <system:String x:Key="Log_Preset_InvalidBgColor">[PresetService] 지원하지 않는 배경색 값입니다: {Color}</system:String>
     <system:String x:Key="Log_Preset_DataValid">[PresetService] 현재 프리셋 데이터 검증 완료 (이상 없음).</system:String>
     <system:String x:Key="Log_Preset_EmptyCustomPath">[PresetService] 사용자 지정 경로가 비어있습니다.</system:String>
     <system:String x:Key="Log_Preset_SubFolderEmpty">[PresetService] 하위 폴더 이름이 비어있습니다.</system:String>
