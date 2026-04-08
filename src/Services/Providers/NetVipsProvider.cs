@@ -184,7 +184,7 @@ public class NetVipsProvider : IProviderService, IDisposable
         var flat = vipsImage.HasAlpha() ? vipsImage.Flatten() : vipsImage;
 
         // NetVips 픽셀 버퍼 (RGB 8-bit packed) → SKBitmap (Rgb888x) 변환
-        byte[] pixels = flat.WriteToMemory();
+        byte[] pixels = flat.WriteToMemory<byte>();
         int w = flat.Width;
         int h = flat.Height;
 
