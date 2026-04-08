@@ -20,6 +20,7 @@
     <sys:String x:Key="List_Path">경로</sys:String>
     <sys:String x:Key="List_Progress">진행 상태</sys:String>
     <sys:String x:Key="List_Resized">변경 크기</sys:String>
+    <sys:String x:Key="List_Engine">Engine</sys:String>
 
     <!-- 리스트 : 상태 -->
     <sys:String x:Key="Status_Pending">대기</sys:String>

@@ -29,16 +29,8 @@ public partial class ConversionViewModel : ViewModelBase
     private readonly EngineSelector _engineSelector;
     private readonly Func<ConvertSettingViewModel> _convertSettingVmFactory;
     private CancellationTokenSource? _convertCts;
-    private readonly object _processesLock = new();
     private readonly Stopwatch _stopwatch = new();
     private readonly DispatcherTimer _timer;
-
-    /// <summary>현재 활발하게 변환 중인 파일 정보를 담는 모델입니다.</summary>
-    public partial class ActiveProcess : ObservableObject
-    {
-        [ObservableProperty] private string _fileName = string.Empty;
-        [ObservableProperty] private string _engineName = string.Empty;
-    }
 
     // ── 변환 작업 공유 카운터 및 파일 목록을 캡슐화하는 컨텍스트 ──────────────
     private sealed class ConversionContext
@@ -64,9 +56,6 @@ public partial class ConversionViewModel : ViewModelBase
             LastUpdateTicks = DateTime.UtcNow.Ticks;
         }
     }
-
-    /// <summary>현재 병렬로 처리 중인 파일 목록 (UI 표시용)</summary>
-    public ObservableCollection<ActiveProcess> ActiveProcesses { get; } = new();
 
     /// <summary>전체 원본 파일 목록에 대한 접근 (리스트 UI 렌더링용)</summary>
     public ReadOnlyObservableCollection<FileItem> Items => _fileList.Items;
@@ -129,9 +118,6 @@ public partial class ConversionViewModel : ViewModelBase
                 elapsed.Minutes,
                 elapsed.Seconds);
         };
-
-        // UI 스레드 외에서도 컬렉션 업데이트가 가능하도록 동기화 활성화
-        BindingOperations.EnableCollectionSynchronization(ActiveProcesses, _processesLock);
 
         OpenConvertSettingCommand = new AsyncRelayCommand(OpenConvertSettingAsync, () => CurrentStatus != AppStatus.Converting);
         ConvertFilesCommand = new AsyncRelayCommand(ConvertFilesAsync, () => CurrentStatus != AppStatus.Converting);
@@ -329,14 +315,8 @@ public partial class ConversionViewModel : ViewModelBase
         item.Progress = 0;
 
         var provider = _engineSelector.GetProvider(item, settings);
-        var activeProcess = new ActiveProcess
-        {
-            FileName = Path.GetFileName(item.Path),
-            EngineName = provider.Name
-        };
-
-        lock (_processesLock) { ActiveProcesses.Add(activeProcess); }
-        CurrentFileName = activeProcess.FileName;
+        item.ProcessingEngine = provider.Name;
+        CurrentFileName = Path.GetFileName(item.Path);
 
         // 진행 상황 사전 알림 (너무 잦은 업데이트 방지)
         long currentTicks = DateTime.UtcNow.Ticks;
@@ -370,11 +350,6 @@ public partial class ConversionViewModel : ViewModelBase
             TotalConvertCount = context.TotalCount;
             FailCount = currentFail;
             OnPropertyChanged(nameof(HasFailures));
-
-            // 완료된 항목 ActiveProcesses에서 제거
-            var target = ActiveProcesses.FirstOrDefault(p => p.FileName == Path.GetFileName(item.Path));
-            if (target != null)
-                lock (_processesLock) { ActiveProcesses.Remove(target); }
 
             // 퍼센트 변경 시 또는 마지막 파일일 때만 UI 업데이트
             if (newPercent != ConvertProgressPercent || currentProcessed == context.TotalCount)
@@ -451,7 +426,6 @@ public partial class ConversionViewModel : ViewModelBase
         CurrentFileName = string.Empty;
         CurrentCpuUsage = string.Empty;
         CurrentTargetFormat = string.Empty;
-        lock (_processesLock) { ActiveProcesses.Clear(); }
         OnPropertyChanged(nameof(HasFailures));
         _convertCts?.Dispose();
         _convertCts = null;

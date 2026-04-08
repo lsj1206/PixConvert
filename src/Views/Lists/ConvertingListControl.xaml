@@ -83,7 +83,7 @@
                     </GridView.ColumnHeaderContainerStyle>
 
                     <!-- Column : Index -->
-                    <GridViewColumn Width="60">
+                    <GridViewColumn Width="60" >
                         <GridViewColumn.Header>
                             <GridViewColumnHeader Content="{DynamicResource List_Index}" />
                         </GridViewColumn.Header>
@@ -177,15 +177,19 @@
                                         Minimum="0"
                                         Value="{Binding Progress}" />
 
-                                    <TextBlock
-                                        x:Name="StatusLabel"
-                                        Margin="12,0,0,0"
-                                        VerticalAlignment="Center"
-                                        FontSize="11"
-                                        FontWeight="SemiBold"
-                                        Foreground="{DynamicResource TextSecondary}"
-                                        Text="{Binding StatusText}"
-                                        TextTrimming="CharacterEllipsis" />
+                                    <StackPanel Orientation="Horizontal" Margin="12,0,0,0" VerticalAlignment="Center">
+                                        <!-- Indicator : Red Dot (Visible during Processing) -->
+                                        <Ellipse x:Name="ProcessingIndicator" Width="6" Height="6" Fill="#FF5252" Margin="0,0,8,0" VerticalAlignment="Center" Visibility="Collapsed" />
+                                        
+                                        <TextBlock
+                                            x:Name="StatusLabel"
+                                            VerticalAlignment="Center"
+                                            FontSize="11"
+                                            FontWeight="SemiBold"
+                                            Foreground="{DynamicResource TextSecondary}"
+                                            Text="{Binding StatusText}"
+                                            TextTrimming="CharacterEllipsis" />
+                                    </StackPanel>
 
                                     <TextBlock
                                         x:Name="SuccessLinkLabel"
@@ -205,6 +209,7 @@
                                     <DataTrigger Binding="{Binding Status}" Value="Processing">
                                         <Setter TargetName="StatusProgressBar" Property="Foreground" Value="#334CAF50" />
                                         <Setter TargetName="StatusLabel" Property="Foreground" Value="#2E7D32" />
+                                        <Setter TargetName="ProcessingIndicator" Property="Visibility" Value="Visible" />
                                     </DataTrigger>
 
                                     <!-- Success State -->
@@ -295,6 +300,20 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
+
+                    <!-- Column : Engine -->
+                    <GridViewColumn Width="80">
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader Content="{DynamicResource List_Engine}" />
+                        </GridViewColumn.Header>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock FontSize="11" FontWeight="Medium" Foreground="{DynamicResource TextSecondary}"
+                                           Text="{Binding ProcessingEngine}" TextAlignment="Center" VerticalAlignment="Center" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
                 </GridView>
             </ListView.View>
         </ListView>

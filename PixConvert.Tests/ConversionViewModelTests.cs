@@ -81,16 +81,4 @@ public class ConversionViewModelTests
         Assert.False(_vm.ConvertFilesCommand.CanExecute(null));
         Assert.True(_vm.CancelConvertCommand.CanExecute(null));
     }
-
-    [Fact]
-    public void ActiveProcesses_ShouldSupportAddAndRemove()
-    {
-        var process = new ConversionViewModel.ActiveProcess { FileName = "test.jpg", EngineName = "SkiaSharp" };
-
-        _vm.ActiveProcesses.Add(process);
-        Assert.Single(_vm.ActiveProcesses);
-
-        _vm.ActiveProcesses.Remove(process);
-        Assert.Empty(_vm.ActiveProcesses);
-    }
 }

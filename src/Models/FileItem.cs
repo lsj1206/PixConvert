@@ -89,6 +89,10 @@ public partial class FileItem : ObservableObject
     [ObservableProperty]
     private double _progress = 0;
 
+    /// <summary>현재 변환을 처리 중인 가동 엔진 이름 (작업 중일 때만 설정됨)</summary>
+    [ObservableProperty]
+    private string? _processingEngine;
+
     /// <summary>변환 성공 후 생성된 결과 파일의 전체 경로</summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(OutputName))]

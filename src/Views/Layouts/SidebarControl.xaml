@@ -5,6 +5,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:services="clr-namespace:PixConvert.Services"
              xmlns:ui="http://schemas.modernwpf.com/2019"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d">
 
     <!-- 사이드바 버튼 스타일 정의 -->
@@ -179,189 +180,158 @@
                                 <Setter Property="ContentTemplate">
                                     <Setter.Value>
                                         <DataTemplate>
-                                            <Grid>
-                                                <Grid.RowDefinitions>
-                                                    <RowDefinition Height="*" />
-                                                    <RowDefinition Height="Auto" />
-                                                </Grid.RowDefinitions>
+                                            <StackPanel Orientation="Vertical">
+                                                <!-- Sidebar : Converting_Status -->
+                                                <Button>
+                                                    <Button.Style>
+                                                        <Style TargetType="Button" BasedOn="{StaticResource SidebarButtonStyle}">
+                                                            <Setter Property="Content" Value="{DynamicResource Btn_Cancel}" />
+                                                            <Setter Property="Command" Value="{Binding Conversion.CancelConvertCommand}" />
+                                                            <Setter Property="Foreground" Value="#FF5555" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Conversion.IsConversionCompleted}" Value="True">
+                                                                    <Setter Property="Content" Value="{DynamicResource Dlg_Confirm}" />
+                                                                    <Setter Property="Command" Value="{Binding Conversion.ConfirmCompletionCommand}" />
+                                                                    <Setter Property="Background" Value="{DynamicResource SystemControlForegroundAccentBrush}" />
+                                                                    <Setter Property="Foreground" Value="Azure" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Button.Style>
+                                                </Button>
 
-                                                <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                                                    <StackPanel Orientation="Vertical">
-                                                        <!-- Sidebar : Converting_Status -->
-                                                        <Button>
-                                                            <Button.Style>
-                                                                <Style TargetType="Button" BasedOn="{StaticResource SidebarButtonStyle}">
-                                                                    <Setter Property="Content" Value="{DynamicResource Btn_Cancel}" />
-                                                                    <Setter Property="Command" Value="{Binding Conversion.CancelConvertCommand}" />
-                                                                    <Setter Property="Foreground" Value="#FF5555" />
-                                                                    <Style.Triggers>
-                                                                        <DataTrigger Binding="{Binding Conversion.IsConversionCompleted}" Value="True">
-                                                                            <Setter Property="Content" Value="{DynamicResource Dlg_Confirm}" />
-                                                                            <Setter Property="Command" Value="{Binding Conversion.ConfirmCompletionCommand}" />
-                                                                            <Setter Property="Background" Value="{DynamicResource SystemControlForegroundAccentBrush}" />
-                                                                            <Setter Property="Foreground" Value="Azure" />
-                                                                        </DataTrigger>
-                                                                    </Style.Triggers>
-                                                                </Style>
-                                                            </Button.Style>
-                                                        </Button>
+                                                <Separator Margin="0,0,0,8" />
 
-                                                        <Separator Margin="0,0,0,8" />
+                                                <TextBlock
+                                                    Margin="0,0,0,4"
+                                                    FontSize="14"
+                                                    FontWeight="SemiBold"
+                                                    Foreground="{DynamicResource SystemControlForegroundAccentBrush}"
+                                                    Text="{DynamicResource Converting_Title}" />
 
-                                                        <DockPanel LastChildFill="False">
-                                                            <TextBlock
-                                                                DockPanel.Dock="Left"
-                                                                Margin="0,0,0,4"
-                                                                FontSize="14"
-                                                                FontWeight="SemiBold"
-                                                                Foreground="{DynamicResource SystemControlForegroundAccentBrush}"
-                                                                Text="{DynamicResource Converting_Title}" />
-                                                            <TextBlock
-                                                                DockPanel.Dock="Right"
-                                                                Margin="0,0,0,4"
-                                                                VerticalAlignment="Bottom"
-                                                                FontSize="12"
-                                                                FontWeight="Medium"
-                                                                Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
-                                                                Text="{Binding Conversion.ConvertingTime}" />
-                                                        </DockPanel>
+                                                <!-- Sidebar : Converting_Details -->
+                                                <TextBlock
+                                                    Margin="0,0,0,4"
+                                                    TextAlignment="Right"
+                                                    FontSize="12"
+                                                    FontWeight="Medium"
+                                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                                    Text="{Binding Conversion.ConvertingTime}" />
+                                                <ProgressBar Margin="0"
+                                                             Padding="0"
+                                                             Height="8"
+                                                             MinHeight="0"
+                                                             VerticalAlignment="Stretch"
+                                                             Maximum="100"
+                                                             Minimum="0"
+                                                             Value="{Binding Conversion.ConvertProgressPercent}" />
+                                                <TextBlock
+                                                    TextAlignment="Right">
+                                                    <Run
+                                                        FontWeight="SemiBold"
+                                                        Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}"
+                                                        Text="{Binding Conversion.ProcessedCount}" />
+                                                    <Run Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" Text="/" />
+                                                    <Run Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" Text="{Binding Conversion.TotalConvertCount}" />
+                                                </TextBlock>
 
-                                                        <!-- Sidebar : Converting_Details -->
-                                                        <Grid Margin="0,0,0,8">
-                                                            <Grid.RowDefinitions>
-                                                                <RowDefinition Height="*" />
-                                                                <RowDefinition Height="*" />
-                                                                <RowDefinition Height="Auto" />
-                                                            </Grid.RowDefinitions>
+                                                <TextBlock Margin="0,0,0,8"
+                                                    TextAlignment="Right"
+                                                    Foreground="#FF5555">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Setter Property="Visibility" Value="Visible" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger
+                                                                    Binding="{Binding Conversion.HasFailures}"
+                                                                    Value="True">
+                                                                    <Setter Property="Visibility" Value="Visible" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                    <Run Text="{DynamicResource Converting_FailCount}" />
+                                                    <Run Text=":" />
+                                                    <Run FontWeight="SemiBold" Text="{Binding Conversion.FailCount}" />
+                                                </TextBlock>
 
-                                                            <ProgressBar Grid.Row="0"
-                                                                Height="6"
-                                                                Margin="0,4,0,0"
-                                                                Maximum="100"
-                                                                Minimum="0"
-                                                                Value="{Binding Conversion.ConvertProgressPercent}" />
+                                                <Separator Margin="0,0,0,8" />
 
-                                                            <TextBlock
-                                                                Grid.Row="1"
-                                                                TextAlignment="Right">
-                                                                <Run
-                                                                    FontWeight="SemiBold"
-                                                                    Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}"
-                                                                    Text="{Binding Conversion.ProcessedCount}" />
-                                                                <Run
-                                                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
-                                                                    Text="/" />
-                                                                <Run
-                                                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
-                                                                    Text="{Binding Conversion.TotalConvertCount}" />
-                                                            </TextBlock>
+                                                <!-- Sidebar : Options Info (Extended) -->
+                                                <TextBlock Margin="0,0,0,2"
+                                                           FontSize="12"
+                                                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                                           Text="{DynamicResource Converting_Format}"/>
+                                                <TextBlock Margin="8,0,0,2"
+                                                           FontSize="12"
+                                                           FontWeight="SemiBold"
+                                                           Text="{Binding Conversion.CurrentTargetFormat}"/>
 
-                                                            <TextBlock
-                                                                Grid.Row="2"
-                                                                TextAlignment="Right"
-                                                                Foreground="#FF5555">
-                                                                <TextBlock.Style>
-                                                                    <Style TargetType="TextBlock">
-                                                                        <Setter Property="Visibility" Value="Hidden" />
-                                                                        <Style.Triggers>
-                                                                            <DataTrigger
-                                                                                Binding="{Binding Conversion.HasFailures}"
-                                                                                Value="True">
-                                                                                <Setter Property="Visibility" Value="Visible" />
-                                                                            </DataTrigger>
-                                                                        </Style.Triggers>
-                                                                    </Style>
-                                                                </TextBlock.Style>
-                                                                <Run Text="{DynamicResource Converting_FailCount}" />
-                                                                <Run Text=":" />
-                                                                <Run
-                                                                    FontWeight="SemiBold"
-                                                                    Text="{Binding Conversion.FailCount}" />
-                                                            </TextBlock>
-                                                        </Grid>
+                                                <TextBlock Margin="0,0,0,2"
+                                                           FontSize="12"
+                                                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                                           Text="{DynamicResource Converting_Cpu}"/>
+                                                <TextBlock Margin="8,0,0,2"
+                                                           FontSize="12"
+                                                           FontWeight="SemiBold"
+                                                           Text="{Binding Conversion.CurrentCpuUsage}"/>
 
-                                                        <Separator Margin="0,0,0,8"/>
+                                                <TextBlock Margin="0,0,0,2"
+                                                           FontSize="12"
+                                                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                                           Text="{DynamicResource Converting_Quality}"/>
+                                                <TextBlock Margin="8,0,0,2"
+                                                           FontSize="12"
+                                                           FontWeight="SemiBold"
+                                                           Text="{Binding Conversion.CurrentQuality}"/>
 
-                                                        <!-- Sidebar : Active_Process_List -->
-                                                        <ScrollViewer MaxHeight="200" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled">
-                                                            <ItemsControl ItemsSource="{Binding Conversion.ActiveProcesses}">
-                                                                <ItemsControl.ItemTemplate>
-                                                                    <DataTemplate>
-                                                                        <Grid Margin="0,0,0,4">
-                                                                            <Grid.ColumnDefinitions>
-                                                                                <ColumnDefinition Width="*" />
-                                                                                <ColumnDefinition Width="Auto" />
-                                                                            </Grid.ColumnDefinitions>
-                                                                            <TextBlock
-                                                                                Grid.Column="0"
-                                                                                FontSize="11"
-                                                                                Text="{Binding FileName}"
-                                                                                TextTrimming="CharacterEllipsis"
-                                                                                ToolTip="{Binding FileName}" />
-                                                                            <Border
-                                                                                Grid.Column="1"
-                                                                                Margin="4,0,0,0"
-                                                                                Padding="4,1"
-                                                                                Background="{DynamicResource SystemControlBackgroundBaseLowBrush}"
-                                                                                CornerRadius="2">
-                                                                                <TextBlock
-                                                                                    FontSize="9"
-                                                                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
-                                                                                    Text="{Binding EngineName}" />
-                                                                            </Border>
-                                                                        </Grid>
-                                                                    </DataTemplate>
-                                                                </ItemsControl.ItemTemplate>
-                                                            </ItemsControl>
-                                                        </ScrollViewer>
-                                                    </StackPanel>
-                                                </ScrollViewer>
+                                                <TextBlock Margin="0,0,0,2"
+                                                           FontSize="12"
+                                                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                                           Text="{DynamicResource Converting_BgColor}"/>
+                                                <TextBlock Margin="8,0,0,2"
+                                                           FontSize="12"
+                                                           FontWeight="SemiBold"
+                                                           Text="{Binding Conversion.CurrentBgColor}"/>
 
-                                                <!-- Sidebar : Job Summary (Extended) -->
-                                                <StackPanel Grid.Row="1" Orientation="Vertical">
-                                                    <Separator Margin="0,8,0,8" />
-                                                    <Grid Margin="0,0,0,0">
-                                                        <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition Width="Auto" />
-                                                            <ColumnDefinition Width="*" />
-                                                        </Grid.ColumnDefinitions>
-                                                        <Grid.RowDefinitions>
-                                                            <RowDefinition Height="Auto" />
-                                                            <RowDefinition Height="Auto" />
-                                                            <RowDefinition Height="Auto" />
-                                                            <RowDefinition Height="Auto" />
-                                                            <RowDefinition Height="Auto" />
-                                                            <RowDefinition Height="Auto" />
-                                                            <RowDefinition Height="Auto" />
-                                                            <RowDefinition Height="Auto" />
-                                                        </Grid.RowDefinitions>
+                                                <TextBlock Margin="0,0,0,2"
+                                                           FontSize="12"
+                                                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                                           Text="{DynamicResource Converting_KeepExif}"/>
+                                                <TextBlock Margin="8,0,0,2"
+                                                           FontSize="12"
+                                                           FontWeight="SemiBold"
+                                                           Text="{Binding Conversion.CurrentKeepExif}"/>
 
-                                                        <TextBlock Grid.Row="0" Grid.Column="0" FontSize="11" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" Text="{DynamicResource Converting_Format}" Margin="0,0,0,2"/>
-                                                        <TextBlock Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" FontSize="11" FontWeight="SemiBold" Text="{Binding Conversion.CurrentTargetFormat}" Margin="8,0,0,2"/>
+                                                <TextBlock Margin="0,0,0,2"
+                                                           FontSize="12"
+                                                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                                           Text="{DynamicResource Converting_Duplicates}"/>
+                                                <TextBlock Margin="8,0,0,2"
+                                                           FontSize="12"
+                                                           FontWeight="SemiBold"
+                                                           Text="{Binding Conversion.CurrentOverwritePolicy}"/>
 
-                                                        <TextBlock Grid.Row="1" Grid.Column="0" FontSize="11" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" Text="{DynamicResource Converting_Cpu}" Margin="0,0,0,2"/>
-                                                        <TextBlock Grid.Row="1" Grid.Column="1" HorizontalAlignment="Right" FontSize="11" FontWeight="SemiBold" Text="{Binding Conversion.CurrentCpuUsage}" Margin="8,0,0,2"/>
+                                                <TextBlock Margin="0,0,0,2"
+                                                           FontSize="12"
+                                                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                                           Text="{DynamicResource Converting_SaveMethod}"/>
+                                                <TextBlock Margin="8,0,0,2"
+                                                           FontSize="12"
+                                                           FontWeight="SemiBold"
+                                                           Text="{Binding Conversion.CurrentSaveMethod}"/>
 
-                                                        <TextBlock Grid.Row="2" Grid.Column="0" FontSize="11" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" Text="{DynamicResource Converting_Quality}" Margin="0,0,0,2"/>
-                                                        <TextBlock Grid.Row="2" Grid.Column="1" HorizontalAlignment="Right" FontSize="11" FontWeight="SemiBold" Text="{Binding Conversion.CurrentQuality}" Margin="8,0,0,2"/>
-
-                                                        <TextBlock Grid.Row="3" Grid.Column="0" FontSize="11" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" Text="{DynamicResource Converting_BgColor}" Margin="0,0,0,2"/>
-                                                        <TextBlock Grid.Row="3" Grid.Column="1" HorizontalAlignment="Right" FontSize="11" FontWeight="SemiBold" Text="{Binding Conversion.CurrentBgColor}" Margin="8,0,0,2"/>
-
-                                                        <TextBlock Grid.Row="4" Grid.Column="0" FontSize="11" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" Text="{DynamicResource Converting_KeepExif}" Margin="0,0,0,2"/>
-                                                        <TextBlock Grid.Row="4" Grid.Column="1" HorizontalAlignment="Right" FontSize="11" FontWeight="SemiBold" Text="{Binding Conversion.CurrentKeepExif}" Margin="8,0,0,2"/>
-
-                                                        <TextBlock Grid.Row="5" Grid.Column="0" FontSize="11" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" Text="{DynamicResource Converting_Duplicates}" Margin="0,0,0,2"/>
-                                                        <TextBlock Grid.Row="5" Grid.Column="1" HorizontalAlignment="Right" FontSize="11" FontWeight="SemiBold" Text="{Binding Conversion.CurrentOverwritePolicy}" Margin="8,0,0,2"/>
-
-                                                        <TextBlock Grid.Row="6" Grid.Column="0" FontSize="11" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" Text="{DynamicResource Converting_SaveMethod}" Margin="0,0,0,2"/>
-                                                        <TextBlock Grid.Row="6" Grid.Column="1" HorizontalAlignment="Right" FontSize="11" FontWeight="SemiBold" Text="{Binding Conversion.CurrentSaveMethod}" Margin="8,0,0,2"/>
-
-                                                        <TextBlock Grid.Row="7" Grid.Column="0" FontSize="11" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" Text="{DynamicResource Converting_SaveLocation}" />
-                                                        <TextBlock Grid.Row="7" Grid.Column="1" HorizontalAlignment="Right" FontSize="11" FontWeight="SemiBold" Text="{Binding Conversion.CurrentSaveLocation}" ToolTip="{Binding Conversion.CurrentSaveLocationTooltip}" TextTrimming="CharacterEllipsis" Margin="8,0,0,0"/>
-                                                    </Grid>
-                                                </StackPanel>
-                                            </Grid>
+                                                <TextBlock Margin="0,0,0,2"
+                                                           FontSize="12"
+                                                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                                           Text="{DynamicResource Converting_SaveLocation}"/>
+                                                <TextBlock Margin="8,0,0,2"
+                                                           FontSize="12"
+                                                           FontWeight="SemiBold"
+                                                           TextTrimming="CharacterEllipsis"
+                                                           Text="{Binding Conversion.CurrentSaveLocation}"
+                                                           ToolTip="{Binding Conversion.CurrentSaveLocationTooltip}"/>
+                                            </StackPanel>
                                         </DataTemplate>
                                     </Setter.Value>
                                 </Setter>
