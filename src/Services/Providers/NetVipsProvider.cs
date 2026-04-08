@@ -161,6 +161,7 @@ public class NetVipsProvider : IProviderService, IDisposable
                 break;
             case "PNG":
                 options.Add("compression", 6);
+                options.Add("strip", true);
                 break;
             case "WEBP":
                 options.Add("Q", settings.Quality);
@@ -169,7 +170,11 @@ public class NetVipsProvider : IProviderService, IDisposable
             case "AVIF":
                 options.Add("compression", Enums.ForeignHeifCompression.Av1);
                 options.Add("Q", settings.Quality);
+                options.Add("strip", true);
                 // libvips의 heifsave는 정지 이미지 저장 시 이 옵션들을 사용함
+                break;
+            case "GIF":
+                options.Add("strip", true);
                 break;
             // GIF, WEBP: WriteToFile 시 확장자 기반으로 n-pages 메타데이터를 자동 참조하여 애니메이션 저장됨
         }

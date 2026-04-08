@@ -46,12 +46,9 @@ public partial class ConvertSettingViewModel : ViewModelBase
         // 1~100 범위로 강제 보정 (0 -> 1, 100 초과 -> 100)
         int coerced = System.Math.Clamp(value, 1, 100);
         if (value != coerced)
-        {
             Quality = coerced;
-        }
     }
 
-    [ObservableProperty] private bool _keepExif = false;
     [ObservableProperty] private OverwritePolicy _OverwritePolicy = OverwritePolicy.Suffix;
     [ObservableProperty] private SaveLocationType _SaveLocation = SaveLocationType.SameAsOriginal;
     [ObservableProperty] private SaveFolderMethod _FolderMethod = SaveFolderMethod.CreateFolder;
@@ -193,7 +190,7 @@ public partial class ConvertSettingViewModel : ViewModelBase
         StandardTargetFormat = s.StandardTargetFormat ?? "JPEG";
         AnimationTargetFormat = s.AnimationTargetFormat ?? "GIF";
         Quality = s.Quality;
-        
+
         // BackgroundColor (HEX) -> UI Preset Mapping
         CustomBackgroundColor = s.BackgroundColor ?? "#FFFFFF";
         if (CustomBackgroundColor.Equals("#FFFFFF", StringComparison.OrdinalIgnoreCase))
@@ -203,7 +200,6 @@ public partial class ConvertSettingViewModel : ViewModelBase
         else
             BgColorOption = BackgroundColorOption.Custom;
 
-        KeepExif = s.KeepExif;
         OverwritePolicy = s.OverwritePolicy;
         SaveLocation = s.SaveLocation;
         FolderMethod = s.FolderMethod;
@@ -234,7 +230,6 @@ public partial class ConvertSettingViewModel : ViewModelBase
             _ => CustomBackgroundColor
         };
 
-        s.KeepExif = KeepExif;
         s.OverwritePolicy = OverwritePolicy;
         s.SaveLocation = SaveLocation;
         s.FolderMethod = FolderMethod;

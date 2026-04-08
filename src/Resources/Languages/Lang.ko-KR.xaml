@@ -75,7 +75,6 @@
     <sys:String x:Key="Converting_Format">대상 포맷</sys:String>
     <sys:String x:Key="Converting_Quality">품질</sys:String>
     <sys:String x:Key="Converting_BgColor">배경색</sys:String>
-    <sys:String x:Key="Converting_KeepExif">EXIF 보존</sys:String>
     <sys:String x:Key="Converting_Duplicates">중복 파일</sys:String>
     <sys:String x:Key="Converting_SaveMethod">저장 방식</sys:String>
     <sys:String x:Key="Converting_SaveLocation">저장 위치</sys:String>
@@ -93,7 +92,6 @@
     <sys:String x:Key="Setting_GroupAnimation">애니메이션 이미지 변환 포맷</sys:String>
     <sys:String x:Key="Setting_Quality">품질</sys:String>
     <sys:String x:Key="Setting_BackgroundColor">배경 색(투명 이미지용)</sys:String>
-    <sys:String x:Key="Setting_KeepExif">메타데이터(EXIF) 보존</sys:String>
 
     <!-- 변환 설정 : 배경색 -->
     <sys:String x:Key="Bg_White">흰색</sys:String>

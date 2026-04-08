@@ -180,20 +180,6 @@
                 </StackPanel>
             </StackPanel>
 
-            <!-- ConvertSetting : KeepExif_Group -->
-            <StackPanel
-                    Margin="0,8,0,8"
-                    Orientation="Horizontal">
-                <TextBlock
-                    Margin="0,0,8,4"
-                    VerticalAlignment="Center"
-                    FontWeight="SemiBold"
-                    Text="{DynamicResource Setting_KeepExif}" />
-                <CheckBox
-                    VerticalAlignment="Center"
-                    IsChecked="{Binding KeepExif}" />
-            </StackPanel>
-
             <!-- ConvertSetting : BackgroundColor_Group -->
             <StackPanel Margin="0,8,0,8">
                 <TextBlock

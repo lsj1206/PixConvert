@@ -75,7 +75,6 @@
     <sys:String x:Key="Converting_Format">Target Format</sys:String>
     <sys:String x:Key="Converting_Quality">Quality</sys:String>
     <sys:String x:Key="Converting_BgColor">Background</sys:String>
-    <sys:String x:Key="Converting_KeepExif">Keep EXIF</sys:String>
     <sys:String x:Key="Converting_Duplicates">Duplicates</sys:String>
     <sys:String x:Key="Converting_SaveMethod">Save Method</sys:String>
     <sys:String x:Key="Converting_SaveLocation">Save to...</sys:String>
@@ -93,7 +92,6 @@
     <sys:String x:Key="Setting_GroupAnimation">Animation Image Format</sys:String>
     <sys:String x:Key="Setting_Quality">Quality</sys:String>
     <sys:String x:Key="Setting_BackgroundColor">Background Color(Transparency)</sys:String>
-    <sys:String x:Key="Setting_KeepExif">Keep Metadata(EXIF)</sys:String>
 
     <!-- Convert Setting : BgColor -->
     <sys:String x:Key="Bg_White">White</sys:String>

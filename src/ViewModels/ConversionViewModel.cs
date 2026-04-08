@@ -64,7 +64,6 @@ public partial class ConversionViewModel : ViewModelBase
     [ObservableProperty] private string _currentTargetFormat = string.Empty;
     [ObservableProperty] private string _currentQuality = string.Empty;
     [ObservableProperty] private string _currentBgColor = string.Empty;
-    [ObservableProperty] private string _currentKeepExif = string.Empty;
     [ObservableProperty] private string _currentOverwritePolicy = string.Empty;
     [ObservableProperty] private string _currentSaveMethod = string.Empty;
     [ObservableProperty] private string _currentSaveLocation = string.Empty;
@@ -474,7 +473,6 @@ public partial class ConversionViewModel : ViewModelBase
 
         CurrentQuality = $"{settings.Quality}";
         CurrentBgColor = settings.BackgroundColor;
-        CurrentKeepExif = settings.KeepExif ? "O" : "X";
         CurrentOverwritePolicy = GetString($"Setting_Overwrite_{settings.OverwritePolicy}");
         CurrentSaveMethod = settings.FolderMethod == SaveFolderMethod.CreateFolder
             ? settings.OutputSubFolderName

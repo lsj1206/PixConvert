@@ -297,15 +297,6 @@
                                                 <TextBlock Margin="0,0,0,2"
                                                            FontSize="12"
                                                            Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
-                                                           Text="{DynamicResource Converting_KeepExif}"/>
-                                                <TextBlock Margin="8,0,0,2"
-                                                           FontSize="12"
-                                                           FontWeight="SemiBold"
-                                                           Text="{Binding Conversion.CurrentKeepExif}"/>
-
-                                                <TextBlock Margin="0,0,0,2"
-                                                           FontSize="12"
-                                                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
                                                            Text="{DynamicResource Converting_Duplicates}"/>
                                                 <TextBlock Margin="8,0,0,2"
                                                            FontSize="12"

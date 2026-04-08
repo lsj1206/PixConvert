@@ -20,9 +20,6 @@ public class ConvertSettings
     /// <summary>배경 채우기 색상 (HEX, 예: #FFFFFF)</summary>
     public string BackgroundColor { get; set; } = "#FFFFFF";
 
-    /// <summary>EXIF 메타데이터 보존 여부</summary>
-    public bool KeepExif { get; set; } = false;
-
     /// <summary>동일한 이름의 파일이 존재할 경우 처리 방침</summary>
     public OverwritePolicy OverwritePolicy { get; set; } = OverwritePolicy.Suffix;
 

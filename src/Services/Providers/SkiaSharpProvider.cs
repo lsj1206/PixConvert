@@ -143,9 +143,6 @@ public class SkiaSharpProvider : IProviderService, IDisposable
             compositedBitmap?.Dispose();
             srcBitmap?.Dispose();
         }
-
-        // ── 5. EXIF 보존 ──────────────────────────────────────────────────
-        // TODO: settings.KeepExif == true 인 경우 NetVips 라우팅으로 처리 예정 (Phase B.5)
     }
 
     // ─────────────────────────────────────────────────────────────────────────
