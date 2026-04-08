@@ -183,33 +183,40 @@ public class NetVipsProvider : IProviderService, IDisposable
         // 알파 채널 제거 (BMP는 알파 미지원)
         var flat = vipsImage.HasAlpha() ? vipsImage.Flatten() : vipsImage;
 
-        // NetVips 픽셀 버퍼 (RGB 8-bit packed) → SKBitmap (Rgb888x) 변환
-        byte[] pixels = flat.WriteToMemory<byte>();
-        int w = flat.Width;
-        int h = flat.Height;
-
-        var info = new SkiaSharp.SKImageInfo(w, h, SkiaSharp.SKColorType.Rgb888x, SkiaSharp.SKAlphaType.Opaque);
-        using var skBitmap = new SkiaSharp.SKBitmap(info);
-
-        byte[] dstBytes = new byte[w * h * 4];
-        var srcSpan = pixels.AsSpan();
-
-        int totalPixels = w * h;
-        for (int i = 0; i < totalPixels; i++)
+        try
         {
-            int srcOff = i * 3;
-            int dstOff = i * 4;
-            dstBytes[dstOff]     = srcSpan[srcOff + 2]; // B
-            dstBytes[dstOff + 1] = srcSpan[srcOff + 1]; // G
-            dstBytes[dstOff + 2] = srcSpan[srcOff];     // R
-            dstBytes[dstOff + 3] = 255;                 // X
+            // NetVips 픽셀 버퍼 (RGB 8-bit packed) → SKBitmap (Bgra8888) 변환
+            byte[] pixels = flat.WriteToMemory<byte>();
+            int w = flat.Width;
+            int h = flat.Height;
+
+            // Windows x64의 PlatformColorType(Bgra8888)와 일치시켜 추가 색상 변환/복사 방지
+            var info = new SkiaSharp.SKImageInfo(w, h, SkiaSharp.SKColorType.Bgra8888, SkiaSharp.SKAlphaType.Opaque);
+            using var skBitmap = new SkiaSharp.SKBitmap(info);
+
+            byte[] dstBytes = new byte[w * h * 4];
+            var srcSpan = pixels.AsSpan();
+
+            int totalPixels = w * h;
+            for (int i = 0; i < totalPixels; i++)
+            {
+                int srcOff = i * 3;
+                int dstOff = i * 4;
+                // NetVips RGB -> Bgra8888 메모리 레이아웃 [B, G, R, A]
+                dstBytes[dstOff] = srcSpan[srcOff + 2];     // B
+                dstBytes[dstOff + 1] = srcSpan[srcOff + 1]; // G
+                dstBytes[dstOff + 2] = srcSpan[srcOff];     // R
+                dstBytes[dstOff + 3] = 255;                 // A
+            }
+
+            System.Runtime.InteropServices.Marshal.Copy(dstBytes, 0, skBitmap.GetPixels(), dstBytes.Length);
+
+            BmpEncoder.SaveAsync(skBitmap, outputPath).GetAwaiter().GetResult();
         }
-        
-        System.Runtime.InteropServices.Marshal.Copy(dstBytes, 0, skBitmap.GetPixels(), dstBytes.Length);
-
-        BmpEncoder.SaveAsync(skBitmap, outputPath).GetAwaiter().GetResult();
-
-        if (flat != vipsImage) flat.Dispose();
+        finally
+        {
+            if (flat != vipsImage) flat.Dispose();
+        }
     }
 
     private static double[] ParseBackgroundColor(ConvertSettings settings)
@@ -249,7 +256,7 @@ public class NetVipsProvider : IProviderService, IDisposable
     {
         using var stream = new System.IO.FileStream(path, System.IO.FileMode.Open, System.IO.FileAccess.Read, System.IO.FileShare.Read);
         using var skBitmap = SkiaSharp.SKBitmap.Decode(stream);
-        
+
         if (skBitmap == null)
             throw new InvalidOperationException($"SkiaSharp failed to decode BMP for NetVips: {path}");
 
