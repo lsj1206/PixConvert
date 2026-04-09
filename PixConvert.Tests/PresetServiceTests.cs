@@ -126,22 +126,6 @@ public class PresetServiceTests
     }
 
     [Fact]
-    public void ValidPresetData_WhenAnimationBackgroundHexIsInvalid_ShouldReturnFalse()
-    {
-        var settings = new ConvertSettings
-        {
-            StandardTargetFormat = "JPEG",
-            AnimationTargetFormat = "GIF",
-            StandardBackgroundColor = "#FFFFFF"
-        };
-
-        var result = _presetService.ValidPresetData(settings, out string errorKey);
-
-        Assert.False(result);
-        Assert.Equal("Msg_Error_ConfigInvalid", errorKey);
-    }
-
-    [Fact]
     public void ValidPresetData_WhenCustomPathIsEmpty_ShouldReturnFalse()
     {
         var settings = new ConvertSettings

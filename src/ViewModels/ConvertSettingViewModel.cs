@@ -32,9 +32,6 @@ public partial class ConvertSettingViewModel : ViewModelBase
 
     [ObservableProperty] private int _animationQuality = 85;
     [ObservableProperty] private bool _animationLossless;
-    [ObservableProperty] private BackgroundColorOption _animationBgColorOption = BackgroundColorOption.White;
-    [ObservableProperty] private string _animationCustomBackgroundColor = "#FFFFFF";
-
     [ObservableProperty] private OverwritePolicy _overwritePolicy = OverwritePolicy.Suffix;
     [ObservableProperty] private SaveLocationType _saveLocation = SaveLocationType.SameAsOriginal;
     [ObservableProperty] private SaveFolderMethod _folderMethod = SaveFolderMethod.CreateFolder;
@@ -44,12 +41,6 @@ public partial class ConvertSettingViewModel : ViewModelBase
 
     public ObservableCollection<FormatTagViewModel> StandardTargetTags { get; } = new();
     public ObservableCollection<FormatTagViewModel> AnimationTargetTags { get; } = new();
-
-    public BackgroundColorOption[] BgColorOptions { get; } = (BackgroundColorOption[])Enum.GetValues(typeof(BackgroundColorOption));
-    public OverwritePolicy[] OverwritePolicies { get; } = (OverwritePolicy[])Enum.GetValues(typeof(OverwritePolicy));
-    public SaveLocationType[] SaveLocationTypes { get; } = (SaveLocationType[])Enum.GetValues(typeof(SaveLocationType));
-    public SaveFolderMethod[] FolderStrategies { get; } = (SaveFolderMethod[])Enum.GetValues(typeof(SaveFolderMethod));
-    public CpuUsageOption[] CpuUsageOptions { get; } = (CpuUsageOption[])Enum.GetValues(typeof(CpuUsageOption));
 
     public IRelayCommand CreatePresetCommand { get; }
     public IRelayCommand CopyPresetCommand { get; }
@@ -77,8 +68,6 @@ public partial class ConvertSettingViewModel : ViewModelBase
         ShowAnimationOptionsSection &&
         SettingOptionCatalog.Supports(SettingOptionSection.Animation, SettingOptionKey.Quality, AnimationTargetFormat) &&
         !(AnimationShowLossless && AnimationLossless);
-
-    public bool AnimationShowBackgroundColor => false;
 
     public ConvertSettingViewModel(
         ILanguageService languageService,
@@ -279,7 +268,6 @@ public partial class ConvertSettingViewModel : ViewModelBase
         OnPropertyChanged(nameof(ShowAnimationOptionsSection));
         OnPropertyChanged(nameof(AnimationShowLossless));
         OnPropertyChanged(nameof(AnimationShowQuality));
-        OnPropertyChanged(nameof(AnimationShowBackgroundColor));
     }
 
     private void HandleStandardTagSelectionChanged(FormatTagViewModel tag)

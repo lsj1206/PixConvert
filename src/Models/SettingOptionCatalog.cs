@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace PixConvert.Models;
@@ -17,21 +16,10 @@ public enum SettingOptionKey
     BackgroundColor
 }
 
-public enum SettingOptionEngineSupport
-{
-    Both,
-    SkiaSharp,
-    NetVips
-}
-
 public sealed record SettingOptionDefinition(
     SettingOptionSection Section,
     SettingOptionKey Key,
-    string LabelResourceKey,
-    IReadOnlyCollection<string> SupportedTargetFormats,
-    SettingOptionEngineSupport SupportedEngines,
-    object DefaultValue,
-    bool ShowAniTag = false);
+    string[] SupportedTargetFormats);
 
 public static class SettingOptionCatalog
 {
@@ -43,38 +31,23 @@ public static class SettingOptionCatalog
         new(
             SettingOptionSection.Standard,
             SettingOptionKey.Lossless,
-            "Setting_Lossless",
-            new[] { "WEBP", "AVIF" },
-            SettingOptionEngineSupport.Both,
-            false),
+            new[] { "WEBP", "AVIF" }),
         new(
             SettingOptionSection.Standard,
             SettingOptionKey.Quality,
-            "Setting_Quality",
-            new[] { "JPEG", "WEBP", "AVIF" },
-            SettingOptionEngineSupport.Both,
-            85),
+            new[] { "JPEG", "WEBP", "AVIF" }),
         new(
             SettingOptionSection.Standard,
             SettingOptionKey.BackgroundColor,
-            "Setting_BackgroundColor",
-            new[] { "JPEG", "BMP" },
-            SettingOptionEngineSupport.Both,
-            "#FFFFFF"),
+            new[] { "JPEG", "BMP" }),
         new(
             SettingOptionSection.Animation,
             SettingOptionKey.Lossless,
-            "Setting_Lossless",
-            new[] { "WEBP" },
-            SettingOptionEngineSupport.NetVips,
-            false),
+            new[] { "WEBP" }),
         new(
             SettingOptionSection.Animation,
             SettingOptionKey.Quality,
-            "Setting_Quality",
-            new[] { "WEBP" },
-            SettingOptionEngineSupport.NetVips,
-            85)
+            new[] { "WEBP" })
     ];
 
     public static bool Supports(SettingOptionSection section, SettingOptionKey key, string? targetFormat)

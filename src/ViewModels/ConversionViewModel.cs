@@ -148,8 +148,6 @@ public partial class ConversionViewModel : ViewModelBase
         {
             ActivePresetName = active.Name;
             IsActivePresetValid = true;
-
-            var s = active.Settings;
         }
         else
         {
