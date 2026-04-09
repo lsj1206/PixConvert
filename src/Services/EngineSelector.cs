@@ -36,7 +36,7 @@ public class EngineSelector
     {
         // 실제 적용될 출력 포맷: 애니메이션 파일은 AnimationTargetFormat, 정지 이미지는 StandardTargetFormat
         string targetFormat = file.IsAnimation
-            ? settings.AnimationTargetFormat
+            ? settings.AnimationTargetFormat ?? string.Empty
             : settings.StandardTargetFormat;
 
         // 1. 애니메이션 파일(GIF, WebP-Animated)은 NetVips로 라우팅

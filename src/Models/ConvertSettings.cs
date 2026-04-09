@@ -8,17 +8,26 @@ public class ConvertSettings
     /// <summary>일반 이미지를 변환할 목표 확장자 (예: JPEG)</summary>
     public string StandardTargetFormat { get; set; } = "JPEG";
 
-    /// <summary>애니메이션(움짤)을 변환할 목표 확장자 (예: GIF)</summary>
-    public string AnimationTargetFormat { get; set; } = "GIF";
+    /// <summary>애니메이션(움짤)을 변환할 목표 확장자 (예: GIF). 비활성화 시 null입니다.</summary>
+    public string? AnimationTargetFormat { get; set; } = "GIF";
 
     /// <summary>CPU 작업 부하 옵션</summary>
     public CpuUsageOption CpuUsage { get; set; } = CpuUsageOption.Optimal;
 
-    /// <summary>이미지 품질 (1~100)</summary>
-    public int Quality { get; set; } = 85;
+    /// <summary>일반 이미지 품질 (1~100). JPEG / WEBP / AVIF에서만 의미가 있습니다.</summary>
+    public int StandardQuality { get; set; } = 85;
 
-    /// <summary>배경 채우기 색상 (HEX, 예: #FFFFFF)</summary>
-    public string BackgroundColor { get; set; } = "#FFFFFF";
+    /// <summary>일반 이미지 무손실 인코딩 여부. WEBP / AVIF에 적용됩니다.</summary>
+    public bool StandardLossless { get; set; }
+
+    /// <summary>일반 이미지 배경 채우기 색상 (HEX, 예: #FFFFFF)</summary>
+    public string StandardBackgroundColor { get; set; } = "#FFFFFF";
+
+    /// <summary>애니메이션 이미지 품질 (1~100). 현재 WEBP에서만 의미가 있습니다.</summary>
+    public int AnimationQuality { get; set; } = 85;
+
+    /// <summary>애니메이션 이미지 무손실 인코딩 여부. 현재 WEBP에 적용됩니다.</summary>
+    public bool AnimationLossless { get; set; }
 
     /// <summary>동일한 이름의 파일이 존재할 경우 처리 방침</summary>
     public OverwritePolicy OverwritePolicy { get; set; } = OverwritePolicy.Suffix;

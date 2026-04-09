@@ -54,6 +54,7 @@
                     Command="{Binding RenamePresetCommand}"
                     Content="{DynamicResource Btn_PresetApply}" />
             </StackPanel>
+
             <!-- ConvertSetting : Preset_Buttons -->
             <StackPanel
                 Margin="0,0,0,8"
@@ -74,60 +75,12 @@
 
             <Separator Margin="0,0,0,8" />
 
-            <!-- ConvertSetting : Standard_Group -->
-            <TextBlock
-                Margin="0,0,0,4"
-                FontWeight="SemiBold"
-                Text="{DynamicResource Setting_GroupStandard}" />
-            <ItemsControl
-                Margin="0,0,0,4"
-                ItemsSource="{Binding StandardTargetTags}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <WrapPanel Orientation="Horizontal" />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <ToggleButton
-                            Style="{DynamicResource FormatTagStyle}"
-                            Content="{Binding Format, Converter={StaticResource UpperCaseConverter}}"
-                            IsChecked="{Binding IsSelected}" />
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-
-            <!-- ConvertSetting : Animation_Group -->
-            <TextBlock
-                Margin="0,0,0,4"
-                FontWeight="SemiBold"
-                Text="{DynamicResource Setting_GroupAnimation}" />
-            <ItemsControl
-                Margin="0,0,0,8"
-                ItemsSource="{Binding AnimationTargetTags}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <WrapPanel Orientation="Horizontal" />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <ToggleButton
-                            Style="{DynamicResource FormatTagStyle}"
-                            Content="{Binding Format, Converter={StaticResource UpperCaseConverter}}"
-                            IsChecked="{Binding IsSelected}" />
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-
-            <Separator Margin="0,0,0,8" />
-
             <!-- ConvertSetting : CpuUsage_Group -->
             <StackPanel
-                Margin="0,8,0,8"
+                Margin="0,4,0,4"
                 Orientation="Horizontal">
                 <TextBlock
-                    Margin="0,0,0,4"
+                    Margin="0,0,0,2"
                     Width="90"
                     VerticalAlignment="Center"
                     FontWeight="SemiBold"
@@ -150,75 +103,8 @@
                 </ComboBox>
             </StackPanel>
 
-            <!-- ConvertSetting : Quality_Group -->
-            <StackPanel
-                Margin="0,8,0,8"
-                Orientation="Horizontal"
-                IsEnabled="{Binding IsLossyFormat}">
-                <TextBlock
-                    Margin="0,0,0,4"
-                    Width="90"
-                    VerticalAlignment="Center"
-                    FontWeight="SemiBold"
-                    Text="{DynamicResource Setting_Quality}" />
-                <StackPanel Orientation="Horizontal">
-                    <Slider
-                        Margin="0,0,8,0"
-                        Width="300"
-                        Maximum="100"
-                        Minimum="1"
-                        Value="{Binding Quality}" />
-                    <ctrls:FilterTextBox
-                        VerticalAlignment="Center"
-                        IsBlank="90"
-                        Filter="Digits"
-                        FilterMode="Allow"
-                        FilterMaxLength="3"
-                        Text="{Binding Quality, UpdateSourceTrigger=PropertyChanged}"
-                        ui:TextBoxHelper.IsDeleteButtonVisible="False"
-                        ui:ControlHelper.PlaceholderText="90" />
-                </StackPanel>
-            </StackPanel>
-
-            <!-- ConvertSetting : BackgroundColor_Group -->
-            <StackPanel Margin="0,8,0,8">
-                <TextBlock
-                    Margin="0,0,0,4"
-                    FontWeight="SemiBold"
-                    Text="{DynamicResource Setting_BackgroundColor}" />
-                <StackPanel
-                    Margin="0,0,0,8"
-                    Orientation="Horizontal">
-                    <RadioButton
-                        VerticalAlignment="Center"
-                        Content="{DynamicResource Bg_White}"
-                        GroupName="BgColorGroup"
-                        IsChecked="{Binding BgColorOption, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=White}" />
-                    <RadioButton
-                        VerticalAlignment="Center"
-                        Content="{DynamicResource Bg_Black}"
-                        GroupName="BgColorGroup"
-                        IsChecked="{Binding BgColorOption, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Black}" />
-                    <StackPanel Orientation="Horizontal">
-                        <RadioButton
-                            MinWidth="32"
-                            VerticalAlignment="Center"
-                            GroupName="BgColorGroup"
-                            IsChecked="{Binding BgColorOption, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Custom}" />
-                        <ctrls:FilterTextBox
-                            Width="120"
-                            VerticalAlignment="Center"
-                            Filter="HexColor"
-                            FilterMode="Allow"
-                            IsEnabled="{Binding BgColorOption, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Custom}"
-                            Text="{Binding CustomBackgroundColor, UpdateSourceTrigger=PropertyChanged}"
-                            ui:ControlHelper.PlaceholderText="{DynamicResource Bg_Custom}"/>
-                    </StackPanel>
-                </StackPanel>
-            </StackPanel>
-
             <!-- ConvertSetting : OverwritePolicy_Group -->
-            <StackPanel Margin="0,8,0,8">
+            <StackPanel Margin="0,8,0,4">
                 <TextBlock
                     Margin="0,0,0,4"
                     FontWeight="SemiBold"
@@ -242,7 +128,7 @@
             </StackPanel>
 
             <!-- ConvertSetting : SaveMethod_Group -->
-            <StackPanel Margin="0,8,0,8">
+            <StackPanel Margin="0,0,0,4">
                 <TextBlock
                     Margin="0,0,0,4"
                     FontWeight="SemiBold"
@@ -271,7 +157,7 @@
             </StackPanel>
 
             <!-- ConvertSetting : SaveLocation_Group -->
-            <StackPanel Margin="0,8,0,8">
+            <StackPanel Margin="0,0,0,16">
                 <TextBlock
                     Margin="0,0,0,4"
                     FontWeight="SemiBold"
@@ -302,6 +188,192 @@
                         IsEnabled="{Binding SaveLocation, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Custom}" />
                 </StackPanel>
             </StackPanel>
+
+            <Separator Margin="0,0,0,16" />
+
+            <!-- ConvertSetting : Standard_Group -->
+            <TextBlock
+                Margin="0,0,0,6"
+                FontWeight="SemiBold"
+                Text="{DynamicResource Setting_GroupStandard}" />
+            <ItemsControl
+                Margin="0,0,0,6"
+                ItemsSource="{Binding StandardTargetTags}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <ToggleButton
+                            Style="{DynamicResource FormatTagStyle}"
+                            Content="{Binding Format, Converter={StaticResource UpperCaseConverter}}"
+                            IsChecked="{Binding IsSelected}" />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            
+            <!-- ConvertSetting : Standard_Options_Group -->
+            <TextBlock FontWeight="SemiBold" Text="{DynamicResource Setting_GroupStandardOptions}" />
+
+            <StackPanel
+                Margin="0,4,0,0"
+                Orientation="Horizontal"
+                Visibility="{Binding StandardShowLossless, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <TextBlock
+                    Margin="0,0,0,4"
+                    VerticalAlignment="Center"
+                    FontWeight="SemiBold"
+                    Text="{DynamicResource Setting_Lossless}" />
+                <CheckBox Margin="12,0,0,1"
+                          IsChecked="{Binding StandardLossless, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            </StackPanel>
+
+            <StackPanel
+                Margin="0,4,0,0"
+                Orientation="Horizontal"
+                Visibility="{Binding StandardShowQuality, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <TextBlock
+                    Margin="0,0,0,4"
+                    Width="54"
+                    VerticalAlignment="Center"
+                    FontWeight="SemiBold"
+                    Text="{DynamicResource Setting_Quality}" />
+                <StackPanel Orientation="Horizontal">
+                    <Slider
+                        Margin="0,0,8,0"
+                        Width="200"
+                        Maximum="100"
+                        Minimum="1"
+                        Value="{Binding StandardQuality}" />
+                    <ctrls:FilterTextBox
+                        VerticalAlignment="Center"
+                        IsBlank="90"
+                        Filter="Digits"
+                        FilterMode="Allow"
+                        FilterMaxLength="3"
+                        Text="{Binding StandardQuality, UpdateSourceTrigger=PropertyChanged}"
+                        ui:TextBoxHelper.IsDeleteButtonVisible="False"
+                        ui:ControlHelper.PlaceholderText="90" />
+                </StackPanel>
+            </StackPanel>
+
+            <StackPanel
+                Margin="0,8,0,0"
+                Visibility="{Binding StandardShowBackgroundColor, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <TextBlock
+                    FontWeight="SemiBold"
+                    Text="{DynamicResource Setting_BackgroundColor}" />
+                <StackPanel
+                    Orientation="Horizontal">
+                    <RadioButton
+                        VerticalAlignment="Center"
+                        Content="{DynamicResource Bg_White}"
+                        GroupName="StandardBgColorGroup"
+                        IsChecked="{Binding StandardBgColorOption, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=White}" />
+                    <RadioButton
+                        VerticalAlignment="Center"
+                        Content="{DynamicResource Bg_Black}"
+                        GroupName="StandardBgColorGroup"
+                        IsChecked="{Binding StandardBgColorOption, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Black}" />
+                    <StackPanel Orientation="Horizontal">
+                        <RadioButton
+                            MinWidth="32"
+                            VerticalAlignment="Center"
+                            GroupName="StandardBgColorGroup"
+                            IsChecked="{Binding StandardBgColorOption, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Custom}" />
+                        <ctrls:FilterTextBox
+                            Width="120"
+                            VerticalAlignment="Center"
+                            Filter="HexColor"
+                            FilterMode="Allow"
+                            IsEnabled="{Binding StandardBgColorOption, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Custom}"
+                            Text="{Binding StandardCustomBackgroundColor, UpdateSourceTrigger=PropertyChanged}"
+                            ui:ControlHelper.PlaceholderText="{DynamicResource Bg_Custom}"/>
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
+
+            <Separator Margin="0,12,0,16" 
+                       Width="350" 
+                       HorizontalAlignment="Left" />
+
+            <!-- ConvertSetting : Animation_Group -->
+            <TextBlock
+                Margin="0,0,0,6"
+                FontWeight="SemiBold"
+                Text="{DynamicResource Setting_GroupAnimation}" />
+            <ItemsControl
+                Margin="0,0,0,6"
+                ItemsSource="{Binding AnimationTargetTags}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <ToggleButton
+                            Style="{DynamicResource FormatTagStyle}"
+                            Content="{Binding Format, Converter={StaticResource UpperCaseConverter}}"
+                            IsChecked="{Binding IsSelected}" />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <!-- ConvertSetting : Animation_Options_Group -->
+            <StackPanel
+                Visibility="{Binding ShowAnimationOptionsSection, Converter={StaticResource BooleanToVisibilityConverter}}">
+
+                <TextBlock FontWeight="SemiBold" Text="{DynamicResource Setting_GroupAnimationOptions}" />
+
+                <StackPanel
+                    Margin="0,4,0,0"
+                    Orientation="Horizontal"
+                    Visibility="{Binding AnimationShowLossless, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <TextBlock
+                        Margin="0,0,0,4"
+                        VerticalAlignment="Center"
+                        FontWeight="SemiBold"
+                        Text="{DynamicResource Setting_Lossless}" />
+                    <CheckBox Margin="12,0,0,1"
+                              IsChecked="{Binding AnimationLossless, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                </StackPanel>
+
+                <StackPanel
+                    Margin="0,8,0,0"
+                    Orientation="Horizontal"
+                    Visibility="{Binding AnimationShowQuality, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <TextBlock
+                        Margin="0,0,0,4"
+                        Width="54"
+                        VerticalAlignment="Center"
+                        FontWeight="SemiBold"
+                        Text="{DynamicResource Setting_Quality}" />
+                    <StackPanel Orientation="Horizontal">
+                        <Slider
+                            Margin="0,0,8,0"
+                            Width="200"
+                            Maximum="100"
+                            Minimum="1"
+                            Value="{Binding AnimationQuality}" />
+                        <ctrls:FilterTextBox
+                            VerticalAlignment="Center"
+                            IsBlank="90"
+                            Filter="Digits"
+                            FilterMode="Allow"
+                            FilterMaxLength="3"
+                            Text="{Binding AnimationQuality, UpdateSourceTrigger=PropertyChanged}"
+                            ui:TextBoxHelper.IsDeleteButtonVisible="False"
+                            ui:ControlHelper.PlaceholderText="90" />
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
+
+            <Separator Margin="0,12,0,0" 
+                       Width="350" 
+                       HorizontalAlignment="Left" />
         </StackPanel>
     </ScrollViewer>
 </UserControl>

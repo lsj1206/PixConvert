@@ -90,7 +90,10 @@
     <!-- Convert Setting -->
     <sys:String x:Key="Setting_GroupStandard">Standard Image Format</sys:String>
     <sys:String x:Key="Setting_GroupAnimation">Animation Image Format</sys:String>
+    <sys:String x:Key="Setting_GroupStandardOptions">Standard Image Options</sys:String>
+    <sys:String x:Key="Setting_GroupAnimationOptions">Animation Image Options</sys:String>
     <sys:String x:Key="Setting_Quality">Quality</sys:String>
+    <sys:String x:Key="Setting_Lossless">Lossless</sys:String>
     <sys:String x:Key="Setting_BackgroundColor">Background Color(Transparency)</sys:String>
 
     <!-- Convert Setting : BgColor -->
@@ -151,6 +154,7 @@
     <sys:String x:Key="Msg_Error_Occurred">Error: {0}</sys:String>
     <sys:String x:Key="Msg_Error_ConfigInvalid">Invalid conversion settings. Please reconfigure.</sys:String>
     <sys:String x:Key="Msg_Error_EmptyPreset">No active preset.</sys:String>
+    <sys:String x:Key="Msg_Error_NoTargetFiles">No files available for conversion.</sys:String>
 
     <!-- Dialog -->
     <sys:String x:Key="Err_Fatal_Title">Startup Error</sys:String>

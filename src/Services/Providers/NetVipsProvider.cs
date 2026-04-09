@@ -31,7 +31,6 @@ public class NetVipsProvider : IProviderService, IDisposable
     {
         token.ThrowIfCancellationRequested();
 
-        // ── 1. 출력 경로 결정 ──────────────────────────────────────────────
         string basePath = OutputPathResolver.Resolve(file, settings);
         var (outputPath, isCollision) = OutputPathResolver.ApplyOverwritePolicy(basePath, settings.OverwritePolicy, session, file.Path);
 
@@ -39,10 +38,6 @@ public class NetVipsProvider : IProviderService, IDisposable
         {
             _logger.LogWarning(_languageService.GetString("Log_Conversion_PathCollision"), outputPath);
         }
-
-        // Overwrite 정책에서 세션 내 동명 파일 충돌 발생 시 경고 로그
-        // ILogger가 없으므로 생략 또는 추가 분석, 현재 로거를 DI받지 않았으므로 생략
-        // (Serilog 로거를 쓸 수도 있으나, 현재 NetVipsProvider 생성자엔 ILogger 없음)
 
         if (outputPath is null)
         {
@@ -54,13 +49,10 @@ public class NetVipsProvider : IProviderService, IDisposable
         if (!string.IsNullOrEmpty(outputDir))
             Directory.CreateDirectory(outputDir);
 
-        // ── 2. 실제 변환 프로세스 격리 (Task.Run) ─────────────────────────
-        // libvips의 동기 I/O 및 내부 스레드 관리를 .NET 스레드풀의 특정 스레드로 격리하여 보호합니다.
         try
         {
             await Task.Run(() => ExecuteConversion(file, settings, outputPath, token), token);
 
-            // 변환 완료 후 결과 파일 크기 측정
             if (System.IO.File.Exists(outputPath))
             {
                 file.OutputSize = new System.IO.FileInfo(outputPath).Length;
@@ -72,31 +64,23 @@ public class NetVipsProvider : IProviderService, IDisposable
         }
         catch (OperationCanceledException)
         {
-            // 취소 시 상태 변경 없이 상위로 전파
             throw;
         }
         catch (Exception)
         {
             file.Status = FileConvertStatus.Error;
-            // 원본 예외와 스택 트레이스를 보존하기 위해 그대로 전파
-            // 상위의 ConversionViewModel.LogError가 전체 정보를 Serilog에 기록함
             throw;
         }
     }
 
-    /// <summary>
-    /// 실제 변환 로직을 수행하는 내부 동기 메서드입니다. (Task.Run 내부에서 실행)
-    /// </summary>
     private void ExecuteConversion(FileItem file, ConvertSettings settings, string outputPath, CancellationToken token)
     {
         token.ThrowIfCancellationRequested();
 
         string targetFormat = file.IsAnimation
-            ? settings.AnimationTargetFormat
+            ? settings.AnimationTargetFormat ?? throw new InvalidOperationException("AnimationTargetFormat is required for animation output.")
             : settings.StandardTargetFormat;
 
-        // n: -1 -> 애니메이션 이미지의 모든 프레임을 로드 (GIF, WebP 등에서만 지원)
-        // access: Sequential -> 메모리 사용량 최소화
         var loaderOptions = new VOption();
         if (file.IsAnimation)
         {
@@ -111,29 +95,25 @@ public class NetVipsProvider : IProviderService, IDisposable
         {
             token.ThrowIfCancellationRequested();
 
-        // ── 3. 배경 합성 (알파 미지원 포맷 대응) ──────────────────────────
-        bool targetSupportsAlpha = targetFormat is "PNG" or "WEBP" or "AVIF" or "GIF";
-        Image workImage = image;
-        bool isNewImage = false;
+            bool targetSupportsAlpha = targetFormat is "PNG" or "WEBP" or "AVIF" or "GIF";
+            Image workImage = image;
+            bool isNewImage = false;
 
-        if (!targetSupportsAlpha && image.HasAlpha())
-        {
-            var bgColor = ParseBackgroundColor(settings);
-            // Flatten은 이미지를 배경색과 합성하여 알파 채널을 제거함
-            workImage = image.Flatten(background: bgColor);
-            isNewImage = true;
-        }
+            if (!targetSupportsAlpha && image.HasAlpha())
+            {
+                var bgColor = ParseBackgroundColor(settings, file.IsAnimation);
+                workImage = image.Flatten(background: bgColor);
+                isNewImage = true;
+            }
 
-        token.ThrowIfCancellationRequested();
+            token.ThrowIfCancellationRequested();
 
-        // ── 4. 포맷별 전용 세이버(Saver) 호출 ──────────────────────────────
             try
             {
-                SaveWithFormat(workImage, outputPath, targetFormat, settings);
+                SaveWithFormat(workImage, outputPath, targetFormat, settings, file.IsAnimation);
             }
             finally
             {
-                // 합성 등으로 생성된 중간 객체 해제
                 if (isNewImage) workImage.Dispose();
             }
         }
@@ -143,12 +123,11 @@ public class NetVipsProvider : IProviderService, IDisposable
         }
     }
 
-    /// <summary>
-    /// libvips의 포맷별 상세 옵션을 적용하여 저장합니다.
-    /// </summary>
-    private static void SaveWithFormat(Image image, string outputPath, string targetFormat, ConvertSettings settings)
+    private static void SaveWithFormat(Image image, string outputPath, string targetFormat, ConvertSettings settings, bool isAnimation)
     {
         var options = new VOption();
+        int quality = GetQuality(settings, isAnimation);
+        bool lossless = GetLossless(settings, isAnimation);
 
         switch (targetFormat.ToUpperInvariant())
         {
@@ -156,7 +135,7 @@ public class NetVipsProvider : IProviderService, IDisposable
                 SaveAsBmpViaSkia(image, outputPath);
                 return;
             case "JPEG":
-                options.Add("Q", settings.Quality);
+                options.Add("Q", quality);
                 options.Add("strip", true);
                 break;
             case "PNG":
@@ -164,38 +143,36 @@ public class NetVipsProvider : IProviderService, IDisposable
                 options.Add("strip", true);
                 break;
             case "WEBP":
-                options.Add("Q", settings.Quality);
+                options.Add("lossless", lossless);
+                if (!lossless)
+                    options.Add("Q", quality);
                 options.Add("strip", true);
                 break;
             case "AVIF":
                 options.Add("compression", Enums.ForeignHeifCompression.Av1);
-                options.Add("Q", settings.Quality);
+                options.Add("lossless", lossless);
+                if (!lossless)
+                    options.Add("Q", quality);
                 options.Add("strip", true);
-                // libvips의 heifsave는 정지 이미지 저장 시 이 옵션들을 사용함
                 break;
             case "GIF":
                 options.Add("strip", true);
                 break;
-            // GIF, WEBP: WriteToFile 시 확장자 기반으로 n-pages 메타데이터를 자동 참조하여 애니메이션 저장됨
         }
 
-        // WriteToFile은 파일 확장자에 따라 적절한 save 오퍼레이션을 선택하고 options를 전달함
         image.WriteToFile(outputPath, options);
     }
 
     private static void SaveAsBmpViaSkia(Image vipsImage, string outputPath)
     {
-        // 알파 채널 제거 (BMP는 알파 미지원)
         var flat = vipsImage.HasAlpha() ? vipsImage.Flatten() : vipsImage;
 
         try
         {
-            // NetVips 픽셀 버퍼 (RGB 8-bit packed) → SKBitmap (Bgra8888) 변환
             byte[] pixels = flat.WriteToMemory<byte>();
             int w = flat.Width;
             int h = flat.Height;
 
-            // Windows x64의 PlatformColorType(Bgra8888)와 일치시켜 추가 색상 변환/복사 방지
             var info = new SkiaSharp.SKImageInfo(w, h, SkiaSharp.SKColorType.Bgra8888, SkiaSharp.SKAlphaType.Opaque);
             using var skBitmap = new SkiaSharp.SKBitmap(info);
 
@@ -207,11 +184,10 @@ public class NetVipsProvider : IProviderService, IDisposable
             {
                 int srcOff = i * 3;
                 int dstOff = i * 4;
-                // NetVips RGB -> Bgra8888 메모리 레이아웃 [B, G, R, A]
-                dstBytes[dstOff] = srcSpan[srcOff + 2];     // B
-                dstBytes[dstOff + 1] = srcSpan[srcOff + 1]; // G
-                dstBytes[dstOff + 2] = srcSpan[srcOff];     // R
-                dstBytes[dstOff + 3] = 255;                 // A
+                dstBytes[dstOff] = srcSpan[srcOff + 2];
+                dstBytes[dstOff + 1] = srcSpan[srcOff + 1];
+                dstBytes[dstOff + 2] = srcSpan[srcOff];
+                dstBytes[dstOff + 3] = 255;
             }
 
             System.Runtime.InteropServices.Marshal.Copy(dstBytes, 0, skBitmap.GetPixels(), dstBytes.Length);
@@ -224,9 +200,11 @@ public class NetVipsProvider : IProviderService, IDisposable
         }
     }
 
-    private static double[] ParseBackgroundColor(ConvertSettings settings)
+    private static double[] ParseBackgroundColor(ConvertSettings settings, bool isAnimation)
     {
-        return TryParseHexToArray(settings.BackgroundColor ?? "#FFFFFF");
+        string backgroundColor = settings.StandardBackgroundColor ?? "#FFFFFF";
+
+        return TryParseHexToArray(backgroundColor);
     }
 
     private static double[] TryParseHexToArray(string hex)
@@ -236,30 +214,39 @@ public class NetVipsProvider : IProviderService, IDisposable
             string clean = hex.TrimStart('#');
             if (clean.Length == 6)
             {
-                return new[]
-                {
-                    (double)Convert.ToByte(clean[0..2], 16),
-                    (double)Convert.ToByte(clean[2..4], 16),
-                    (double)Convert.ToByte(clean[4..6], 16)
-                };
+                return
+                [
+                    Convert.ToByte(clean[0..2], 16),
+                    Convert.ToByte(clean[2..4], 16),
+                    Convert.ToByte(clean[4..6], 16)
+                ];
             }
-            if (clean.Length == 8) // AARRGGBB
+            if (clean.Length == 8)
             {
-                return new[]
-                {
-                    (double)Convert.ToByte(clean[2..4], 16),
-                    (double)Convert.ToByte(clean[4..6], 16),
-                    (double)Convert.ToByte(clean[6..8], 16)
-                };
+                return
+                [
+                    Convert.ToByte(clean[2..4], 16),
+                    Convert.ToByte(clean[4..6], 16),
+                    Convert.ToByte(clean[6..8], 16)
+                ];
             }
         }
-        catch { /* Fallback to white */ }
-        return new[] { 255.0, 255.0, 255.0 };
+        catch
+        {
+        }
+
+        return [255.0, 255.0, 255.0];
     }
+
+    private static int GetQuality(ConvertSettings settings, bool isAnimation) =>
+        isAnimation ? settings.AnimationQuality : settings.StandardQuality;
+
+    private static bool GetLossless(ConvertSettings settings, bool isAnimation) =>
+        isAnimation ? settings.AnimationLossless : settings.StandardLossless;
 
     private static Image LoadBmpViaSkia(string path)
     {
-        using var stream = new System.IO.FileStream(path, System.IO.FileMode.Open, System.IO.FileAccess.Read, System.IO.FileShare.Read);
+        using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
         using var skBitmap = SkiaSharp.SKBitmap.Decode(stream);
 
         if (skBitmap == null)
@@ -268,7 +255,6 @@ public class NetVipsProvider : IProviderService, IDisposable
         int w = skBitmap.Width;
         int h = skBitmap.Height;
 
-        // Opaque BMP 처리를 위해 RGB 3밴드 확보
         byte[] rgbPixels = new byte[w * h * 3];
 
         using var srcBitmap = skBitmap.Copy(SkiaSharp.SKColorType.Rgba8888);
@@ -279,9 +265,9 @@ public class NetVipsProvider : IProviderService, IDisposable
         {
             int srcOff = i * 4;
             int dstOff = i * 3;
-            rgbPixels[dstOff]     = span[srcOff];     // R
-            rgbPixels[dstOff + 1] = span[srcOff + 1]; // G
-            rgbPixels[dstOff + 2] = span[srcOff + 2]; // B
+            rgbPixels[dstOff] = span[srcOff];
+            rgbPixels[dstOff + 1] = span[srcOff + 1];
+            rgbPixels[dstOff + 2] = span[srcOff + 2];
         }
 
         return Image.NewFromMemory(rgbPixels, w, h, 3, Enums.BandFormat.Uchar);
@@ -291,7 +277,6 @@ public class NetVipsProvider : IProviderService, IDisposable
     {
         if (_isDisposed) return;
         _isDisposed = true;
-        // 인스턴스 레벨의 NetVips 자원 명시적 해제는 불필요 (루컬 using 블록에서 처리)
         GC.SuppressFinalize(this);
     }
 }

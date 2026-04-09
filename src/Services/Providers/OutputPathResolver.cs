@@ -30,7 +30,7 @@ internal static class OutputPathResolver
     public static string Resolve(FileItem file, ConvertSettings settings)
     {
         string targetFormat = file.IsAnimation
-            ? settings.AnimationTargetFormat
+            ? settings.AnimationTargetFormat ?? throw new InvalidOperationException("AnimationTargetFormat is required for animation output.")
             : settings.StandardTargetFormat;
 
         string ext = FormatToExtension.TryGetValue(targetFormat, out var e) ? e : targetFormat.ToLower();

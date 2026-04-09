@@ -32,6 +32,17 @@ public partial class ConversionViewModel : ViewModelBase
     private readonly Stopwatch _stopwatch = new();
     private readonly DispatcherTimer _timer;
 
+    private static bool CanConvertFile(FileItem item, ConvertSettings settings)
+    {
+        if (item.IsUnsupported)
+            return false;
+
+        if (item.IsAnimation && string.IsNullOrWhiteSpace(settings.AnimationTargetFormat))
+            return false;
+
+        return true;
+    }
+
     // ── 변환 작업 공유 카운터 및 파일 목록을 캡슐화하는 컨텍스트 ──────────────
     private sealed class ConversionContext
     {
@@ -46,10 +57,10 @@ public partial class ConversionViewModel : ViewModelBase
         /// <summary>Interlocked 연산에 사용되는 마지막 진행 알림 시각 (Ticks)</summary>
         public long LastUpdateTicks;
 
-        public ConversionContext(FileListViewModel fileList, string presetName)
+        public ConversionContext(FileListViewModel fileList, ConvertSettings settings, string presetName)
         {
             ActiveFiles = fileList.Items
-                .Where(item => !item.IsUnsupported)
+                .Where(item => CanConvertFile(item, settings))
                 .ToList();
             TotalCount = ActiveFiles.Count;
             PresetName = presetName;
@@ -212,7 +223,7 @@ public partial class ConversionViewModel : ViewModelBase
         {
             // ValidateBeforeConvertAsync에서 이미 null 체크 완료
             var settings = _presetService.ActivePreset!.Settings;
-            var context = new ConversionContext(_fileList, _presetService.ActivePreset.Name);
+            var context = new ConversionContext(_fileList, settings, _presetService.ActivePreset.Name);
             var parallelOptions = BuildParallelOptions(settings.CpuUsage, cts.Token);
 
             _logger.LogInformation(GetString("Log_Conversion_BatchStart"), context.ActiveFiles.Count);
@@ -252,11 +263,24 @@ public partial class ConversionViewModel : ViewModelBase
     private async Task<bool> ValidateBeforeConvertAsync()
     {
         if (_fileList.Items.Count == 0)
+        {
+            _snackbarService.Show(GetString("Msg_Error_NoTargetFiles"), SnackbarType.Warning);
             return false;
+        }
 
-        var availableCount = _fileList.Items.Count - _fileList.UnsupportedCount;
-        if (availableCount <= 0)
+        if (_presetService.ActivePreset == null)
+        {
+            _snackbarService.Show(GetString("Msg_Error_EmptyPreset"), SnackbarType.Error);
             return false;
+        }
+
+        var settings = _presetService.ActivePreset.Settings;
+        var availableCount = _fileList.Items.Count(item => CanConvertFile(item, settings));
+        if (availableCount <= 0)
+        {
+            _snackbarService.Show(GetString("Msg_Error_NoTargetFiles"), SnackbarType.Warning);
+            return false;
+        }
 
         bool isConfirmed = await _dialogService.ShowConfirmationAsync(
             string.Format(GetString("Dlg_Ask_Convert"), availableCount), "Dlg_Title_Convert");
@@ -271,7 +295,7 @@ public partial class ConversionViewModel : ViewModelBase
         }
 
         // 프리셋 데이터 유효성 검사 (자동 보정 없이 에러만 표시)
-        if (!_presetService.ValidPresetData(_presetService.ActivePreset.Settings, out string errorKey))
+        if (!_presetService.ValidPresetData(settings, out string errorKey))
         {
             _snackbarService.Show(GetString(errorKey), SnackbarType.Error);
             return false;
@@ -467,12 +491,12 @@ public partial class ConversionViewModel : ViewModelBase
         if (hasStandard && hasAnimation)
             CurrentTargetFormat = $"{settings.StandardTargetFormat} / {settings.AnimationTargetFormat}";
         else if (hasAnimation)
-            CurrentTargetFormat = settings.AnimationTargetFormat;
+            CurrentTargetFormat = settings.AnimationTargetFormat ?? string.Empty;
         else
             CurrentTargetFormat = settings.StandardTargetFormat;
 
-        CurrentQuality = $"{settings.Quality}";
-        CurrentBgColor = settings.BackgroundColor;
+        CurrentQuality = BuildQualitySummary(settings, hasStandard, hasAnimation);
+        CurrentBgColor = BuildBackgroundSummary(settings, hasStandard);
         CurrentOverwritePolicy = GetString($"Setting_Overwrite_{settings.OverwritePolicy}");
         CurrentSaveMethod = settings.FolderMethod == SaveFolderMethod.CreateFolder
             ? settings.OutputSubFolderName
@@ -494,5 +518,53 @@ public partial class ConversionViewModel : ViewModelBase
             CurrentSaveLocation = $"...{folderName}";
             CurrentSaveLocationTooltip = settings.CustomOutputPath;
         }
+    }
+
+    private static string BuildQualitySummary(ConvertSettings settings, bool hasStandard, bool hasAnimation)
+    {
+        var parts = new List<string>();
+
+        if (hasStandard)
+        {
+            string format = settings.StandardTargetFormat.ToUpperInvariant();
+            string? standardPart = format switch
+            {
+                "JPEG" => $"STD {format} {settings.StandardQuality}",
+                "WEBP" => settings.StandardLossless ? $"STD {format} Lossless" : $"STD {format} {settings.StandardQuality}",
+                "AVIF" => settings.StandardLossless ? $"STD {format} Lossless" : $"STD {format} {settings.StandardQuality}",
+                _ => null
+            };
+
+            if (!string.IsNullOrWhiteSpace(standardPart))
+                parts.Add(standardPart);
+        }
+
+        if (hasAnimation && !string.IsNullOrWhiteSpace(settings.AnimationTargetFormat))
+        {
+            string format = settings.AnimationTargetFormat.ToUpperInvariant();
+            string? animationPart = format switch
+            {
+                "WEBP" => settings.AnimationLossless ? $"ANI {format} Lossless" : $"ANI {format} {settings.AnimationQuality}",
+                _ => null
+            };
+
+            if (!string.IsNullOrWhiteSpace(animationPart))
+                parts.Add(animationPart);
+        }
+
+        return string.Join(" / ", parts);
+    }
+
+    private static string BuildBackgroundSummary(ConvertSettings settings, bool hasStandard)
+    {
+        if (!hasStandard)
+            return string.Empty;
+
+        string format = settings.StandardTargetFormat.ToUpperInvariant();
+        return format switch
+        {
+            "JPEG" or "BMP" => $"STD {settings.StandardBackgroundColor}",
+            _ => string.Empty
+        };
     }
 }

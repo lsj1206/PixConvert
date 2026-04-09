@@ -11,7 +11,7 @@ namespace PixConvert.Services.Providers;
 
 /// <summary>
 /// SkiaSharp 엔진을 사용하는 정지 이미지 변환 공급자입니다.
-/// 지원 출력 포맷: JPEG / PNG / BMP / WebP
+/// 지원 출력 포맷: JPEG / PNG / BMP / WebP.
 /// </summary>
 public class SkiaSharpProvider : IProviderService, IDisposable
 {
@@ -30,7 +30,6 @@ public class SkiaSharpProvider : IProviderService, IDisposable
     {
         token.ThrowIfCancellationRequested();
 
-        // ── 1. 출력 경로 결정 ──────────────────────────────────────────────
         string basePath = OutputPathResolver.Resolve(file, settings);
         var (outputPath, isCollision) = OutputPathResolver.ApplyOverwritePolicy(basePath, settings.OverwritePolicy, session, file.Path);
 
@@ -49,14 +48,13 @@ public class SkiaSharpProvider : IProviderService, IDisposable
         if (!string.IsNullOrEmpty(outputDir))
             Directory.CreateDirectory(outputDir);
 
-        SKBitmap? srcBitmap        = null;
+        SKBitmap? srcBitmap = null;
         SKBitmap? compositedBitmap = null;
 
         try
         {
             token.ThrowIfCancellationRequested();
 
-            // ── 2. 이미지 디코딩 ──────────────────────────────────────────────
             try
             {
                 await using var inputStream = new FileStream(
@@ -67,60 +65,44 @@ public class SkiaSharpProvider : IProviderService, IDisposable
             catch (Exception)
             {
                 file.Status = FileConvertStatus.Error;
-                // 원본 예외 보존 (상위 ConversionViewModel에서 전체 예외 기록)
                 throw;
             }
 
             token.ThrowIfCancellationRequested();
 
-            // ── 3. 배경색 합성 ────────────────────────────────────────────────
             string targetFormat = file.IsAnimation
-                ? settings.AnimationTargetFormat
+                ? settings.AnimationTargetFormat ?? throw new InvalidOperationException("AnimationTargetFormat is required for animation output.")
                 : settings.StandardTargetFormat;
 
             bool targetSupportsAlpha = targetFormat is "PNG" or "WEBP";
-            bool needsCompositing    = !targetSupportsAlpha && HasAlphaChannel(srcBitmap);
+            bool needsCompositing = !targetSupportsAlpha && HasAlphaChannel(srcBitmap);
 
             SKBitmap bitmapToEncode;
             if (needsCompositing)
             {
-                compositedBitmap = CompositeBackground(srcBitmap, settings);
-                bitmapToEncode   = compositedBitmap;
+                compositedBitmap = CompositeBackground(srcBitmap, settings, file.IsAnimation);
+                bitmapToEncode = compositedBitmap;
             }
             else
             {
                 bitmapToEncode = srcBitmap;
             }
 
-            // ── 4. 인코딩 및 파일 저장 ────────────────────────────────────────
             try
             {
                 if (targetFormat.Equals("BMP", StringComparison.OrdinalIgnoreCase))
                 {
-                    // BMP는 SKImage.Encode가 null을 반환하므로 별도 고성능 경로로 처리
                     await BmpEncoder.SaveAsync(bitmapToEncode, outputPath);
                 }
                 else
                 {
-                    var (skFormat, quality) = ResolveEncodeParams(targetFormat, settings.Quality);
+                    using var data = EncodeBitmap(bitmapToEncode, targetFormat, settings, file.IsAnimation);
 
-                    // SKImage.FromBitmap()을 사용하여 인코딩 수행
-                    using var image = SKImage.FromBitmap(bitmapToEncode);
-                    using var data  = image.Encode(skFormat, quality);
-
-                    if (data is null)
-                    {
-                        var msg = string.Format(_languageService.GetString("Log_Skia_EncodeFail"), targetFormat);
-                        throw new InvalidOperationException(msg);
-                    }
-
-                    // 인코딩된 메모리 버퍼를 스트림에 쓰는 동기 호출 (데이터 복사 비용 미미)
                     await using var outputStream = new FileStream(
                         outputPath, FileMode.Create, FileAccess.Write, FileShare.None, 4096, useAsync: true);
                     data.SaveTo(outputStream);
                 }
 
-                // 변환 완료 후 결과 파일 크기 측정
                 if (System.IO.File.Exists(outputPath))
                 {
                     file.OutputSize = new System.IO.FileInfo(outputPath).Length;
@@ -133,42 +115,29 @@ public class SkiaSharpProvider : IProviderService, IDisposable
             catch (Exception)
             {
                 file.Status = FileConvertStatus.Error;
-                // 원본 예외 보존 (상위 ConversionViewModel에서 전체 예외 기록)
                 throw;
             }
         }
         finally
         {
-            // 명확한 소유권 기반 리소스 해제
             compositedBitmap?.Dispose();
             srcBitmap?.Dispose();
         }
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // Private helpers
-    // ─────────────────────────────────────────────────────────────────────────
-
-    /// <summary>비트맵에 실제 유효한 알파 채널(투명도)이 있는지 확인합니다.</summary>
     private static bool HasAlphaChannel(SKBitmap bitmap) =>
         bitmap.AlphaType is SKAlphaType.Premul or SKAlphaType.Unpremul;
 
-    /// <summary>
-    /// 알파 채널을 지원하지 않는 출력 포맷용으로 배경색을 합성합니다.
-    /// 결과 비트맵은 Opaque RGB이므로 호출자가 Dispose해야 합니다.
-    /// </summary>
-    private static SKBitmap CompositeBackground(SKBitmap src, ConvertSettings settings)
+    private static SKBitmap CompositeBackground(SKBitmap src, ConvertSettings settings, bool isAnimation)
     {
-        SKColor bgColor = ParseBackgroundColor(settings);
+        SKColor bgColor = ParseBackgroundColor(settings, isAnimation);
 
         var colorType = SKImageInfo.PlatformColorType;
         var dst = new SKBitmap(src.Width, src.Height, colorType, SKAlphaType.Opaque);
         using var canvas = new SKCanvas(dst);
 
-        // 1. 배경 색상으로 채우기
         canvas.Clear(bgColor);
 
-        // 2. 원본 이미지를 위에 합성 (알파 블렌딩 자동 적용)
         using var paint = new SKPaint { IsAntialias = false };
         canvas.DrawBitmap(src, 0, 0, paint);
         canvas.Flush();
@@ -176,16 +145,12 @@ public class SkiaSharpProvider : IProviderService, IDisposable
         return dst;
     }
 
-    /// <summary>설정에서 배경색 SKColor를 파싱합니다.</summary>
-    private static SKColor ParseBackgroundColor(ConvertSettings settings)
+    private static SKColor ParseBackgroundColor(ConvertSettings settings, bool isAnimation)
     {
-        return TryParseHexColor(settings.BackgroundColor ?? "#FFFFFF");
+        string backgroundColor = settings.StandardBackgroundColor ?? "#FFFFFF";
+        return TryParseHexColor(backgroundColor);
     }
 
-    /// <summary>
-    /// "#RRGGBB" 또는 "#AARRGGBB" 형식의 HEX 문자열을 SKColor로 변환합니다.
-    /// 파싱 실패 시 흰색(White)으로 폴백합니다.
-    /// </summary>
     private static SKColor TryParseHexColor(string hex)
     {
         try
@@ -211,19 +176,55 @@ public class SkiaSharpProvider : IProviderService, IDisposable
         }
     }
 
-    /// <summary>출력 포맷 문자열로부터 SKEncodedImageFormat과 Quality를 결정합니다.</summary>
-    private static (SKEncodedImageFormat Format, int Quality) ResolveEncodeParams(
-        string targetFormat, int quality)
+    private SKData EncodeBitmap(SKBitmap bitmap, string targetFormat, ConvertSettings settings, bool isAnimation)
     {
         return targetFormat.ToUpperInvariant() switch
         {
-            "JPEG" => (SKEncodedImageFormat.Jpeg, quality),
-            "PNG"  => (SKEncodedImageFormat.Png,  100),    // PNG는 무손실 → quality 무의미
-            "WEBP" => (SKEncodedImageFormat.Webp, quality),
-            // BMP는 위의 SaveAsBmpAsync로 처리되므로 여기 도달하지 않음
-            _      => throw new NotSupportedException($"SkiaSharpProvider에서 지원하지 않는 대상 포맷: {targetFormat}")
+            "JPEG" => EncodeJpeg(bitmap, GetQuality(settings, isAnimation)),
+            "PNG" => EncodePng(bitmap),
+            "WEBP" => EncodeWebp(bitmap, settings, isAnimation),
+            _ => throw new NotSupportedException($"SkiaSharpProvider에서 지원하지 않는 대상 포맷: {targetFormat}")
         };
     }
 
-    public void Dispose() { /* SkiaSharp은 인스턴스 레벨 네이티브 자원 없음 */ }
+    private SKData EncodeJpeg(SKBitmap bitmap, int quality)
+    {
+        using var image = SKImage.FromBitmap(bitmap);
+        return image.Encode(SKEncodedImageFormat.Jpeg, quality)
+            ?? throw new InvalidOperationException(string.Format(_languageService.GetString("Log_Skia_EncodeFail"), "JPEG"));
+    }
+
+    private SKData EncodePng(SKBitmap bitmap)
+    {
+        using SKPixmap pixmap = bitmap.PeekPixels()
+            ?? throw new InvalidOperationException(string.Format(_languageService.GetString("Log_Skia_EncodeFail"), "PNG"));
+
+        var options = new SKPngEncoderOptions(SKPngEncoderFilterFlags.AllFilters, 6);
+        return pixmap.Encode(options)
+            ?? throw new InvalidOperationException(string.Format(_languageService.GetString("Log_Skia_EncodeFail"), "PNG"));
+    }
+
+    private SKData EncodeWebp(SKBitmap bitmap, ConvertSettings settings, bool isAnimation)
+    {
+        using SKPixmap pixmap = bitmap.PeekPixels()
+            ?? throw new InvalidOperationException(string.Format(_languageService.GetString("Log_Skia_EncodeFail"), "WEBP"));
+
+        bool lossless = GetLossless(settings, isAnimation);
+        int quality = GetQuality(settings, isAnimation);
+
+        var options = lossless
+            ? new SKWebpEncoderOptions(SKWebpEncoderCompression.Lossless, 100f)
+            : new SKWebpEncoderOptions(SKWebpEncoderCompression.Lossy, quality);
+
+        return pixmap.Encode(options)
+            ?? throw new InvalidOperationException(string.Format(_languageService.GetString("Log_Skia_EncodeFail"), "WEBP"));
+    }
+
+    private static int GetQuality(ConvertSettings settings, bool isAnimation) =>
+        isAnimation ? settings.AnimationQuality : settings.StandardQuality;
+
+    private static bool GetLossless(ConvertSettings settings, bool isAnimation) =>
+        isAnimation ? settings.AnimationLossless : settings.StandardLossless;
+
+    public void Dispose() { }
 }

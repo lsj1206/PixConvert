@@ -141,9 +141,16 @@ public class PresetService : IPresetService
         }
 
         // 2. 변환 품질(Quality) 범위 확인
-        if (settings.Quality < 1 || settings.Quality > 100)
+        if (settings.StandardQuality < 1 || settings.StandardQuality > 100)
         {
-            _logger.LogError(_languageService.GetString("Log_Preset_InvalidQuality"), settings.Quality);
+            _logger.LogError(_languageService.GetString("Log_Preset_InvalidQuality"), settings.StandardQuality);
+            errorMessageKey = "Msg_Error_ConfigInvalid";
+            return false;
+        }
+
+        if (settings.AnimationQuality < 1 || settings.AnimationQuality > 100)
+        {
+            _logger.LogError(_languageService.GetString("Log_Preset_InvalidQuality"), settings.AnimationQuality);
             errorMessageKey = "Msg_Error_ConfigInvalid";
             return false;
         }
@@ -161,7 +168,8 @@ public class PresetService : IPresetService
         }
 
         // 4. 애니메이션(움짤) 이미지 타겟 포맷 검증
-        if (string.IsNullOrEmpty(settings.AnimationTargetFormat) || !allowedAnimation.Contains(settings.AnimationTargetFormat, StringComparer.OrdinalIgnoreCase))
+        if (!string.IsNullOrWhiteSpace(settings.AnimationTargetFormat) &&
+            !allowedAnimation.Contains(settings.AnimationTargetFormat, StringComparer.OrdinalIgnoreCase))
         {
             _logger.LogError(_languageService.GetString("Log_Preset_InvalidAnimFormat"), settings.AnimationTargetFormat);
             errorMessageKey = "Msg_Error_ConfigInvalid";
@@ -180,9 +188,9 @@ public class PresetService : IPresetService
         }
 
         // 배경색 HEX 포맷 검증 (#RRGGBB 또는 #AARRGGBB)
-        if (string.IsNullOrWhiteSpace(settings.BackgroundColor) || !System.Text.RegularExpressions.Regex.IsMatch(settings.BackgroundColor, "^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{8})$"))
+        if (string.IsNullOrWhiteSpace(settings.StandardBackgroundColor) || !System.Text.RegularExpressions.Regex.IsMatch(settings.StandardBackgroundColor, "^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{8})$"))
         {
-            _logger.LogError(_languageService.GetString("Log_Preset_InvalidBgColor"), settings.BackgroundColor);
+            _logger.LogError(_languageService.GetString("Log_Preset_InvalidBgColor"), settings.StandardBackgroundColor);
             errorMessageKey = "Msg_Error_ConfigInvalid";
             return false;
         }

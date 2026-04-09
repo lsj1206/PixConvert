@@ -90,7 +90,10 @@
     <!-- 변환 설정 -->
     <sys:String x:Key="Setting_GroupStandard">일반 이미지 변환 포맷</sys:String>
     <sys:String x:Key="Setting_GroupAnimation">애니메이션 이미지 변환 포맷</sys:String>
+    <sys:String x:Key="Setting_GroupStandardOptions">일반 이미지 옵션</sys:String>
+    <sys:String x:Key="Setting_GroupAnimationOptions">애니 이미지 옵션</sys:String>
     <sys:String x:Key="Setting_Quality">품질</sys:String>
+    <sys:String x:Key="Setting_Lossless">무손실</sys:String>
     <sys:String x:Key="Setting_BackgroundColor">배경 색(투명 이미지용)</sys:String>
 
     <!-- 변환 설정 : 배경색 -->
@@ -151,6 +154,7 @@
     <sys:String x:Key="Msg_Error_Occurred">작업 중 오류 발생: {0}</sys:String>
     <sys:String x:Key="Msg_Error_ConfigInvalid">변환 설정에 문제가 있습니다. 다시 설정해주세요.</sys:String>
     <sys:String x:Key="Msg_Error_EmptyPreset">활성화된 프리셋이 없습니다.</sys:String>
+    <sys:String x:Key="Msg_Error_NoTargetFiles">변환 대상 파일이 없습니다.</sys:String>
 
     <!-- 다이얼로그 -->
     <sys:String x:Key="Err_Fatal_Title">시작 오류</sys:String>

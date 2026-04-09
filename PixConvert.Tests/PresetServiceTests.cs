@@ -23,14 +23,37 @@ public class PresetServiceTests
     [InlineData(0, false)]
     [InlineData(101, false)]
     [InlineData(50, true)]
-    public void ValidPresetData_ShouldValidateQuality(int quality, bool expected)
+    public void ValidPresetData_ShouldValidateStandardQuality(int quality, bool expected)
     {
         var settings = new ConvertSettings
         {
-            Quality = quality,
+            StandardQuality = quality,
             StandardTargetFormat = "JPEG",
             AnimationTargetFormat = "GIF",
-            BackgroundColor = "#FFFFFF"
+            StandardBackgroundColor = "#FFFFFF"
+        };
+
+        var result = _presetService.ValidPresetData(settings, out string errorKey);
+
+        Assert.Equal(expected, result);
+        if (!expected)
+            Assert.Equal("Msg_Error_ConfigInvalid", errorKey);
+        else
+            Assert.True(string.IsNullOrEmpty(errorKey));
+    }
+
+    [Theory]
+    [InlineData(0, false)]
+    [InlineData(101, false)]
+    [InlineData(50, true)]
+    public void ValidPresetData_ShouldValidateAnimationQuality(int quality, bool expected)
+    {
+        var settings = new ConvertSettings
+        {
+            AnimationQuality = quality,
+            StandardTargetFormat = "JPEG",
+            AnimationTargetFormat = "GIF",
+            StandardBackgroundColor = "#FFFFFF"
         };
 
         var result = _presetService.ValidPresetData(settings, out string errorKey);
@@ -53,12 +76,28 @@ public class PresetServiceTests
         {
             StandardTargetFormat = format,
             AnimationTargetFormat = "GIF",
-            BackgroundColor = "#FFFFFF"
+            StandardBackgroundColor = "#FFFFFF"
         };
 
         var result = _presetService.ValidPresetData(settings, out _);
 
         Assert.Equal(expected, result);
+    }
+
+    [Fact]
+    public void ValidPresetData_WhenAnimationTargetFormatIsNull_ShouldReturnTrue()
+    {
+        var settings = new ConvertSettings
+        {
+            StandardTargetFormat = "JPEG",
+            AnimationTargetFormat = null,
+            StandardBackgroundColor = "#FFFFFF"
+        };
+
+        var result = _presetService.ValidPresetData(settings, out string errorKey);
+
+        Assert.True(result);
+        Assert.True(string.IsNullOrEmpty(errorKey));
     }
 
     [Fact]
@@ -71,13 +110,29 @@ public class PresetServiceTests
     }
 
     [Fact]
-    public void ValidPresetData_WhenBackgroundHexIsInvalid_ShouldReturnFalse()
+    public void ValidPresetData_WhenStandardBackgroundHexIsInvalid_ShouldReturnFalse()
     {
         var settings = new ConvertSettings
         {
             StandardTargetFormat = "JPEG",
             AnimationTargetFormat = "GIF",
-            BackgroundColor = "INVALID"
+            StandardBackgroundColor = "INVALID"
+        };
+
+        var result = _presetService.ValidPresetData(settings, out string errorKey);
+
+        Assert.False(result);
+        Assert.Equal("Msg_Error_ConfigInvalid", errorKey);
+    }
+
+    [Fact]
+    public void ValidPresetData_WhenAnimationBackgroundHexIsInvalid_ShouldReturnFalse()
+    {
+        var settings = new ConvertSettings
+        {
+            StandardTargetFormat = "JPEG",
+            AnimationTargetFormat = "GIF",
+            StandardBackgroundColor = "#FFFFFF"
         };
 
         var result = _presetService.ValidPresetData(settings, out string errorKey);
@@ -95,7 +150,7 @@ public class PresetServiceTests
             AnimationTargetFormat = "GIF",
             SaveLocation = SaveLocationType.Custom,
             CustomOutputPath = "",
-            BackgroundColor = "#FFFFFF"
+            StandardBackgroundColor = "#FFFFFF"
         };
 
         var result = _presetService.ValidPresetData(settings, out string errorKey);
@@ -113,7 +168,7 @@ public class PresetServiceTests
             AnimationTargetFormat = "GIF",
             FolderMethod = SaveFolderMethod.CreateFolder,
             OutputSubFolderName = "",
-            BackgroundColor = "#FFFFFF"
+            StandardBackgroundColor = "#FFFFFF"
         };
 
         var result = _presetService.ValidPresetData(settings, out _);
@@ -130,7 +185,7 @@ public class PresetServiceTests
             AnimationTargetFormat = "GIF",
             FolderMethod = SaveFolderMethod.CreateFolder,
             OutputSubFolderName = "Invalid/Folder?Name",
-            BackgroundColor = "#FFFFFF"
+            StandardBackgroundColor = "#FFFFFF"
         };
 
         var result = _presetService.ValidPresetData(settings, out _);
@@ -227,7 +282,7 @@ public class PresetServiceTests
     public void CopyPreset_WhenValid_ShouldAddNewPreset()
     {
         _presetService.Config.Presets.Clear();
-        var original = new ConvertPreset { Name = "Original", Settings = new ConvertSettings { Quality = 90 } };
+        var original = new ConvertPreset { Name = "Original", Settings = new ConvertSettings { StandardQuality = 90 } };
         _presetService.Config.Presets.Add(original);
 
         _presetService.CopyPreset("Original", "Original_Copy");
@@ -240,13 +295,13 @@ public class PresetServiceTests
     public void CopyPreset_ShouldCreateDeepCopy_OriginalChangeDoesNotAffectCopy()
     {
         _presetService.Config.Presets.Clear();
-        var original = new ConvertPreset { Name = "Source", Settings = new ConvertSettings { Quality = 80 } };
+        var original = new ConvertPreset { Name = "Source", Settings = new ConvertSettings { StandardQuality = 80 } };
         _presetService.Config.Presets.Add(original);
 
         _presetService.CopyPreset("Source", "Dest");
-        original.Settings.Quality = 50;
+        original.Settings.StandardQuality = 50;
 
         var copy = _presetService.Config.Presets.First(p => p.Name == "Dest");
-        Assert.Equal(80, copy.Settings.Quality);
+        Assert.Equal(80, copy.Settings.StandardQuality);
     }
 }
