@@ -110,6 +110,7 @@
     <sys:String x:Key="Setting_Lossless">Lossless</sys:String>
     <sys:String x:Key="Setting_BackgroundColor">Background Color</sys:String>
     <sys:String x:Key="Setting_CompressionLevel">Compression</sys:String>
+    <sys:String x:Key="Setting_EncodingEffort">Encoding Effort</sys:String>
     <!-- Convert Setting : BgColor -->
     <sys:String x:Key="Bg_White">White</sys:String>
     <sys:String x:Key="Bg_Black">Black</sys:String>
@@ -129,11 +130,6 @@
     <sys:String x:Key="Setting_Subsampling_444">4:4:4</sys:String>
     <sys:String x:Key="Setting_Subsampling_On">On</sys:String>
     <sys:String x:Key="Setting_Subsampling_Off">Off</sys:String>
-    <!-- Convert Setting : Encoding Effort -->
-    <sys:String x:Key="Setting_EncodingEffort">Encoding Effort</sys:String>
-    <sys:String x:Key="Setting_Effort_Fast">Fast</sys:String>
-    <sys:String x:Key="Setting_Effort_Balance">Balance</sys:String>
-    <sys:String x:Key="Setting_Effort_Slow">Slow</sys:String>
     <!-- Convert Setting : Bit Depth -->
     <sys:String x:Key="Setting_BitDepth">Bit Depth</sys:String>
     <sys:String x:Key="Setting_BitDepth_Auto">Auto</sys:String>

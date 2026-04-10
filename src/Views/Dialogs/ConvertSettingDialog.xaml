@@ -81,8 +81,7 @@
                 Margin="0,4,0,4"
                 Orientation="Horizontal">
                 <TextBlock
-                    Margin="0,0,0,2"
-                    Width="90"
+                    Margin="0,0,12,2"
                     VerticalAlignment="Center"
                     FontWeight="SemiBold"
                     Text="{DynamicResource Setting_CpuUsage}" />
@@ -225,12 +224,11 @@
                 Orientation="Horizontal"
                 Visibility="{Binding StandardShowLossless, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <TextBlock
-                    Margin="0,0,0,4"
+                    Margin="0,0,12,3"
                     VerticalAlignment="Center"
                     FontWeight="SemiBold"
                     Text="{DynamicResource Setting_Lossless}" />
-                <CheckBox Margin="12,0,0,1"
-                          IsChecked="{Binding StandardLossless, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <CheckBox IsChecked="{Binding StandardLossless, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
             </StackPanel>
 
             <StackPanel
@@ -238,8 +236,7 @@
                 Orientation="Horizontal"
                 Visibility="{Binding StandardShowQuality, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <TextBlock
-                    Margin="0,0,0,4"
-                    Width="60"
+                    Margin="0,0,12,4"
                     VerticalAlignment="Center"
                     FontWeight="SemiBold"
                     Text="{DynamicResource Setting_Quality}" />
@@ -294,15 +291,14 @@
                 Orientation="Horizontal"
                 Visibility="{Binding StandardShowPngCompression, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <TextBlock
-                    Margin="0,0,0,4"
-                    Width="100"
+                    Margin="0,0,12,4"
                     VerticalAlignment="Center"
                     FontWeight="SemiBold"
                     Text="{DynamicResource Setting_CompressionLevel}" />
                 <StackPanel Orientation="Horizontal">
                     <Slider
                         Margin="0,0,8,0"
-                        Width="100"
+                        Width="150"
                         Maximum="9"
                         Minimum="0"
                         Value="{Binding StandardPngCompressionLevel}" />
@@ -324,8 +320,7 @@
                 Orientation="Horizontal"
                 Visibility="{Binding StandardShowPngFilter, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <TextBlock
-                    Margin="0,0,0,1"
-                    Width="50"
+                    Margin="0,0,12,1"
                     VerticalAlignment="Center"
                     FontWeight="SemiBold"
                     Text="{DynamicResource Setting_Filter}" />
@@ -371,28 +366,30 @@
 
             <StackPanel
                 Margin="0,8,0,0"
+                Orientation="Horizontal"
                 Visibility="{Binding StandardShowAvifEncodingEffort, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <TextBlock
-                    Margin="0,0,0,4"
-                    HorizontalAlignment="Left"
+                    Margin="0,0,12,4"
+                    VerticalAlignment="Center"
                     FontWeight="SemiBold"
                     Text="{DynamicResource Setting_EncodingEffort}" />
                 <StackPanel Orientation="Horizontal">
-                    <RadioButton
-                        MinWidth="90"
-                        Content="{DynamicResource Setting_Effort_Balance}"
-                        GroupName="StandardAvifEncodingEffort"
-                        IsChecked="{Binding StandardAvifEncodingEffort, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Balanced}" />
-                    <RadioButton
-                        MinWidth="90"
-                        Content="{DynamicResource Setting_Effort_Fast}"
-                        GroupName="StandardAvifEncodingEffort"
-                        IsChecked="{Binding StandardAvifEncodingEffort, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Fast}" />
-                    <RadioButton
-                        MinWidth="90"
-                        Content="{DynamicResource Setting_Effort_Slow}"
-                        GroupName="StandardAvifEncodingEffort"
-                        IsChecked="{Binding StandardAvifEncodingEffort, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Slow}" />
+                    <Slider
+                        Margin="0,0,8,0"
+                        Width="150"
+                        Maximum="9"
+                        Minimum="0"
+                        Value="{Binding StandardAvifEncodingEffort}" />
+                    <ctrls:FilterTextBox
+                        MinWidth="32"
+                        VerticalAlignment="Center"
+                        IsBlank="4"
+                        Filter="Digits"
+                        FilterMode="Allow"
+                        FilterMaxLength="1"
+                        Text="{Binding StandardAvifEncodingEffort, UpdateSourceTrigger=PropertyChanged}"
+                        ui:TextBoxHelper.IsDeleteButtonVisible="False"
+                        ui:ControlHelper.PlaceholderText="4" />
                 </StackPanel>
             </StackPanel>
 
@@ -505,12 +502,11 @@
                     Orientation="Horizontal"
                     Visibility="{Binding AnimationShowLossless, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <TextBlock
-                        Margin="0,0,0,4"
+                        Margin="0,0,12,3"
                         VerticalAlignment="Center"
                         FontWeight="SemiBold"
                         Text="{DynamicResource Setting_Lossless}" />
-                    <CheckBox Margin="12,0,0,1"
-                              IsChecked="{Binding AnimationLossless, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <CheckBox IsChecked="{Binding AnimationLossless, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 </StackPanel>
 
                 <StackPanel
@@ -518,8 +514,7 @@
                     Orientation="Horizontal"
                     Visibility="{Binding AnimationShowQuality, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <TextBlock
-                        Margin="0,0,0,4"
-                        Width="60"
+                        Margin="0,0,12,4"
                         VerticalAlignment="Center"
                         FontWeight="SemiBold"
                         Text="{DynamicResource Setting_Quality}" />

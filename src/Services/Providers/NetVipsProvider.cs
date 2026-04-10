@@ -164,7 +164,6 @@ public class NetVipsProvider : IProviderService, IDisposable
                 throw new NotSupportedException($"NetVipsProviderì—ì„œ ì§€ì›í•˜ì§€ ì•ŠëŠ” ëŒ€ìƒ í¬ë§·: {targetFormat}");
         }
     }
-
     private static void SaveAvif(Image image, string outputPath, ConvertSettings settings, bool isAnimation, int quality, bool lossless)
     {
         Enums.ForeignSubsample subsampleMode = ResolveAvifSubsampleMode(settings, isAnimation, lossless);
@@ -316,18 +315,8 @@ public class NetVipsProvider : IProviderService, IDisposable
         };
     }
 
-    private static int ResolveAvifEncodingEffort(ConvertSettings settings, bool isAnimation)
-    {
-        if (isAnimation)
-            return 4;
-
-        return settings.StandardAvifEncodingEffort switch
-        {
-            AvifEncodingEffortMode.Fast => 0,
-            AvifEncodingEffortMode.Slow => 9,
-            _ => 4
-        };
-    }
+    private static int ResolveAvifEncodingEffort(ConvertSettings settings, bool isAnimation) =>
+        isAnimation ? 4 : settings.StandardAvifEncodingEffort;
 
     private static int? ResolveAvifBitDepth(ConvertSettings settings, bool isAnimation)
     {

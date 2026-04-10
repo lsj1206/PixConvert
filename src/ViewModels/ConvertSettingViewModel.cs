@@ -21,21 +21,18 @@ public partial class ConvertSettingViewModel : ViewModelBase
 
     [ObservableProperty] private ConvertPreset? _selectedPreset;
     [ObservableProperty] private string _presetNameEdit = string.Empty;
-
     [ObservableProperty] private string _standardTargetFormat = "JPEG";
     [ObservableProperty] private string? _animationTargetFormat = "GIF";
-
     [ObservableProperty] private int _standardQuality = 85;
     [ObservableProperty] private bool _standardLossless;
     [ObservableProperty] private JpegChromaSubsamplingMode _standardJpegChromaSubsampling = JpegChromaSubsamplingMode.Auto;
     [ObservableProperty] private int _standardPngCompressionLevel = 6;
     [ObservableProperty] private PngFilterMode _standardPngFilter = PngFilterMode.Adaptive;
     [ObservableProperty] private AvifChromaSubsamplingMode _standardAvifChromaSubsampling = AvifChromaSubsamplingMode.Auto;
-    [ObservableProperty] private AvifEncodingEffortMode _standardAvifEncodingEffort = AvifEncodingEffortMode.Balanced;
+    [ObservableProperty] private int _standardAvifEncodingEffort = 4;
     [ObservableProperty] private AvifBitDepthMode _standardAvifBitDepth = AvifBitDepthMode.Auto;
     [ObservableProperty] private BackgroundColorOption _standardBgColorOption = BackgroundColorOption.White;
     [ObservableProperty] private string _standardCustomBackgroundColor = "#FFFFFF";
-
     [ObservableProperty] private int _animationQuality = 85;
     [ObservableProperty] private bool _animationLossless;
     [ObservableProperty] private OverwritePolicy _overwritePolicy = OverwritePolicy.Suffix;
@@ -150,6 +147,13 @@ public partial class ConvertSettingViewModel : ViewModelBase
         int coerced = Math.Clamp(value, 0, 9);
         if (value != coerced)
             StandardPngCompressionLevel = coerced;
+    }
+
+    partial void OnStandardAvifEncodingEffortChanged(int value)
+    {
+        int coerced = Math.Clamp(value, 0, 9);
+        if (value != coerced)
+            StandardAvifEncodingEffort = coerced;
     }
 
     partial void OnStandardTargetFormatChanged(string value) => OnTargetFormatsChanged();

@@ -110,6 +110,7 @@
     <sys:String x:Key="Setting_Lossless">무손실</sys:String>
     <sys:String x:Key="Setting_BackgroundColor">배경 색</sys:String>
     <sys:String x:Key="Setting_CompressionLevel">압축</sys:String>
+    <sys:String x:Key="Setting_EncodingEffort">인코딩 강도</sys:String>
     <!-- 변환 설정 : 배경색 -->
     <sys:String x:Key="Bg_White">흰색</sys:String>
     <sys:String x:Key="Bg_Black">검은색</sys:String>
@@ -129,11 +130,6 @@
     <sys:String x:Key="Setting_Subsampling_444">4:4:4</sys:String>
     <sys:String x:Key="Setting_Subsampling_On">사용</sys:String>
     <sys:String x:Key="Setting_Subsampling_Off">미사용</sys:String>
-    <!-- 변환 설정 : 인코딩 속도 -->
-    <sys:String x:Key="Setting_EncodingEffort">인코딩 속도</sys:String>
-    <sys:String x:Key="Setting_Effort_Balance">균형</sys:String>
-    <sys:String x:Key="Setting_Effort_Fast">고속</sys:String>
-    <sys:String x:Key="Setting_Effort_Slow">저속</sys:String>
     <!-- 변환 설정 : 비트 깊이 -->
     <sys:String x:Key="Setting_BitDepth">비트 깊이</sys:String>
     <sys:String x:Key="Setting_BitDepth_Auto">자동</sys:String>

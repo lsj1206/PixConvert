@@ -28,7 +28,7 @@ public class ConvertSettings
 
     public AvifChromaSubsamplingMode StandardAvifChromaSubsampling { get; set; } = AvifChromaSubsamplingMode.Auto;
 
-    public AvifEncodingEffortMode StandardAvifEncodingEffort { get; set; } = AvifEncodingEffortMode.Balanced;
+    public int StandardAvifEncodingEffort { get; set; } = 4;
 
     public AvifBitDepthMode StandardAvifBitDepth { get; set; } = AvifBitDepthMode.Auto;
 
@@ -74,7 +74,5 @@ public enum JpegChromaSubsamplingMode { Auto, Chroma420, Chroma444 }
 public enum PngFilterMode { Adaptive, None, Sub, Up, Average, Paeth }
 
 public enum AvifChromaSubsamplingMode { Auto, On, Off }
-
-public enum AvifEncodingEffortMode { Fast, Balanced, Slow }
 
 public enum AvifBitDepthMode { Auto, Bit8, Bit10, Bit12 }

@@ -75,7 +75,7 @@ public class NetVipsProviderTests : IDisposable
         {
             StandardTargetFormat = "AVIF",
             StandardAvifChromaSubsampling = AvifChromaSubsamplingMode.Off,
-            StandardAvifEncodingEffort = AvifEncodingEffortMode.Slow,
+            StandardAvifEncodingEffort = 9,
             StandardAvifBitDepth = AvifBitDepthMode.Bit8,
             SaveLocation = SaveLocationType.SameAsOriginal,
             FolderMethod = SaveFolderMethod.NoFolder
