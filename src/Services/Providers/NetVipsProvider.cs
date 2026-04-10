@@ -323,8 +323,8 @@ public class NetVipsProvider : IProviderService, IDisposable
 
         return settings.StandardAvifEncodingEffort switch
         {
-            AvifEncodingEffortMode.Fast => 2,
-            AvifEncodingEffortMode.Slow => 7,
+            AvifEncodingEffortMode.Fast => 0,
+            AvifEncodingEffortMode.Slow => 9,
             _ => 4
         };
     }

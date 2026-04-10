@@ -74,7 +74,8 @@ public partial class ConvertSettingViewModel : ViewModelBase
         SettingOptionCatalog.Supports(SettingOptionSection.Standard, SettingOptionKey.PngFilter, StandardTargetFormat);
 
     public bool StandardShowAvifChromaSubsampling =>
-        SettingOptionCatalog.Supports(SettingOptionSection.Standard, SettingOptionKey.AvifChromaSubsampling, StandardTargetFormat);
+        SettingOptionCatalog.Supports(SettingOptionSection.Standard, SettingOptionKey.AvifChromaSubsampling, StandardTargetFormat) &&
+        !StandardLossless;
 
     public bool StandardCanEditAvifChromaSubsampling =>
         StandardShowAvifChromaSubsampling && !StandardLossless;
@@ -156,6 +157,7 @@ public partial class ConvertSettingViewModel : ViewModelBase
 
     partial void OnStandardLosslessChanged(bool value)
     {
+        OnPropertyChanged(nameof(StandardShowAvifChromaSubsampling));
         OnPropertyChanged(nameof(StandardShowQuality));
         OnPropertyChanged(nameof(StandardCanEditAvifChromaSubsampling));
     }

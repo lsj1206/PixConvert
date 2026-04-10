@@ -344,33 +344,6 @@
 
             <StackPanel
                 Margin="0,8,0,0"
-                Visibility="{Binding StandardShowAvifEncodingEffort, Converter={StaticResource BooleanToVisibilityConverter}}">
-                <TextBlock
-                    Margin="0,0,0,4"
-                    HorizontalAlignment="Left"
-                    FontWeight="SemiBold"
-                    Text="{DynamicResource Setting_EncodingEffort}" />
-                <StackPanel Orientation="Horizontal">
-                    <RadioButton
-                        MinWidth="90"
-                        Content="{DynamicResource Setting_Effort_Balance}"
-                        GroupName="StandardAvifEncodingEffort"
-                        IsChecked="{Binding StandardAvifEncodingEffort, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Balanced}" />
-                    <RadioButton
-                        MinWidth="90"
-                        Content="{DynamicResource Setting_Effort_Fast}"
-                        GroupName="StandardAvifEncodingEffort"
-                        IsChecked="{Binding StandardAvifEncodingEffort, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Fast}" />
-                    <RadioButton
-                        MinWidth="90"
-                        Content="{DynamicResource Setting_Effort_Slow}"
-                        GroupName="StandardAvifEncodingEffort"
-                        IsChecked="{Binding StandardAvifEncodingEffort, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Slow}" />
-                </StackPanel>
-            </StackPanel>
-
-            <StackPanel
-                Margin="0,8,0,0"
                 Visibility="{Binding StandardShowAvifChromaSubsampling, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <TextBlock
                     Margin="0,0,0,4"
@@ -393,6 +366,33 @@
                         Content="{DynamicResource Setting_Subsampling_Off}"
                         GroupName="StandardAvifChromaSubsampling"
                         IsChecked="{Binding StandardAvifChromaSubsampling, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Off}" />
+                </StackPanel>
+            </StackPanel>
+
+            <StackPanel
+                Margin="0,8,0,0"
+                Visibility="{Binding StandardShowAvifEncodingEffort, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <TextBlock
+                    Margin="0,0,0,4"
+                    HorizontalAlignment="Left"
+                    FontWeight="SemiBold"
+                    Text="{DynamicResource Setting_EncodingEffort}" />
+                <StackPanel Orientation="Horizontal">
+                    <RadioButton
+                        MinWidth="90"
+                        Content="{DynamicResource Setting_Effort_Balance}"
+                        GroupName="StandardAvifEncodingEffort"
+                        IsChecked="{Binding StandardAvifEncodingEffort, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Balanced}" />
+                    <RadioButton
+                        MinWidth="90"
+                        Content="{DynamicResource Setting_Effort_Fast}"
+                        GroupName="StandardAvifEncodingEffort"
+                        IsChecked="{Binding StandardAvifEncodingEffort, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Fast}" />
+                    <RadioButton
+                        MinWidth="90"
+                        Content="{DynamicResource Setting_Effort_Slow}"
+                        GroupName="StandardAvifEncodingEffort"
+                        IsChecked="{Binding StandardAvifEncodingEffort, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Slow}" />
                 </StackPanel>
             </StackPanel>
 
