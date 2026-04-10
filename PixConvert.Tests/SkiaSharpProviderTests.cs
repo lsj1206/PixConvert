@@ -168,6 +168,47 @@ public class SkiaSharpProviderTests : IDisposable
     }
 
     [Fact]
+    public async Task ConvertAsync_WhenJpegSubsamplingIs444_ShouldConvertSuccessfully()
+    {
+        var file = new FileItem { Path = _inputPath, FileSignature = "PNG" };
+        var settings = new ConvertSettings
+        {
+            StandardTargetFormat = "JPEG",
+            StandardQuality = 95,
+            StandardJpegChromaSubsampling = JpegChromaSubsamplingMode.Chroma444,
+            SaveLocation = SaveLocationType.SameAsOriginal,
+            FolderMethod = SaveFolderMethod.NoFolder
+        };
+
+        await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
+
+        string outputPath = Path.Combine(_testDir, "input.jpg");
+        Assert.True(File.Exists(outputPath));
+        Assert.Equal(FileConvertStatus.Success, file.Status);
+    }
+
+    [Fact]
+    public async Task ConvertAsync_WhenPngCompressionAndFilterAreCustomized_ShouldConvertSuccessfully()
+    {
+        var file = new FileItem { Path = _inputPath, FileSignature = "PNG" };
+        var settings = new ConvertSettings
+        {
+            StandardTargetFormat = "PNG",
+            StandardPngCompressionLevel = 9,
+            StandardPngFilter = PngFilterMode.Paeth,
+            SaveLocation = SaveLocationType.SameAsOriginal,
+            FolderMethod = SaveFolderMethod.NoFolder,
+            OverwritePolicy = OverwritePolicy.Suffix
+        };
+
+        await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
+
+        string outputPath = Path.Combine(_testDir, "input_1.png");
+        Assert.True(File.Exists(outputPath));
+        Assert.Equal(FileConvertStatus.Success, file.Status);
+    }
+
+    [Fact]
     public async Task ConvertAsync_WhenCancelled_ShouldThrowAndCleanup()
     {
         var file = new FileItem { Path = _inputPath, FileSignature = "PNG" };

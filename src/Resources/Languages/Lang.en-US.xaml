@@ -21,14 +21,12 @@
     <sys:String x:Key="List_Progress">Progress</sys:String>
     <sys:String x:Key="List_Resized">Resized</sys:String>
     <sys:String x:Key="List_Engine">Engine</sys:String>
-
     <!-- List : Status -->
     <sys:String x:Key="Status_Pending">Ready</sys:String>
     <sys:String x:Key="Status_Processing">Converting</sys:String>
     <sys:String x:Key="Status_Success">Success</sys:String>
     <sys:String x:Key="Status_Error">Error</sys:String>
     <sys:String x:Key="Status_Skipped">Skipped</sys:String>
-
     <!-- List : Badge-->
     <sys:String x:Key="List_Badge_Ani">ANI</sys:String>
 
@@ -40,14 +38,12 @@
     <sys:String x:Key="Btn_Cancel">Cancel</sys:String>
     <sys:String x:Key="Btn_ListManager">List Manager</sys:String>
     <sys:String x:Key="Btn_ReorderIndex">Reorder Index</sys:String>
-
     <!-- Sidebar : Option -->
     <sys:String x:Key="Sort_Label">Sort</sys:String>
     <sys:String x:Key="Sort_Asc">Ascending</sys:String>
     <sys:String x:Key="Sort_Desc">Descending</sys:String>
     <sys:String x:Key="Option_MismatchOnly">Diff Filter</sys:String>
     <sys:String x:Key="Tip_MismatchOnly">Filter only files where extension and format signature differ.</sys:String>
-
     <!-- Sidebar : Sorting -->
     <sys:String x:Key="Sort_Index">Index</sys:String>
     <sys:String x:Key="Sort_NameIndex">Name-Index</sys:String>
@@ -57,7 +53,6 @@
     <sys:String x:Key="Sort_Size">Size</sys:String>
     <sys:String x:Key="Sort_Extension">Ext.</sys:String>
     <sys:String x:Key="Sort_Signature">Format</sys:String>
-
     <!-- Sidebar : List Manager -->
     <sys:String x:Key="Btn_Back">Exit</sys:String>
     <sys:String x:Key="Btn_ListClear">Clear All Items</sys:String>
@@ -65,7 +60,6 @@
     <sys:String x:Key="ListManager_Desc">Select Format to remove.</sys:String>
     <sys:String x:Key="ListManager_Unsupported">Unsupported</sys:String>
     <sys:String x:Key="Btn_ClearSelected">Clear Selected</sys:String>
-
     <!-- Sidebar : Converting -->
     <sys:String x:Key="Converting_Title">Converting</sys:String>
     <sys:String x:Key="Converting_FailCount">Failed</sys:String>
@@ -86,26 +80,18 @@
     <sys:String x:Key="Btn_PresetCreate">Create Preset</sys:String>
     <sys:String x:Key="Btn_PresetCopy">Copy Preset</sys:String>
     <sys:String x:Key="Btn_PresetDelete">Delete Preset</sys:String>
-
-    <!-- Convert Setting -->
-    <sys:String x:Key="Setting_GroupStandard">Standard Image Format</sys:String>
-    <sys:String x:Key="Setting_GroupAnimation">Animation Image Format</sys:String>
-    <sys:String x:Key="Setting_GroupStandardOptions">Standard Image Options</sys:String>
-    <sys:String x:Key="Setting_GroupAnimationOptions">Animation Image Options</sys:String>
-    <sys:String x:Key="Setting_Quality">Quality</sys:String>
-    <sys:String x:Key="Setting_Lossless">Lossless</sys:String>
-    <sys:String x:Key="Setting_BackgroundColor">Background Color(Transparency)</sys:String>
-
-    <!-- Convert Setting : BgColor -->
-    <sys:String x:Key="Bg_White">White</sys:String>
-    <sys:String x:Key="Bg_Black">Black</sys:String>
-    <sys:String x:Key="Bg_Custom">#FFFFFF (HEX)</sys:String>
-
+    <!-- Convert Setting : CPU Usage -->
+    <sys:String x:Key="Setting_CpuUsage">CPU Usage</sys:String>
+    <sys:String x:Key="Setting_Cpu_Max">Max: 90%</sys:String>
+    <sys:String x:Key="Setting_Cpu_Optimal">Optimal: 75%</sys:String>
+    <sys:String x:Key="Setting_Cpu_Half">Half: 50%</sys:String>
+    <sys:String x:Key="Setting_Cpu_Low">Low: 25%</sys:String>
+    <sys:String x:Key="Setting_Cpu_Minimum">Minimum: Single Core</sys:String>
     <!-- Convert Setting : Duplicate File Policy -->
     <sys:String x:Key="Setting_OverwritePolicy">Duplicate File Policy</sys:String>
+    <sys:String x:Key="Setting_Overwrite_Overwrite">Overwrite</sys:String>
     <sys:String x:Key="Setting_Overwrite_Suffix">Add Suffix</sys:String>
     <sys:String x:Key="Setting_Overwrite_Skip">Skip</sys:String>
-    <sys:String x:Key="Setting_Overwrite_Overwrite">Overwrite</sys:String>
     <!-- Convert Setting : Save Location -->
     <sys:String x:Key="Setting_SaveLocation">Save Location</sys:String>
     <sys:String x:Key="Setting_SaveLocation_Same">Same as Original</sys:String>
@@ -115,14 +101,45 @@
     <sys:String x:Key="Setting_SaveMethod">Save Method</sys:String>
     <sys:String x:Key="Setting_SaveMethod_NoFolder">File Only</sys:String>
     <sys:String x:Key="Setting_SaveMethod_CreateFolder">Create Folder</sys:String>
-
-    <!-- Convert Setting : CPU Usage -->
-    <sys:String x:Key="Setting_CpuUsage">CPU Usage</sys:String>
-    <sys:String x:Key="Setting_Cpu_Max">Max: 90%</sys:String>
-    <sys:String x:Key="Setting_Cpu_Optimal">Optimal: 75%</sys:String>
-    <sys:String x:Key="Setting_Cpu_Half">Half: 50%</sys:String>
-    <sys:String x:Key="Setting_Cpu_Low">Low: 25%</sys:String>
-    <sys:String x:Key="Setting_Cpu_Minimum">Minimum: Single Core</sys:String>
+    <!-- Convert Setting -->
+    <sys:String x:Key="Setting_GroupStandard">Standard Image Format</sys:String>
+    <sys:String x:Key="Setting_GroupStandardOptions">Standard Image Options</sys:String>
+    <sys:String x:Key="Setting_GroupAnimation">Animation Image Format</sys:String>
+    <sys:String x:Key="Setting_GroupAnimationOptions">Animation Image Options</sys:String>
+    <sys:String x:Key="Setting_Quality">Quality</sys:String>
+    <sys:String x:Key="Setting_Lossless">Lossless</sys:String>
+    <sys:String x:Key="Setting_BackgroundColor">Background Color</sys:String>
+    <sys:String x:Key="Setting_CompressionLevel">Compression</sys:String>
+    <!-- Convert Setting : BgColor -->
+    <sys:String x:Key="Bg_White">White</sys:String>
+    <sys:String x:Key="Bg_Black">Black</sys:String>
+    <sys:String x:Key="Bg_Custom">#FFFFFF (HEX)</sys:String>
+    <!-- Convert Setting : Filter -->
+    <sys:String x:Key="Setting_Filter">Filter</sys:String>
+    <sys:String x:Key="Setting_Filter_None">None</sys:String>
+    <sys:String x:Key="Setting_Filter_Adaptive">Adaptive</sys:String>
+    <sys:String x:Key="Setting_Filter_Average">Average</sys:String>
+    <sys:String x:Key="Setting_Filter_Paeth">Paeth</sys:String>
+    <sys:String x:Key="Setting_Filter_Sub">Sub</sys:String>
+    <sys:String x:Key="Setting_Filter_Up">Up</sys:String>
+    <!-- Convert Setting : Chroma Subsampling -->
+    <sys:String x:Key="Setting_ChromaSubsampling">Chroma Subsampling</sys:String>
+    <sys:String x:Key="Setting_Subsampling_Auto">Auto</sys:String>
+    <sys:String x:Key="Setting_Subsampling_420">4:2:0</sys:String>
+    <sys:String x:Key="Setting_Subsampling_444">4:4:4</sys:String>
+    <sys:String x:Key="Setting_Subsampling_On">On</sys:String>
+    <sys:String x:Key="Setting_Subsampling_Off">Off</sys:String>
+    <!-- Convert Setting : Encoding Effort -->
+    <sys:String x:Key="Setting_EncodingEffort">Encoding Effort</sys:String>
+    <sys:String x:Key="Setting_Effort_Fast">Fast</sys:String>
+    <sys:String x:Key="Setting_Effort_Balance">Balance</sys:String>
+    <sys:String x:Key="Setting_Effort_Slow">Slow</sys:String>
+    <!-- Convert Setting : Bit Depth -->
+    <sys:String x:Key="Setting_BitDepth">Bit Depth</sys:String>
+    <sys:String x:Key="Setting_BitDepth_Auto">Auto</sys:String>
+    <sys:String x:Key="Setting_BitDepth_8">8-bit</sys:String>
+    <sys:String x:Key="Setting_BitDepth_10">10-bit</sys:String>
+    <sys:String x:Key="Setting_BitDepth_12">12-bit</sys:String>
 
     <!-- Snackbar : File Loading -->
     <sys:String x:Key="Msg_LoadingFile">Loading files...</sys:String>
@@ -134,22 +151,18 @@
     <sys:String x:Key="Msg_NoNewFiles">No files available to add.</sys:String>
     <sys:String x:Key="Msg_LimitReached">Cannot add more files.</sys:String>
     <sys:String x:Key="Msg_FileAddError">Error adding file: {0}</sys:String>
-
     <!-- Snackbar : List Action -->
     <sys:String x:Key="Msg_ReorderIndex">Reordering index.</sys:String>
     <sys:String x:Key="Msg_RemoveFile">Removing {0} file(s) from list.</sys:String>
     <sys:String x:Key="Msg_ClearList">Clearing list.</sys:String>
-
     <!-- Snackbar : Conversion -->
     <sys:String x:Key="Msg_OperationComplete">{0} operation(s) complete.</sys:String>
     <sys:String x:Key="Msg_OperationCompleteWithSkipped">{0} converted, {1} skipped</sys:String>
     <sys:String x:Key="Msg_Convert_Cancelling">Cancelling operation...</sys:String>
     <sys:String x:Key="Msg_Convert_Cancelled">Operation has been cancelled.</sys:String>
-
     <!-- Snackbar : Preset -->
     <sys:String x:Key="Msg_Preset_SaveSuccess">Settings saved successfully</sys:String>
     <sys:String x:Key="Msg_Preset_SaveError">Failed to save settings</sys:String>
-
     <!-- Snackbar : Common Error -->
     <sys:String x:Key="Msg_Error_Occurred">Error: {0}</sys:String>
     <sys:String x:Key="Msg_Error_ConfigInvalid">Invalid conversion settings. Please reconfigure.</sys:String>
@@ -163,30 +176,24 @@
     <sys:String x:Key="Dlg_No">No</sys:String>
     <sys:String x:Key="Dlg_Confirm">Confirm</sys:String>
     <sys:String x:Key="Dlg_Cancel">Cancel</sys:String>
-
     <!-- Convert -->
     <sys:String x:Key="Dlg_Title_Convert">Conversion</sys:String>
     <sys:String x:Key="Dlg_Ask_Convert">Are you sure you want to convert {0} file(s)?</sys:String>
-
     <!-- Cancel Convert -->
     <sys:String x:Key="Dlg_Title_CancelConvert">Cancel Conversion</sys:String>
     <sys:String x:Key="Dlg_Ask_CancelConvert">Are you sure you want to cancel?</sys:String>
     <sys:String x:Key="Dlg_Warn_CancelConvert">⚠️ Tasks already in progress will not be cancelled.</sys:String>
-
     <!-- Reorder Index -->
     <sys:String x:Key="Dlg_Title_ReorderIndex">Reorder Index</sys:String>
     <sys:String x:Key="Dlg_Ask_ReorderIndex">Reindex based on current order?</sys:String>
     <sys:String x:Key="Dlg_Warn_ReorderIndex">⚠️ Existing indexes will be reset.</sys:String>
-
     <!-- Clear List -->
     <sys:String x:Key="Dlg_Title_ClearList">Clear List</sys:String>
     <sys:String x:Key="Dlg_Ask_ClearList">Clear all files from the list?</sys:String>
-
     <!-- Delete File -->
     <sys:String x:Key="Dlg_Title_DeleteConfirm">Remove</sys:String>
     <sys:String x:Key="Dlg_Ask_DeleteSingle">Remove the selected file from the list?</sys:String>
     <sys:String x:Key="Dlg_Ask_DeleteMulti">Remove {0} files from the list?</sys:String>
-
     <!-- Add Folder -->
     <sys:String x:Key="Dlg_Title_AddFile">Add File</sys:String>
     <sys:String x:Key="Dlg_Title_AddFolder">Add Folder</sys:String>

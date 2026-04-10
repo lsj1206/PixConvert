@@ -155,6 +155,13 @@ public class PresetService : IPresetService
             return false;
         }
 
+        if (settings.StandardPngCompressionLevel < 0 || settings.StandardPngCompressionLevel > 9)
+        {
+            _logger.LogError(_languageService.GetString("Log_Preset_InvalidQuality"), settings.StandardPngCompressionLevel);
+            errorMessageKey = "Msg_Error_ConfigInvalid";
+            return false;
+        }
+
         // 지원하는 확장자 포맷 배열
         var allowedStandard = new[] { "JPEG", "PNG", "BMP", "WEBP", "AVIF" };
         var allowedAnimation = new[] { "GIF", "WEBP" };
@@ -180,7 +187,12 @@ public class PresetService : IPresetService
         if (!Enum.IsDefined(typeof(CpuUsageOption), settings.CpuUsage) ||
             !Enum.IsDefined(typeof(SaveLocationType), settings.SaveLocation) ||
             !Enum.IsDefined(typeof(SaveFolderMethod), settings.FolderMethod) ||
-            !Enum.IsDefined(typeof(OverwritePolicy), settings.OverwritePolicy))
+            !Enum.IsDefined(typeof(OverwritePolicy), settings.OverwritePolicy) ||
+            !Enum.IsDefined(typeof(JpegChromaSubsamplingMode), settings.StandardJpegChromaSubsampling) ||
+            !Enum.IsDefined(typeof(PngFilterMode), settings.StandardPngFilter) ||
+            !Enum.IsDefined(typeof(AvifChromaSubsamplingMode), settings.StandardAvifChromaSubsampling) ||
+            !Enum.IsDefined(typeof(AvifEncodingEffortMode), settings.StandardAvifEncodingEffort) ||
+            !Enum.IsDefined(typeof(AvifBitDepthMode), settings.StandardAvifBitDepth))
         {
             _logger.LogError(_languageService.GetString("Log_Preset_InvalidEnum"));
             errorMessageKey = "Msg_Error_ConfigInvalid";

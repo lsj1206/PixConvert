@@ -180,26 +180,36 @@ public class SkiaSharpProvider : IProviderService, IDisposable
     {
         return targetFormat.ToUpperInvariant() switch
         {
-            "JPEG" => EncodeJpeg(bitmap, GetQuality(settings, isAnimation)),
-            "PNG" => EncodePng(bitmap),
+            "JPEG" => EncodeJpeg(bitmap, settings, isAnimation),
+            "PNG" => EncodePng(bitmap, settings),
             "WEBP" => EncodeWebp(bitmap, settings, isAnimation),
             _ => throw new NotSupportedException($"SkiaSharpProvider에서 지원하지 않는 대상 포맷: {targetFormat}")
         };
     }
 
-    private SKData EncodeJpeg(SKBitmap bitmap, int quality)
+    private SKData EncodeJpeg(SKBitmap bitmap, ConvertSettings settings, bool isAnimation)
     {
-        using var image = SKImage.FromBitmap(bitmap);
-        return image.Encode(SKEncodedImageFormat.Jpeg, quality)
+        using SKPixmap pixmap = bitmap.PeekPixels()
+            ?? throw new InvalidOperationException(string.Format(_languageService.GetString("Log_Skia_EncodeFail"), "JPEG"));
+
+        int quality = GetQuality(settings, isAnimation);
+        var options = new SKJpegEncoderOptions(
+            quality,
+            ResolveJpegDownsample(settings, isAnimation, quality),
+            SKJpegEncoderAlphaOption.Ignore);
+
+        return pixmap.Encode(options)
             ?? throw new InvalidOperationException(string.Format(_languageService.GetString("Log_Skia_EncodeFail"), "JPEG"));
     }
 
-    private SKData EncodePng(SKBitmap bitmap)
+    private SKData EncodePng(SKBitmap bitmap, ConvertSettings settings)
     {
         using SKPixmap pixmap = bitmap.PeekPixels()
             ?? throw new InvalidOperationException(string.Format(_languageService.GetString("Log_Skia_EncodeFail"), "PNG"));
 
-        var options = new SKPngEncoderOptions(SKPngEncoderFilterFlags.AllFilters, 6);
+        var options = new SKPngEncoderOptions(
+            ResolvePngFilter(settings.StandardPngFilter),
+            settings.StandardPngCompressionLevel);
         return pixmap.Encode(options)
             ?? throw new InvalidOperationException(string.Format(_languageService.GetString("Log_Skia_EncodeFail"), "PNG"));
     }
@@ -225,6 +235,30 @@ public class SkiaSharpProvider : IProviderService, IDisposable
 
     private static bool GetLossless(ConvertSettings settings, bool isAnimation) =>
         isAnimation ? settings.AnimationLossless : settings.StandardLossless;
+
+    private static SKJpegEncoderDownsample ResolveJpegDownsample(ConvertSettings settings, bool isAnimation, int quality)
+    {
+        if (isAnimation)
+            return quality >= 90 ? SKJpegEncoderDownsample.Downsample444 : SKJpegEncoderDownsample.Downsample420;
+
+        return settings.StandardJpegChromaSubsampling switch
+        {
+            JpegChromaSubsamplingMode.Chroma420 => SKJpegEncoderDownsample.Downsample420,
+            JpegChromaSubsamplingMode.Chroma444 => SKJpegEncoderDownsample.Downsample444,
+            _ => quality >= 90 ? SKJpegEncoderDownsample.Downsample444 : SKJpegEncoderDownsample.Downsample420
+        };
+    }
+
+    private static SKPngEncoderFilterFlags ResolvePngFilter(PngFilterMode mode) =>
+        mode switch
+        {
+            PngFilterMode.None => SKPngEncoderFilterFlags.NoFilters,
+            PngFilterMode.Sub => SKPngEncoderFilterFlags.Sub,
+            PngFilterMode.Up => SKPngEncoderFilterFlags.Up,
+            PngFilterMode.Average => SKPngEncoderFilterFlags.Avg,
+            PngFilterMode.Paeth => SKPngEncoderFilterFlags.Paeth,
+            _ => SKPngEncoderFilterFlags.AllFilters
+        };
 
     public void Dispose() { }
 }

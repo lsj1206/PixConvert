@@ -74,6 +74,9 @@ public class NetVipsProviderTests : IDisposable
         var settings = new ConvertSettings
         {
             StandardTargetFormat = "AVIF",
+            StandardAvifChromaSubsampling = AvifChromaSubsamplingMode.Off,
+            StandardAvifEncodingEffort = AvifEncodingEffortMode.Slow,
+            StandardAvifBitDepth = AvifBitDepthMode.Bit8,
             SaveLocation = SaveLocationType.SameAsOriginal,
             FolderMethod = SaveFolderMethod.NoFolder
         };
@@ -81,6 +84,46 @@ public class NetVipsProviderTests : IDisposable
         await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
 
         string expectedPath = Path.Combine(_testDir, "input.avif");
+        Assert.True(File.Exists(expectedPath));
+        Assert.Equal(FileConvertStatus.Success, file.Status);
+    }
+
+    [Fact]
+    public async Task ConvertAsync_WhenTargetIsJpegWithCustomSubsampling_ShouldWork()
+    {
+        var file = new FileItem { Path = _inputPath, FileSignature = "PNG" };
+        var settings = new ConvertSettings
+        {
+            StandardTargetFormat = "JPEG",
+            StandardJpegChromaSubsampling = JpegChromaSubsamplingMode.Chroma444,
+            SaveLocation = SaveLocationType.SameAsOriginal,
+            FolderMethod = SaveFolderMethod.NoFolder
+        };
+
+        await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
+
+        string expectedPath = Path.Combine(_testDir, "input.jpg");
+        Assert.True(File.Exists(expectedPath));
+        Assert.Equal(FileConvertStatus.Success, file.Status);
+    }
+
+    [Fact]
+    public async Task ConvertAsync_WhenTargetIsPngWithCustomCompressionAndFilter_ShouldWork()
+    {
+        var file = new FileItem { Path = _inputPath, FileSignature = "PNG" };
+        var settings = new ConvertSettings
+        {
+            StandardTargetFormat = "PNG",
+            StandardPngCompressionLevel = 9,
+            StandardPngFilter = PngFilterMode.Paeth,
+            SaveLocation = SaveLocationType.SameAsOriginal,
+            FolderMethod = SaveFolderMethod.NoFolder,
+            OverwritePolicy = OverwritePolicy.Suffix
+        };
+
+        await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
+
+        string expectedPath = Path.Combine(_testDir, "input_1.png");
         Assert.True(File.Exists(expectedPath));
         Assert.Equal(FileConvertStatus.Success, file.Status);
     }

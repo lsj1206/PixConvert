@@ -27,6 +27,12 @@ public partial class ConvertSettingViewModel : ViewModelBase
 
     [ObservableProperty] private int _standardQuality = 85;
     [ObservableProperty] private bool _standardLossless;
+    [ObservableProperty] private JpegChromaSubsamplingMode _standardJpegChromaSubsampling = JpegChromaSubsamplingMode.Auto;
+    [ObservableProperty] private int _standardPngCompressionLevel = 6;
+    [ObservableProperty] private PngFilterMode _standardPngFilter = PngFilterMode.Adaptive;
+    [ObservableProperty] private AvifChromaSubsamplingMode _standardAvifChromaSubsampling = AvifChromaSubsamplingMode.Auto;
+    [ObservableProperty] private AvifEncodingEffortMode _standardAvifEncodingEffort = AvifEncodingEffortMode.Balanced;
+    [ObservableProperty] private AvifBitDepthMode _standardAvifBitDepth = AvifBitDepthMode.Auto;
     [ObservableProperty] private BackgroundColorOption _standardBgColorOption = BackgroundColorOption.White;
     [ObservableProperty] private string _standardCustomBackgroundColor = "#FFFFFF";
 
@@ -57,6 +63,27 @@ public partial class ConvertSettingViewModel : ViewModelBase
 
     public bool StandardShowBackgroundColor =>
         SettingOptionCatalog.Supports(SettingOptionSection.Standard, SettingOptionKey.BackgroundColor, StandardTargetFormat);
+
+    public bool StandardShowJpegChromaSubsampling =>
+        SettingOptionCatalog.Supports(SettingOptionSection.Standard, SettingOptionKey.JpegChromaSubsampling, StandardTargetFormat);
+
+    public bool StandardShowPngCompression =>
+        SettingOptionCatalog.Supports(SettingOptionSection.Standard, SettingOptionKey.PngCompression, StandardTargetFormat);
+
+    public bool StandardShowPngFilter =>
+        SettingOptionCatalog.Supports(SettingOptionSection.Standard, SettingOptionKey.PngFilter, StandardTargetFormat);
+
+    public bool StandardShowAvifChromaSubsampling =>
+        SettingOptionCatalog.Supports(SettingOptionSection.Standard, SettingOptionKey.AvifChromaSubsampling, StandardTargetFormat);
+
+    public bool StandardCanEditAvifChromaSubsampling =>
+        StandardShowAvifChromaSubsampling && !StandardLossless;
+
+    public bool StandardShowAvifEncodingEffort =>
+        SettingOptionCatalog.Supports(SettingOptionSection.Standard, SettingOptionKey.AvifEncodingEffort, StandardTargetFormat);
+
+    public bool StandardShowAvifBitDepth =>
+        SettingOptionCatalog.Supports(SettingOptionSection.Standard, SettingOptionKey.AvifBitDepth, StandardTargetFormat);
 
     public bool ShowAnimationOptionsSection => !string.IsNullOrWhiteSpace(AnimationTargetFormat);
 
@@ -117,12 +144,20 @@ public partial class ConvertSettingViewModel : ViewModelBase
             AnimationQuality = coerced;
     }
 
+    partial void OnStandardPngCompressionLevelChanged(int value)
+    {
+        int coerced = Math.Clamp(value, 0, 9);
+        if (value != coerced)
+            StandardPngCompressionLevel = coerced;
+    }
+
     partial void OnStandardTargetFormatChanged(string value) => OnTargetFormatsChanged();
     partial void OnAnimationTargetFormatChanged(string? value) => OnTargetFormatsChanged();
 
     partial void OnStandardLosslessChanged(bool value)
     {
         OnPropertyChanged(nameof(StandardShowQuality));
+        OnPropertyChanged(nameof(StandardCanEditAvifChromaSubsampling));
     }
 
     partial void OnAnimationLosslessChanged(bool value)
@@ -167,6 +202,12 @@ public partial class ConvertSettingViewModel : ViewModelBase
 
         StandardQuality = settings.StandardQuality;
         StandardLossless = settings.StandardLossless;
+        StandardJpegChromaSubsampling = settings.StandardJpegChromaSubsampling;
+        StandardPngCompressionLevel = settings.StandardPngCompressionLevel;
+        StandardPngFilter = settings.StandardPngFilter;
+        StandardAvifChromaSubsampling = settings.StandardAvifChromaSubsampling;
+        StandardAvifEncodingEffort = settings.StandardAvifEncodingEffort;
+        StandardAvifBitDepth = settings.StandardAvifBitDepth;
         StandardCustomBackgroundColor = settings.StandardBackgroundColor ?? "#FFFFFF";
         StandardBgColorOption = ParseBackgroundColorOption(StandardCustomBackgroundColor);
 
@@ -194,6 +235,12 @@ public partial class ConvertSettingViewModel : ViewModelBase
 
         settings.StandardQuality = StandardQuality;
         settings.StandardLossless = StandardLossless;
+        settings.StandardJpegChromaSubsampling = StandardJpegChromaSubsampling;
+        settings.StandardPngCompressionLevel = StandardPngCompressionLevel;
+        settings.StandardPngFilter = StandardPngFilter;
+        settings.StandardAvifChromaSubsampling = StandardAvifChromaSubsampling;
+        settings.StandardAvifEncodingEffort = StandardAvifEncodingEffort;
+        settings.StandardAvifBitDepth = StandardAvifBitDepth;
         settings.StandardBackgroundColor = ResolveBackgroundColor(StandardBgColorOption, StandardCustomBackgroundColor);
 
         settings.AnimationQuality = AnimationQuality;
@@ -265,6 +312,13 @@ public partial class ConvertSettingViewModel : ViewModelBase
         OnPropertyChanged(nameof(StandardShowLossless));
         OnPropertyChanged(nameof(StandardShowQuality));
         OnPropertyChanged(nameof(StandardShowBackgroundColor));
+        OnPropertyChanged(nameof(StandardShowJpegChromaSubsampling));
+        OnPropertyChanged(nameof(StandardShowPngCompression));
+        OnPropertyChanged(nameof(StandardShowPngFilter));
+        OnPropertyChanged(nameof(StandardShowAvifChromaSubsampling));
+        OnPropertyChanged(nameof(StandardCanEditAvifChromaSubsampling));
+        OnPropertyChanged(nameof(StandardShowAvifEncodingEffort));
+        OnPropertyChanged(nameof(StandardShowAvifBitDepth));
         OnPropertyChanged(nameof(ShowAnimationOptionsSection));
         OnPropertyChanged(nameof(AnimationShowLossless));
         OnPropertyChanged(nameof(AnimationShowQuality));

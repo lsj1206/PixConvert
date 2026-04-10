@@ -13,7 +13,13 @@ public enum SettingOptionKey
 {
     Lossless,
     Quality,
-    BackgroundColor
+    BackgroundColor,
+    JpegChromaSubsampling,
+    PngCompression,
+    PngFilter,
+    AvifChromaSubsampling,
+    AvifEncodingEffort,
+    AvifBitDepth
 }
 
 public sealed record SettingOptionDefinition(
@@ -40,6 +46,30 @@ public static class SettingOptionCatalog
             SettingOptionSection.Standard,
             SettingOptionKey.BackgroundColor,
             new[] { "JPEG", "BMP" }),
+        new(
+            SettingOptionSection.Standard,
+            SettingOptionKey.JpegChromaSubsampling,
+            new[] { "JPEG" }),
+        new(
+            SettingOptionSection.Standard,
+            SettingOptionKey.PngCompression,
+            new[] { "PNG" }),
+        new(
+            SettingOptionSection.Standard,
+            SettingOptionKey.PngFilter,
+            new[] { "PNG" }),
+        new(
+            SettingOptionSection.Standard,
+            SettingOptionKey.AvifChromaSubsampling,
+            new[] { "AVIF" }),
+        new(
+            SettingOptionSection.Standard,
+            SettingOptionKey.AvifEncodingEffort,
+            new[] { "AVIF" }),
+        new(
+            SettingOptionSection.Standard,
+            SettingOptionKey.AvifBitDepth,
+            new[] { "AVIF" }),
         new(
             SettingOptionSection.Animation,
             SettingOptionKey.Lossless,

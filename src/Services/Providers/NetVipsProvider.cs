@@ -125,7 +125,6 @@ public class NetVipsProvider : IProviderService, IDisposable
 
     private static void SaveWithFormat(Image image, string outputPath, string targetFormat, ConvertSettings settings, bool isAnimation)
     {
-        var options = new VOption();
         int quality = GetQuality(settings, isAnimation);
         bool lossless = GetLossless(settings, isAnimation);
 
@@ -135,32 +134,65 @@ public class NetVipsProvider : IProviderService, IDisposable
                 SaveAsBmpViaSkia(image, outputPath);
                 return;
             case "JPEG":
-                options.Add("Q", quality);
-                options.Add("strip", true);
-                break;
+                image.Jpegsave(
+                    outputPath,
+                    q: quality,
+                    subsampleMode: ResolveJpegSubsampleMode(settings, isAnimation, quality),
+                    keep: Enums.ForeignKeep.None);
+                return;
             case "PNG":
-                options.Add("compression", 6);
-                options.Add("strip", true);
-                break;
+                image.Pngsave(
+                    outputPath,
+                    compression: settings.StandardPngCompressionLevel,
+                    filter: ResolvePngFilter(settings.StandardPngFilter),
+                    keep: Enums.ForeignKeep.None);
+                return;
             case "WEBP":
-                options.Add("lossless", lossless);
-                if (!lossless)
-                    options.Add("Q", quality);
-                options.Add("strip", true);
-                break;
+                image.Webpsave(
+                    outputPath,
+                    q: lossless ? null : quality,
+                    lossless: lossless,
+                    keep: Enums.ForeignKeep.None);
+                return;
             case "AVIF":
-                options.Add("compression", Enums.ForeignHeifCompression.Av1);
-                options.Add("lossless", lossless);
-                if (!lossless)
-                    options.Add("Q", quality);
-                options.Add("strip", true);
-                break;
+                SaveAvif(image, outputPath, settings, isAnimation, quality, lossless);
+                return;
             case "GIF":
-                options.Add("strip", true);
-                break;
+                image.Gifsave(outputPath, keep: Enums.ForeignKeep.None);
+                return;
+            default:
+                throw new NotSupportedException($"NetVipsProviderì—ì„œ ì§€ì›í•˜ì§€ ì•ŠëŠ” ëŒ€ìƒ í¬ë§·: {targetFormat}");
+        }
+    }
+
+    private static void SaveAvif(Image image, string outputPath, ConvertSettings settings, bool isAnimation, int quality, bool lossless)
+    {
+        Enums.ForeignSubsample subsampleMode = ResolveAvifSubsampleMode(settings, isAnimation, lossless);
+        int effort = ResolveAvifEncodingEffort(settings, isAnimation);
+        int? bitDepth = ResolveAvifBitDepth(settings, isAnimation);
+
+        if (bitDepth.HasValue)
+        {
+            image.Heifsave(
+                outputPath,
+                q: lossless ? null : quality,
+                bitdepth: bitDepth.Value,
+                lossless: lossless,
+                compression: Enums.ForeignHeifCompression.Av1,
+                effort: effort,
+                subsampleMode: subsampleMode,
+                keep: Enums.ForeignKeep.None);
+            return;
         }
 
-        image.WriteToFile(outputPath, options);
+        image.Heifsave(
+            outputPath,
+            q: lossless ? null : quality,
+            lossless: lossless,
+            compression: Enums.ForeignHeifCompression.Av1,
+            effort: effort,
+            subsampleMode: subsampleMode,
+            keep: Enums.ForeignKeep.None);
     }
 
     private static void SaveAsBmpViaSkia(Image vipsImage, string outputPath)
@@ -243,6 +275,73 @@ public class NetVipsProvider : IProviderService, IDisposable
 
     private static bool GetLossless(ConvertSettings settings, bool isAnimation) =>
         isAnimation ? settings.AnimationLossless : settings.StandardLossless;
+
+    private static Enums.ForeignSubsample ResolveJpegSubsampleMode(ConvertSettings settings, bool isAnimation, int quality)
+    {
+        if (isAnimation)
+            return quality >= 90 ? Enums.ForeignSubsample.Off : Enums.ForeignSubsample.On;
+
+        return settings.StandardJpegChromaSubsampling switch
+        {
+            JpegChromaSubsamplingMode.Chroma420 => Enums.ForeignSubsample.On,
+            JpegChromaSubsamplingMode.Chroma444 => Enums.ForeignSubsample.Off,
+            _ => Enums.ForeignSubsample.Auto
+        };
+    }
+
+    private static Enums.ForeignPngFilter ResolvePngFilter(PngFilterMode mode) =>
+        mode switch
+        {
+            PngFilterMode.None => Enums.ForeignPngFilter.None,
+            PngFilterMode.Sub => Enums.ForeignPngFilter.Sub,
+            PngFilterMode.Up => Enums.ForeignPngFilter.Up,
+            PngFilterMode.Average => Enums.ForeignPngFilter.Avg,
+            PngFilterMode.Paeth => Enums.ForeignPngFilter.Paeth,
+            _ => Enums.ForeignPngFilter.All
+        };
+
+    private static Enums.ForeignSubsample ResolveAvifSubsampleMode(ConvertSettings settings, bool isAnimation, bool lossless)
+    {
+        if (isAnimation)
+            return Enums.ForeignSubsample.Auto;
+
+        if (lossless)
+            return Enums.ForeignSubsample.Off;
+
+        return settings.StandardAvifChromaSubsampling switch
+        {
+            AvifChromaSubsamplingMode.On => Enums.ForeignSubsample.On,
+            AvifChromaSubsamplingMode.Off => Enums.ForeignSubsample.Off,
+            _ => Enums.ForeignSubsample.Auto
+        };
+    }
+
+    private static int ResolveAvifEncodingEffort(ConvertSettings settings, bool isAnimation)
+    {
+        if (isAnimation)
+            return 4;
+
+        return settings.StandardAvifEncodingEffort switch
+        {
+            AvifEncodingEffortMode.Fast => 2,
+            AvifEncodingEffortMode.Slow => 7,
+            _ => 4
+        };
+    }
+
+    private static int? ResolveAvifBitDepth(ConvertSettings settings, bool isAnimation)
+    {
+        if (isAnimation)
+            return null;
+
+        return settings.StandardAvifBitDepth switch
+        {
+            AvifBitDepthMode.Bit8 => 8,
+            AvifBitDepthMode.Bit10 => 10,
+            AvifBitDepthMode.Bit12 => 12,
+            _ => null
+        };
+    }
 
     private static Image LoadBmpViaSkia(string path)
     {

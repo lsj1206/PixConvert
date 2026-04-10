@@ -20,6 +20,18 @@ public class ConvertSettings
     /// <summary>일반 이미지 무손실 인코딩 여부. WEBP / AVIF에 적용됩니다.</summary>
     public bool StandardLossless { get; set; }
 
+    public JpegChromaSubsamplingMode StandardJpegChromaSubsampling { get; set; } = JpegChromaSubsamplingMode.Auto;
+
+    public int StandardPngCompressionLevel { get; set; } = 6;
+
+    public PngFilterMode StandardPngFilter { get; set; } = PngFilterMode.Adaptive;
+
+    public AvifChromaSubsamplingMode StandardAvifChromaSubsampling { get; set; } = AvifChromaSubsamplingMode.Auto;
+
+    public AvifEncodingEffortMode StandardAvifEncodingEffort { get; set; } = AvifEncodingEffortMode.Balanced;
+
+    public AvifBitDepthMode StandardAvifBitDepth { get; set; } = AvifBitDepthMode.Auto;
+
     /// <summary>일반 이미지 배경 채우기 색상 (HEX, 예: #FFFFFF)</summary>
     public string StandardBackgroundColor { get; set; } = "#FFFFFF";
 
@@ -56,3 +68,13 @@ public enum SaveFolderMethod { NoFolder, CreateFolder }
 
 /// <summary>출력 저장 위치 유형</summary>
 public enum SaveLocationType { SameAsOriginal, Custom }
+
+public enum JpegChromaSubsamplingMode { Auto, Chroma420, Chroma444 }
+
+public enum PngFilterMode { Adaptive, None, Sub, Up, Average, Paeth }
+
+public enum AvifChromaSubsamplingMode { Auto, On, Off }
+
+public enum AvifEncodingEffortMode { Fast, Balanced, Slow }
+
+public enum AvifBitDepthMode { Auto, Bit8, Bit10, Bit12 }

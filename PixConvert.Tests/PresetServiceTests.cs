@@ -177,6 +177,84 @@ public class PresetServiceTests
         Assert.False(result);
     }
 
+    [Theory]
+    [InlineData(-1, false)]
+    [InlineData(0, true)]
+    [InlineData(6, true)]
+    [InlineData(9, true)]
+    [InlineData(10, false)]
+    public void ValidPresetData_ShouldValidateStandardPngCompressionLevel(int compressionLevel, bool expected)
+    {
+        var settings = new ConvertSettings
+        {
+            StandardTargetFormat = "PNG",
+            AnimationTargetFormat = "GIF",
+            StandardBackgroundColor = "#FFFFFF",
+            StandardPngCompressionLevel = compressionLevel
+        };
+
+        var result = _presetService.ValidPresetData(settings, out string errorKey);
+
+        Assert.Equal(expected, result);
+        if (!expected)
+            Assert.Equal("Msg_Error_ConfigInvalid", errorKey);
+        else
+            Assert.True(string.IsNullOrEmpty(errorKey));
+    }
+
+    [Fact]
+    public void ValidPresetData_WhenJpegSubsamplingEnumIsInvalid_ShouldReturnFalse()
+    {
+        var settings = new ConvertSettings
+        {
+            StandardTargetFormat = "JPEG",
+            AnimationTargetFormat = "GIF",
+            StandardBackgroundColor = "#FFFFFF",
+            StandardJpegChromaSubsampling = (JpegChromaSubsamplingMode)999
+        };
+
+        var result = _presetService.ValidPresetData(settings, out string errorKey);
+
+        Assert.False(result);
+        Assert.Equal("Msg_Error_ConfigInvalid", errorKey);
+    }
+
+    [Fact]
+    public void ValidPresetData_WhenPngFilterEnumIsInvalid_ShouldReturnFalse()
+    {
+        var settings = new ConvertSettings
+        {
+            StandardTargetFormat = "PNG",
+            AnimationTargetFormat = "GIF",
+            StandardBackgroundColor = "#FFFFFF",
+            StandardPngFilter = (PngFilterMode)999
+        };
+
+        var result = _presetService.ValidPresetData(settings, out string errorKey);
+
+        Assert.False(result);
+        Assert.Equal("Msg_Error_ConfigInvalid", errorKey);
+    }
+
+    [Fact]
+    public void ValidPresetData_WhenAvifEnumsAreValid_ShouldReturnTrue()
+    {
+        var settings = new ConvertSettings
+        {
+            StandardTargetFormat = "AVIF",
+            AnimationTargetFormat = "GIF",
+            StandardBackgroundColor = "#FFFFFF",
+            StandardAvifChromaSubsampling = AvifChromaSubsamplingMode.Off,
+            StandardAvifEncodingEffort = AvifEncodingEffortMode.Slow,
+            StandardAvifBitDepth = AvifBitDepthMode.Bit10
+        };
+
+        var result = _presetService.ValidPresetData(settings, out string errorKey);
+
+        Assert.True(result);
+        Assert.True(string.IsNullOrEmpty(errorKey));
+    }
+
     [Fact]
     public void AddPreset_WhenNewName_ShouldIncreaseCount()
     {
