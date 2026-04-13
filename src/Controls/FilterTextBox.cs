@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -13,6 +14,7 @@ public enum Filter
     ValidSpecial, // Windows 파일명에 사용가능한 특수 문자
     InvalidSpecial, // Windows 파일명에 사용불가능한 특수 문자 (< > : " / \ | ? *)
     Digits, // 숫자 (0-9)
+    Decimal, // 숫자와 소수점 (0-9, .)
     Alpha, // 영문자 (대소문자)
     HexColor // HEX 색상 코드 (#0-9A-Fa-f)
 }
@@ -130,6 +132,32 @@ public class FilterTextBox : TextBox
             typeof(FilterTextBox),
             new PropertyMetadata(0, OnFilterPropertyChanged));
 
+    public int DecimalPlaces
+    {
+        get => (int)GetValue(DecimalPlacesProperty);
+        set => SetValue(DecimalPlacesProperty, value);
+    }
+
+    public static readonly DependencyProperty DecimalPlacesProperty =
+        DependencyProperty.Register(
+            nameof(DecimalPlaces),
+            typeof(int),
+            typeof(FilterTextBox),
+            new PropertyMetadata(-1, OnFilterPropertyChanged));
+
+    public double DecimalMaxValue
+    {
+        get => (double)GetValue(DecimalMaxValueProperty);
+        set => SetValue(DecimalMaxValueProperty, value);
+    }
+
+    public static readonly DependencyProperty DecimalMaxValueProperty =
+        DependencyProperty.Register(
+            nameof(DecimalMaxValue),
+            typeof(double),
+            typeof(FilterTextBox),
+            new PropertyMetadata(double.NaN, OnFilterPropertyChanged));
+
     /// <summary>
     /// 빈 값(Blank)일 때 자동으로 채워질 기본값
     /// </summary>
@@ -245,6 +273,7 @@ public class FilterTextBox : TextBox
             Filter.ValidSpecial => " !@#$%^&()_+-=[]{};',.~",
             Filter.InvalidSpecial => "<>:\"/\\|?*",
             Filter.Digits => "0123456789",
+            Filter.Decimal => "0123456789.",
             Filter.Alpha => "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
             Filter.HexColor => "#0123456789ABCDEFabcdef",
             _ => null
@@ -302,6 +331,7 @@ public class FilterTextBox : TextBox
 
         var builder = new StringBuilder(original.Length);
 
+        bool hasDecimalPoint = false;
         foreach (char c in original)
         {
             // BlockedCharacters 우선 적용
@@ -318,10 +348,21 @@ public class FilterTextBox : TextBox
                 continue;
             }
 
+            if (Filter == Filter.Decimal && c == '.')
+            {
+                if (hasDecimalPoint)
+                    continue;
+
+                hasDecimalPoint = true;
+            }
+
             builder.Append(c);
         }
 
         string filtered = builder.ToString();
+
+        if (Filter == Filter.Decimal)
+            filtered = ApplyDecimalConstraints(filtered);
 
         // 길이 제한
         if (FilterMaxLength > 0 && filtered.Length > FilterMaxLength)
@@ -343,6 +384,53 @@ public class FilterTextBox : TextBox
         // 이를 통해 포커스 이동 없이 생성 버튼을 눌러도 값이 정상 반영됨
         var binding = GetBindingExpression(TextProperty);
         binding?.UpdateSource();
+    }
+
+    private string ApplyDecimalConstraints(string text)
+    {
+        if (DecimalPlaces >= 0)
+        {
+            int decimalIndex = text.IndexOf('.');
+            if (decimalIndex >= 0)
+            {
+                int allowedLength = decimalIndex + 1 + DecimalPlaces;
+                if (text.Length > allowedLength)
+                    text = text.Substring(0, allowedLength);
+            }
+        }
+
+        if (double.IsNaN(DecimalMaxValue) ||
+            string.IsNullOrWhiteSpace(text) ||
+            text == "." ||
+            text.EndsWith(".", StringComparison.Ordinal))
+        {
+            return text;
+        }
+
+        if (!double.TryParse(
+                text,
+                NumberStyles.AllowDecimalPoint,
+                CultureInfo.InvariantCulture,
+                out double value))
+        {
+            return text;
+        }
+
+        return value > DecimalMaxValue
+            ? FormatDecimalValue(DecimalMaxValue, DecimalPlaces)
+            : text;
+    }
+
+    private static string FormatDecimalValue(double value, int decimalPlaces)
+    {
+        if (decimalPlaces < 0)
+            return value.ToString(CultureInfo.InvariantCulture);
+
+        string format = decimalPlaces == 0
+            ? "0"
+            : $"0.{new string('#', decimalPlaces)}";
+
+        return value.ToString(format, CultureInfo.InvariantCulture);
     }
 
     #endregion

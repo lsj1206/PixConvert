@@ -169,6 +169,20 @@ public class PresetService : IPresetService
             return false;
         }
 
+        if (settings.AnimationGifInterframeMaxError < 0 || settings.AnimationGifInterframeMaxError > 32)
+        {
+            _logger.LogError(_languageService.GetString("Log_Preset_InvalidQuality"), settings.AnimationGifInterframeMaxError);
+            errorMessageKey = "Msg_Error_ConfigInvalid";
+            return false;
+        }
+
+        if (settings.AnimationGifInterpaletteMaxError < 0 || settings.AnimationGifInterpaletteMaxError > 32)
+        {
+            _logger.LogError(_languageService.GetString("Log_Preset_InvalidQuality"), settings.AnimationGifInterpaletteMaxError);
+            errorMessageKey = "Msg_Error_ConfigInvalid";
+            return false;
+        }
+
         // 지원하는 확장자 포맷 배열
         var allowedStandard = new[] { "JPEG", "PNG", "BMP", "WEBP", "AVIF" };
         var allowedAnimation = new[] { "GIF", "WEBP" };
@@ -198,7 +212,8 @@ public class PresetService : IPresetService
             !Enum.IsDefined(typeof(JpegChromaSubsamplingMode), settings.StandardJpegChromaSubsampling) ||
             !Enum.IsDefined(typeof(PngFilterMode), settings.StandardPngFilter) ||
             !Enum.IsDefined(typeof(AvifChromaSubsamplingMode), settings.StandardAvifChromaSubsampling) ||
-            !Enum.IsDefined(typeof(AvifBitDepthMode), settings.StandardAvifBitDepth))
+            !Enum.IsDefined(typeof(AvifBitDepthMode), settings.StandardAvifBitDepth) ||
+            !Enum.IsDefined(typeof(GifPalettePreset), settings.AnimationGifPalettePreset))
         {
             _logger.LogError(_languageService.GetString("Log_Preset_InvalidEnum"));
             errorMessageKey = "Msg_Error_ConfigInvalid";

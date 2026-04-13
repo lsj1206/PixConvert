@@ -111,6 +111,8 @@
     <sys:String x:Key="Setting_BackgroundColor">Background Color</sys:String>
     <sys:String x:Key="Setting_CompressionLevel">Compression</sys:String>
     <sys:String x:Key="Setting_EncodingEffort">Encoding Effort</sys:String>
+    <sys:String x:Key="Setting_InterframeMaxError">Frame Tolerance</sys:String>
+    <sys:String x:Key="Setting_InterpaletteMaxError">Palette Tolerance</sys:String>
     <!-- Convert Setting : BgColor -->
     <sys:String x:Key="Bg_White">White</sys:String>
     <sys:String x:Key="Bg_Black">Black</sys:String>
@@ -136,6 +138,13 @@
     <sys:String x:Key="Setting_BitDepth_8">8-bit</sys:String>
     <sys:String x:Key="Setting_BitDepth_10">10-bit</sys:String>
     <sys:String x:Key="Setting_BitDepth_12">12-bit</sys:String>
+    <!-- Convert Setting : GIF Palette Preset -->
+    <sys:String x:Key="Setting_PalettePreset">Palette Preset</sys:String>
+    <sys:String x:Key="Setting_GifPalette_Minimal">Minimal (64 colors / 0)</sys:String>
+    <sys:String x:Key="Setting_GifPalette_Simple">Simple (128 colors / dither 0.3)</sys:String>
+    <sys:String x:Key="Setting_GifPalette_Standard">Standard (256 colors / 0)</sys:String>
+    <sys:String x:Key="Setting_GifPalette_Balance">Balance (256 colors / dither 0.3)</sys:String>
+    <sys:String x:Key="Setting_GifPalette_Vivid">Vivid (256 colors / dither 0.5)</sys:String>
 
     <!-- Snackbar : File Loading -->
     <sys:String x:Key="Msg_LoadingFile">Loading files...</sys:String>

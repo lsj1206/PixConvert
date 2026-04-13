@@ -111,6 +111,8 @@
     <sys:String x:Key="Setting_BackgroundColor">배경 색</sys:String>
     <sys:String x:Key="Setting_CompressionLevel">압축</sys:String>
     <sys:String x:Key="Setting_EncodingEffort">인코딩 강도</sys:String>
+    <sys:String x:Key="Setting_InterframeMaxError">프레임 차이 허용값</sys:String>
+    <sys:String x:Key="Setting_InterpaletteMaxError">색상 차이 허용값</sys:String>
     <!-- 변환 설정 : 배경색 -->
     <sys:String x:Key="Bg_White">흰색</sys:String>
     <sys:String x:Key="Bg_Black">검은색</sys:String>
@@ -136,6 +138,13 @@
     <sys:String x:Key="Setting_BitDepth_8">8-bit</sys:String>
     <sys:String x:Key="Setting_BitDepth_10">10-bit</sys:String>
     <sys:String x:Key="Setting_BitDepth_12">12-bit</sys:String>
+    <!-- 변환 설정 : GIF 색상 표현 -->
+    <sys:String x:Key="Setting_PalettePreset">색상 표현</sys:String>
+    <sys:String x:Key="Setting_GifPalette_Minimal">최소 (64색 / 무보정)</sys:String>
+    <sys:String x:Key="Setting_GifPalette_Simple">단순 (128색 / 디더링 0.3)</sys:String>
+    <sys:String x:Key="Setting_GifPalette_Standard">표준 (256색 / 무보정)</sys:String>
+    <sys:String x:Key="Setting_GifPalette_Balance">균형 (256색 / 디더링 0.3)</sys:String>
+    <sys:String x:Key="Setting_GifPalette_Vivid">풍부 (256색 / 디더링 0.5)</sys:String>
 
     <!-- 스낵바 : 파일 불러오기 -->
     <sys:String x:Key="Msg_LoadingFile">파일 불러오는 중...</sys:String>

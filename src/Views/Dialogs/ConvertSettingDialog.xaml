@@ -536,6 +536,93 @@
                             ui:ControlHelper.PlaceholderText="90" />
                     </StackPanel>
                 </StackPanel>
+
+                <StackPanel
+                    Margin="0,8,0,0"
+                    Orientation="Horizontal"
+                    Visibility="{Binding AnimationShowGifPalettePreset, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <TextBlock
+                        Margin="0,0,12,1"
+                        VerticalAlignment="Center"
+                        FontWeight="SemiBold"
+                        Text="{DynamicResource Setting_PalettePreset}" />
+                    <ComboBox
+                        Width="220"
+                        SelectedValuePath="Tag"
+                        SelectedValue="{Binding AnimationGifPalettePreset}">
+                        <ComboBoxItem Content="{DynamicResource Setting_GifPalette_Minimal}" Tag="{x:Static model:GifPalettePreset.Minimal}" />
+                        <ComboBoxItem Content="{DynamicResource Setting_GifPalette_Simple}" Tag="{x:Static model:GifPalettePreset.Simple}" />
+                        <ComboBoxItem Content="{DynamicResource Setting_GifPalette_Standard}" Tag="{x:Static model:GifPalettePreset.Standard}" />
+                        <ComboBoxItem Content="{DynamicResource Setting_GifPalette_Balance}" Tag="{x:Static model:GifPalettePreset.Balance}" />
+                        <ComboBoxItem Content="{DynamicResource Setting_GifPalette_Vivid}" Tag="{x:Static model:GifPalettePreset.Vivid}" />
+                    </ComboBox>
+                </StackPanel>
+
+                <StackPanel
+                    Margin="0,8,0,0"
+                    Orientation="Horizontal"
+                    Visibility="{Binding AnimationShowGifInterframeMaxError, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <TextBlock
+                        Margin="0,0,12,4"
+                        VerticalAlignment="Center"
+                        FontWeight="SemiBold"
+                        Text="{DynamicResource Setting_InterframeMaxError}" />
+                    <StackPanel Orientation="Horizontal">
+                        <Slider
+                            Margin="0,0,8,0"
+                            Width="150"
+                            Maximum="32"
+                            Minimum="0"
+                            IsSnapToTickEnabled="True"
+                            SmallChange="0.01"
+                            TickFrequency="0.01"
+                            Value="{Binding AnimationGifInterframeMaxError}" />
+                        <ctrls:FilterTextBox
+                            Width="56"
+                            VerticalAlignment="Center"
+                            IsBlank="0"
+                            Filter="Decimal"
+                            FilterMode="Allow"
+                            FilterMaxLength="5"
+                            DecimalMaxValue="32"
+                            DecimalPlaces="2"
+                            Text="{Binding AnimationGifInterframeMaxErrorText, UpdateSourceTrigger=PropertyChanged}"
+                            ui:TextBoxHelper.IsDeleteButtonVisible="False" />
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel
+                    Margin="0,8,0,0"
+                    Orientation="Horizontal"
+                    Visibility="{Binding AnimationShowGifInterpaletteMaxError, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <TextBlock
+                        Margin="0,0,12,4"
+                        VerticalAlignment="Center"
+                        FontWeight="SemiBold"
+                        Text="{DynamicResource Setting_InterpaletteMaxError}" />
+                    <StackPanel Orientation="Horizontal">
+                        <Slider
+                            Margin="0,0,8,0"
+                            Width="150"
+                            Maximum="32"
+                            Minimum="0"
+                            IsSnapToTickEnabled="True"
+                            SmallChange="0.01"
+                            TickFrequency="0.01"
+                            Value="{Binding AnimationGifInterpaletteMaxError}" />
+                        <ctrls:FilterTextBox
+                            Width="56"
+                            VerticalAlignment="Center"
+                            IsBlank="0"
+                            Filter="Decimal"
+                            FilterMode="Allow"
+                            FilterMaxLength="5"
+                            DecimalMaxValue="32"
+                            DecimalPlaces="2"
+                            Text="{Binding AnimationGifInterpaletteMaxErrorText, UpdateSourceTrigger=PropertyChanged}"
+                            ui:TextBoxHelper.IsDeleteButtonVisible="False" />
+                    </StackPanel>
+                </StackPanel>
             </StackPanel>
 
             <Separator Margin="0,12,0,0"

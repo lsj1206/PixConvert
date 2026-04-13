@@ -19,7 +19,10 @@ public enum SettingOptionKey
     PngFilter,
     AvifChromaSubsampling,
     AvifEncodingEffort,
-    AvifBitDepth
+    AvifBitDepth,
+    GifPalettePreset,
+    GifInterframeMaxError,
+    GifInterpaletteMaxError
 }
 
 public sealed record SettingOptionDefinition(
@@ -77,7 +80,19 @@ public static class SettingOptionCatalog
         new(
             SettingOptionSection.Animation,
             SettingOptionKey.Quality,
-            new[] { "WEBP" })
+            new[] { "WEBP" }),
+        new(
+            SettingOptionSection.Animation,
+            SettingOptionKey.GifPalettePreset,
+            new[] { "GIF" }),
+        new(
+            SettingOptionSection.Animation,
+            SettingOptionKey.GifInterframeMaxError,
+            new[] { "GIF" }),
+        new(
+            SettingOptionSection.Animation,
+            SettingOptionKey.GifInterpaletteMaxError,
+            new[] { "GIF" })
     ];
 
     public static bool Supports(SettingOptionSection section, SettingOptionKey key, string? targetFormat)

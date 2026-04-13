@@ -158,7 +158,7 @@ public class NetVipsProvider : IProviderService, IDisposable
                 SaveAvif(image, outputPath, settings, isAnimation, quality, lossless);
                 return;
             case "GIF":
-                image.Gifsave(outputPath, keep: Enums.ForeignKeep.None);
+                SaveGif(image, outputPath, settings, isAnimation);
                 return;
             default:
                 throw new NotSupportedException($"NetVipsProviderì—ì„œ ì§€ì›í•˜ì§€ ì•ŠëŠ” ëŒ€ìƒ í¬ë§·: {targetFormat}");
@@ -191,6 +191,19 @@ public class NetVipsProvider : IProviderService, IDisposable
             compression: Enums.ForeignHeifCompression.Av1,
             effort: effort,
             subsampleMode: subsampleMode,
+            keep: Enums.ForeignKeep.None);
+    }
+
+    private static void SaveGif(Image image, string outputPath, ConvertSettings settings, bool isAnimation)
+    {
+        var (dither, bitDepth) = ResolveGifPalettePreset(settings, isAnimation);
+
+        image.Gifsave(
+            outputPath,
+            dither: dither,
+            bitdepth: bitDepth,
+            interframeMaxerror: ResolveGifInterframeMaxError(settings, isAnimation),
+            interpaletteMaxerror: ResolveGifInterpaletteMaxError(settings, isAnimation),
             keep: Enums.ForeignKeep.None);
     }
 
@@ -331,6 +344,27 @@ public class NetVipsProvider : IProviderService, IDisposable
             _ => null
         };
     }
+
+    private static (double Dither, int BitDepth) ResolveGifPalettePreset(ConvertSettings settings, bool isAnimation)
+    {
+        if (!isAnimation)
+            return (0.0, 8);
+
+        return settings.AnimationGifPalettePreset switch
+        {
+            GifPalettePreset.Vivid => (0.5, 8),
+            GifPalettePreset.Balance => (0.3, 8),
+            GifPalettePreset.Simple => (0.3, 7),
+            GifPalettePreset.Minimal => (0.0, 6),
+            _ => (0.0, 8)
+        };
+    }
+
+    private static double ResolveGifInterframeMaxError(ConvertSettings settings, bool isAnimation) =>
+        isAnimation ? settings.AnimationGifInterframeMaxError : 0.0;
+
+    private static double ResolveGifInterpaletteMaxError(ConvertSettings settings, bool isAnimation) =>
+        isAnimation ? settings.AnimationGifInterpaletteMaxError : 0.0;
 
     private static Image LoadBmpViaSkia(string path)
     {

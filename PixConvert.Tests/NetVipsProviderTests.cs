@@ -176,6 +176,32 @@ public class NetVipsProviderTests : IDisposable
     }
 
     [Fact]
+    public async Task ConvertAsync_GifToGif_WithCustomGifOptions_ShouldProduceValidFile()
+    {
+        string gifPath = CreateAnimatedGif(3);
+        var file = new FileItem { Path = gifPath, FileSignature = "GIF", IsAnimation = true };
+        var settings = new ConvertSettings
+        {
+            AnimationTargetFormat = "GIF",
+            AnimationGifPalettePreset = GifPalettePreset.Simple,
+            AnimationGifInterframeMaxError = 4.0,
+            AnimationGifInterpaletteMaxError = 2.0,
+            SaveLocation = SaveLocationType.SameAsOriginal,
+            FolderMethod = SaveFolderMethod.NoFolder,
+            OverwritePolicy = OverwritePolicy.Suffix
+        };
+
+        await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
+
+        string expectedPath = Path.Combine(_testDir, "animated_1.gif");
+        Assert.True(File.Exists(expectedPath));
+        Assert.Equal(FileConvertStatus.Success, file.Status);
+
+        using var output = NetVips.Image.NewFromFile(expectedPath);
+        Assert.NotNull(output);
+    }
+
+    [Fact]
     public async Task ConvertAsync_WhenAlphaAndJpegTarget_ShouldFlattenBackground()
     {
         var file = new FileItem { Path = _inputPath, FileSignature = "PNG" };

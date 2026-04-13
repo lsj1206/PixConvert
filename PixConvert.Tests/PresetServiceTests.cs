@@ -280,6 +280,73 @@ public class PresetServiceTests
             Assert.True(string.IsNullOrEmpty(errorKey));
     }
 
+    [Theory]
+    [InlineData(-0.1, false)]
+    [InlineData(0.0, true)]
+    [InlineData(16.0, true)]
+    [InlineData(32.0, true)]
+    [InlineData(32.1, false)]
+    public void ValidPresetData_ShouldValidateAnimationGifInterframeMaxError(double value, bool expected)
+    {
+        var settings = new ConvertSettings
+        {
+            StandardTargetFormat = "JPEG",
+            AnimationTargetFormat = "GIF",
+            StandardBackgroundColor = "#FFFFFF",
+            AnimationGifInterframeMaxError = value
+        };
+
+        var result = _presetService.ValidPresetData(settings, out string errorKey);
+
+        Assert.Equal(expected, result);
+        if (!expected)
+            Assert.Equal("Msg_Error_ConfigInvalid", errorKey);
+        else
+            Assert.True(string.IsNullOrEmpty(errorKey));
+    }
+
+    [Theory]
+    [InlineData(-0.1, false)]
+    [InlineData(0.0, true)]
+    [InlineData(16.0, true)]
+    [InlineData(32.0, true)]
+    [InlineData(32.1, false)]
+    public void ValidPresetData_ShouldValidateAnimationGifInterpaletteMaxError(double value, bool expected)
+    {
+        var settings = new ConvertSettings
+        {
+            StandardTargetFormat = "JPEG",
+            AnimationTargetFormat = "GIF",
+            StandardBackgroundColor = "#FFFFFF",
+            AnimationGifInterpaletteMaxError = value
+        };
+
+        var result = _presetService.ValidPresetData(settings, out string errorKey);
+
+        Assert.Equal(expected, result);
+        if (!expected)
+            Assert.Equal("Msg_Error_ConfigInvalid", errorKey);
+        else
+            Assert.True(string.IsNullOrEmpty(errorKey));
+    }
+
+    [Fact]
+    public void ValidPresetData_WhenGifPalettePresetEnumIsInvalid_ShouldReturnFalse()
+    {
+        var settings = new ConvertSettings
+        {
+            StandardTargetFormat = "JPEG",
+            AnimationTargetFormat = "GIF",
+            StandardBackgroundColor = "#FFFFFF",
+            AnimationGifPalettePreset = (GifPalettePreset)999
+        };
+
+        var result = _presetService.ValidPresetData(settings, out string errorKey);
+
+        Assert.False(result);
+        Assert.Equal("Msg_Error_ConfigInvalid", errorKey);
+    }
+
     [Fact]
     public void AddPreset_WhenNewName_ShouldIncreaseCount()
     {

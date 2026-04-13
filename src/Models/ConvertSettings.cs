@@ -41,6 +41,15 @@ public class ConvertSettings
     /// <summary>애니메이션 이미지 무손실 인코딩 여부. 현재 WEBP에 적용됩니다.</summary>
     public bool AnimationLossless { get; set; }
 
+    /// <summary>애니메이션 GIF 팔레트 프리셋입니다.</summary>
+    public GifPalettePreset AnimationGifPalettePreset { get; set; } = GifPalettePreset.Standard;
+
+    /// <summary>GIF 프레임 간 차이 허용값입니다.</summary>
+    public double AnimationGifInterframeMaxError { get; set; }
+
+    /// <summary>GIF 팔레트 간 차이 허용값입니다.</summary>
+    public double AnimationGifInterpaletteMaxError { get; set; }
+
     /// <summary>동일한 이름의 파일이 존재할 경우 처리 방침</summary>
     public OverwritePolicy OverwritePolicy { get; set; } = OverwritePolicy.Suffix;
 
@@ -76,3 +85,5 @@ public enum PngFilterMode { Adaptive, None, Sub, Up, Average, Paeth }
 public enum AvifChromaSubsamplingMode { Auto, On, Off }
 
 public enum AvifBitDepthMode { Auto, Bit8, Bit10, Bit12 }
+
+public enum GifPalettePreset { Minimal, Simple, Standard, Balance, Vivid }

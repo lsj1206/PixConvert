@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using Microsoft.Extensions.Logging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -35,6 +36,11 @@ public partial class ConvertSettingViewModel : ViewModelBase
     [ObservableProperty] private string _standardCustomBackgroundColor = "#FFFFFF";
     [ObservableProperty] private int _animationQuality = 85;
     [ObservableProperty] private bool _animationLossless;
+    [ObservableProperty] private GifPalettePreset _animationGifPalettePreset = GifPalettePreset.Standard;
+    [ObservableProperty] private double _animationGifInterframeMaxError;
+    [ObservableProperty] private double _animationGifInterpaletteMaxError;
+    [ObservableProperty] private string _animationGifInterframeMaxErrorText = "0";
+    [ObservableProperty] private string _animationGifInterpaletteMaxErrorText = "0";
     [ObservableProperty] private OverwritePolicy _overwritePolicy = OverwritePolicy.Suffix;
     [ObservableProperty] private SaveLocationType _saveLocation = SaveLocationType.SameAsOriginal;
     [ObservableProperty] private SaveFolderMethod _folderMethod = SaveFolderMethod.CreateFolder;
@@ -93,6 +99,18 @@ public partial class ConvertSettingViewModel : ViewModelBase
         ShowAnimationOptionsSection &&
         SettingOptionCatalog.Supports(SettingOptionSection.Animation, SettingOptionKey.Quality, AnimationTargetFormat) &&
         !(AnimationShowLossless && AnimationLossless);
+
+    public bool AnimationShowGifPalettePreset =>
+        ShowAnimationOptionsSection &&
+        SettingOptionCatalog.Supports(SettingOptionSection.Animation, SettingOptionKey.GifPalettePreset, AnimationTargetFormat);
+
+    public bool AnimationShowGifInterframeMaxError =>
+        ShowAnimationOptionsSection &&
+        SettingOptionCatalog.Supports(SettingOptionSection.Animation, SettingOptionKey.GifInterframeMaxError, AnimationTargetFormat);
+
+    public bool AnimationShowGifInterpaletteMaxError =>
+        ShowAnimationOptionsSection &&
+        SettingOptionCatalog.Supports(SettingOptionSection.Animation, SettingOptionKey.GifInterpaletteMaxError, AnimationTargetFormat);
 
     public ConvertSettingViewModel(
         ILanguageService languageService,
@@ -154,6 +172,44 @@ public partial class ConvertSettingViewModel : ViewModelBase
         int coerced = Math.Clamp(value, 0, 9);
         if (value != coerced)
             StandardAvifEncodingEffort = coerced;
+    }
+
+    partial void OnAnimationGifInterframeMaxErrorChanged(double value)
+    {
+        double coerced = CoerceGifErrorValue(value);
+        if (Math.Abs(value - coerced) > double.Epsilon)
+        {
+            AnimationGifInterframeMaxError = coerced;
+            return;
+        }
+
+        string formatted = FormatGifErrorValue(coerced);
+        if (!AnimationGifInterframeMaxErrorText.Equals(formatted, StringComparison.Ordinal))
+            AnimationGifInterframeMaxErrorText = formatted;
+    }
+
+    partial void OnAnimationGifInterpaletteMaxErrorChanged(double value)
+    {
+        double coerced = CoerceGifErrorValue(value);
+        if (Math.Abs(value - coerced) > double.Epsilon)
+        {
+            AnimationGifInterpaletteMaxError = coerced;
+            return;
+        }
+
+        string formatted = FormatGifErrorValue(coerced);
+        if (!AnimationGifInterpaletteMaxErrorText.Equals(formatted, StringComparison.Ordinal))
+            AnimationGifInterpaletteMaxErrorText = formatted;
+    }
+
+    partial void OnAnimationGifInterframeMaxErrorTextChanged(string value)
+    {
+        ApplyGifErrorText(value, true);
+    }
+
+    partial void OnAnimationGifInterpaletteMaxErrorTextChanged(string value)
+    {
+        ApplyGifErrorText(value, false);
     }
 
     partial void OnStandardTargetFormatChanged(string value) => OnTargetFormatsChanged();
@@ -219,6 +275,11 @@ public partial class ConvertSettingViewModel : ViewModelBase
 
         AnimationQuality = settings.AnimationQuality;
         AnimationLossless = settings.AnimationLossless;
+        AnimationGifPalettePreset = settings.AnimationGifPalettePreset;
+        AnimationGifInterframeMaxError = settings.AnimationGifInterframeMaxError;
+        AnimationGifInterpaletteMaxError = settings.AnimationGifInterpaletteMaxError;
+        AnimationGifInterframeMaxErrorText = FormatGifErrorValue(AnimationGifInterframeMaxError);
+        AnimationGifInterpaletteMaxErrorText = FormatGifErrorValue(AnimationGifInterpaletteMaxError);
 
         OverwritePolicy = settings.OverwritePolicy;
         SaveLocation = settings.SaveLocation;
@@ -251,6 +312,9 @@ public partial class ConvertSettingViewModel : ViewModelBase
 
         settings.AnimationQuality = AnimationQuality;
         settings.AnimationLossless = AnimationLossless;
+        settings.AnimationGifPalettePreset = AnimationGifPalettePreset;
+        settings.AnimationGifInterframeMaxError = AnimationGifInterframeMaxError;
+        settings.AnimationGifInterpaletteMaxError = AnimationGifInterpaletteMaxError;
 
         settings.OverwritePolicy = OverwritePolicy;
         settings.SaveLocation = SaveLocation;
@@ -328,6 +392,9 @@ public partial class ConvertSettingViewModel : ViewModelBase
         OnPropertyChanged(nameof(ShowAnimationOptionsSection));
         OnPropertyChanged(nameof(AnimationShowLossless));
         OnPropertyChanged(nameof(AnimationShowQuality));
+        OnPropertyChanged(nameof(AnimationShowGifPalettePreset));
+        OnPropertyChanged(nameof(AnimationShowGifInterframeMaxError));
+        OnPropertyChanged(nameof(AnimationShowGifInterpaletteMaxError));
     }
 
     private void HandleStandardTagSelectionChanged(FormatTagViewModel tag)
@@ -429,6 +496,55 @@ public partial class ConvertSettingViewModel : ViewModelBase
             BackgroundColorOption.Black => "#000000",
             _ => customColor
         };
+    }
+
+    private static double CoerceGifErrorValue(double value)
+    {
+        double clamped = Math.Clamp(value, 0.0, 32.0);
+        return Math.Round(clamped, 2, MidpointRounding.AwayFromZero);
+    }
+
+    private static bool TryParseGifErrorText(string? value, out double parsed)
+    {
+        parsed = 0.0;
+
+        if (string.IsNullOrWhiteSpace(value) || value.EndsWith(".", StringComparison.Ordinal))
+            return false;
+
+        if (!double.TryParse(
+                value,
+                NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite,
+                CultureInfo.InvariantCulture,
+                out double raw))
+        {
+            return false;
+        }
+
+        parsed = CoerceGifErrorValue(raw);
+        return true;
+    }
+
+    private static string FormatGifErrorValue(double value) =>
+        CoerceGifErrorValue(value).ToString("0.##", CultureInfo.InvariantCulture);
+
+    private void ApplyGifErrorText(string value, bool isInterframe)
+    {
+        if (!TryParseGifErrorText(value, out double parsed))
+            return;
+
+        string formatted = FormatGifErrorValue(parsed);
+        if (!value.Equals(formatted, StringComparison.Ordinal))
+        {
+            if (isInterframe)
+                AnimationGifInterframeMaxErrorText = formatted;
+            else
+                AnimationGifInterpaletteMaxErrorText = formatted;
+        }
+
+        if (isInterframe)
+            AnimationGifInterframeMaxError = parsed;
+        else
+            AnimationGifInterpaletteMaxError = parsed;
     }
 }
 
