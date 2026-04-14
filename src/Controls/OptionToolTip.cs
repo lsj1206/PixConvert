@@ -27,7 +27,7 @@ public class OptionToolTip : StackPanel
 
         _titleText = CreateTextBlock(fontSize: 12);
         _bodyText = CreateTextBlock(fontSize: 12);
-        _cautionText = CreateTextBlock(fontSize: 12);
+        _cautionText = CreateTextBlock(fontSize: 11);
 
         _bodyText.Margin = new Thickness(0, 2, 0, 0);
         _cautionText.Margin = new Thickness(0, 2, 0, 0);

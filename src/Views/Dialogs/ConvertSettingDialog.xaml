@@ -358,7 +358,8 @@
                             <ToolTip>
                                 <ctrls:OptionToolTip
                                     Title="{DynamicResource SettingTip_JpegChromaSubsampling_Title}"
-                                    Body="{DynamicResource SettingTip_JpegChromaSubsampling_Body}" />
+                                    Body="{DynamicResource SettingTip_JpegChromaSubsampling_Body}"
+                                    Caution="{DynamicResource SettingTip_JpegChromaSubsampling_Caution}" />
                             </ToolTip>
                         </Button.ToolTip>
                         <ui:FontIcon FontSize="12" Glyph="&#xE946;" />
@@ -367,19 +368,19 @@
                 <StackPanel Orientation="Horizontal">
                     <RadioButton
                         MinWidth="90"
-                        Content="{DynamicResource Setting_Subsampling_Auto}"
+                        Content="{DynamicResource Setting_Subsampling_444}"
                         GroupName="StandardJpegSubsamplingGroup"
-                        IsChecked="{Binding StandardJpegChromaSubsampling, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Auto}" />
+                        IsChecked="{Binding StandardJpegChromaSubsampling, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Chroma444}" />
+                    <RadioButton
+                        MinWidth="90"
+                        Content="{DynamicResource Setting_Subsampling_422}"
+                        GroupName="StandardJpegSubsamplingGroup"
+                        IsChecked="{Binding StandardJpegChromaSubsampling, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Chroma422}" />
                     <RadioButton
                         MinWidth="90"
                         Content="{DynamicResource Setting_Subsampling_420}"
                         GroupName="StandardJpegSubsamplingGroup"
                         IsChecked="{Binding StandardJpegChromaSubsampling, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Chroma420}" />
-                    <RadioButton
-                        MinWidth="90"
-                        Content="{DynamicResource Setting_Subsampling_444}"
-                        GroupName="StandardJpegSubsamplingGroup"
-                        IsChecked="{Binding StandardJpegChromaSubsampling, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Chroma444}" />
                 </StackPanel>
             </StackPanel>
 

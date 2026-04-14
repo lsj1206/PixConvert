@@ -108,6 +108,25 @@ public class NetVipsProviderTests : IDisposable
     }
 
     [Fact]
+    public async Task ConvertAsync_WhenTargetIsJpegWith422Subsampling_ShouldWork()
+    {
+        var file = new FileItem { Path = _inputPath, FileSignature = "PNG" };
+        var settings = new ConvertSettings
+        {
+            StandardTargetFormat = "JPEG",
+            StandardJpegChromaSubsampling = JpegChromaSubsamplingMode.Chroma422,
+            SaveLocation = SaveLocationType.SameAsOriginal,
+            FolderMethod = SaveFolderMethod.NoFolder
+        };
+
+        await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
+
+        string expectedPath = Path.Combine(_testDir, "input.jpg");
+        Assert.True(File.Exists(expectedPath));
+        Assert.Equal(FileConvertStatus.Success, file.Status);
+    }
+
+    [Fact]
     public async Task ConvertAsync_WhenTargetIsPngWithCustomCompression_ShouldWork()
     {
         var file = new FileItem { Path = _inputPath, FileSignature = "PNG" };

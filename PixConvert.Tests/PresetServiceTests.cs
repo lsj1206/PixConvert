@@ -220,6 +220,14 @@ public class PresetServiceTests
     }
 
     [Fact]
+    public void ConvertSettings_DefaultJpegSubsampling_ShouldBe444()
+    {
+        var settings = new ConvertSettings();
+
+        Assert.Equal(JpegChromaSubsamplingMode.Chroma444, settings.StandardJpegChromaSubsampling);
+    }
+
+    [Fact]
     public void ValidPresetData_WhenAvifOptionsAreValid_ShouldReturnTrue()
     {
         var settings = new ConvertSettings

@@ -195,7 +195,7 @@ public class SkiaSharpProvider : IProviderService, IDisposable
         int quality = GetQuality(settings, isAnimation);
         var options = new SKJpegEncoderOptions(
             quality,
-            ResolveJpegDownsample(settings, isAnimation, quality),
+            ResolveJpegDownsample(settings, isAnimation),
             SKJpegEncoderAlphaOption.Ignore);
 
         return pixmap.Encode(options)
@@ -236,16 +236,17 @@ public class SkiaSharpProvider : IProviderService, IDisposable
     private static bool GetLossless(ConvertSettings settings, bool isAnimation) =>
         isAnimation ? settings.AnimationLossless : settings.StandardLossless;
 
-    private static SKJpegEncoderDownsample ResolveJpegDownsample(ConvertSettings settings, bool isAnimation, int quality)
+    private static SKJpegEncoderDownsample ResolveJpegDownsample(ConvertSettings settings, bool isAnimation)
     {
         if (isAnimation)
-            return quality >= 90 ? SKJpegEncoderDownsample.Downsample444 : SKJpegEncoderDownsample.Downsample420;
+            return SKJpegEncoderDownsample.Downsample444;
 
         return settings.StandardJpegChromaSubsampling switch
         {
             JpegChromaSubsamplingMode.Chroma420 => SKJpegEncoderDownsample.Downsample420,
+            JpegChromaSubsamplingMode.Chroma422 => SKJpegEncoderDownsample.Downsample422,
             JpegChromaSubsamplingMode.Chroma444 => SKJpegEncoderDownsample.Downsample444,
-            _ => quality >= 90 ? SKJpegEncoderDownsample.Downsample444 : SKJpegEncoderDownsample.Downsample420
+            _ => SKJpegEncoderDownsample.Downsample444
         };
     }
 

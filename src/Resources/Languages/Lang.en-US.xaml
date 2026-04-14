@@ -123,8 +123,9 @@ Actual parallelism depends on the number of CPU cores and threads.</sys:String>
     <sys:String x:Key="SettingTip_StandardLossless_Title">Lossless</sys:String>
     <sys:String x:Key="SettingTip_StandardQuality_Title">Quality</sys:String>
     <sys:String x:Key="SettingTip_JpegChromaSubsampling_Title">Chroma Subsampling</sys:String>
-    <sys:String x:Key="SettingTip_JpegChromaSubsampling_Body" xml:space="preserve">Sets JPEG color resolution. 4:4:4 preserves color information.
-4:2:0 reduces color information horizontally and vertically to reduce file size.</sys:String>
+    <sys:String x:Key="SettingTip_JpegChromaSubsampling_Body" xml:space="preserve">4:4:4 preserves full chroma resolution and is the default.
+4:2:2 reduces chroma resolution horizontally to save space.
+4:2:0 reduces chroma resolution horizontally and vertically to save more space.</sys:String>
     <sys:String x:Key="SettingTip_PngCompression_Title">PNG Compression</sys:String>
     <sys:String x:Key="SettingTip_PngCompression_Body" xml:space="preserve">Changes compression time and file size without changing pixel quality.
 0 is fast and can be larger, while 9 is slower but may be smaller.</sys:String>
@@ -176,6 +177,7 @@ Higher values may reduce file size by merging palettes more aggressively.</sys:S
     <sys:String x:Key="Setting_ChromaSubsampling">Chroma Subsampling</sys:String>
     <sys:String x:Key="Setting_Subsampling_Auto">Auto</sys:String>
     <sys:String x:Key="Setting_Subsampling_420">4:2:0</sys:String>
+    <sys:String x:Key="Setting_Subsampling_422">4:2:2</sys:String>
     <sys:String x:Key="Setting_Subsampling_444">4:4:4</sys:String>
     <sys:String x:Key="Setting_Subsampling_On">On</sys:String>
     <sys:String x:Key="Setting_Subsampling_Off">Off</sys:String>

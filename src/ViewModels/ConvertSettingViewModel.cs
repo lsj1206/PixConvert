@@ -26,7 +26,7 @@ public partial class ConvertSettingViewModel : ViewModelBase
     [ObservableProperty] private string? _animationTargetFormat = "GIF";
     [ObservableProperty] private int _standardQuality = 85;
     [ObservableProperty] private bool _standardLossless;
-    [ObservableProperty] private JpegChromaSubsamplingMode _standardJpegChromaSubsampling = JpegChromaSubsamplingMode.Auto;
+    [ObservableProperty] private JpegChromaSubsamplingMode _standardJpegChromaSubsampling = JpegChromaSubsamplingMode.Chroma444;
     [ObservableProperty] private int _standardPngCompressionLevel = 6;
     [ObservableProperty] private AvifChromaSubsamplingMode _standardAvifChromaSubsampling = AvifChromaSubsamplingMode.Auto;
     [ObservableProperty] private int _standardAvifEncodingEffort = 4;

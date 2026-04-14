@@ -122,8 +122,10 @@
     <sys:String x:Key="SettingTip_StandardLossless_Title">무손실/손실 압축을 설정합니다.</sys:String>
     <sys:String x:Key="SettingTip_StandardQuality_Title">손실 압축의 품질을 설정합니다.</sys:String>
     <sys:String x:Key="SettingTip_JpegChromaSubsampling_Title">밝기 해상도 대비 색차 해상도를 설정합니다.</sys:String>
-    <sys:String x:Key="SettingTip_JpegChromaSubsampling_Body" xml:space="preserve">4:4:4 : 밝기와 색차가 모두 같은 해상도로, 색상 정보를 최대한 보존합니다.
-4:2:0 : 색상 정보를 가로/세로 방향으로 줄여 용량을 줄입니다.</sys:String>
+    <sys:String x:Key="SettingTip_JpegChromaSubsampling_Body" xml:space="preserve">• 4:4:4는 밝기와 색차가 같은 해상도를 유지합니다.
+• 4:2:2는 가로 방향 색차 해상도를 줄입니다.
+• 4:2:0는 가로/세로 방향 색차 해상도를 줄입니다.</sys:String>
+    <sys:String x:Key="SettingTip_JpegChromaSubsampling_Caution">⚠️AVIF->JPEG 변환 시 4:2:2는 품질에 따라 4:4:4 혹은 4:2:0으로 적용됩니다.</sys:String>
     <sys:String x:Key="SettingTip_PngCompression_Title">PNG 압축</sys:String>
     <sys:String x:Key="SettingTip_PngCompression_Body" xml:space="preserve">픽셀 품질은 바꾸지 않고 압축 시간과 파일 크기만 조절합니다.
 0은 빠르고 파일이 클 수 있으며, 9는 느리지만 더 작아질 수 있습니다.</sys:String>
@@ -175,6 +177,7 @@
     <sys:String x:Key="Setting_ChromaSubsampling">색차 서브샘플링</sys:String>
     <sys:String x:Key="Setting_Subsampling_Auto">자동</sys:String>
     <sys:String x:Key="Setting_Subsampling_420">4:2:0</sys:String>
+    <sys:String x:Key="Setting_Subsampling_422">4:2:2</sys:String>
     <sys:String x:Key="Setting_Subsampling_444">4:4:4</sys:String>
     <sys:String x:Key="Setting_Subsampling_On">사용</sys:String>
     <sys:String x:Key="Setting_Subsampling_Off">미사용</sys:String>
@@ -240,11 +243,11 @@
     <!-- 변환 취소 -->
     <sys:String x:Key="Dlg_Title_CancelConvert">변환 취소</sys:String>
     <sys:String x:Key="Dlg_Ask_CancelConvert">변환 작업을 취소하시겠습니까?</sys:String>
-    <sys:String x:Key="Dlg_Warn_CancelConvert">⚠️ 이미 변환 중인 작업은 취소되지 않습니다.</sys:String>
+    <sys:String x:Key="Dlg_Warn_CancelConvert">⚠️이미 변환 중인 작업은 취소되지 않습니다.</sys:String>
     <!-- 번호 재정렬 -->
     <sys:String x:Key="Dlg_Title_ReorderIndex">번호 재정렬</sys:String>
     <sys:String x:Key="Dlg_Ask_ReorderIndex">번호를 현재 순서대로 정렬하시겠습니까?</sys:String>
-    <sys:String x:Key="Dlg_Warn_ReorderIndex">⚠️ 기존 번호는 초기화됩니다.</sys:String>
+    <sys:String x:Key="Dlg_Warn_ReorderIndex">⚠️기존 번호는 초기화됩니다.</sys:String>
     <!-- 목록 삭제 -->
     <sys:String x:Key="Dlg_Title_ClearList">목록 청소</sys:String>
     <sys:String x:Key="Dlg_Ask_ClearList">목록을 전부 삭제하시겠습니까?</sys:String>

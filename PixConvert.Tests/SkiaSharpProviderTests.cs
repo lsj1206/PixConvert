@@ -188,6 +188,26 @@ public class SkiaSharpProviderTests : IDisposable
     }
 
     [Fact]
+    public async Task ConvertAsync_WhenJpegSubsamplingIs422_ShouldConvertSuccessfully()
+    {
+        var file = new FileItem { Path = _inputPath, FileSignature = "PNG" };
+        var settings = new ConvertSettings
+        {
+            StandardTargetFormat = "JPEG",
+            StandardQuality = 95,
+            StandardJpegChromaSubsampling = JpegChromaSubsamplingMode.Chroma422,
+            SaveLocation = SaveLocationType.SameAsOriginal,
+            FolderMethod = SaveFolderMethod.NoFolder
+        };
+
+        await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
+
+        string outputPath = Path.Combine(_testDir, "input.jpg");
+        Assert.True(File.Exists(outputPath));
+        Assert.Equal(FileConvertStatus.Success, file.Status);
+    }
+
+    [Fact]
     public async Task ConvertAsync_WhenPngCompressionIsCustomized_ShouldConvertSuccessfully()
     {
         var file = new FileItem { Path = _inputPath, FileSignature = "PNG" };

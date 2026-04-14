@@ -20,7 +20,7 @@ public class ConvertSettings
     /// <summary>일반 이미지 무손실 인코딩 여부. WEBP / AVIF에 적용됩니다.</summary>
     public bool StandardLossless { get; set; }
 
-    public JpegChromaSubsamplingMode StandardJpegChromaSubsampling { get; set; } = JpegChromaSubsamplingMode.Auto;
+    public JpegChromaSubsamplingMode StandardJpegChromaSubsampling { get; set; } = JpegChromaSubsamplingMode.Chroma444;
 
     public int StandardPngCompressionLevel { get; set; } = 6;
 
@@ -82,7 +82,12 @@ public enum SaveFolderMethod { NoFolder, CreateFolder }
 /// <summary>출력 저장 위치 유형</summary>
 public enum SaveLocationType { SameAsOriginal, Custom }
 
-public enum JpegChromaSubsamplingMode { Auto, Chroma420, Chroma444 }
+public enum JpegChromaSubsamplingMode
+{
+    Chroma444,
+    Chroma422,
+    Chroma420
+}
 
 public enum AvifChromaSubsamplingMode { Auto, On, Off }
 

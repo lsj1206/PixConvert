@@ -137,7 +137,7 @@ public class NetVipsProvider : IProviderService, IDisposable
                 image.Jpegsave(
                     outputPath,
                     q: quality,
-                    subsampleMode: ResolveJpegSubsampleMode(settings, isAnimation, quality),
+                    subsampleMode: ResolveJpegSubsampleMode(settings, isAnimation),
                     keep: Enums.ForeignKeep.None);
                 return;
             case "PNG":
@@ -335,16 +335,17 @@ public class NetVipsProvider : IProviderService, IDisposable
     private static bool GetLossless(ConvertSettings settings, bool isAnimation) =>
         isAnimation ? settings.AnimationLossless : settings.StandardLossless;
 
-    private static Enums.ForeignSubsample ResolveJpegSubsampleMode(ConvertSettings settings, bool isAnimation, int quality)
+    private static Enums.ForeignSubsample ResolveJpegSubsampleMode(ConvertSettings settings, bool isAnimation)
     {
         if (isAnimation)
-            return quality >= 90 ? Enums.ForeignSubsample.Off : Enums.ForeignSubsample.On;
+            return Enums.ForeignSubsample.Off;
 
         return settings.StandardJpegChromaSubsampling switch
         {
             JpegChromaSubsamplingMode.Chroma420 => Enums.ForeignSubsample.On,
             JpegChromaSubsamplingMode.Chroma444 => Enums.ForeignSubsample.Off,
-            _ => Enums.ForeignSubsample.Auto
+            JpegChromaSubsamplingMode.Chroma422 => Enums.ForeignSubsample.Auto,
+            _ => Enums.ForeignSubsample.Off
         };
     }
 
