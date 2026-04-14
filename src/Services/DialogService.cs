@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ namespace PixConvert.Services;
 public class DialogService : IDialogService
 {
     private readonly ILanguageService _languageService;
+    private int _isDialogOpen;
 
     public DialogService(ILanguageService languageService)
     {
@@ -27,49 +29,61 @@ public class DialogService : IDialogService
         // 현재 활성화된 메인 윈도우를 찾아 다이얼로그의 부모로 설정합니다.
         var window = Application.Current.MainWindow;
         if (window == null) return false;
+        if (!TryReserveDialog()) return false;
 
-        object dialogContent = message;
-
-        if (!string.IsNullOrWhiteSpace(warningMessage))
+        try
         {
-            var stackPanel = new System.Windows.Controls.StackPanel { Margin = new System.Windows.Thickness(0, 4, 0, 0) };
+            object dialogContent = message;
 
-            stackPanel.Children.Add(new System.Windows.Controls.TextBlock
+            if (!string.IsNullOrWhiteSpace(warningMessage))
             {
-                Text = message,
-                FontSize = 14,
-                TextWrapping = System.Windows.TextWrapping.Wrap
-            });
+                var stackPanel = new System.Windows.Controls.StackPanel { Margin = new System.Windows.Thickness(0, 4, 0, 0) };
 
-            stackPanel.Children.Add(new System.Windows.Controls.TextBlock
+                stackPanel.Children.Add(new System.Windows.Controls.TextBlock
+                {
+                    Text = message,
+                    FontSize = 14,
+                    TextWrapping = System.Windows.TextWrapping.Wrap
+                });
+
+                stackPanel.Children.Add(new System.Windows.Controls.TextBlock
+                {
+                    Text = warningMessage,
+                    FontSize = 12,
+                    Foreground = new System.Windows.Media.SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#D97706")), // Dark Orange/Yellow
+                    FontFamily = new System.Windows.Media.FontFamily("Segoe UI Emoji, Segoe UI"), // For emoji
+                    Margin = new System.Windows.Thickness(0, 12, 0, 0),
+                    TextWrapping = System.Windows.TextWrapping.Wrap
+                });
+
+                dialogContent = stackPanel;
+            }
+
+            var dialog = new ContentDialog
             {
-                Text = warningMessage,
-                FontSize = 12,
-                Foreground = new System.Windows.Media.SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#D97706")), // Dark Orange/Yellow
-                FontFamily = new System.Windows.Media.FontFamily("Segoe UI Emoji, Segoe UI"), // For emoji
-                Margin = new System.Windows.Thickness(0, 12, 0, 0),
-                TextWrapping = System.Windows.TextWrapping.Wrap
-            });
+                Content = dialogContent,
+                DefaultButton = ContentDialogButton.Close, // Close 버튼을 파란색(Primary)으로 만듦
+                Owner = window
+            };
 
-            dialogContent = stackPanel;
+            // 좌측(PrimaryButton, 회색) -> 아니오
+            // 우측(CloseButton, 파란색) -> 예
+            dialog.SetResourceReference(ContentDialog.TitleProperty, string.IsNullOrEmpty(titleKey) ? "Dlg_Confirm" : titleKey);
+            dialog.SetResourceReference(ContentDialog.PrimaryButtonTextProperty, "Dlg_No");
+            dialog.SetResourceReference(ContentDialog.CloseButtonTextProperty, "Dlg_Yes");
+
+            var result = await dialog.ShowAsync();
+            // CloseButton(우측 파란색)을 눌렀을 때가 승인(true)
+            return result == ContentDialogResult.None;
         }
-
-        var dialog = new ContentDialog
+        catch (InvalidOperationException ex) when (IsContentDialogAlreadyOpenException(ex))
         {
-            Content = dialogContent,
-            DefaultButton = ContentDialogButton.Close, // Close 버튼을 파란색(Primary)으로 만듦
-            Owner = window
-        };
-
-        // 좌측(PrimaryButton, 회색) -> 아니오
-        // 우측(CloseButton, 파란색) -> 예
-        dialog.SetResourceReference(ContentDialog.TitleProperty, string.IsNullOrEmpty(titleKey) ? "Dlg_Confirm" : titleKey);
-        dialog.SetResourceReference(ContentDialog.PrimaryButtonTextProperty, "Dlg_No");
-        dialog.SetResourceReference(ContentDialog.CloseButtonTextProperty, "Dlg_Yes");
-
-        var result = await dialog.ShowAsync();
-        // CloseButton(우측 파란색)을 눌렀을 때가 승인(true)
-        return result == ContentDialogResult.None;
+            return false;
+        }
+        finally
+        {
+            ReleaseDialog();
+        }
     }
 
     /// <summary>
@@ -79,35 +93,62 @@ public class DialogService : IDialogService
     {
         var window = Application.Current.MainWindow;
         if (window == null) return false;
+        if (!TryReserveDialog()) return false;
 
-        var dialog = new ContentDialog
+        try
         {
-            Content = content,
-            DefaultButton = ContentDialogButton.Close, // Close 버튼을 파란색(Primary)으로 만듦
-            Owner = window
-        };
+            var dialog = new ContentDialog
+            {
+                Content = content,
+                DefaultButton = ContentDialogButton.Close, // Close 버튼을 파란색(Primary)으로 만듦
+                Owner = window
+            };
 
-        // 실시간 다국어 반영을 위해 리소스 레퍼런스 설정
-        dialog.SetResourceReference(ContentDialog.TitleProperty, titleKey);
+            // 실시간 다국어 반영을 위해 리소스 레퍼런스 설정
+            dialog.SetResourceReference(ContentDialog.TitleProperty, titleKey);
 
-        // 좌측(PrimaryButton, 취소)
-        dialog.SetResourceReference(ContentDialog.PrimaryButtonTextProperty, closeKey ?? "Dlg_Cancel");
+            // 좌측(PrimaryButton, 취소)
+            dialog.SetResourceReference(ContentDialog.PrimaryButtonTextProperty, closeKey ?? "Dlg_Cancel");
 
-        // 우측(CloseButton, 확인)
-        if (!string.IsNullOrEmpty(primaryKey))
-            dialog.SetResourceReference(ContentDialog.CloseButtonTextProperty, primaryKey);
-        else
-            dialog.SetResourceReference(ContentDialog.CloseButtonTextProperty, "Dlg_Confirm");
+            // 우측(CloseButton, 확인)
+            if (!string.IsNullOrEmpty(primaryKey))
+                dialog.SetResourceReference(ContentDialog.CloseButtonTextProperty, primaryKey);
+            else
+                dialog.SetResourceReference(ContentDialog.CloseButtonTextProperty, "Dlg_Confirm");
 
-        var contentWidth = GetPreferredContentWidth(content);
-        if (contentWidth > 0)
-        {
-            ApplyFixedDialogWidth(dialog, contentWidth + 50); // 600 + 25*2 기준
+            var contentWidth = GetPreferredContentWidth(content);
+            if (contentWidth > 0)
+            {
+                ApplyFixedDialogWidth(dialog, contentWidth + 50); // 600 + 25*2 기준
+            }
+
+            var result = await dialog.ShowAsync();
+            // CloseButton(우측 파란색)을 눌렀을 때가 승인(true)
+            return result == ContentDialogResult.None;
         }
+        catch (InvalidOperationException ex) when (IsContentDialogAlreadyOpenException(ex))
+        {
+            return false;
+        }
+        finally
+        {
+            ReleaseDialog();
+        }
+    }
 
-        var result = await dialog.ShowAsync();
-        // CloseButton(우측 파란색)을 눌렀을 때가 승인(true)
-        return result == ContentDialogResult.None;
+    private bool TryReserveDialog()
+    {
+        return Interlocked.CompareExchange(ref _isDialogOpen, 1, 0) == 0;
+    }
+
+    private void ReleaseDialog()
+    {
+        Interlocked.Exchange(ref _isDialogOpen, 0);
+    }
+
+    private static bool IsContentDialogAlreadyOpenException(InvalidOperationException ex)
+    {
+        return ex.Message.Contains("Only a single ContentDialog", StringComparison.Ordinal);
     }
 
     private static double GetPreferredContentWidth(object content)

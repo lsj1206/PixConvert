@@ -16,7 +16,6 @@ public enum SettingOptionKey
     BackgroundColor,
     JpegChromaSubsampling,
     PngCompression,
-    PngFilter,
     AvifChromaSubsampling,
     AvifEncodingEffort,
     AvifBitDepth,
@@ -59,10 +58,6 @@ public static class SettingOptionCatalog
         new(
             SettingOptionSection.Standard,
             SettingOptionKey.PngCompression,
-            new[] { "PNG" }),
-        new(
-            SettingOptionSection.Standard,
-            SettingOptionKey.PngFilter,
             new[] { "PNG" }),
         new(
             SettingOptionSection.Standard,

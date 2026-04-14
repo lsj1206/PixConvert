@@ -188,14 +188,13 @@ public class SkiaSharpProviderTests : IDisposable
     }
 
     [Fact]
-    public async Task ConvertAsync_WhenPngCompressionAndFilterAreCustomized_ShouldConvertSuccessfully()
+    public async Task ConvertAsync_WhenPngCompressionIsCustomized_ShouldConvertSuccessfully()
     {
         var file = new FileItem { Path = _inputPath, FileSignature = "PNG" };
         var settings = new ConvertSettings
         {
             StandardTargetFormat = "PNG",
             StandardPngCompressionLevel = 9,
-            StandardPngFilter = PngFilterMode.Paeth,
             SaveLocation = SaveLocationType.SameAsOriginal,
             FolderMethod = SaveFolderMethod.NoFolder,
             OverwritePolicy = OverwritePolicy.Suffix

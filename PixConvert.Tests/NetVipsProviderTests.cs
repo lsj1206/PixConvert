@@ -108,14 +108,13 @@ public class NetVipsProviderTests : IDisposable
     }
 
     [Fact]
-    public async Task ConvertAsync_WhenTargetIsPngWithCustomCompressionAndFilter_ShouldWork()
+    public async Task ConvertAsync_WhenTargetIsPngWithCustomCompression_ShouldWork()
     {
         var file = new FileItem { Path = _inputPath, FileSignature = "PNG" };
         var settings = new ConvertSettings
         {
             StandardTargetFormat = "PNG",
             StandardPngCompressionLevel = 9,
-            StandardPngFilter = PngFilterMode.Paeth,
             SaveLocation = SaveLocationType.SameAsOriginal,
             FolderMethod = SaveFolderMethod.NoFolder,
             OverwritePolicy = OverwritePolicy.Suffix

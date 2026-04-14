@@ -220,23 +220,6 @@ public class PresetServiceTests
     }
 
     [Fact]
-    public void ValidPresetData_WhenPngFilterEnumIsInvalid_ShouldReturnFalse()
-    {
-        var settings = new ConvertSettings
-        {
-            StandardTargetFormat = "PNG",
-            AnimationTargetFormat = "GIF",
-            StandardBackgroundColor = "#FFFFFF",
-            StandardPngFilter = (PngFilterMode)999
-        };
-
-        var result = _presetService.ValidPresetData(settings, out string errorKey);
-
-        Assert.False(result);
-        Assert.Equal("Msg_Error_ConfigInvalid", errorKey);
-    }
-
-    [Fact]
     public void ValidPresetData_WhenAvifOptionsAreValid_ShouldReturnTrue()
     {
         var settings = new ConvertSettings

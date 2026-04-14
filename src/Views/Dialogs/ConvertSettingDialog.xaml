@@ -20,6 +20,28 @@
             <Setter Property="Padding" Value="10,4" />
             <Setter Property="ui:ControlHelper.CornerRadius" Value="4" />
         </Style>
+
+        <Style
+            x:Key="InfoIconButtonStyle"
+            TargetType="Button">
+            <Setter Property="Width" Value="18" />
+            <Setter Property="Height" Value="18" />
+            <Setter Property="MinWidth" Value="0" />
+            <Setter Property="MinHeight" Value="0" />
+            <Setter Property="Margin" Value="4,0,0,0" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Cursor" Value="Help" />
+            <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="ToolTipService.InitialShowDelay" Value="300" />
+            <Setter Property="ToolTipService.ShowDuration" Value="60000" />
+            <Setter Property="ToolTipService.ShowsToolTipOnKeyboardFocus" Value="True" />
+        </Style>
+
     </UserControl.Resources>
 
     <ScrollViewer
@@ -80,13 +102,27 @@
             <StackPanel
                 Margin="0,4,0,4"
                 Orientation="Horizontal">
-                <TextBlock
+                <StackPanel
                     Margin="0,0,12,2"
                     VerticalAlignment="Center"
-                    FontWeight="SemiBold"
-                    Text="{DynamicResource Setting_CpuUsage}" />
+                    Orientation="Horizontal">
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        FontWeight="SemiBold"
+                        Text="{DynamicResource Setting_CpuUsage}" />
+                    <Button Style="{StaticResource InfoIconButtonStyle}">
+                        <Button.ToolTip>
+                            <ToolTip>
+                                <ctrls:OptionToolTip
+                                    Title="{DynamicResource SettingTip_CpuUsage_Title}"
+                                    Body="{DynamicResource SettingTip_CpuUsage_Body}" />
+                            </ToolTip>
+                        </Button.ToolTip>
+                        <ui:FontIcon FontSize="12" Glyph="&#xE946;" />
+                    </Button>
+                </StackPanel>
                 <ComboBox
-                    Width="200"
+                    Width="180"
                     HorizontalAlignment="Left"
                     SelectedValuePath="Tag"
                     SelectedValue="{Binding CpuUsage}">
@@ -105,10 +141,23 @@
 
             <!-- ConvertSetting : OverwritePolicy_Group -->
             <StackPanel Margin="0,8,0,4">
-                <TextBlock
+                <StackPanel
                     Margin="0,0,0,4"
-                    FontWeight="SemiBold"
-                    Text="{DynamicResource Setting_OverwritePolicy}" />
+                    Orientation="Horizontal">
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        FontWeight="SemiBold"
+                        Text="{DynamicResource Setting_OverwritePolicy}" />
+                    <Button Style="{StaticResource InfoIconButtonStyle}">
+                        <Button.ToolTip>
+                            <ToolTip>
+                                <ctrls:OptionToolTip
+                                    Title="{DynamicResource SettingTip_OverwritePolicy_Title}" />
+                            </ToolTip>
+                        </Button.ToolTip>
+                        <ui:FontIcon FontSize="12" Glyph="&#xE946;" />
+                    </Button>
+                </StackPanel>
                 <StackPanel
                     Margin="0,0,0,8"
                     Orientation="Horizontal">
@@ -129,10 +178,14 @@
 
             <!-- ConvertSetting : SaveMethod_Group -->
             <StackPanel Margin="0,0,0,4">
-                <TextBlock
+                <StackPanel
                     Margin="0,0,0,4"
-                    FontWeight="SemiBold"
-                    Text="{DynamicResource Setting_SaveMethod}" />
+                    Orientation="Horizontal">
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        FontWeight="SemiBold"
+                        Text="{DynamicResource Setting_SaveMethod}" />
+                </StackPanel>
                 <StackPanel
                     Margin="0,0,0,8"
                     Orientation="Horizontal">
@@ -158,10 +211,14 @@
 
             <!-- ConvertSetting : SaveLocation_Group -->
             <StackPanel Margin="0,0,0,16">
-                <TextBlock
+                <StackPanel
                     Margin="0,0,0,4"
-                    FontWeight="SemiBold"
-                    Text="{DynamicResource Setting_SaveLocation}" />
+                    Orientation="Horizontal">
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        FontWeight="SemiBold"
+                        Text="{DynamicResource Setting_SaveLocation}" />
+                </StackPanel>
                 <RadioButton
                     Margin="0,0,0,4"
                     Content="{DynamicResource Setting_SaveLocation_Same}"
@@ -223,11 +280,24 @@
                 Margin="0,4,0,0"
                 Orientation="Horizontal"
                 Visibility="{Binding StandardShowLossless, Converter={StaticResource BooleanToVisibilityConverter}}">
-                <TextBlock
+                <StackPanel
                     Margin="0,0,12,3"
                     VerticalAlignment="Center"
-                    FontWeight="SemiBold"
-                    Text="{DynamicResource Setting_Lossless}" />
+                    Orientation="Horizontal">
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        FontWeight="SemiBold"
+                        Text="{DynamicResource Setting_Lossless}" />
+                    <Button Style="{StaticResource InfoIconButtonStyle}">
+                        <Button.ToolTip>
+                            <ToolTip>
+                                <ctrls:OptionToolTip
+                                    Title="{DynamicResource SettingTip_StandardLossless_Title}" />
+                            </ToolTip>
+                        </Button.ToolTip>
+                        <ui:FontIcon FontSize="12" Glyph="&#xE946;" />
+                    </Button>
+                </StackPanel>
                 <CheckBox IsChecked="{Binding StandardLossless, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
             </StackPanel>
 
@@ -235,11 +305,24 @@
                 Margin="0,4,0,0"
                 Orientation="Horizontal"
                 Visibility="{Binding StandardShowQuality, Converter={StaticResource BooleanToVisibilityConverter}}">
-                <TextBlock
+                <StackPanel
                     Margin="0,0,12,4"
                     VerticalAlignment="Center"
-                    FontWeight="SemiBold"
-                    Text="{DynamicResource Setting_Quality}" />
+                    Orientation="Horizontal">
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        FontWeight="SemiBold"
+                        Text="{DynamicResource Setting_Quality}" />
+                    <Button Style="{StaticResource InfoIconButtonStyle}">
+                        <Button.ToolTip>
+                            <ToolTip>
+                                <ctrls:OptionToolTip
+                                    Title="{DynamicResource SettingTip_StandardQuality_Title}" />
+                            </ToolTip>
+                        </Button.ToolTip>
+                        <ui:FontIcon FontSize="12" Glyph="&#xE946;" />
+                    </Button>
+                </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <Slider
                         Margin="0,0,8,0"
@@ -262,11 +345,25 @@
             <StackPanel
                 Margin="0,8,0,0"
                 Visibility="{Binding StandardShowJpegChromaSubsampling, Converter={StaticResource BooleanToVisibilityConverter}}">
-                <TextBlock
+                <StackPanel
                     Margin="0,0,0,4"
                     HorizontalAlignment="Left"
-                    FontWeight="SemiBold"
-                    Text="{DynamicResource Setting_ChromaSubsampling}" />
+                    Orientation="Horizontal">
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        FontWeight="SemiBold"
+                        Text="{DynamicResource Setting_ChromaSubsampling}" />
+                    <Button Style="{StaticResource InfoIconButtonStyle}">
+                        <Button.ToolTip>
+                            <ToolTip>
+                                <ctrls:OptionToolTip
+                                    Title="{DynamicResource SettingTip_JpegChromaSubsampling_Title}"
+                                    Body="{DynamicResource SettingTip_JpegChromaSubsampling_Body}" />
+                            </ToolTip>
+                        </Button.ToolTip>
+                        <ui:FontIcon FontSize="12" Glyph="&#xE946;" />
+                    </Button>
+                </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <RadioButton
                         MinWidth="90"
@@ -290,11 +387,25 @@
                 Margin="0,4,0,0"
                 Orientation="Horizontal"
                 Visibility="{Binding StandardShowPngCompression, Converter={StaticResource BooleanToVisibilityConverter}}">
-                <TextBlock
+                <StackPanel
                     Margin="0,0,12,4"
                     VerticalAlignment="Center"
-                    FontWeight="SemiBold"
-                    Text="{DynamicResource Setting_CompressionLevel}" />
+                    Orientation="Horizontal">
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        FontWeight="SemiBold"
+                        Text="{DynamicResource Setting_CompressionLevel}" />
+                    <Button Style="{StaticResource InfoIconButtonStyle}">
+                        <Button.ToolTip>
+                            <ToolTip>
+                                <ctrls:OptionToolTip
+                                    Title="{DynamicResource SettingTip_PngCompression_Title}"
+                                    Body="{DynamicResource SettingTip_PngCompression_Body}" />
+                            </ToolTip>
+                        </Button.ToolTip>
+                        <ui:FontIcon FontSize="12" Glyph="&#xE946;" />
+                    </Button>
+                </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <Slider
                         Margin="0,0,8,0"
@@ -317,34 +428,27 @@
 
             <StackPanel
                 Margin="0,8,0,0"
-                Orientation="Horizontal"
-                Visibility="{Binding StandardShowPngFilter, Converter={StaticResource BooleanToVisibilityConverter}}">
-                <TextBlock
-                    Margin="0,0,12,1"
-                    VerticalAlignment="Center"
-                    FontWeight="SemiBold"
-                    Text="{DynamicResource Setting_Filter}" />
-                <ComboBox
-                    Width="120"
-                    SelectedValuePath="Tag"
-                    SelectedValue="{Binding StandardPngFilter}">
-                    <ComboBoxItem Content="{DynamicResource Setting_Filter_None}" Tag="{x:Static model:PngFilterMode.None}" />
-                    <ComboBoxItem Content="{DynamicResource Setting_Filter_Adaptive}" Tag="{x:Static model:PngFilterMode.Adaptive}" />
-                    <ComboBoxItem Content="{DynamicResource Setting_Filter_Average}" Tag="{x:Static model:PngFilterMode.Average}" />
-                    <ComboBoxItem Content="{DynamicResource Setting_Filter_Paeth}" Tag="{x:Static model:PngFilterMode.Paeth}" />
-                    <ComboBoxItem Content="{DynamicResource Setting_Filter_Sub}" Tag="{x:Static model:PngFilterMode.Sub}" />
-                    <ComboBoxItem Content="{DynamicResource Setting_Filter_Up}" Tag="{x:Static model:PngFilterMode.Up}" />
-                </ComboBox>
-            </StackPanel>
-
-            <StackPanel
-                Margin="0,8,0,0"
                 Visibility="{Binding StandardShowAvifChromaSubsampling, Converter={StaticResource BooleanToVisibilityConverter}}">
-                <TextBlock
+                <StackPanel
                     Margin="0,0,0,4"
                     HorizontalAlignment="Left"
-                    FontWeight="SemiBold"
-                    Text="{DynamicResource Setting_ChromaSubsampling}" />
+                    Orientation="Horizontal">
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        FontWeight="SemiBold"
+                        Text="{DynamicResource Setting_ChromaSubsampling}" />
+                    <Button Style="{StaticResource InfoIconButtonStyle}">
+                        <Button.ToolTip>
+                            <ToolTip>
+                                <ctrls:OptionToolTip
+                                    Title="{DynamicResource SettingTip_AvifChromaSubsampling_Title}"
+                                    Body="{DynamicResource SettingTip_AvifChromaSubsampling_Body}"
+                                    Caution="{DynamicResource SettingTip_AvifChromaSubsampling_Caution}" />
+                            </ToolTip>
+                        </Button.ToolTip>
+                        <ui:FontIcon FontSize="12" Glyph="&#xE946;" />
+                    </Button>
+                </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <RadioButton
                         MinWidth="90"
@@ -368,11 +472,25 @@
                 Margin="0,8,0,0"
                 Orientation="Horizontal"
                 Visibility="{Binding StandardShowAvifEncodingEffort, Converter={StaticResource BooleanToVisibilityConverter}}">
-                <TextBlock
+                <StackPanel
                     Margin="0,0,12,4"
                     VerticalAlignment="Center"
-                    FontWeight="SemiBold"
-                    Text="{DynamicResource Setting_EncodingEffort}" />
+                    Orientation="Horizontal">
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        FontWeight="SemiBold"
+                        Text="{DynamicResource Setting_EncodingEffort}" />
+                    <Button Style="{StaticResource InfoIconButtonStyle}">
+                        <Button.ToolTip>
+                            <ToolTip>
+                                <ctrls:OptionToolTip
+                                    Title="{DynamicResource SettingTip_AvifEncodingEffort_Title}"
+                                    Body="{DynamicResource SettingTip_AvifEncodingEffort_Body}" />
+                            </ToolTip>
+                        </Button.ToolTip>
+                        <ui:FontIcon FontSize="12" Glyph="&#xE946;" />
+                    </Button>
+                </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <Slider
                         Margin="0,0,8,0"
@@ -396,11 +514,25 @@
             <StackPanel
                 Margin="0,8,0,0"
                 Visibility="{Binding StandardShowAvifBitDepth, Converter={StaticResource BooleanToVisibilityConverter}}">
-                <TextBlock
+                <StackPanel
                     Margin="0,0,0,4"
                     HorizontalAlignment="Left"
-                    FontWeight="SemiBold"
-                    Text="{DynamicResource Setting_BitDepth}" />
+                    Orientation="Horizontal">
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        FontWeight="SemiBold"
+                        Text="{DynamicResource Setting_BitDepth}" />
+                    <Button Style="{StaticResource InfoIconButtonStyle}">
+                        <Button.ToolTip>
+                            <ToolTip>
+                                <ctrls:OptionToolTip
+                                    Title="{DynamicResource SettingTip_AvifBitDepth_Title}"
+                                    Body="{DynamicResource SettingTip_AvifBitDepth_Body}" />
+                            </ToolTip>
+                        </Button.ToolTip>
+                        <ui:FontIcon FontSize="12" Glyph="&#xE946;" />
+                    </Button>
+                </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <RadioButton
                         MinWidth="90"
@@ -428,9 +560,22 @@
             <StackPanel
                 Margin="0,8,0,0"
                 Visibility="{Binding StandardShowBackgroundColor, Converter={StaticResource BooleanToVisibilityConverter}}">
-                <TextBlock
-                    FontWeight="SemiBold"
-                    Text="{DynamicResource Setting_BackgroundColor}" />
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        FontWeight="SemiBold"
+                        Text="{DynamicResource Setting_BackgroundColor}" />
+                    <Button Style="{StaticResource InfoIconButtonStyle}">
+                        <Button.ToolTip>
+                            <ToolTip>
+                                <ctrls:OptionToolTip
+                                    Title="{DynamicResource SettingTip_BackgroundColor_Title}"
+                                    Body="{DynamicResource SettingTip_BackgroundColor_Body}" />
+                            </ToolTip>
+                        </Button.ToolTip>
+                        <ui:FontIcon FontSize="12" Glyph="&#xE946;" />
+                    </Button>
+                </StackPanel>
                 <StackPanel
                     Orientation="Horizontal">
                     <RadioButton
@@ -501,11 +646,25 @@
                     Margin="0,4,0,0"
                     Orientation="Horizontal"
                     Visibility="{Binding AnimationShowLossless, Converter={StaticResource BooleanToVisibilityConverter}}">
-                    <TextBlock
+                    <StackPanel
                         Margin="0,0,12,3"
                         VerticalAlignment="Center"
-                        FontWeight="SemiBold"
-                        Text="{DynamicResource Setting_Lossless}" />
+                        Orientation="Horizontal">
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            FontWeight="SemiBold"
+                            Text="{DynamicResource Setting_Lossless}" />
+                        <Button Style="{StaticResource InfoIconButtonStyle}">
+                            <Button.ToolTip>
+                                <ToolTip>
+                                    <ctrls:OptionToolTip
+                                        Title="{DynamicResource SettingTip_AnimationLossless_Title}"
+                                        Body="{DynamicResource SettingTip_AnimationLossless_Body}" />
+                                </ToolTip>
+                            </Button.ToolTip>
+                            <ui:FontIcon FontSize="12" Glyph="&#xE946;" />
+                        </Button>
+                    </StackPanel>
                     <CheckBox IsChecked="{Binding AnimationLossless, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 </StackPanel>
 
@@ -513,11 +672,25 @@
                     Margin="0,8,0,0"
                     Orientation="Horizontal"
                     Visibility="{Binding AnimationShowWebpPreset, Converter={StaticResource BooleanToVisibilityConverter}}">
-                    <TextBlock
+                    <StackPanel
                         Margin="0,0,12,1"
                         VerticalAlignment="Center"
-                        FontWeight="SemiBold"
-                        Text="{DynamicResource Setting_WebpPreset}" />
+                        Orientation="Horizontal">
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            FontWeight="SemiBold"
+                            Text="{DynamicResource Setting_WebpPreset}" />
+                        <Button Style="{StaticResource InfoIconButtonStyle}">
+                            <Button.ToolTip>
+                                <ToolTip>
+                                    <ctrls:OptionToolTip
+                                        Title="{DynamicResource SettingTip_WebpPreset_Title}"
+                                        Body="{DynamicResource SettingTip_WebpPreset_Body}" />
+                                </ToolTip>
+                            </Button.ToolTip>
+                            <ui:FontIcon FontSize="12" Glyph="&#xE946;" />
+                        </Button>
+                    </StackPanel>
                     <ComboBox
                         Width="100"
                         SelectedValuePath="Tag"
@@ -535,11 +708,25 @@
                     Margin="0,8,0,0"
                     Orientation="Horizontal"
                     Visibility="{Binding AnimationShowQuality, Converter={StaticResource BooleanToVisibilityConverter}}">
-                    <TextBlock
+                    <StackPanel
                         Margin="0,0,12,4"
                         VerticalAlignment="Center"
-                        FontWeight="SemiBold"
-                        Text="{DynamicResource Setting_Quality}" />
+                        Orientation="Horizontal">
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            FontWeight="SemiBold"
+                            Text="{DynamicResource Setting_Quality}" />
+                        <Button Style="{StaticResource InfoIconButtonStyle}">
+                            <Button.ToolTip>
+                                <ToolTip>
+                                    <ctrls:OptionToolTip
+                                        Title="{DynamicResource SettingTip_AnimationQuality_Title}"
+                                        Body="{DynamicResource SettingTip_AnimationQuality_Body}" />
+                                </ToolTip>
+                            </Button.ToolTip>
+                            <ui:FontIcon FontSize="12" Glyph="&#xE946;" />
+                        </Button>
+                    </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <Slider
                             Margin="0,0,8,0"
@@ -563,11 +750,26 @@
                     Margin="0,8,0,0"
                     Orientation="Horizontal"
                     Visibility="{Binding AnimationShowWebpPreserveTransparentPixels, Converter={StaticResource BooleanToVisibilityConverter}}">
-                    <TextBlock
+                    <StackPanel
                         Margin="0,0,12,3"
                         VerticalAlignment="Center"
-                        FontWeight="SemiBold"
-                        Text="{DynamicResource Setting_PreserveTransparentPixels}" />
+                        Orientation="Horizontal">
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            FontWeight="SemiBold"
+                            Text="{DynamicResource Setting_PreserveTransparentPixels}" />
+                        <Button Style="{StaticResource InfoIconButtonStyle}">
+                            <Button.ToolTip>
+                                <ToolTip>
+                                    <ctrls:OptionToolTip
+                                        Title="{DynamicResource SettingTip_PreserveTransparentPixels_Title}"
+                                        Body="{DynamicResource SettingTip_PreserveTransparentPixels_Body}"
+                                        Caution="{DynamicResource SettingTip_PreserveTransparentPixels_Caution}" />
+                                </ToolTip>
+                            </Button.ToolTip>
+                            <ui:FontIcon FontSize="12" Glyph="&#xE946;" />
+                        </Button>
+                    </StackPanel>
                     <CheckBox IsChecked="{Binding AnimationWebpPreserveTransparentPixels, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 </StackPanel>
 
@@ -575,11 +777,25 @@
                     Margin="0,8,0,0"
                     Orientation="Horizontal"
                     Visibility="{Binding AnimationShowWebpEncodingEffort, Converter={StaticResource BooleanToVisibilityConverter}}">
-                    <TextBlock
+                    <StackPanel
                         Margin="0,0,12,4"
                         VerticalAlignment="Center"
-                        FontWeight="SemiBold"
-                        Text="{DynamicResource Setting_EncodingEffort}" />
+                        Orientation="Horizontal">
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            FontWeight="SemiBold"
+                            Text="{DynamicResource Setting_EncodingEffort}" />
+                        <Button Style="{StaticResource InfoIconButtonStyle}">
+                            <Button.ToolTip>
+                                <ToolTip>
+                                    <ctrls:OptionToolTip
+                                        Title="{DynamicResource SettingTip_WebpEncodingEffort_Title}"
+                                        Body="{DynamicResource SettingTip_WebpEncodingEffort_Body}" />
+                                </ToolTip>
+                            </Button.ToolTip>
+                            <ui:FontIcon FontSize="12" Glyph="&#xE946;" />
+                        </Button>
+                    </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <Slider
                             Margin="0,0,8,0"
@@ -607,11 +823,25 @@
                     Margin="0,8,0,0"
                     Orientation="Horizontal"
                     Visibility="{Binding AnimationShowGifPalettePreset, Converter={StaticResource BooleanToVisibilityConverter}}">
-                    <TextBlock
+                    <StackPanel
                         Margin="0,0,12,1"
                         VerticalAlignment="Center"
-                        FontWeight="SemiBold"
-                        Text="{DynamicResource Setting_PalettePreset}" />
+                        Orientation="Horizontal">
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            FontWeight="SemiBold"
+                            Text="{DynamicResource Setting_PalettePreset}" />
+                        <Button Style="{StaticResource InfoIconButtonStyle}">
+                            <Button.ToolTip>
+                                <ToolTip>
+                                    <ctrls:OptionToolTip
+                                        Title="{DynamicResource SettingTip_GifPalettePreset_Title}"
+                                        Body="{DynamicResource SettingTip_GifPalettePreset_Body}" />
+                                </ToolTip>
+                            </Button.ToolTip>
+                            <ui:FontIcon FontSize="12" Glyph="&#xE946;" />
+                        </Button>
+                    </StackPanel>
                     <ComboBox
                         Width="220"
                         SelectedValuePath="Tag"
@@ -628,11 +858,26 @@
                     Margin="0,8,0,0"
                     Orientation="Horizontal"
                     Visibility="{Binding AnimationShowGifInterframeMaxError, Converter={StaticResource BooleanToVisibilityConverter}}">
-                    <TextBlock
+                    <StackPanel
                         Margin="0,0,12,4"
                         VerticalAlignment="Center"
-                        FontWeight="SemiBold"
-                        Text="{DynamicResource Setting_InterframeMaxError}" />
+                        Orientation="Horizontal">
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            FontWeight="SemiBold"
+                            Text="{DynamicResource Setting_InterframeMaxError}" />
+                        <Button Style="{StaticResource InfoIconButtonStyle}">
+                            <Button.ToolTip>
+                                <ToolTip>
+                                    <ctrls:OptionToolTip
+                                        Title="{DynamicResource SettingTip_InterframeMaxError_Title}"
+                                        Body="{DynamicResource SettingTip_InterframeMaxError_Body}"
+                                        Caution="{DynamicResource SettingTip_InterframeMaxError_Caution}" />
+                                </ToolTip>
+                            </Button.ToolTip>
+                            <ui:FontIcon FontSize="12" Glyph="&#xE946;" />
+                        </Button>
+                    </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <Slider
                             Margin="0,0,8,0"
@@ -661,11 +906,26 @@
                     Margin="0,8,0,0"
                     Orientation="Horizontal"
                     Visibility="{Binding AnimationShowGifInterpaletteMaxError, Converter={StaticResource BooleanToVisibilityConverter}}">
-                    <TextBlock
+                    <StackPanel
                         Margin="0,0,12,4"
                         VerticalAlignment="Center"
-                        FontWeight="SemiBold"
-                        Text="{DynamicResource Setting_InterpaletteMaxError}" />
+                        Orientation="Horizontal">
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            FontWeight="SemiBold"
+                            Text="{DynamicResource Setting_InterpaletteMaxError}" />
+                        <Button Style="{StaticResource InfoIconButtonStyle}">
+                            <Button.ToolTip>
+                                <ToolTip>
+                                    <ctrls:OptionToolTip
+                                        Title="{DynamicResource SettingTip_InterpaletteMaxError_Title}"
+                                        Body="{DynamicResource SettingTip_InterpaletteMaxError_Body}"
+                                        Caution="{DynamicResource SettingTip_InterpaletteMaxError_Caution}" />
+                                </ToolTip>
+                            </Button.ToolTip>
+                            <ui:FontIcon FontSize="12" Glyph="&#xE946;" />
+                        </Button>
+                    </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <Slider
                             Margin="0,0,8,0"

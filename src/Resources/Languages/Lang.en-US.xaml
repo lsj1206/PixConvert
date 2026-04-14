@@ -115,18 +115,63 @@
     <sys:String x:Key="Setting_PreserveTransparentPixels">Preserve Transparent Pixels RGB</sys:String>
     <sys:String x:Key="Setting_InterframeMaxError">Frame Tolerance</sys:String>
     <sys:String x:Key="Setting_InterpaletteMaxError">Palette Tolerance</sys:String>
+    <!-- Convert Setting : Option Tips -->
+    <sys:String x:Key="SettingTip_CpuUsage_Title">CPU Usage</sys:String>
+    <sys:String x:Key="SettingTip_CpuUsage_Body" xml:space="preserve">Selects how many jobs can run at the same time.
+Actual parallelism depends on the number of CPU cores and threads.</sys:String>
+    <sys:String x:Key="SettingTip_OverwritePolicy_Title">Duplicate File Policy</sys:String>
+    <sys:String x:Key="SettingTip_StandardLossless_Title">Lossless</sys:String>
+    <sys:String x:Key="SettingTip_StandardQuality_Title">Quality</sys:String>
+    <sys:String x:Key="SettingTip_JpegChromaSubsampling_Title">Chroma Subsampling</sys:String>
+    <sys:String x:Key="SettingTip_JpegChromaSubsampling_Body" xml:space="preserve">Sets JPEG color resolution. 4:4:4 preserves color information.
+4:2:0 reduces color information horizontally and vertically to reduce file size.</sys:String>
+    <sys:String x:Key="SettingTip_PngCompression_Title">PNG Compression</sys:String>
+    <sys:String x:Key="SettingTip_PngCompression_Body" xml:space="preserve">Changes compression time and file size without changing pixel quality.
+0 is fast and can be larger, while 9 is slower but may be smaller.</sys:String>
+    <sys:String x:Key="SettingTip_AvifChromaSubsampling_Title">AVIF Chroma Subsampling</sys:String>
+    <sys:String x:Key="SettingTip_AvifChromaSubsampling_Body" xml:space="preserve">Controls whether color information is reduced for lossy AVIF output.
+It can reduce file size but may soften color edges.</sys:String>
+    <sys:String x:Key="SettingTip_AvifChromaSubsampling_Caution">This option is hidden and not applied in lossless mode.</sys:String>
+    <sys:String x:Key="SettingTip_AvifEncodingEffort_Title">AVIF Encoding Effort</sys:String>
+    <sys:String x:Key="SettingTip_AvifEncodingEffort_Body" xml:space="preserve">Sets how much computation the AVIF encoder spends on compression.
+0 is fast, while 9 is slower and may reduce file size.</sys:String>
+    <sys:String x:Key="SettingTip_AvifBitDepth_Title">AVIF Bit Depth</sys:String>
+    <sys:String x:Key="SettingTip_AvifBitDepth_Body" xml:space="preserve">Sets the AVIF output bit depth.
+Auto sends no value and delegates behavior to NetVips/libvips defaults.</sys:String>
+    <sys:String x:Key="SettingTip_BackgroundColor_Title">Background Color</sys:String>
+    <sys:String x:Key="SettingTip_BackgroundColor_Body" xml:space="preserve">Used when saving to formats without alpha, such as JPEG or BMP.
+Transparent areas are composited with the selected background color.</sys:String>
+    <sys:String x:Key="SettingTip_AnimationLossless_Title">Animation Lossless</sys:String>
+    <sys:String x:Key="SettingTip_AnimationLossless_Body" xml:space="preserve">Stores animated WebP without lossy compression.
+Files can be larger, and lossy quality plus WebP preset are not used.</sys:String>
+    <sys:String x:Key="SettingTip_AnimationQuality_Title">Animation Quality</sys:String>
+    <sys:String x:Key="SettingTip_AnimationQuality_Body" xml:space="preserve">Sets the quality for lossy animated WebP output.
+Higher values can stay closer to the source but may increase file size.</sys:String>
+    <sys:String x:Key="SettingTip_WebpPreset_Title">WebP Preset</sys:String>
+    <sys:String x:Key="SettingTip_WebpPreset_Body" xml:space="preserve">Passes an image-type hint to the lossy WebP encoder.
+It tunes compression for photos, drawings, icons, text, and similar content.</sys:String>
+    <sys:String x:Key="SettingTip_PreserveTransparentPixels_Title">Preserve Transparent Pixels RGB</sys:String>
+    <sys:String x:Key="SettingTip_PreserveTransparentPixels_Body" xml:space="preserve">Attempts to preserve RGB values in fully transparent pixels for lossless WebP.
+Preservation can keep transparent-area color data for later processing or re-encoding.</sys:String>
+    <sys:String x:Key="SettingTip_PreserveTransparentPixels_Caution">If the current native engine does not support the exact option, saving continues but this preservation may not be applied.</sys:String>
+    <sys:String x:Key="SettingTip_WebpEncodingEffort_Title">WebP Encoding Effort</sys:String>
+    <sys:String x:Key="SettingTip_WebpEncodingEffort_Body" xml:space="preserve">Sets animated WebP compression effort.
+0 is fast and 6 is slower, but higher values may reduce file size.</sys:String>
+    <sys:String x:Key="SettingTip_GifPalettePreset_Title">GIF Palette Preset</sys:String>
+    <sys:String x:Key="SettingTip_GifPalettePreset_Body" xml:space="preserve">Chooses the GIF color count and dithering preset.
+More colors and stronger dithering can smooth gradients but may increase size and noise.</sys:String>
+    <sys:String x:Key="SettingTip_InterframeMaxError_Title">Frame Tolerance</sys:String>
+    <sys:String x:Key="SettingTip_InterframeMaxError_Body" xml:space="preserve">Sets how much difference is allowed between GIF frames.
+Higher values optimize more aggressively and may reduce file size.</sys:String>
+    <sys:String x:Key="SettingTip_InterframeMaxError_Caution">Higher values can introduce ghosting or edge errors.</sys:String>
+    <sys:String x:Key="SettingTip_InterpaletteMaxError_Title">Palette Tolerance</sys:String>
+    <sys:String x:Key="SettingTip_InterpaletteMaxError_Body" xml:space="preserve">Sets how much palette difference is allowed between GIF frames.
+Higher values may reduce file size by merging palettes more aggressively.</sys:String>
+    <sys:String x:Key="SettingTip_InterpaletteMaxError_Caution">Higher values can reduce color accuracy.</sys:String>
     <!-- Convert Setting : BgColor -->
     <sys:String x:Key="Bg_White">White</sys:String>
     <sys:String x:Key="Bg_Black">Black</sys:String>
     <sys:String x:Key="Bg_Custom">#FFFFFF (HEX)</sys:String>
-    <!-- Convert Setting : Filter -->
-    <sys:String x:Key="Setting_Filter">Filter</sys:String>
-    <sys:String x:Key="Setting_Filter_None">None</sys:String>
-    <sys:String x:Key="Setting_Filter_Adaptive">Adaptive</sys:String>
-    <sys:String x:Key="Setting_Filter_Average">Average</sys:String>
-    <sys:String x:Key="Setting_Filter_Paeth">Paeth</sys:String>
-    <sys:String x:Key="Setting_Filter_Sub">Sub</sys:String>
-    <sys:String x:Key="Setting_Filter_Up">Up</sys:String>
     <!-- Convert Setting : Chroma Subsampling -->
     <sys:String x:Key="Setting_ChromaSubsampling">Chroma Subsampling</sys:String>
     <sys:String x:Key="Setting_Subsampling_Auto">Auto</sys:String>

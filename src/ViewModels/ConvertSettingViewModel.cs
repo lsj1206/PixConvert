@@ -28,7 +28,6 @@ public partial class ConvertSettingViewModel : ViewModelBase
     [ObservableProperty] private bool _standardLossless;
     [ObservableProperty] private JpegChromaSubsamplingMode _standardJpegChromaSubsampling = JpegChromaSubsamplingMode.Auto;
     [ObservableProperty] private int _standardPngCompressionLevel = 6;
-    [ObservableProperty] private PngFilterMode _standardPngFilter = PngFilterMode.Adaptive;
     [ObservableProperty] private AvifChromaSubsamplingMode _standardAvifChromaSubsampling = AvifChromaSubsamplingMode.Auto;
     [ObservableProperty] private int _standardAvifEncodingEffort = 4;
     [ObservableProperty] private AvifBitDepthMode _standardAvifBitDepth = AvifBitDepthMode.Auto;
@@ -75,9 +74,6 @@ public partial class ConvertSettingViewModel : ViewModelBase
 
     public bool StandardShowPngCompression =>
         SettingOptionCatalog.Supports(SettingOptionSection.Standard, SettingOptionKey.PngCompression, StandardTargetFormat);
-
-    public bool StandardShowPngFilter =>
-        SettingOptionCatalog.Supports(SettingOptionSection.Standard, SettingOptionKey.PngFilter, StandardTargetFormat);
 
     public bool StandardShowAvifChromaSubsampling =>
         SettingOptionCatalog.Supports(SettingOptionSection.Standard, SettingOptionKey.AvifChromaSubsampling, StandardTargetFormat) &&
@@ -292,7 +288,6 @@ public partial class ConvertSettingViewModel : ViewModelBase
         StandardLossless = settings.StandardLossless;
         StandardJpegChromaSubsampling = settings.StandardJpegChromaSubsampling;
         StandardPngCompressionLevel = settings.StandardPngCompressionLevel;
-        StandardPngFilter = settings.StandardPngFilter;
         StandardAvifChromaSubsampling = settings.StandardAvifChromaSubsampling;
         StandardAvifEncodingEffort = settings.StandardAvifEncodingEffort;
         StandardAvifBitDepth = settings.StandardAvifBitDepth;
@@ -333,7 +328,6 @@ public partial class ConvertSettingViewModel : ViewModelBase
         settings.StandardLossless = StandardLossless;
         settings.StandardJpegChromaSubsampling = StandardJpegChromaSubsampling;
         settings.StandardPngCompressionLevel = StandardPngCompressionLevel;
-        settings.StandardPngFilter = StandardPngFilter;
         settings.StandardAvifChromaSubsampling = StandardAvifChromaSubsampling;
         settings.StandardAvifEncodingEffort = StandardAvifEncodingEffort;
         settings.StandardAvifBitDepth = StandardAvifBitDepth;
@@ -416,7 +410,6 @@ public partial class ConvertSettingViewModel : ViewModelBase
         OnPropertyChanged(nameof(StandardShowBackgroundColor));
         OnPropertyChanged(nameof(StandardShowJpegChromaSubsampling));
         OnPropertyChanged(nameof(StandardShowPngCompression));
-        OnPropertyChanged(nameof(StandardShowPngFilter));
         OnPropertyChanged(nameof(StandardShowAvifChromaSubsampling));
         OnPropertyChanged(nameof(StandardCanEditAvifChromaSubsampling));
         OnPropertyChanged(nameof(StandardShowAvifEncodingEffort));

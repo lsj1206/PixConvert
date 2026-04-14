@@ -24,8 +24,6 @@ public class ConvertSettings
 
     public int StandardPngCompressionLevel { get; set; } = 6;
 
-    public PngFilterMode StandardPngFilter { get; set; } = PngFilterMode.Adaptive;
-
     public AvifChromaSubsamplingMode StandardAvifChromaSubsampling { get; set; } = AvifChromaSubsamplingMode.Auto;
 
     public int StandardAvifEncodingEffort { get; set; } = 4;
@@ -85,8 +83,6 @@ public enum SaveFolderMethod { NoFolder, CreateFolder }
 public enum SaveLocationType { SameAsOriginal, Custom }
 
 public enum JpegChromaSubsamplingMode { Auto, Chroma420, Chroma444 }
-
-public enum PngFilterMode { Adaptive, None, Sub, Up, Average, Paeth }
 
 public enum AvifChromaSubsamplingMode { Auto, On, Off }
 

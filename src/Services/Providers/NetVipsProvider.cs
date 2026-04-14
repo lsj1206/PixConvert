@@ -144,7 +144,7 @@ public class NetVipsProvider : IProviderService, IDisposable
                 image.Pngsave(
                     outputPath,
                     compression: settings.StandardPngCompressionLevel,
-                    filter: ResolvePngFilter(settings.StandardPngFilter),
+                    filter: Enums.ForeignPngFilter.All,
                     keep: Enums.ForeignKeep.None);
                 return;
             case "WEBP":
@@ -347,17 +347,6 @@ public class NetVipsProvider : IProviderService, IDisposable
             _ => Enums.ForeignSubsample.Auto
         };
     }
-
-    private static Enums.ForeignPngFilter ResolvePngFilter(PngFilterMode mode) =>
-        mode switch
-        {
-            PngFilterMode.None => Enums.ForeignPngFilter.None,
-            PngFilterMode.Sub => Enums.ForeignPngFilter.Sub,
-            PngFilterMode.Up => Enums.ForeignPngFilter.Up,
-            PngFilterMode.Average => Enums.ForeignPngFilter.Avg,
-            PngFilterMode.Paeth => Enums.ForeignPngFilter.Paeth,
-            _ => Enums.ForeignPngFilter.All
-        };
 
     private static Enums.ForeignSubsample ResolveAvifSubsampleMode(ConvertSettings settings, bool isAnimation, bool lossless)
     {

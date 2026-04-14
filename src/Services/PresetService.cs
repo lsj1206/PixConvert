@@ -217,7 +217,6 @@ public class PresetService : IPresetService
             !Enum.IsDefined(typeof(SaveFolderMethod), settings.FolderMethod) ||
             !Enum.IsDefined(typeof(OverwritePolicy), settings.OverwritePolicy) ||
             !Enum.IsDefined(typeof(JpegChromaSubsamplingMode), settings.StandardJpegChromaSubsampling) ||
-            !Enum.IsDefined(typeof(PngFilterMode), settings.StandardPngFilter) ||
             !Enum.IsDefined(typeof(AvifChromaSubsamplingMode), settings.StandardAvifChromaSubsampling) ||
             !Enum.IsDefined(typeof(AvifBitDepthMode), settings.StandardAvifBitDepth) ||
             !Enum.IsDefined(typeof(GifPalettePreset), settings.AnimationGifPalettePreset) ||

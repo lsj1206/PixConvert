@@ -208,7 +208,7 @@ public class SkiaSharpProvider : IProviderService, IDisposable
             ?? throw new InvalidOperationException(string.Format(_languageService.GetString("Log_Skia_EncodeFail"), "PNG"));
 
         var options = new SKPngEncoderOptions(
-            ResolvePngFilter(settings.StandardPngFilter),
+            SKPngEncoderFilterFlags.AllFilters,
             settings.StandardPngCompressionLevel);
         return pixmap.Encode(options)
             ?? throw new InvalidOperationException(string.Format(_languageService.GetString("Log_Skia_EncodeFail"), "PNG"));
@@ -248,17 +248,6 @@ public class SkiaSharpProvider : IProviderService, IDisposable
             _ => quality >= 90 ? SKJpegEncoderDownsample.Downsample444 : SKJpegEncoderDownsample.Downsample420
         };
     }
-
-    private static SKPngEncoderFilterFlags ResolvePngFilter(PngFilterMode mode) =>
-        mode switch
-        {
-            PngFilterMode.None => SKPngEncoderFilterFlags.NoFilters,
-            PngFilterMode.Sub => SKPngEncoderFilterFlags.Sub,
-            PngFilterMode.Up => SKPngEncoderFilterFlags.Up,
-            PngFilterMode.Average => SKPngEncoderFilterFlags.Avg,
-            PngFilterMode.Paeth => SKPngEncoderFilterFlags.Paeth,
-            _ => SKPngEncoderFilterFlags.AllFilters
-        };
 
     public void Dispose() { }
 }
