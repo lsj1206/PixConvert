@@ -347,6 +347,48 @@ public class PresetServiceTests
         Assert.Equal("Msg_Error_ConfigInvalid", errorKey);
     }
 
+    [Theory]
+    [InlineData(-1, false)]
+    [InlineData(0, true)]
+    [InlineData(4, true)]
+    [InlineData(6, true)]
+    [InlineData(7, false)]
+    public void ValidPresetData_ShouldValidateAnimationWebpEncodingEffort(int effort, bool expected)
+    {
+        var settings = new ConvertSettings
+        {
+            StandardTargetFormat = "JPEG",
+            AnimationTargetFormat = "WEBP",
+            StandardBackgroundColor = "#FFFFFF",
+            AnimationWebpEncodingEffort = effort
+        };
+
+        var result = _presetService.ValidPresetData(settings, out string errorKey);
+
+        Assert.Equal(expected, result);
+        if (!expected)
+            Assert.Equal("Msg_Error_ConfigInvalid", errorKey);
+        else
+            Assert.True(string.IsNullOrEmpty(errorKey));
+    }
+
+    [Fact]
+    public void ValidPresetData_WhenWebpPresetEnumIsInvalid_ShouldReturnFalse()
+    {
+        var settings = new ConvertSettings
+        {
+            StandardTargetFormat = "JPEG",
+            AnimationTargetFormat = "WEBP",
+            StandardBackgroundColor = "#FFFFFF",
+            AnimationWebpPreset = (WebpPresetMode)999
+        };
+
+        var result = _presetService.ValidPresetData(settings, out string errorKey);
+
+        Assert.False(result);
+        Assert.Equal("Msg_Error_ConfigInvalid", errorKey);
+    }
+
     [Fact]
     public void AddPreset_WhenNewName_ShouldIncreaseCount()
     {

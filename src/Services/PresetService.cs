@@ -183,6 +183,13 @@ public class PresetService : IPresetService
             return false;
         }
 
+        if (settings.AnimationWebpEncodingEffort < 0 || settings.AnimationWebpEncodingEffort > 6)
+        {
+            _logger.LogError(_languageService.GetString("Log_Preset_InvalidQuality"), settings.AnimationWebpEncodingEffort);
+            errorMessageKey = "Msg_Error_ConfigInvalid";
+            return false;
+        }
+
         // 지원하는 확장자 포맷 배열
         var allowedStandard = new[] { "JPEG", "PNG", "BMP", "WEBP", "AVIF" };
         var allowedAnimation = new[] { "GIF", "WEBP" };
@@ -213,7 +220,8 @@ public class PresetService : IPresetService
             !Enum.IsDefined(typeof(PngFilterMode), settings.StandardPngFilter) ||
             !Enum.IsDefined(typeof(AvifChromaSubsamplingMode), settings.StandardAvifChromaSubsampling) ||
             !Enum.IsDefined(typeof(AvifBitDepthMode), settings.StandardAvifBitDepth) ||
-            !Enum.IsDefined(typeof(GifPalettePreset), settings.AnimationGifPalettePreset))
+            !Enum.IsDefined(typeof(GifPalettePreset), settings.AnimationGifPalettePreset) ||
+            !Enum.IsDefined(typeof(WebpPresetMode), settings.AnimationWebpPreset))
         {
             _logger.LogError(_languageService.GetString("Log_Preset_InvalidEnum"));
             errorMessageKey = "Msg_Error_ConfigInvalid";

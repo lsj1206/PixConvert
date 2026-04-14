@@ -41,6 +41,12 @@ public class ConvertSettings
     /// <summary>애니메이션 이미지 무손실 인코딩 여부. 현재 WEBP에 적용됩니다.</summary>
     public bool AnimationLossless { get; set; }
 
+    public int AnimationWebpEncodingEffort { get; set; } = 4;
+
+    public WebpPresetMode AnimationWebpPreset { get; set; } = WebpPresetMode.Default;
+
+    public bool AnimationWebpPreserveTransparentPixels { get; set; }
+
     /// <summary>애니메이션 GIF 팔레트 프리셋입니다.</summary>
     public GifPalettePreset AnimationGifPalettePreset { get; set; } = GifPalettePreset.Standard;
 
@@ -87,3 +93,5 @@ public enum AvifChromaSubsamplingMode { Auto, On, Off }
 public enum AvifBitDepthMode { Auto, Bit8, Bit10, Bit12 }
 
 public enum GifPalettePreset { Minimal, Simple, Standard, Balance, Vivid }
+
+public enum WebpPresetMode { Default, Picture, Photo, Drawing, Icon, Text }

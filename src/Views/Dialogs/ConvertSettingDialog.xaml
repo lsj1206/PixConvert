@@ -512,6 +512,28 @@
                 <StackPanel
                     Margin="0,8,0,0"
                     Orientation="Horizontal"
+                    Visibility="{Binding AnimationShowWebpPreset, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <TextBlock
+                        Margin="0,0,12,1"
+                        VerticalAlignment="Center"
+                        FontWeight="SemiBold"
+                        Text="{DynamicResource Setting_WebpPreset}" />
+                    <ComboBox
+                        Width="100"
+                        SelectedValuePath="Tag"
+                        SelectedValue="{Binding AnimationWebpPreset}">
+                        <ComboBoxItem Content="{DynamicResource Setting_WebpPreset_Default}" Tag="{x:Static model:WebpPresetMode.Default}" />
+                        <ComboBoxItem Content="{DynamicResource Setting_WebpPreset_Picture}" Tag="{x:Static model:WebpPresetMode.Picture}" />
+                        <ComboBoxItem Content="{DynamicResource Setting_WebpPreset_Photo}" Tag="{x:Static model:WebpPresetMode.Photo}" />
+                        <ComboBoxItem Content="{DynamicResource Setting_WebpPreset_Drawing}" Tag="{x:Static model:WebpPresetMode.Drawing}" />
+                        <ComboBoxItem Content="{DynamicResource Setting_WebpPreset_Icon}" Tag="{x:Static model:WebpPresetMode.Icon}" />
+                        <ComboBoxItem Content="{DynamicResource Setting_WebpPreset_Text}" Tag="{x:Static model:WebpPresetMode.Text}" />
+                    </ComboBox>
+                </StackPanel>
+
+                <StackPanel
+                    Margin="0,8,0,0"
+                    Orientation="Horizontal"
                     Visibility="{Binding AnimationShowQuality, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <TextBlock
                         Margin="0,0,12,4"
@@ -534,6 +556,50 @@
                             Text="{Binding AnimationQuality, UpdateSourceTrigger=PropertyChanged}"
                             ui:TextBoxHelper.IsDeleteButtonVisible="False"
                             ui:ControlHelper.PlaceholderText="90" />
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel
+                    Margin="0,8,0,0"
+                    Orientation="Horizontal"
+                    Visibility="{Binding AnimationShowWebpPreserveTransparentPixels, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <TextBlock
+                        Margin="0,0,12,3"
+                        VerticalAlignment="Center"
+                        FontWeight="SemiBold"
+                        Text="{DynamicResource Setting_PreserveTransparentPixels}" />
+                    <CheckBox IsChecked="{Binding AnimationWebpPreserveTransparentPixels, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                </StackPanel>
+
+                <StackPanel
+                    Margin="0,8,0,0"
+                    Orientation="Horizontal"
+                    Visibility="{Binding AnimationShowWebpEncodingEffort, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <TextBlock
+                        Margin="0,0,12,4"
+                        VerticalAlignment="Center"
+                        FontWeight="SemiBold"
+                        Text="{DynamicResource Setting_EncodingEffort}" />
+                    <StackPanel Orientation="Horizontal">
+                        <Slider
+                            Margin="0,0,8,0"
+                            Width="200"
+                            Maximum="6"
+                            Minimum="0"
+                            IsSnapToTickEnabled="True"
+                            SmallChange="1"
+                            TickFrequency="1"
+                            Value="{Binding AnimationWebpEncodingEffort}" />
+                        <ctrls:FilterTextBox
+                            Width="40"
+                            VerticalAlignment="Center"
+                            IsBlank="4"
+                            Filter="Digits"
+                            FilterMode="Allow"
+                            FilterMaxLength="1"
+                            Text="{Binding AnimationWebpEncodingEffort, UpdateSourceTrigger=PropertyChanged}"
+                            ui:TextBoxHelper.IsDeleteButtonVisible="False"
+                            ui:ControlHelper.PlaceholderText="4" />
                     </StackPanel>
                 </StackPanel>
 

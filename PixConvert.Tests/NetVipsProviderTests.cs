@@ -176,6 +176,59 @@ public class NetVipsProviderTests : IDisposable
     }
 
     [Fact]
+    public async Task ConvertAsync_GifToWebp_WithLossyWebpOptions_ShouldProduceValidFile()
+    {
+        string gifPath = CreateAnimatedGif(2);
+        var file = new FileItem { Path = gifPath, FileSignature = "GIF", IsAnimation = true };
+        var settings = new ConvertSettings
+        {
+            AnimationTargetFormat = "WEBP",
+            AnimationLossless = false,
+            AnimationQuality = 80,
+            AnimationWebpEncodingEffort = 6,
+            AnimationWebpPreset = WebpPresetMode.Drawing,
+            SaveLocation = SaveLocationType.SameAsOriginal,
+            FolderMethod = SaveFolderMethod.NoFolder,
+            OverwritePolicy = OverwritePolicy.Suffix
+        };
+
+        await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
+
+        string expectedPath = Path.Combine(_testDir, "animated.webp");
+        Assert.True(File.Exists(expectedPath));
+        Assert.Equal(FileConvertStatus.Success, file.Status);
+
+        using var output = NetVips.Image.NewFromFile(expectedPath);
+        Assert.NotNull(output);
+    }
+
+    [Fact]
+    public async Task ConvertAsync_GifToWebp_WithLosslessWebpOptions_ShouldProduceValidFile()
+    {
+        string gifPath = CreateAnimatedGif(2);
+        var file = new FileItem { Path = gifPath, FileSignature = "GIF", IsAnimation = true };
+        var settings = new ConvertSettings
+        {
+            AnimationTargetFormat = "WEBP",
+            AnimationLossless = true,
+            AnimationWebpEncodingEffort = 6,
+            AnimationWebpPreserveTransparentPixels = true,
+            SaveLocation = SaveLocationType.SameAsOriginal,
+            FolderMethod = SaveFolderMethod.NoFolder,
+            OverwritePolicy = OverwritePolicy.Suffix
+        };
+
+        await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
+
+        string expectedPath = Path.Combine(_testDir, "animated.webp");
+        Assert.True(File.Exists(expectedPath));
+        Assert.Equal(FileConvertStatus.Success, file.Status);
+
+        using var output = NetVips.Image.NewFromFile(expectedPath);
+        Assert.NotNull(output);
+    }
+
+    [Fact]
     public async Task ConvertAsync_GifToGif_WithCustomGifOptions_ShouldProduceValidFile()
     {
         string gifPath = CreateAnimatedGif(3);

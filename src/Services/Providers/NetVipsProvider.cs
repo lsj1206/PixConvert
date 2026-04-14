@@ -148,11 +148,7 @@ public class NetVipsProvider : IProviderService, IDisposable
                     keep: Enums.ForeignKeep.None);
                 return;
             case "WEBP":
-                image.Webpsave(
-                    outputPath,
-                    q: lossless ? null : quality,
-                    lossless: lossless,
-                    keep: Enums.ForeignKeep.None);
+                SaveWebp(image, outputPath, settings, isAnimation, quality, lossless);
                 return;
             case "AVIF":
                 SaveAvif(image, outputPath, settings, isAnimation, quality, lossless);
@@ -164,6 +160,57 @@ public class NetVipsProvider : IProviderService, IDisposable
                 throw new NotSupportedException($"NetVipsProviderì—ì„œ ì§€ì›í•˜ì§€ ì•ŠëŠ” ëŒ€ìƒ í¬ë§·: {targetFormat}");
         }
     }
+
+    private static void SaveWebp(Image image, string outputPath, ConvertSettings settings, bool isAnimation, int quality, bool lossless)
+    {
+        if (!isAnimation)
+        {
+            image.Webpsave(
+                outputPath,
+                q: lossless ? null : quality,
+                lossless: lossless,
+                keep: Enums.ForeignKeep.None);
+            return;
+        }
+
+        if (lossless)
+        {
+            SaveLosslessWebp(image, outputPath, settings);
+            return;
+        }
+
+        image.Webpsave(
+            outputPath,
+            q: quality,
+            lossless: false,
+            preset: ResolveWebpPreset(settings.AnimationWebpPreset),
+            alphaQ: 100,
+            effort: settings.AnimationWebpEncodingEffort,
+            keep: Enums.ForeignKeep.None);
+    }
+
+    private static void SaveLosslessWebp(Image image, string outputPath, ConvertSettings settings)
+    {
+        try
+        {
+            image.Webpsave(
+                outputPath,
+                lossless: true,
+                exact: settings.AnimationWebpPreserveTransparentPixels,
+                effort: settings.AnimationWebpEncodingEffort,
+                keep: Enums.ForeignKeep.None);
+        }
+        catch (ArgumentException ex) when (ex.Message.Contains("exact", StringComparison.OrdinalIgnoreCase))
+        {
+            // NetVips 3.2.0 exposes `exact`, but some bundled libvips/webp builds do not.
+            image.Webpsave(
+                outputPath,
+                lossless: true,
+                effort: settings.AnimationWebpEncodingEffort,
+                keep: Enums.ForeignKeep.None);
+        }
+    }
+
     private static void SaveAvif(Image image, string outputPath, ConvertSettings settings, bool isAnimation, int quality, bool lossless)
     {
         Enums.ForeignSubsample subsampleMode = ResolveAvifSubsampleMode(settings, isAnimation, lossless);
@@ -365,6 +412,17 @@ public class NetVipsProvider : IProviderService, IDisposable
 
     private static double ResolveGifInterpaletteMaxError(ConvertSettings settings, bool isAnimation) =>
         isAnimation ? settings.AnimationGifInterpaletteMaxError : 0.0;
+
+    private static Enums.ForeignWebpPreset ResolveWebpPreset(WebpPresetMode preset) =>
+        preset switch
+        {
+            WebpPresetMode.Picture => Enums.ForeignWebpPreset.Picture,
+            WebpPresetMode.Photo => Enums.ForeignWebpPreset.Photo,
+            WebpPresetMode.Drawing => Enums.ForeignWebpPreset.Drawing,
+            WebpPresetMode.Icon => Enums.ForeignWebpPreset.Icon,
+            WebpPresetMode.Text => Enums.ForeignWebpPreset.Text,
+            _ => Enums.ForeignWebpPreset.Default
+        };
 
     private static Image LoadBmpViaSkia(string path)
     {
