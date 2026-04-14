@@ -583,7 +583,7 @@
                     <StackPanel Orientation="Horizontal">
                         <Slider
                             Margin="0,0,8,0"
-                            Width="200"
+                            Width="120"
                             Maximum="6"
                             Minimum="0"
                             IsSnapToTickEnabled="True"
@@ -591,7 +591,7 @@
                             TickFrequency="1"
                             Value="{Binding AnimationWebpEncodingEffort}" />
                         <ctrls:FilterTextBox
-                            Width="40"
+                            MinWidth="32"
                             VerticalAlignment="Center"
                             IsBlank="4"
                             Filter="Digits"
