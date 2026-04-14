@@ -443,8 +443,7 @@
                             <ToolTip>
                                 <ctrls:OptionToolTip
                                     Title="{DynamicResource SettingTip_AvifChromaSubsampling_Title}"
-                                    Body="{DynamicResource SettingTip_AvifChromaSubsampling_Body}"
-                                    Caution="{DynamicResource SettingTip_AvifChromaSubsampling_Caution}" />
+                                    Body="{DynamicResource SettingTip_AvifChromaSubsampling_Body}" />
                             </ToolTip>
                         </Button.ToolTip>
                         <ui:FontIcon FontSize="12" Glyph="&#xE946;" />
@@ -570,8 +569,7 @@
                         <Button.ToolTip>
                             <ToolTip>
                                 <ctrls:OptionToolTip
-                                    Title="{DynamicResource SettingTip_BackgroundColor_Title}"
-                                    Body="{DynamicResource SettingTip_BackgroundColor_Body}" />
+                                    Title="{DynamicResource SettingTip_BackgroundColor_Title}" />
                             </ToolTip>
                         </Button.ToolTip>
                         <ui:FontIcon FontSize="12" Glyph="&#xE946;" />
@@ -659,8 +657,7 @@
                             <Button.ToolTip>
                                 <ToolTip>
                                     <ctrls:OptionToolTip
-                                        Title="{DynamicResource SettingTip_AnimationLossless_Title}"
-                                        Body="{DynamicResource SettingTip_AnimationLossless_Body}" />
+                                        Title="{DynamicResource SettingTip_AnimationLossless_Title}" />
                                 </ToolTip>
                             </Button.ToolTip>
                             <ui:FontIcon FontSize="12" Glyph="&#xE946;" />
@@ -685,8 +682,7 @@
                             <Button.ToolTip>
                                 <ToolTip>
                                     <ctrls:OptionToolTip
-                                        Title="{DynamicResource SettingTip_WebpPreset_Title}"
-                                        Body="{DynamicResource SettingTip_WebpPreset_Body}" />
+                                        Title="{DynamicResource SettingTip_WebpPreset_Title}" />
                                 </ToolTip>
                             </Button.ToolTip>
                             <ui:FontIcon FontSize="12" Glyph="&#xE946;" />
@@ -721,8 +717,7 @@
                             <Button.ToolTip>
                                 <ToolTip>
                                     <ctrls:OptionToolTip
-                                        Title="{DynamicResource SettingTip_AnimationQuality_Title}"
-                                        Body="{DynamicResource SettingTip_AnimationQuality_Body}" />
+                                        Title="{DynamicResource SettingTip_AnimationQuality_Title}" />
                                 </ToolTip>
                             </Button.ToolTip>
                             <ui:FontIcon FontSize="12" Glyph="&#xE946;" />
@@ -763,9 +758,7 @@
                             <Button.ToolTip>
                                 <ToolTip>
                                     <ctrls:OptionToolTip
-                                        Title="{DynamicResource SettingTip_PreserveTransparentPixels_Title}"
-                                        Body="{DynamicResource SettingTip_PreserveTransparentPixels_Body}"
-                                        Caution="{DynamicResource SettingTip_PreserveTransparentPixels_Caution}" />
+                                        Title="{DynamicResource SettingTip_PreserveTransparentPixels_Title}" />
                                 </ToolTip>
                             </Button.ToolTip>
                             <ui:FontIcon FontSize="12" Glyph="&#xE946;" />
@@ -844,7 +837,7 @@
                         </Button>
                     </StackPanel>
                     <ComboBox
-                        Width="220"
+                        Width="100"
                         SelectedValuePath="Tag"
                         SelectedValue="{Binding AnimationGifPalettePreset}">
                         <ComboBoxItem Content="{DynamicResource Setting_GifPalette_Minimal}" Tag="{x:Static model:GifPalettePreset.Minimal}" />
@@ -872,7 +865,6 @@
                                 <ToolTip>
                                     <ctrls:OptionToolTip
                                         Title="{DynamicResource SettingTip_InterframeMaxError_Title}"
-                                        Body="{DynamicResource SettingTip_InterframeMaxError_Body}"
                                         Caution="{DynamicResource SettingTip_InterframeMaxError_Caution}" />
                                 </ToolTip>
                             </Button.ToolTip>
@@ -920,7 +912,6 @@
                                 <ToolTip>
                                     <ctrls:OptionToolTip
                                         Title="{DynamicResource SettingTip_InterpaletteMaxError_Title}"
-                                        Body="{DynamicResource SettingTip_InterpaletteMaxError_Body}"
                                         Caution="{DynamicResource SettingTip_InterpaletteMaxError_Caution}" />
                                 </ToolTip>
                             </Button.ToolTip>

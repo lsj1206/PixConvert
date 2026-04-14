@@ -121,53 +121,49 @@
     <sys:String x:Key="SettingTip_OverwritePolicy_Title">경로에 동일한 파일명이 존재할 때 처리 방식을 선택합니다.</sys:String>
     <sys:String x:Key="SettingTip_StandardLossless_Title">무손실/손실 압축을 설정합니다.</sys:String>
     <sys:String x:Key="SettingTip_StandardQuality_Title">손실 압축의 품질을 설정합니다.</sys:String>
-    <sys:String x:Key="SettingTip_JpegChromaSubsampling_Title">밝기 해상도 대비 색차 해상도를 설정합니다.</sys:String>
+    <sys:String x:Key="SettingTip_JpegChromaSubsampling_Title">색차 해상도를 설정합니다.</sys:String>
     <sys:String x:Key="SettingTip_JpegChromaSubsampling_Body" xml:space="preserve">• 4:4:4는 밝기와 색차가 같은 해상도를 유지합니다.
 • 4:2:2는 가로 방향 색차 해상도를 줄입니다.
 • 4:2:0는 가로/세로 방향 색차 해상도를 줄입니다.</sys:String>
     <sys:String x:Key="SettingTip_JpegChromaSubsampling_Caution">⚠️AVIF->JPEG 변환 시 4:2:2는 품질에 따라 4:4:4 혹은 4:2:0으로 적용됩니다.</sys:String>
-    <sys:String x:Key="SettingTip_PngCompression_Title">PNG 압축</sys:String>
-    <sys:String x:Key="SettingTip_PngCompression_Body" xml:space="preserve">픽셀 품질은 바꾸지 않고 압축 시간과 파일 크기만 조절합니다.
-0은 빠르고 파일이 클 수 있으며, 9는 느리지만 더 작아질 수 있습니다.</sys:String>
-    <sys:String x:Key="SettingTip_AvifChromaSubsampling_Title">AVIF 색차 서브샘플링</sys:String>
-    <sys:String x:Key="SettingTip_AvifChromaSubsampling_Body" xml:space="preserve">AVIF 손실 저장에서 색상 정보를 줄일지 정합니다.
-용량 절감에 유리할 수 있지만 색 경계가 흐려질 수 있습니다.</sys:String>
-    <sys:String x:Key="SettingTip_AvifChromaSubsampling_Caution">무손실 모드에서는 적용하지 않아 옵션이 숨겨집니다.</sys:String>
-    <sys:String x:Key="SettingTip_AvifEncodingEffort_Title">AVIF 인코딩 강도</sys:String>
-    <sys:String x:Key="SettingTip_AvifEncodingEffort_Body" xml:space="preserve">AVIF 인코더가 압축을 위해 사용하는 계산량입니다.
-0은 빠르고, 9는 느리지만 파일 크기가 줄어들 수 있습니다.</sys:String>
-    <sys:String x:Key="SettingTip_AvifBitDepth_Title">AVIF 비트 깊이</sys:String>
-    <sys:String x:Key="SettingTip_AvifBitDepth_Body" xml:space="preserve">AVIF 저장 비트 심도를 지정합니다.
-자동은 앱이 값을 전달하지 않고 NetVips/libvips 기본 동작에 맡깁니다.</sys:String>
-    <sys:String x:Key="SettingTip_BackgroundColor_Title">배경 색</sys:String>
-    <sys:String x:Key="SettingTip_BackgroundColor_Body" xml:space="preserve">JPEG/BMP처럼 알파를 지원하지 않는 포맷으로 저장할 때 사용합니다.
-투명 영역은 선택한 배경색과 합성되어 저장됩니다.</sys:String>
-    <sys:String x:Key="SettingTip_AnimationLossless_Title">애니메이션 무손실</sys:String>
-    <sys:String x:Key="SettingTip_AnimationLossless_Body" xml:space="preserve">애니메이션 WebP를 무손실로 저장합니다.
-용량이 커질 수 있으며 손실 품질과 WebP 프리셋은 사용하지 않습니다.</sys:String>
-    <sys:String x:Key="SettingTip_AnimationQuality_Title">애니메이션 품질</sys:String>
-    <sys:String x:Key="SettingTip_AnimationQuality_Body" xml:space="preserve">손실 애니메이션 WebP 저장 품질입니다.
-값이 높을수록 원본에 가까워질 수 있지만 파일 크기가 커질 수 있습니다.</sys:String>
-    <sys:String x:Key="SettingTip_WebpPreset_Title">WebP 프리셋</sys:String>
-    <sys:String x:Key="SettingTip_WebpPreset_Body" xml:space="preserve">손실 WebP 인코더에 이미지 유형 힌트를 전달합니다.
-사진, 그림, 아이콘, 텍스트 등 콘텐츠 특성에 맞춰 압축 방식을 조정합니다.</sys:String>
-    <sys:String x:Key="SettingTip_PreserveTransparentPixels_Title">투명 픽셀 RGB값 보존</sys:String>
-    <sys:String x:Key="SettingTip_PreserveTransparentPixels_Body" xml:space="preserve">무손실 WebP에서 완전 투명 픽셀의 RGB 값을 보존하려고 시도합니다.
-보존하면 후처리나 재인코딩에서 투명 영역의 색 정보가 유지될 수 있습니다.</sys:String>
-    <sys:String x:Key="SettingTip_PreserveTransparentPixels_Caution">현재 native 엔진이 exact 옵션을 지원하지 않으면 저장은 계속되지만 이 보존은 적용되지 않을 수 있습니다.</sys:String>
-    <sys:String x:Key="SettingTip_WebpEncodingEffort_Title">WebP 인코딩 강도</sys:String>
-    <sys:String x:Key="SettingTip_WebpEncodingEffort_Body" xml:space="preserve">애니메이션 WebP 압축 계산 강도입니다.
-0은 빠르고 6은 느리지만 파일 크기가 줄어들 수 있습니다.</sys:String>
-    <sys:String x:Key="SettingTip_GifPalettePreset_Title">GIF 색상 표현</sys:String>
-    <sys:String x:Key="SettingTip_GifPalettePreset_Body" xml:space="preserve">GIF 색상 수와 디더링 조합을 선택합니다.
-색이 많고 디더링이 강할수록 계조는 부드럽지만 용량과 노이즈가 늘 수 있습니다.</sys:String>
-    <sys:String x:Key="SettingTip_InterframeMaxError_Title">프레임 차이 허용값</sys:String>
-    <sys:String x:Key="SettingTip_InterframeMaxError_Body" xml:space="preserve">GIF 프레임 간 차이를 얼마나 허용할지 정합니다.
-값이 높을수록 더 공격적으로 최적화되어 용량이 줄 수 있습니다.</sys:String>
+    <sys:String x:Key="SettingTip_PngCompression_Title">압축 강도를 설정합니다.</sys:String>
+    <sys:String x:Key="SettingTip_PngCompression_Body" xml:space="preserve">이미지의 품질은 변경되지않습니다.
+• 0: 무압축, 빠름, 용량 큼
+• 6: 기본값
+• 9: 최대 압축, 느림, 용량 작음</sys:String>
+    <sys:String x:Key="SettingTip_AvifChromaSubsampling_Title">손실 저장시, 색차 해상도를 설정합니다.</sys:String>
+    <sys:String x:Key="SettingTip_AvifChromaSubsampling_Body" xml:space="preserve">• 자동: 품질이 90 이상이면 4:4:4, 미만이면 4:2:0이 적용됩니다.
+• 사용(4:2:0): 가로/세로 방향 색차 해상도를 줄입니다.
+• 미사용(4:4:4): 밝기와 색차가 같은 해상도를 유지합니다.</sys:String>
+    <sys:String x:Key="SettingTip_AvifEncodingEffort_Title">얼마나 CPU 시간을 소모해 더 좋은 압축 결과를 찾을 지 결정하는 옵션입니다.</sys:String>
+    <sys:String x:Key="SettingTip_AvifEncodingEffort_Body" xml:space="preserve">• 0: 인코딩 빠름, 용량 큼
+• 4: 기본값
+• 9: 인코딩 느림, 용량 작음</sys:String>
+    <sys:String x:Key="SettingTip_AvifBitDepth_Title">채널당 색 표현 정밀도에 관한 설정입니다.</sys:String>
+    <sys:String x:Key="SettingTip_AvifBitDepth_Body" xml:space="preserve">• 자동: 입력 이미지 타입에 따라 자동 결정됩니다.
+• 8-bit: 256 단계, 일반적
+• 10-bit: 1024 단계
+• 12-bit: 4096 단계</sys:String>
+    <sys:String x:Key="SettingTip_BackgroundColor_Title">알파(투명도)를 지원하지 않는 포맷으로 저장할 때 사용합니다.</sys:String>
+    <sys:String x:Key="SettingTip_AnimationLossless_Title">무손실/손실 압축을 설정합니다.</sys:String>
+    <sys:String x:Key="SettingTip_AnimationQuality_Title">손실 압축의 품질을 설정합니다.</sys:String>
+    <sys:String x:Key="SettingTip_WebpPreset_Title">이미지 유형 힌트를 통해 손실 압축 방식을 조정하는 옵션입니다.</sys:String>
+    <sys:String x:Key="SettingTip_PreserveTransparentPixels_Title">무손실 압축 시 투명 픽셀의 RGB값 보존 여부를 설정합니다.</sys:String>
+    <sys:String x:Key="SettingTip_WebpEncodingEffort_Title">얼마나 CPU 시간을 소모해 더 좋은 압축 결과를 찾을 지 결정하는 옵션입니다.</sys:String>
+    <sys:String x:Key="SettingTip_WebpEncodingEffort_Body" xml:space="preserve">• 0: 인코딩 빠름, 용량 큼
+• 4: 기본값
+• 6: 인코딩 느림, 용량 작음</sys:String>
+    <sys:String x:Key="SettingTip_GifPalettePreset_Title">비트 심도와 디더링을 설정합니다.</sys:String>
+    <sys:String x:Key="SettingTip_GifPalettePreset_Body" xml:space="preserve">비트 심도: 프레임당 색상 수의 상한
+디더링: 원본과의 색 오차를 주변 픽셀로 분산
+• 최소: 6-bit(64색), 디더링 없음
+• 단순: 7-bit(128색), 디더링 0.3
+• 표준: 8-bit(256색), 디더링 없음
+• 균형: 8-bit(256색), 디더링 0.3
+• 풍부: 8-bit(256색), 디더링 0.5</sys:String>
+    <sys:String x:Key="SettingTip_InterframeMaxError_Title">프레임 간에 비슷한 부분을 투명 처리로 최적화할 때 허용 오차를 설정합니다.</sys:String>
     <sys:String x:Key="SettingTip_InterframeMaxError_Caution">값을 높이면 잔상이나 경계 오차가 생길 수 있습니다.</sys:String>
-    <sys:String x:Key="SettingTip_InterpaletteMaxError_Title">색상 차이 허용값</sys:String>
-    <sys:String x:Key="SettingTip_InterpaletteMaxError_Body" xml:space="preserve">GIF 프레임별 팔레트 차이를 얼마나 허용할지 정합니다.
-값이 높을수록 용량은 줄 수 있지만 팔레트가 더 크게 합쳐집니다.</sys:String>
+    <sys:String x:Key="SettingTip_InterpaletteMaxError_Title">프레임 간에 비슷한 색상을 재사용하여 최적화 할 때 허용 오차를 설정합니다.</sys:String>
     <sys:String x:Key="SettingTip_InterpaletteMaxError_Caution">값을 높이면 색 정확도가 낮아질 수 있습니다.</sys:String>
     <!-- 변환 설정 : 배경색 -->
     <sys:String x:Key="Bg_White">흰색</sys:String>
@@ -189,11 +185,11 @@
     <sys:String x:Key="Setting_BitDepth_12">12-bit</sys:String>
     <!-- 변환 설정 : GIF 색상 표현 -->
     <sys:String x:Key="Setting_PalettePreset">색상 표현</sys:String>
-    <sys:String x:Key="Setting_GifPalette_Minimal">최소 (64색 / 무보정)</sys:String>
-    <sys:String x:Key="Setting_GifPalette_Simple">단순 (128색 / 디더링 0.3)</sys:String>
-    <sys:String x:Key="Setting_GifPalette_Standard">표준 (256색 / 무보정)</sys:String>
-    <sys:String x:Key="Setting_GifPalette_Balance">균형 (256색 / 디더링 0.3)</sys:String>
-    <sys:String x:Key="Setting_GifPalette_Vivid">풍부 (256색 / 디더링 0.5)</sys:String>
+    <sys:String x:Key="Setting_GifPalette_Minimal">최소</sys:String>
+    <sys:String x:Key="Setting_GifPalette_Simple">단순</sys:String>
+    <sys:String x:Key="Setting_GifPalette_Standard">표준</sys:String>
+    <sys:String x:Key="Setting_GifPalette_Balance">균형</sys:String>
+    <sys:String x:Key="Setting_GifPalette_Vivid">풍부</sys:String>
     <!-- 변환 설정 : WebP 프리셋 -->
     <sys:String x:Key="Setting_WebpPreset_Default">기본</sys:String>
     <sys:String x:Key="Setting_WebpPreset_Picture">그림</sys:String>

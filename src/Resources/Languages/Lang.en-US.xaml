@@ -116,58 +116,54 @@
     <sys:String x:Key="Setting_InterframeMaxError">Frame Tolerance</sys:String>
     <sys:String x:Key="Setting_InterpaletteMaxError">Palette Tolerance</sys:String>
     <!-- Convert Setting : Option Tips -->
-    <sys:String x:Key="SettingTip_CpuUsage_Title">CPU Usage</sys:String>
-    <sys:String x:Key="SettingTip_CpuUsage_Body" xml:space="preserve">Selects how many jobs can run at the same time.
-Actual parallelism depends on the number of CPU cores and threads.</sys:String>
-    <sys:String x:Key="SettingTip_OverwritePolicy_Title">Duplicate File Policy</sys:String>
-    <sys:String x:Key="SettingTip_StandardLossless_Title">Lossless</sys:String>
-    <sys:String x:Key="SettingTip_StandardQuality_Title">Quality</sys:String>
-    <sys:String x:Key="SettingTip_JpegChromaSubsampling_Title">Chroma Subsampling</sys:String>
-    <sys:String x:Key="SettingTip_JpegChromaSubsampling_Body" xml:space="preserve">4:4:4 preserves full chroma resolution and is the default.
-4:2:2 reduces chroma resolution horizontally to save space.
-4:2:0 reduces chroma resolution horizontally and vertically to save more space.</sys:String>
-    <sys:String x:Key="SettingTip_PngCompression_Title">PNG Compression</sys:String>
-    <sys:String x:Key="SettingTip_PngCompression_Body" xml:space="preserve">Changes compression time and file size without changing pixel quality.
-0 is fast and can be larger, while 9 is slower but may be smaller.</sys:String>
-    <sys:String x:Key="SettingTip_AvifChromaSubsampling_Title">AVIF Chroma Subsampling</sys:String>
-    <sys:String x:Key="SettingTip_AvifChromaSubsampling_Body" xml:space="preserve">Controls whether color information is reduced for lossy AVIF output.
-It can reduce file size but may soften color edges.</sys:String>
-    <sys:String x:Key="SettingTip_AvifChromaSubsampling_Caution">This option is hidden and not applied in lossless mode.</sys:String>
-    <sys:String x:Key="SettingTip_AvifEncodingEffort_Title">AVIF Encoding Effort</sys:String>
-    <sys:String x:Key="SettingTip_AvifEncodingEffort_Body" xml:space="preserve">Sets how much computation the AVIF encoder spends on compression.
-0 is fast, while 9 is slower and may reduce file size.</sys:String>
-    <sys:String x:Key="SettingTip_AvifBitDepth_Title">AVIF Bit Depth</sys:String>
-    <sys:String x:Key="SettingTip_AvifBitDepth_Body" xml:space="preserve">Sets the AVIF output bit depth.
-Auto sends no value and delegates behavior to NetVips/libvips defaults.</sys:String>
-    <sys:String x:Key="SettingTip_BackgroundColor_Title">Background Color</sys:String>
-    <sys:String x:Key="SettingTip_BackgroundColor_Body" xml:space="preserve">Used when saving to formats without alpha, such as JPEG or BMP.
-Transparent areas are composited with the selected background color.</sys:String>
-    <sys:String x:Key="SettingTip_AnimationLossless_Title">Animation Lossless</sys:String>
-    <sys:String x:Key="SettingTip_AnimationLossless_Body" xml:space="preserve">Stores animated WebP without lossy compression.
-Files can be larger, and lossy quality plus WebP preset are not used.</sys:String>
-    <sys:String x:Key="SettingTip_AnimationQuality_Title">Animation Quality</sys:String>
-    <sys:String x:Key="SettingTip_AnimationQuality_Body" xml:space="preserve">Sets the quality for lossy animated WebP output.
-Higher values can stay closer to the source but may increase file size.</sys:String>
-    <sys:String x:Key="SettingTip_WebpPreset_Title">WebP Preset</sys:String>
-    <sys:String x:Key="SettingTip_WebpPreset_Body" xml:space="preserve">Passes an image-type hint to the lossy WebP encoder.
-It tunes compression for photos, drawings, icons, text, and similar content.</sys:String>
-    <sys:String x:Key="SettingTip_PreserveTransparentPixels_Title">Preserve Transparent Pixels RGB</sys:String>
-    <sys:String x:Key="SettingTip_PreserveTransparentPixels_Body" xml:space="preserve">Attempts to preserve RGB values in fully transparent pixels for lossless WebP.
-Preservation can keep transparent-area color data for later processing or re-encoding.</sys:String>
-    <sys:String x:Key="SettingTip_PreserveTransparentPixels_Caution">If the current native engine does not support the exact option, saving continues but this preservation may not be applied.</sys:String>
-    <sys:String x:Key="SettingTip_WebpEncodingEffort_Title">WebP Encoding Effort</sys:String>
-    <sys:String x:Key="SettingTip_WebpEncodingEffort_Body" xml:space="preserve">Sets animated WebP compression effort.
-0 is fast and 6 is slower, but higher values may reduce file size.</sys:String>
-    <sys:String x:Key="SettingTip_GifPalettePreset_Title">GIF Palette Preset</sys:String>
-    <sys:String x:Key="SettingTip_GifPalettePreset_Body" xml:space="preserve">Chooses the GIF color count and dithering preset.
-More colors and stronger dithering can smooth gradients but may increase size and noise.</sys:String>
-    <sys:String x:Key="SettingTip_InterframeMaxError_Title">Frame Tolerance</sys:String>
-    <sys:String x:Key="SettingTip_InterframeMaxError_Body" xml:space="preserve">Sets how much difference is allowed between GIF frames.
-Higher values optimize more aggressively and may reduce file size.</sys:String>
+    <sys:String x:Key="SettingTip_CpuUsage_Title">Sets the number of concurrent conversion jobs.</sys:String>
+    <sys:String x:Key="SettingTip_CpuUsage_Body">The job count is determined by the number of CPU cores and threads.</sys:String>
+    <sys:String x:Key="SettingTip_OverwritePolicy_Title">Selects what to do when a file with the same name already exists in the output path.</sys:String>
+    <sys:String x:Key="SettingTip_StandardLossless_Title">Sets lossless or lossy compression.</sys:String>
+    <sys:String x:Key="SettingTip_StandardQuality_Title">Sets the quality for lossy compression.</sys:String>
+    <sys:String x:Key="SettingTip_JpegChromaSubsampling_Title">Sets chroma resolution.</sys:String>
+    <sys:String x:Key="SettingTip_JpegChromaSubsampling_Body" xml:space="preserve">• 4:4:4 keeps luma and chroma at the same resolution.
+• 4:2:2 reduces chroma resolution horizontally.
+• 4:2:0 reduces chroma resolution horizontally and vertically.</sys:String>
+    <sys:String x:Key="SettingTip_JpegChromaSubsampling_Caution">⚠️ For AVIF-to-JPEG conversion, 4:2:2 is applied as either 4:4:4 or 4:2:0 depending on quality.</sys:String>
+    <sys:String x:Key="SettingTip_PngCompression_Title">Sets compression strength.</sys:String>
+    <sys:String x:Key="SettingTip_PngCompression_Body" xml:space="preserve">Image quality is not changed.
+• 0: No compression, fast, large file
+• 6: Default
+• 9: Maximum compression, slow, small file</sys:String>
+    <sys:String x:Key="SettingTip_AvifChromaSubsampling_Title">For lossy saves, sets chroma resolution.</sys:String>
+    <sys:String x:Key="SettingTip_AvifChromaSubsampling_Body" xml:space="preserve">• Auto: Applies 4:4:4 when quality is 90 or higher, otherwise 4:2:0.
+• On (4:2:0): Reduces chroma resolution horizontally and vertically.
+• Off (4:4:4): Keeps luma and chroma at the same resolution.</sys:String>
+    <sys:String x:Key="SettingTip_AvifEncodingEffort_Title">Determines how much CPU time is spent searching for better compression results.</sys:String>
+    <sys:String x:Key="SettingTip_AvifEncodingEffort_Body" xml:space="preserve">• 0: Fast encoding, larger file
+• 4: Default
+• 9: Slow encoding, smaller file</sys:String>
+    <sys:String x:Key="SettingTip_AvifBitDepth_Title">Sets color precision per channel.</sys:String>
+    <sys:String x:Key="SettingTip_AvifBitDepth_Body" xml:space="preserve">• Auto: Determined automatically from the input image type.
+• 8-bit: 256 levels, common
+• 10-bit: 1024 levels
+• 12-bit: 4096 levels</sys:String>
+    <sys:String x:Key="SettingTip_BackgroundColor_Title">Used when saving to formats that do not support alpha transparency.</sys:String>
+    <sys:String x:Key="SettingTip_AnimationLossless_Title">Sets lossless or lossy compression.</sys:String>
+    <sys:String x:Key="SettingTip_AnimationQuality_Title">Sets the quality for lossy compression.</sys:String>
+    <sys:String x:Key="SettingTip_WebpPreset_Title">Adjusts lossy compression using an image-type hint.</sys:String>
+    <sys:String x:Key="SettingTip_PreserveTransparentPixels_Title">Sets whether RGB values in transparent pixels are preserved during lossless compression.</sys:String>
+    <sys:String x:Key="SettingTip_WebpEncodingEffort_Title">Determines how much CPU time is spent searching for better compression results.</sys:String>
+    <sys:String x:Key="SettingTip_WebpEncodingEffort_Body" xml:space="preserve">• 0: Fast encoding, larger file
+• 4: Default
+• 6: Slow encoding, smaller file</sys:String>
+    <sys:String x:Key="SettingTip_GifPalettePreset_Title">Sets bit depth and dithering.</sys:String>
+    <sys:String x:Key="SettingTip_GifPalettePreset_Body" xml:space="preserve">Bit depth: Upper limit for colors per frame
+Dithering: Distributes color error from the source across neighboring pixels
+• Minimal: 6-bit (64 colors), no dithering
+• Simple: 7-bit (128 colors), dithering 0.3
+• Standard: 8-bit (256 colors), no dithering
+• Balance: 8-bit (256 colors), dithering 0.3
+• Vivid: 8-bit (256 colors), dithering 0.5</sys:String>
+    <sys:String x:Key="SettingTip_InterframeMaxError_Title">Sets the tolerance when optimizing similar areas between frames as transparent.</sys:String>
     <sys:String x:Key="SettingTip_InterframeMaxError_Caution">Higher values can introduce ghosting or edge errors.</sys:String>
-    <sys:String x:Key="SettingTip_InterpaletteMaxError_Title">Palette Tolerance</sys:String>
-    <sys:String x:Key="SettingTip_InterpaletteMaxError_Body" xml:space="preserve">Sets how much palette difference is allowed between GIF frames.
-Higher values may reduce file size by merging palettes more aggressively.</sys:String>
+    <sys:String x:Key="SettingTip_InterpaletteMaxError_Title">Sets the tolerance when optimizing by reusing similar colors between frames.</sys:String>
     <sys:String x:Key="SettingTip_InterpaletteMaxError_Caution">Higher values can reduce color accuracy.</sys:String>
     <!-- Convert Setting : BgColor -->
     <sys:String x:Key="Bg_White">White</sys:String>
@@ -189,11 +185,11 @@ Higher values may reduce file size by merging palettes more aggressively.</sys:S
     <sys:String x:Key="Setting_BitDepth_12">12-bit</sys:String>
     <!-- Convert Setting : GIF Palette Preset -->
     <sys:String x:Key="Setting_PalettePreset">Palette Preset</sys:String>
-    <sys:String x:Key="Setting_GifPalette_Minimal">Minimal (64 colors / 0)</sys:String>
-    <sys:String x:Key="Setting_GifPalette_Simple">Simple (128 colors / dither 0.3)</sys:String>
-    <sys:String x:Key="Setting_GifPalette_Standard">Standard (256 colors / 0)</sys:String>
-    <sys:String x:Key="Setting_GifPalette_Balance">Balance (256 colors / dither 0.3)</sys:String>
-    <sys:String x:Key="Setting_GifPalette_Vivid">Vivid (256 colors / dither 0.5)</sys:String>
+    <sys:String x:Key="Setting_GifPalette_Minimal">Minimal</sys:String>
+    <sys:String x:Key="Setting_GifPalette_Simple">Simple</sys:String>
+    <sys:String x:Key="Setting_GifPalette_Standard">Standard</sys:String>
+    <sys:String x:Key="Setting_GifPalette_Balance">Balance</sys:String>
+    <sys:String x:Key="Setting_GifPalette_Vivid">Vivid</sys:String>
     <!-- Convert Setting : WebP Preset -->
     <sys:String x:Key="Setting_WebpPreset_Default">Default</sys:String>
     <sys:String x:Key="Setting_WebpPreset_Picture">Picture</sys:String>
