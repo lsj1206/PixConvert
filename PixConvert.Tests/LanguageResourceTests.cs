@@ -64,6 +64,7 @@ public class LanguageResourceTests
     [Theory]
     [InlineData("Lang.ko-KR.xaml")]
     [InlineData("Lang.en-US.xaml")]
+    [InlineData("Lang.Serilog.xaml")]
     public void LanguageResources_ShouldLoadAsWpfResourceDictionary(string fileName)
     {
         Exception? exception = null;
@@ -89,15 +90,48 @@ public class LanguageResourceTests
         Assert.Null(exception);
     }
 
+    [Fact]
+    public void LogResources_ShouldContainReferencedLogKeys()
+    {
+        var referencedKeys = LoadReferencedLogKeys();
+        var logKeys = LoadLanguageKeys("Lang.Serilog.xaml").ToHashSet(StringComparer.Ordinal);
+
+        Assert.NotEmpty(referencedKeys);
+        AssertNoMissingKeys("Lang.Serilog.xaml", referencedKeys, logKeys);
+    }
+
+    [Fact]
+    public void LogResources_ShouldContainEnglishOnlyText()
+    {
+        var logEntries = LoadLanguageEntries("Lang.Serilog.xaml")
+            .Where(pair => pair.Key.StartsWith("Log_", StringComparison.Ordinal))
+            .ToArray();
+
+        Assert.NotEmpty(logEntries);
+        foreach (var (key, value) in logEntries)
+        {
+            Assert.True(
+                value.All(IsPrintableAscii),
+                $"{key} contains non-English or mojibake text: {value}");
+        }
+    }
+
     private static IEnumerable<string> LoadLanguageKeys(string fileName)
+    {
+        return LoadLanguageEntries(fileName).Keys;
+    }
+
+    private static Dictionary<string, string> LoadLanguageEntries(string fileName)
     {
         XNamespace xamlNamespace = "http://schemas.microsoft.com/winfx/2006/xaml";
         var path = Path.Combine(GetRepoRoot(), "src", "Resources", "Languages", fileName);
         return XDocument.Load(path)
             .Descendants()
-            .Attributes(xamlNamespace + "Key")
-            .Select(attribute => attribute.Value)
-            .ToArray();
+            .Where(element => element.Attribute(xamlNamespace + "Key") is not null)
+            .ToDictionary(
+                element => element.Attribute(xamlNamespace + "Key")!.Value,
+                element => element.Value,
+                StringComparer.Ordinal);
     }
 
     private static HashSet<string> LoadConvertSettingDialogSettingTipKeys()
@@ -107,6 +141,20 @@ public class LanguageResourceTests
         return Regex.Matches(xaml, @"DynamicResource\s+(SettingTip_[A-Za-z0-9_]+)")
             .Select(match => match.Groups[1].Value)
             .ToHashSet(StringComparer.Ordinal);
+    }
+
+    private static HashSet<string> LoadReferencedLogKeys()
+    {
+        var srcPath = Path.Combine(GetRepoRoot(), "src");
+        return Directory.EnumerateFiles(srcPath, "*.cs", SearchOption.AllDirectories)
+            .SelectMany(path => Regex.Matches(File.ReadAllText(path), @"\bLog_[A-Za-z0-9_]+\b"))
+            .Select(match => match.Value)
+            .ToHashSet(StringComparer.Ordinal);
+    }
+
+    private static bool IsPrintableAscii(char value)
+    {
+        return value is >= ' ' and <= '~' or '\r' or '\n' or '\t';
     }
 
     private static void AssertNoMissingKeys(

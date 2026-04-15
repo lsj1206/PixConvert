@@ -32,22 +32,8 @@ public partial class App : Application
     /// </summary>
     public App()
     {
-        // 기본 로그 저장 위치: 실행 파일(또는 배포 시) 하위의 logs 폴더
-        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-        string logFilePath = System.IO.Path.Combine(baseDir, "logs", "pixconvert_log_.txt");
-
-    #if DEBUG
-        // 개발 환경(DEBUG)에서는 src와 동일한 레벨(프로젝트 최상위)의 logs 폴더로 지정
-        var dir = new System.IO.DirectoryInfo(baseDir);
-        while (dir != null && dir.Name != "src")
-        {
-            dir = dir.Parent;
-        }
-        if (dir?.Parent != null)
-        {
-            logFilePath = System.IO.Path.Combine(dir.Parent.FullName, "logs", "pixconvert_log_.txt");
-        }
-    #endif
+        AppPaths.EnsureLogsFolder();
+        string logFilePath = System.IO.Path.Combine(AppPaths.LogsFolder, "pixconvert_log_.txt");
 
         // 1. Serilog 전역 로거 구성 (DI 조립 전 발생하는 에러 체크)
         Log.Logger = new LoggerConfiguration()

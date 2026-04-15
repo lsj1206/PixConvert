@@ -3,68 +3,69 @@
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
     <!-- App.xaml.cs -->
-    <system:String x:Key="Log_App_Start">=== PixConvert 애플리케이션 시작 ===</system:String>
-    <system:String x:Key="Log_App_End">=== PixConvert 애플리케이션 정상 종료 ===</system:String>
-    <system:String x:Key="Log_UI_UnhandledException">[UI Thread] 처리되지 않은 예외 발생</system:String>
-    <system:String x:Key="Log_Background_UnhandledException">[Background Task] 처리되지 않은 예외 발생</system:String>
-    <system:String x:Key="Log_AppDomain_UnhandledException">[AppDomain] 런타임 환경 치명적 예외 발생</system:String>
-    <system:String x:Key="Log_App_FatalInit">메인 윈도우 초기화 중 치명적 오류 발생</system:String>
+    <system:String x:Key="Log_App_Start">=== PixConvert started ===</system:String>
+    <system:String x:Key="Log_App_End">=== PixConvert closed ===</system:String>
+    <system:String x:Key="Log_UI_UnhandledException">[UI Thread] Unhandled exception.</system:String>
+    <system:String x:Key="Log_Background_UnhandledException">[Background Task] Unhandled exception.</system:String>
+    <system:String x:Key="Log_AppDomain_UnhandledException">[AppDomain] Fatal runtime exception.</system:String>
+    <system:String x:Key="Log_App_FatalInit">[App] Fatal startup error.</system:String>
 
-    <!-- SidebarViewModel.cs -->
-    <system:String x:Key="Log_Sidebar_ProcessStart">[SidebarViewModel] 파일 추가 프로세스 시작. 입력된 경로 수: {Count}</system:String>
-    <system:String x:Key="Log_Sidebar_ProcessError">[SidebarViewModel] 파일 추가 프로세스 중 예외 발생</system:String>
+    <!-- FileInputViewModel.cs -->
+    <system:String x:Key="Log_Sidebar_ProcessStart">[FileInputViewModel] Add files started. Count={Count}</system:String>
+    <system:String x:Key="Log_Sidebar_ProcessError">[FileInputViewModel] Add files failed.</system:String>
 
     <!-- FileScannerService.cs -->
-    <system:String x:Key="Log_File_SignatureFail">[FileScannerService] 시그니처 분석 실패. 파일: {Path}</system:String>
-    <system:String x:Key="Log_File_MetaFail">[FileScannerService] 단일 스트림 메타데이터 접근 실패. 파일: {Path}</system:String>
-    <system:String x:Key="Log_File_FolderAccessFail">[FileScannerService] 폴더 접근 권한 없음 무시됨: {DirPath}</system:String>
-    <system:String x:Key="Log_File_FolderTraverseFail">[FileScannerService] 폴더 순회 중 예기치 않은 오류 발생: {DirPath}</system:String>
+    <system:String x:Key="Log_File_SignatureFail">[FileScannerService] Signature read failed. Path={Path}</system:String>
+    <system:String x:Key="Log_File_MetaFail">[FileScannerService] Metadata read failed. Path={Path}</system:String>
+    <system:String x:Key="Log_File_FolderAccessFail">[FileScannerService] Folder access denied. Skipped. Path={DirPath}</system:String>
+    <system:String x:Key="Log_File_FolderTraverseFail">[FileScannerService] Folder traversal failed. Path={DirPath}</system:String>
 
-    <!-- FileAnalyzerService.cs -->
-    <system:String x:Key="Log_Process_WmiDiskNumber">[FileAnalyzerService] WMI 물리 디스크 번호 매핑 시도. 드라이브: {DriveLetter}</system:String>
-    <system:String x:Key="Log_Process_WmiSsdCheck">[FileAnalyzerService] WMI 물리 디스크 유형 조회 완료. 디스크: {DiskNumber}, SSD 판단여부: {IsSsd}</system:String>
-    <system:String x:Key="Log_Process_WmiFail">[FileAnalyzerService] WMI 디스크 매핑 실패. 드라이브({DriveLetter})를 식별할 수 없어 HDD(안전)로 간주합니다.</system:String>
-    <system:String x:Key="Log_Process_WmiException">[FileAnalyzerService] WMI 디스크 조회 중 예외 발생. 경로({RootPath})를 판단할 수 없어 HDD(안전)로 간주합니다.</system:String>
-    <system:String x:Key="Log_Process_WmiUnknown">[FileAnalyzerService] WMI 디스크 유형을 특정할 수 없습니다. 디스크({DiskNumber})를 HDD(안전)로 간주합니다.</system:String>
-    <system:String x:Key="Log_Process_Parallelism">[FileAnalyzerService] 파일 처리용 스레드 수 최종 결정. 유형: {DriveType}, 병렬도(MaxDegree): {Parallelism}</system:String>
-    <system:String x:Key="Log_Process_Summary">[FileAnalyzerService] 파일 경로 분석 완료. 총: {Total}, 추가: {Added}, 중복됨: {Dup}, 한도초과: {Ignored}, 소요: {Time}ms</system:String>
-    <system:String x:Key="Log_Process_LimitReached">[FileAnalyzerService] 파일 개수 제한({Limit})에 도달하여 나머지 파일(약 {Count}개)을 무시합니다.</system:String>
+    <!-- DriveInfoService.cs / FileAnalyzerService.cs -->
+    <system:String x:Key="Log_Process_WmiDiskNumber">[DriveInfoService] WMI disk mapping started. Drive={DriveLetter}</system:String>
+    <system:String x:Key="Log_Process_WmiSsdCheck">[DriveInfoService] WMI disk type checked. Disk={DiskNumber}, IsSsd={IsSsd}</system:String>
+    <system:String x:Key="Log_Process_WmiFail">[DriveInfoService] WMI disk mapping failed. Drive={DriveLetter}</system:String>
+    <system:String x:Key="Log_Process_WmiException">[DriveInfoService] WMI disk check failed. Path={RootPath}</system:String>
+    <system:String x:Key="Log_Process_WmiUnknown">[DriveInfoService] WMI disk type unknown. Disk={DiskNumber}</system:String>
+    <system:String x:Key="Log_Process_Parallelism">[DriveInfoService] Parallelism selected. DriveType={DriveType}, Parallelism={Parallelism}</system:String>
+    <system:String x:Key="Log_Process_Summary">[FileAnalyzerService] File analysis completed. Total={Total}, Added={Added}, Duplicate={Dup}, Ignored={Ignored}, ElapsedMs={Time}</system:String>
+    <system:String x:Key="Log_Process_LimitReached">[FileAnalyzerService] File limit reached. Limit={Limit}, Ignored={Count}</system:String>
 
     <!-- PresetService.cs -->
-    <system:String x:Key="Log_Preset_FileNotFound">[PresetService] 설정 파일이 존재하지 않아 기본값을 생성합니다.</system:String>
-    <system:String x:Key="Log_Preset_FileEmpty">[PresetService] 설정 파일이 비어있어 기본값을 사용합니다.</system:String>
-    <system:String x:Key="Log_Preset_FileLoadSuccess">[PresetService] 설정 파일 로드 완료.</system:String>
-    <system:String x:Key="Log_Preset_FileLoadError">[PresetService] 설정 로드 중 오류 발생. 기본값을 사용합니다.</system:String>
-    <system:String x:Key="Log_Preset_FileSaveSuccess">[PresetService] 설정 저장 완료.</system:String>
-    <system:String x:Key="Log_Preset_FileSaveError">[PresetService] 설정 저장 중 오류 발생.</system:String>
-    <system:String x:Key="Log_Preset_NotFoundSelected">[PresetService] 선택된 프리셋 이름 '{LastSelectedPresetName}'이(가) 리스트에 존재하지 않습니다. 첫 번째 프리셋으로 재지정합니다.</system:String>
-    <system:String x:Key="Log_Preset_ValidDataStart">[PresetService] 현재 프리셋 데이터 유효성 검증을 시작합니다.</system:String>
-    <system:String x:Key="Log_Preset_SettingsNull">[PresetService] 현재 선택된 프리셋의 설정(Settings)이 null입니다.</system:String>
-    <system:String x:Key="Log_Preset_InvalidQuality">[PresetService] 지원하지 않는 Quality 값입니다: {Quality}. 1~100 사이여야 합니다.</system:String>
-    <system:String x:Key="Log_Preset_InvalidStdFormat">[PresetService] 지원하지 않는 StandardTargetFormat 값입니다: {Format}</system:String>
-    <system:String x:Key="Log_Preset_InvalidAnimFormat">[PresetService] 지원하지 않는 AnimationTargetFormat 값입니다: {Format}</system:String>
-    <system:String x:Key="Log_Preset_InvalidEnum">[PresetService] 열거형(Enum) 설정 값 중 지원하지 않는 값이 포함되어 있습니다.</system:String>
-    <system:String x:Key="Log_Preset_InvalidBgColor">[PresetService] 지원하지 않는 배경색 값입니다: {Color}</system:String>
-    <system:String x:Key="Log_Preset_DataValid">[PresetService] 현재 프리셋 데이터 검증 완료 (이상 없음).</system:String>
-    <system:String x:Key="Log_Preset_EmptyCustomPath">[PresetService] 사용자 지정 경로가 비어있습니다.</system:String>
-    <system:String x:Key="Log_Preset_SubFolderEmpty">[PresetService] 하위 폴더 이름이 비어있습니다.</system:String>
-    <system:String x:Key="Log_Preset_SubFolderInvalid">[PresetService] 하위 폴더 이름에 부적절한 문자가 포함됨: {Name}</system:String>
+    <system:String x:Key="Log_Preset_FileNotFound">[PresetService] Preset file not found. Using defaults.</system:String>
+    <system:String x:Key="Log_Preset_FileEmpty">[PresetService] Preset file is empty. Using defaults.</system:String>
+    <system:String x:Key="Log_Preset_FileLoadSuccess">[PresetService] Preset file loaded.</system:String>
+    <system:String x:Key="Log_Preset_FileLoadError">[PresetService] Preset file load failed. Using defaults.</system:String>
+    <system:String x:Key="Log_Preset_FileSaveSuccess">[PresetService] Preset file saved.</system:String>
+    <system:String x:Key="Log_Preset_FileSaveError">[PresetService] Preset file save failed.</system:String>
+    <system:String x:Key="Log_Preset_NotFoundSelected">[PresetService] Selected preset not found. Name={LastSelectedPresetName}</system:String>
+    <system:String x:Key="Log_Preset_ValidDataStart">[PresetService] Preset validation started.</system:String>
+    <system:String x:Key="Log_Preset_SettingsNull">[PresetService] Preset settings are null.</system:String>
+    <system:String x:Key="Log_Preset_InvalidQuality">[PresetService] Invalid numeric option. Value={Quality}</system:String>
+    <system:String x:Key="Log_Preset_InvalidStdFormat">[PresetService] Invalid standard target format. Format={Format}</system:String>
+    <system:String x:Key="Log_Preset_InvalidAnimFormat">[PresetService] Invalid animation target format. Format={Format}</system:String>
+    <system:String x:Key="Log_Preset_InvalidEnum">[PresetService] Invalid enum option.</system:String>
+    <system:String x:Key="Log_Preset_InvalidBgColor">[PresetService] Invalid background color. Color={Color}</system:String>
+    <system:String x:Key="Log_Preset_DataValid">[PresetService] Preset validation completed.</system:String>
+    <system:String x:Key="Log_Preset_EmptyCustomPath">[PresetService] Custom output path is empty.</system:String>
+    <system:String x:Key="Log_Preset_SubFolderEmpty">[PresetService] Output subfolder name is empty.</system:String>
+    <system:String x:Key="Log_Preset_SubFolderInvalid">[PresetService] Output subfolder name is invalid. Name={Name}</system:String>
 
     <!-- SettingService.cs -->
-    <system:String x:Key="Log_Setting_FileNotFound">[SettingService] 설정 파일이 존재하지 않아 기본값을 생성합니다.</system:String>
-    <system:String x:Key="Log_Setting_FileEmpty">[SettingService] 설정 파일이 비어있어 기본값을 사용합니다.</system:String>
-    <system:String x:Key="Log_Setting_FileLoadSuccess">[SettingService] 설정 파일 로드 완료.</system:String>
-    <system:String x:Key="Log_Setting_FileLoadError">[SettingService] 설정 로드 중 오류 발생. 기본값을 사용합니다.</system:String>
-    <system:String x:Key="Log_Setting_FileSaveSuccess">[SettingService] 설정 저장 완료.</system:String>
-    <system:String x:Key="Log_Setting_FileSaveError">[SettingService] 설정 저장 중 오류 발생.</system:String>
+    <system:String x:Key="Log_Setting_FileNotFound">[SettingService] Settings file not found. Using defaults.</system:String>
+    <system:String x:Key="Log_Setting_FileEmpty">[SettingService] Settings file is empty. Using defaults.</system:String>
+    <system:String x:Key="Log_Setting_FileLoadSuccess">[SettingService] Settings file loaded.</system:String>
+    <system:String x:Key="Log_Setting_FileLoadError">[SettingService] Settings file load failed. Using defaults.</system:String>
+    <system:String x:Key="Log_Setting_FileSaveSuccess">[SettingService] Settings file saved.</system:String>
+    <system:String x:Key="Log_Setting_FileSaveError">[SettingService] Settings file save failed.</system:String>
 
     <!-- SnackbarService.cs -->
-    <system:String x:Key="Log_Snackbar_ShowError">[SnackbarService] Show 처리 중 예외 발생</system:String>
-    <system:String x:Key="Log_Snackbar_ShowProgressError">[SnackbarService] ShowProgress 처리 중 예외 발생</system:String>
-    
+    <system:String x:Key="Log_Snackbar_ShowError">[SnackbarService] Show failed.</system:String>
+    <system:String x:Key="Log_Snackbar_ShowProgressError">[SnackbarService] ShowProgress failed.</system:String>
+
     <!-- ConversionViewModel.cs / Providers -->
-    <system:String x:Key="Log_Conversion_FileError">[ConversionViewModel] 파일 변환 중 예외 발생: {Path}</system:String>
-    <system:String x:Key="Log_Conversion_BatchStart">[ConversionViewModel] 일괄 변환 시작. 총 파일 수: {Count}</system:String>
-    <system:String x:Key="Log_Conversion_PathCollision">[ConversionViewModel] 동일 배치 내 출력 경로 충돌 (덮어쓰기): {Path}</system:String>
+    <system:String x:Key="Log_Conversion_FileError">[ConversionViewModel] File conversion failed. Path={Path}</system:String>
+    <system:String x:Key="Log_Conversion_BatchStart">[ConversionViewModel] Batch conversion started. Count={Count}</system:String>
+    <system:String x:Key="Log_Conversion_PathCollision">[ConversionViewModel] Output path collision. Path={Path}</system:String>
+    <system:String x:Key="Log_Skia_EncodeFail">[SkiaSharpProvider] Failed to encode {0}.</system:String>
 
 </ResourceDictionary>
