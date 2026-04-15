@@ -272,6 +272,12 @@
             </ItemsControl>
 
             <!-- ConvertSetting : Standard_Options_Group -->
+            <StackPanel
+                Margin="0,-6,0,6"
+                Visibility="{Binding StandardShowAvifEncodingEffort, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <TextBlock Foreground="#D97706" Text="{DynamicResource Tip_Avif}" />
+            </StackPanel>
+
             <TextBlock Margin="0,0,0,4"
                        FontWeight="SemiBold"
                        Text="{DynamicResource Setting_GroupStandardOptions}" />
@@ -323,23 +329,21 @@
                         <ui:FontIcon FontSize="12" Glyph="&#xE946;" />
                     </Button>
                 </StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <Slider
-                        Margin="0,0,8,0"
-                        Width="200"
-                        Maximum="100"
-                        Minimum="1"
-                        Value="{Binding StandardQuality}" />
-                    <ctrls:FilterTextBox
-                        VerticalAlignment="Center"
-                        IsBlank="90"
-                        Filter="Digits"
-                        FilterMode="Allow"
-                        FilterMaxLength="3"
-                        Text="{Binding StandardQuality, UpdateSourceTrigger=PropertyChanged}"
-                        ui:TextBoxHelper.IsDeleteButtonVisible="False"
-                        ui:ControlHelper.PlaceholderText="90" />
-                </StackPanel>
+                <Slider
+                    Margin="0,0,8,0"
+                    Width="200"
+                    Maximum="100"
+                    Minimum="1"
+                    Value="{Binding StandardQuality}" />
+                <ctrls:FilterTextBox
+                    VerticalAlignment="Center"
+                    IsBlank="90"
+                    Filter="Digits"
+                    FilterMode="Allow"
+                    FilterMaxLength="3"
+                    Text="{Binding StandardQuality, UpdateSourceTrigger=PropertyChanged}"
+                    ui:TextBoxHelper.IsDeleteButtonVisible="False"
+                    ui:ControlHelper.PlaceholderText="90" />
             </StackPanel>
 
             <StackPanel
@@ -407,24 +411,22 @@
                         <ui:FontIcon FontSize="12" Glyph="&#xE946;" />
                     </Button>
                 </StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <Slider
-                        Margin="0,0,8,0"
-                        Width="150"
-                        Maximum="9"
-                        Minimum="0"
-                        Value="{Binding StandardPngCompressionLevel}" />
-                    <ctrls:FilterTextBox
-                        MinWidth="32"
-                        VerticalAlignment="Center"
-                        IsBlank="6"
-                        Filter="Digits"
-                        FilterMode="Allow"
-                        FilterMaxLength="1"
-                        Text="{Binding StandardPngCompressionLevel, UpdateSourceTrigger=PropertyChanged}"
-                        ui:TextBoxHelper.IsDeleteButtonVisible="False"
-                        ui:ControlHelper.PlaceholderText="6" />
-                </StackPanel>
+                <Slider
+                    Margin="0,0,8,0"
+                    Width="150"
+                    Maximum="9"
+                    Minimum="0"
+                    Value="{Binding StandardPngCompressionLevel}" />
+                <ctrls:FilterTextBox
+                    MinWidth="32"
+                    VerticalAlignment="Center"
+                    IsBlank="6"
+                    Filter="Digits"
+                    FilterMode="Allow"
+                    FilterMaxLength="1"
+                    Text="{Binding StandardPngCompressionLevel, UpdateSourceTrigger=PropertyChanged}"
+                    ui:TextBoxHelper.IsDeleteButtonVisible="False"
+                    ui:ControlHelper.PlaceholderText="6" />
             </StackPanel>
 
             <StackPanel
@@ -485,30 +487,29 @@
                             <ToolTip>
                                 <ctrls:OptionToolTip
                                     Title="{DynamicResource SettingTip_AvifEncodingEffort_Title}"
-                                    Body="{DynamicResource SettingTip_AvifEncodingEffort_Body}" />
+                                    Body="{DynamicResource SettingTip_AvifEncodingEffort_Body}"
+                                    Caution="{DynamicResource SettingTip_AvifEncodingEffort_Caution}"  />
                             </ToolTip>
                         </Button.ToolTip>
                         <ui:FontIcon FontSize="12" Glyph="&#xE946;" />
                     </Button>
                 </StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <Slider
-                        Margin="0,0,8,0"
-                        Width="150"
-                        Maximum="9"
-                        Minimum="0"
-                        Value="{Binding StandardAvifEncodingEffort}" />
-                    <ctrls:FilterTextBox
-                        MinWidth="32"
-                        VerticalAlignment="Center"
-                        IsBlank="4"
-                        Filter="Digits"
-                        FilterMode="Allow"
-                        FilterMaxLength="1"
-                        Text="{Binding StandardAvifEncodingEffort, UpdateSourceTrigger=PropertyChanged}"
-                        ui:TextBoxHelper.IsDeleteButtonVisible="False"
-                        ui:ControlHelper.PlaceholderText="4" />
-                </StackPanel>
+                <Slider
+                    Margin="0,0,8,0"
+                    Width="150"
+                    Maximum="9"
+                    Minimum="0"
+                    Value="{Binding StandardAvifEncodingEffort}" />
+                <ctrls:FilterTextBox
+                    MinWidth="32"
+                    VerticalAlignment="Center"
+                    IsBlank="4"
+                    Filter="Digits"
+                    FilterMode="Allow"
+                    FilterMaxLength="1"
+                    Text="{Binding StandardAvifEncodingEffort, UpdateSourceTrigger=PropertyChanged}"
+                    ui:TextBoxHelper.IsDeleteButtonVisible="False"
+                    ui:ControlHelper.PlaceholderText="4" />
             </StackPanel>
 
             <StackPanel
@@ -784,7 +785,7 @@
                                 <ToolTip>
                                     <ctrls:OptionToolTip
                                         Title="{DynamicResource SettingTip_WebpEncodingEffort_Title}"
-                                        Body="{DynamicResource SettingTip_WebpEncodingEffort_Body}" />
+                                        Body="{DynamicResource SettingTip_WebpEncodingEffort_Body}"/>
                                 </ToolTip>
                             </Button.ToolTip>
                             <ui:FontIcon FontSize="12" Glyph="&#xE946;" />

@@ -116,6 +116,7 @@
     <sys:String x:Key="Setting_InterframeMaxError">프레임 차이 허용값</sys:String>
     <sys:String x:Key="Setting_InterpaletteMaxError">색상 차이 허용값</sys:String>
     <!-- 변환 설정 : 옵션 도움말 -->
+    <sys:String x:Key="Tip_Avif">⚠️AVIF 변환 작업은 CPU 자원을 많이 소모합니다.</sys:String>
     <sys:String x:Key="SettingTip_CpuUsage_Title">동시에 변환할 작업 수를 설정합니다.</sys:String>
     <sys:String x:Key="SettingTip_CpuUsage_Body">CPU의 코어 및 스레드 개수에 따라 작업 수가 정해집니다.</sys:String>
     <sys:String x:Key="SettingTip_OverwritePolicy_Title">경로에 동일한 파일명이 존재할 때 처리 방식을 선택합니다.</sys:String>
@@ -139,6 +140,7 @@
     <sys:String x:Key="SettingTip_AvifEncodingEffort_Body" xml:space="preserve">• 0: 인코딩 빠름, 용량 큼
 • 4: 기본값
 • 9: 인코딩 느림, 용량 작음</sys:String>
+    <sys:String x:Key="SettingTip_AvifEncodingEffort_Caution">⚠️값이 높을수록 인코딩 시간이 길어집니다.</sys:String>
     <sys:String x:Key="SettingTip_AvifBitDepth_Title">채널당 색 표현 정밀도에 관한 설정입니다.</sys:String>
     <sys:String x:Key="SettingTip_AvifBitDepth_Body" xml:space="preserve">• 자동: 입력 이미지 타입에 따라 자동 결정됩니다.
 • 8-bit: 256 단계, 일반적

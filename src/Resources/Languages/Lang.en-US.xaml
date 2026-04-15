@@ -116,6 +116,7 @@
     <sys:String x:Key="Setting_InterframeMaxError">Frame Tolerance</sys:String>
     <sys:String x:Key="Setting_InterpaletteMaxError">Palette Tolerance</sys:String>
     <!-- Convert Setting : Option Tips -->
+    <sys:String x:Key="Tip_Avif">⚠️AVIF conversion tasks consume a lot of CPU resources.</sys:String>
     <sys:String x:Key="SettingTip_CpuUsage_Title">Sets the number of concurrent conversion jobs.</sys:String>
     <sys:String x:Key="SettingTip_CpuUsage_Body">The job count is determined by the number of CPU cores and threads.</sys:String>
     <sys:String x:Key="SettingTip_OverwritePolicy_Title">Selects what to do when a file with the same name already exists in the output path.</sys:String>
@@ -139,6 +140,7 @@
     <sys:String x:Key="SettingTip_AvifEncodingEffort_Body" xml:space="preserve">• 0: Fast encoding, larger file
 • 4: Default
 • 9: Slow encoding, smaller file</sys:String>
+    <sys:String x:Key="SettingTip_AvifEncodingEffort_Caution">⚠️Higher values result in longer encoding times.</sys:String>
     <sys:String x:Key="SettingTip_AvifBitDepth_Title">Sets color precision per channel.</sys:String>
     <sys:String x:Key="SettingTip_AvifBitDepth_Body" xml:space="preserve">• Auto: Determined automatically from the input image type.
 • 8-bit: 256 levels, common
