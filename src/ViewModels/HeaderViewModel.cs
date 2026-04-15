@@ -35,15 +35,6 @@ public partial class HeaderViewModel : ViewModelBase
     private DateTime _lastCpuCheckTime = DateTime.UtcNow;
     private TimeSpan _lastTotalProcessorTime = TimeSpan.Zero;
 
-    // --- 테스트용 상태 제어 ---
-    public AppStatus[] AllStatus => Enum.GetValues<AppStatus>();
-
-    public AppStatus SelectedStatus
-    {
-        get => CurrentStatus;
-        set => RequestStatus(value);
-    }
-
     /// <summary>
     /// HeaderViewModel의 새 인스턴스를 초기화하며 필요한 서비스를 주입받고 초기 상태를 설정합니다.
     /// </summary>

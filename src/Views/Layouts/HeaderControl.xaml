@@ -21,18 +21,6 @@
                 <ColumnDefinition Width="Auto" /> <!-- Header : Version_Info -->
             </Grid.ColumnDefinitions>
 
-            <!-- Header : Filter_ComboBox -->
-            <StackPanel
-                Grid.Column="0"
-                Margin="12,0"
-                VerticalAlignment="Center">
-                <ComboBox
-                    Width="130"
-                    FontSize="11"
-                    ItemsSource="{Binding Header.AllStatus}"
-                    SelectedItem="{Binding Header.SelectedStatus, Mode=TwoWay}" />
-            </StackPanel>
-
             <!-- Header : Status_Dashboard_Group -->
             <StackPanel
                 Grid.Column="1"
