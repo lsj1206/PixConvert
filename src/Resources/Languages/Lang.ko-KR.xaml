@@ -67,8 +67,10 @@
     <sys:String x:Key="Converting_SelectPreset">Empty</sys:String>
     <sys:String x:Key="Converting_Cpu">CPU 설정</sys:String>
     <sys:String x:Key="Converting_Format">대상 포맷</sys:String>
-    <sys:String x:Key="Converting_Quality">품질</sys:String>
     <sys:String x:Key="Converting_BgColor">배경색</sys:String>
+    <sys:String x:Key="Converting_StandardOptions">정지 이미지 옵션</sys:String>
+    <sys:String x:Key="Converting_AnimationOptions">애니 이미지 옵션</sys:String>
+    <sys:String x:Key="Converting_Jpeg422AvifAuto">4:2:2(AVIF 입력 Auto 적용)</sys:String>
     <sys:String x:Key="Converting_Duplicates">중복 파일</sys:String>
     <sys:String x:Key="Converting_SaveMethod">저장 방식</sys:String>
     <sys:String x:Key="Converting_SaveLocation">저장 위치</sys:String>

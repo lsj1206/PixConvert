@@ -73,8 +73,10 @@ public partial class ConversionViewModel : ViewModelBase
 
     [ObservableProperty] private string _currentCpuUsage = string.Empty;
     [ObservableProperty] private string _currentTargetFormat = string.Empty;
-    [ObservableProperty] private string _currentQuality = string.Empty;
-    [ObservableProperty] private string _currentBgColor = string.Empty;
+    [ObservableProperty] private string _currentStandardOptions = string.Empty;
+    [ObservableProperty] private string _currentAnimationOptions = string.Empty;
+    [ObservableProperty] private bool _showCurrentStandardOptions;
+    [ObservableProperty] private bool _showCurrentAnimationOptions;
     [ObservableProperty] private string _currentOverwritePolicy = string.Empty;
     [ObservableProperty] private string _currentSaveMethod = string.Empty;
     [ObservableProperty] private string _currentSaveLocation = string.Empty;
@@ -447,6 +449,10 @@ public partial class ConversionViewModel : ViewModelBase
         CurrentFileName = string.Empty;
         CurrentCpuUsage = string.Empty;
         CurrentTargetFormat = string.Empty;
+        CurrentStandardOptions = string.Empty;
+        CurrentAnimationOptions = string.Empty;
+        ShowCurrentStandardOptions = false;
+        ShowCurrentAnimationOptions = false;
         OnPropertyChanged(nameof(HasFailures));
         _convertCts?.Dispose();
         _convertCts = null;
@@ -493,8 +499,10 @@ public partial class ConversionViewModel : ViewModelBase
         else
             CurrentTargetFormat = settings.StandardTargetFormat;
 
-        CurrentQuality = BuildQualitySummary(settings, hasStandard, hasAnimation);
-        CurrentBgColor = BuildBackgroundSummary(settings, hasStandard);
+        CurrentStandardOptions = BuildStandardOptionsSummary(settings, activeFiles, GetString);
+        CurrentAnimationOptions = BuildAnimationOptionsSummary(settings, activeFiles, GetString);
+        ShowCurrentStandardOptions = !string.IsNullOrWhiteSpace(CurrentStandardOptions);
+        ShowCurrentAnimationOptions = !string.IsNullOrWhiteSpace(CurrentAnimationOptions);
         CurrentOverwritePolicy = GetString($"Setting_Overwrite_{settings.OverwritePolicy}");
         CurrentSaveMethod = settings.FolderMethod == SaveFolderMethod.CreateFolder
             ? settings.OutputSubFolderName
@@ -518,51 +526,131 @@ public partial class ConversionViewModel : ViewModelBase
         }
     }
 
-    private static string BuildQualitySummary(ConvertSettings settings, bool hasStandard, bool hasAnimation)
+    internal static string BuildStandardOptionsSummary(
+        ConvertSettings settings,
+        IReadOnlyList<FileItem> activeFiles,
+        Func<string, string> getString)
     {
-        var parts = new List<string>();
-
-        if (hasStandard)
-        {
-            string format = settings.StandardTargetFormat.ToUpperInvariant();
-            string? standardPart = format switch
-            {
-                "JPEG" => $"STD {format} {settings.StandardQuality}",
-                "WEBP" => settings.StandardLossless ? $"STD {format} Lossless" : $"STD {format} {settings.StandardQuality}",
-                "AVIF" => settings.StandardLossless ? $"STD {format} Lossless" : $"STD {format} {settings.StandardQuality}",
-                _ => null
-            };
-
-            if (!string.IsNullOrWhiteSpace(standardPart))
-                parts.Add(standardPart);
-        }
-
-        if (hasAnimation && !string.IsNullOrWhiteSpace(settings.AnimationTargetFormat))
-        {
-            string format = settings.AnimationTargetFormat.ToUpperInvariant();
-            string? animationPart = format switch
-            {
-                "WEBP" => settings.AnimationLossless ? $"ANI {format} Lossless" : $"ANI {format} {settings.AnimationQuality}",
-                _ => null
-            };
-
-            if (!string.IsNullOrWhiteSpace(animationPart))
-                parts.Add(animationPart);
-        }
-
-        return string.Join(" / ", parts);
-    }
-
-    private static string BuildBackgroundSummary(ConvertSettings settings, bool hasStandard)
-    {
-        if (!hasStandard)
+        if (!activeFiles.Any(f => !f.IsAnimation))
             return string.Empty;
 
+        var parts = new List<string>();
         string format = settings.StandardTargetFormat.ToUpperInvariant();
-        return format switch
+
+        switch (format)
         {
-            "JPEG" or "BMP" => $"STD {settings.StandardBackgroundColor}",
-            _ => string.Empty
+            case "JPEG":
+                parts.Add($"{getString("Setting_Quality")} {settings.StandardQuality}");
+                parts.Add($"{getString("Setting_ChromaSubsampling")} {ResolveJpegChromaSummary(settings, activeFiles, getString)}");
+                parts.Add($"{getString("Converting_BgColor")} {settings.StandardBackgroundColor}");
+                break;
+            case "PNG":
+                parts.Add($"{getString("Setting_CompressionLevel")} {settings.StandardPngCompressionLevel}");
+                break;
+            case "WEBP":
+                parts.Add(settings.StandardLossless
+                    ? getString("Setting_Lossless")
+                    : $"{getString("Setting_Quality")} {settings.StandardQuality}");
+                break;
+            case "AVIF":
+                if (settings.StandardLossless)
+                {
+                    parts.Add(getString("Setting_Lossless"));
+                }
+                else
+                {
+                    parts.Add($"{getString("Setting_Quality")} {settings.StandardQuality}");
+                    parts.Add($"{getString("Setting_ChromaSubsampling")} {ResolveAvifChromaSummary(settings.StandardAvifChromaSubsampling, getString)}");
+                }
+
+                parts.Add($"{getString("Setting_EncodingEffort")} {settings.StandardAvifEncodingEffort}");
+                parts.Add($"{getString("Setting_BitDepth")} {ResolveAvifBitDepthSummary(settings.StandardAvifBitDepth, getString)}");
+                break;
+            case "BMP":
+                parts.Add($"{getString("Converting_BgColor")} {settings.StandardBackgroundColor}");
+                break;
+        }
+
+        return string.Join(Environment.NewLine, parts);
+    }
+
+    internal static string BuildAnimationOptionsSummary(
+        ConvertSettings settings,
+        IReadOnlyList<FileItem> activeFiles,
+        Func<string, string> getString)
+    {
+        if (!activeFiles.Any(f => f.IsAnimation) || string.IsNullOrWhiteSpace(settings.AnimationTargetFormat))
+            return string.Empty;
+
+        var parts = new List<string>();
+        string format = settings.AnimationTargetFormat.ToUpperInvariant();
+
+        switch (format)
+        {
+            case "WEBP":
+                if (settings.AnimationLossless)
+                {
+                    parts.Add(getString("Setting_Lossless"));
+                    parts.Add($"{getString("Setting_EncodingEffort")} {settings.AnimationWebpEncodingEffort}");
+                    parts.Add($"{getString("Setting_PreserveTransparentPixels")} {ResolveBooleanSummary(settings.AnimationWebpPreserveTransparentPixels, getString)}");
+                }
+                else
+                {
+                    parts.Add($"{getString("Setting_Quality")} {settings.AnimationQuality}");
+                    parts.Add($"{getString("Setting_EncodingEffort")} {settings.AnimationWebpEncodingEffort}");
+                    parts.Add($"{getString("Setting_WebpPreset")} {getString($"Setting_WebpPreset_{settings.AnimationWebpPreset}")}");
+                }
+                break;
+            case "GIF":
+                parts.Add($"{getString("Setting_PalettePreset")} {getString($"Setting_GifPalette_{settings.AnimationGifPalettePreset}")}");
+                parts.Add($"{getString("Setting_InterframeMaxError")} {FormatErrorValue(settings.AnimationGifInterframeMaxError)}");
+                parts.Add($"{getString("Setting_InterpaletteMaxError")} {FormatErrorValue(settings.AnimationGifInterpaletteMaxError)}");
+                break;
+        }
+
+        return string.Join(Environment.NewLine, parts);
+    }
+
+    private static string ResolveJpegChromaSummary(
+        ConvertSettings settings,
+        IReadOnlyList<FileItem> activeFiles,
+        Func<string, string> getString)
+    {
+        bool hasAvifInput = activeFiles.Any(f =>
+            !f.IsAnimation &&
+            string.Equals(f.FileSignature, "AVIF", StringComparison.OrdinalIgnoreCase));
+
+        if (settings.StandardJpegChromaSubsampling == JpegChromaSubsamplingMode.Chroma422 && hasAvifInput)
+            return getString("Converting_Jpeg422AvifAuto");
+
+        return settings.StandardJpegChromaSubsampling switch
+        {
+            JpegChromaSubsamplingMode.Chroma420 => getString("Setting_Subsampling_420"),
+            JpegChromaSubsamplingMode.Chroma422 => getString("Setting_Subsampling_422"),
+            _ => getString("Setting_Subsampling_444")
         };
     }
+
+    private static string ResolveAvifChromaSummary(AvifChromaSubsamplingMode mode, Func<string, string> getString) =>
+        mode switch
+        {
+            AvifChromaSubsamplingMode.On => getString("Setting_Subsampling_On"),
+            AvifChromaSubsamplingMode.Off => getString("Setting_Subsampling_Off"),
+            _ => getString("Setting_Subsampling_Auto")
+        };
+
+    private static string ResolveAvifBitDepthSummary(AvifBitDepthMode mode, Func<string, string> getString) =>
+        mode switch
+        {
+            AvifBitDepthMode.Bit8 => getString("Setting_BitDepth_8"),
+            AvifBitDepthMode.Bit10 => getString("Setting_BitDepth_10"),
+            AvifBitDepthMode.Bit12 => getString("Setting_BitDepth_12"),
+            _ => getString("Setting_BitDepth_Auto")
+        };
+
+    private static string ResolveBooleanSummary(bool value, Func<string, string> getString) =>
+        getString(value ? "Setting_Subsampling_On" : "Setting_Subsampling_Off");
+
+    private static string FormatErrorValue(double value) =>
+        value.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
 }

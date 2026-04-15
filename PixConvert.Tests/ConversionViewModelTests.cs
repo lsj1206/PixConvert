@@ -81,4 +81,124 @@ public class ConversionViewModelTests
         Assert.False(_vm.ConvertFilesCommand.CanExecute(null));
         Assert.True(_vm.CancelConvertCommand.CanExecute(null));
     }
+
+    [Fact]
+    public void BuildStandardOptionsSummary_WhenJpeg_ShouldIncludeQualityChromaAndBackground()
+    {
+        var settings = new ConvertSettings
+        {
+            StandardTargetFormat = "JPEG",
+            StandardQuality = 90,
+            StandardJpegChromaSubsampling = JpegChromaSubsamplingMode.Chroma444,
+            StandardBackgroundColor = "#101010"
+        };
+        var files = new List<FileItem> { new() { Path = @"C:\test.png", FileSignature = "PNG" } };
+
+        string summary = ConversionViewModel.BuildStandardOptionsSummary(settings, files, Key);
+
+        Assert.Equal(
+            string.Join(Environment.NewLine,
+                "Setting_Quality 90",
+                "Setting_ChromaSubsampling Setting_Subsampling_444",
+                "Converting_BgColor #101010"),
+            summary);
+    }
+
+    [Fact]
+    public void BuildStandardOptionsSummary_WhenJpeg422WithAvifInput_ShouldShowNetVipsFallback()
+    {
+        var settings = new ConvertSettings
+        {
+            StandardTargetFormat = "JPEG",
+            StandardQuality = 90,
+            StandardJpegChromaSubsampling = JpegChromaSubsamplingMode.Chroma422,
+            StandardBackgroundColor = "#FFFFFF"
+        };
+        var files = new List<FileItem> { new() { Path = @"C:\test.avif", FileSignature = "AVIF" } };
+
+        string summary = ConversionViewModel.BuildStandardOptionsSummary(settings, files, Key);
+
+        Assert.Contains("Setting_ChromaSubsampling Converting_Jpeg422AvifAuto", summary);
+    }
+
+    [Fact]
+    public void BuildStandardOptionsSummary_WhenAvifLossless_ShouldExcludeQualityAndChroma()
+    {
+        var settings = new ConvertSettings
+        {
+            StandardTargetFormat = "AVIF",
+            StandardLossless = true,
+            StandardQuality = 90,
+            StandardAvifEncodingEffort = 9,
+            StandardAvifBitDepth = AvifBitDepthMode.Bit10
+        };
+        var files = new List<FileItem> { new() { Path = @"C:\test.png", FileSignature = "PNG" } };
+
+        string summary = ConversionViewModel.BuildStandardOptionsSummary(settings, files, Key);
+
+        Assert.Equal(
+            string.Join(Environment.NewLine,
+                "Setting_Lossless",
+                "Setting_EncodingEffort 9",
+                "Setting_BitDepth Setting_BitDepth_10"),
+            summary);
+    }
+
+    [Fact]
+    public void BuildAnimationOptionsSummary_WhenWebpLossy_ShouldIncludeQualityEffortAndPreset()
+    {
+        var settings = new ConvertSettings
+        {
+            AnimationTargetFormat = "WEBP",
+            AnimationLossless = false,
+            AnimationQuality = 80,
+            AnimationWebpEncodingEffort = 6,
+            AnimationWebpPreset = WebpPresetMode.Photo
+        };
+        var files = new List<FileItem> { new() { Path = @"C:\test.gif", FileSignature = "GIF", IsAnimation = true } };
+
+        string summary = ConversionViewModel.BuildAnimationOptionsSummary(settings, files, Key);
+
+        Assert.Equal(
+            string.Join(Environment.NewLine,
+                "Setting_Quality 80",
+                "Setting_EncodingEffort 6",
+                "Setting_WebpPreset Setting_WebpPreset_Photo"),
+            summary);
+    }
+
+    [Fact]
+    public void BuildAnimationOptionsSummary_WhenGif_ShouldIncludePaletteAndErrors()
+    {
+        var settings = new ConvertSettings
+        {
+            AnimationTargetFormat = "GIF",
+            AnimationGifPalettePreset = GifPalettePreset.Balance,
+            AnimationGifInterframeMaxError = 1.25,
+            AnimationGifInterpaletteMaxError = 2.5
+        };
+        var files = new List<FileItem> { new() { Path = @"C:\test.gif", FileSignature = "GIF", IsAnimation = true } };
+
+        string summary = ConversionViewModel.BuildAnimationOptionsSummary(settings, files, Key);
+
+        Assert.Equal(
+            string.Join(Environment.NewLine,
+                "Setting_PalettePreset Setting_GifPalette_Balance",
+                "Setting_InterframeMaxError 1.25",
+                "Setting_InterpaletteMaxError 2.5"),
+            summary);
+    }
+
+    [Fact]
+    public void BuildAnimationOptionsSummary_WhenAnimationTargetIsNull_ShouldReturnEmpty()
+    {
+        var settings = new ConvertSettings { AnimationTargetFormat = null };
+        var files = new List<FileItem> { new() { Path = @"C:\test.gif", FileSignature = "GIF", IsAnimation = true } };
+
+        string summary = ConversionViewModel.BuildAnimationOptionsSummary(settings, files, Key);
+
+        Assert.Equal(string.Empty, summary);
+    }
+
+    private static string Key(string key) => key;
 }
