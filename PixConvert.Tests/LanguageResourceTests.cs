@@ -37,6 +37,30 @@ public class LanguageResourceTests
         AssertNoMissingKeys("Lang.en-US.xaml", referencedKeys, enKeys);
     }
 
+    [Fact]
+    public void LanguageResources_ShouldContainAppSettingInfoKeys()
+    {
+        string[] expectedKeys =
+        [
+            "Setting_App_GitHub",
+            "Setting_App_Engine",
+            "Setting_App_DataFolder",
+            "Setting_App_CheckUpdate",
+            "Setting_App_OpenGitHub",
+            "Setting_App_OpenDataFolder",
+            "Setting_App_UpdateChecking",
+            "Setting_App_UpdateLatest",
+            "Setting_App_UpdateAvailable",
+            "Setting_App_UpdateNoRelease",
+            "Setting_App_UpdateFailed"
+        ];
+        var koKeys = LoadLanguageKeys("Lang.ko-KR.xaml").ToHashSet(StringComparer.Ordinal);
+        var enKeys = LoadLanguageKeys("Lang.en-US.xaml").ToHashSet(StringComparer.Ordinal);
+
+        AssertNoMissingKeys("Lang.ko-KR.xaml", expectedKeys, koKeys);
+        AssertNoMissingKeys("Lang.en-US.xaml", expectedKeys, enKeys);
+    }
+
     [Theory]
     [InlineData("Lang.ko-KR.xaml")]
     [InlineData("Lang.en-US.xaml")]

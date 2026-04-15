@@ -1,7 +1,9 @@
-using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using PixConvert.Models;
 using PixConvert.Services;
 using PixConvert.Services.Interfaces;
@@ -14,9 +16,13 @@ namespace PixConvert.ViewModels;
 public partial class AppSettingViewModel : ViewModelBase
 {
     private readonly ISettingService _settingService;
+    private readonly IAppInfoService _appInfoService;
+    private readonly IExternalLauncher _externalLauncher;
     private readonly ListManagerViewModel _listManager;
 
-    [ObservableProperty] private string _appVersion = App.Version;
+    [ObservableProperty] private bool _isCheckingUpdate;
+    [ObservableProperty] private string _updateStatusText = string.Empty;
+    [ObservableProperty] private string _engineInfoText = string.Empty;
 
     /// <summary>현재 선택된 언어 코드 (en-US, ko-KR 등)</summary>
     [ObservableProperty] private string _currentLanguageCode;
@@ -44,10 +50,14 @@ public partial class AppSettingViewModel : ViewModelBase
         ILanguageService languageService,
         ILogger<AppSettingViewModel> logger,
         ISettingService settingService,
+        IAppInfoService appInfoService,
+        IExternalLauncher externalLauncher,
         ListManagerViewModel listManager)
         : base(languageService, logger)
     {
         _settingService = settingService;
+        _appInfoService = appInfoService;
+        _externalLauncher = externalLauncher;
         _listManager = listManager;
 
         // 저장된 설정으로 초기값 동기화
@@ -55,6 +65,9 @@ public partial class AppSettingViewModel : ViewModelBase
 
         // 저장된 언어로 초기값 설정
         CurrentLanguageCode = _languageService.GetCurrentLanguage();
+        EngineInfoText = string.Join(
+            Environment.NewLine,
+            _appInfoService.GetEngineInfo().Select(engine => $"{engine.Name} {engine.Version}"));
     }
 
     /// <summary>
@@ -74,4 +87,52 @@ public partial class AppSettingViewModel : ViewModelBase
     /// 현재 설정 상태를 settings.json에 저장합니다.
     /// </summary>
     private Task SaveSettingsAsync() => _settingService.SaveAsync();
+
+    [RelayCommand(CanExecute = nameof(CanCheckUpdate))]
+    private async Task CheckUpdateAsync()
+    {
+        IsCheckingUpdate = true;
+        UpdateStatusText = GetString("Setting_App_UpdateChecking");
+
+        try
+        {
+            var result = await _appInfoService.CheckLatestReleaseAsync(CancellationToken.None);
+            UpdateStatusText = FormatUpdateStatus(result);
+        }
+        catch
+        {
+            UpdateStatusText = GetString("Setting_App_UpdateFailed");
+        }
+        finally
+        {
+            IsCheckingUpdate = false;
+        }
+    }
+
+    [RelayCommand]
+    private void OpenGitHub()
+    {
+        _externalLauncher.OpenUrl(_appInfoService.RepositoryUrl);
+    }
+
+    [RelayCommand]
+    private void OpenAppDataFolder()
+    {
+        _externalLauncher.OpenFolder(_appInfoService.AppDataFolderPath);
+    }
+
+    private bool CanCheckUpdate() => !IsCheckingUpdate;
+
+    partial void OnIsCheckingUpdateChanged(bool value)
+    {
+        CheckUpdateCommand.NotifyCanExecuteChanged();
+    }
+
+    private string FormatUpdateStatus(UpdateCheckResult result)
+    {
+        string message = GetString(result.MessageKey);
+        return result.Status == UpdateCheckStatus.UpdateAvailable && !string.IsNullOrWhiteSpace(result.LatestVersion)
+            ? string.Format(message, result.LatestVersion)
+            : message;
+    }
 }

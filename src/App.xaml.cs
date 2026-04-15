@@ -1,4 +1,5 @@
 using System;
+using System.Net.Http;
 using System.Windows;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -113,6 +114,14 @@ public partial class App : Application
         services.AddSingleton<IFileScannerService, FileScannerService>();
         services.AddSingleton<IFileAnalyzerService, FileAnalyzerService>();
         services.AddSingleton<ISortingService, SortingService>();
+        services.AddSingleton(_ =>
+        {
+            var httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(8) };
+            httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("PixConvert");
+            return httpClient;
+        });
+        services.AddSingleton<IExternalLauncher, ExternalLauncher>();
+        services.AddSingleton<IAppInfoService, AppInfoService>();
 
         // [Conversion Engine] 변환 엔진 관련 서비스 등록
         services.AddSingleton<SkiaSharpProvider>();

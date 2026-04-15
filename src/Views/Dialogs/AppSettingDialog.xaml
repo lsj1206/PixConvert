@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:PixConvert"
              xmlns:ui="http://schemas.modernwpf.com/2019"
              mc:Ignorable="d"
              MinWidth="500"
@@ -96,17 +97,94 @@
                         CornerRadius="4">
                         <ui:SimpleStackPanel Spacing="12">
                             <!-- 버전 정보 -->
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <TextBlock FontWeight="Medium" Text="{DynamicResource Setting_App_Version}" />
+                            <DockPanel LastChildFill="False">
                                 <TextBlock
-                                    Grid.Column="1"
-                                    FontWeight="SemiBold"
-                                    Text="{Binding AppVersion}" />
-                            </Grid>
+                                    DockPanel.Dock="Left"
+                                    VerticalAlignment="Center"
+                                    FontWeight="Medium"
+                                    Text="{DynamicResource Setting_App_Version}" />
+                                <StackPanel
+                                    DockPanel.Dock="Right"
+                                    Orientation="Horizontal">
+                                    <TextBlock
+                                        Margin="0,0,6,0"
+                                        VerticalAlignment="Bottom"
+                                        Text="{x:Static local:App.Version}" />
+                                    <Button
+                                        Width="32"
+                                        Height="32"
+                                        Padding="0"
+                                        Command="{Binding CheckUpdateCommand}"
+                                        ToolTip="{DynamicResource Setting_App_CheckUpdate}">
+                                        <ui:FontIcon FontSize="14" Glyph="&#xE72C;" />
+                                    </Button>
+                                </StackPanel>
+                                <TextBlock
+                                    DockPanel.Dock="Right"
+                                    Margin="0,6,24,0"
+                                    VerticalAlignment="Bottom"
+                                    FontSize="12"
+                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                    Text="{Binding UpdateStatusText}"
+                                    TextWrapping="Wrap" />
+                            </DockPanel>
+
+                            <Separator />
+
+                            <!-- GitHub 링크 -->
+                            <DockPanel LastChildFill="False">
+                                <TextBlock
+                                    VerticalAlignment="Center"
+                                    FontWeight="Medium"
+                                    Text="{DynamicResource Setting_App_GitHub}" />
+                                <Button
+                                    DockPanel.Dock="Right"
+                                    Width="32"
+                                    Height="32"
+                                    Padding="0"
+                                    Command="{Binding OpenGitHubCommand}"
+                                    ToolTip="{DynamicResource Setting_App_OpenGitHub}">
+                                    <Viewbox Width="16" Height="16">
+                                        <Path
+                                            Data="M12,0C5.37,0 0,5.37 0,12C0,17.31 3.435,21.795 8.205,23.385C8.805,23.49 9.025,23.13 9.025,22.815C9.025,22.53 9.01,21.585 9.01,20.58C5.995,21.135 5.215,19.845 4.975,19.17C4.84,18.825 4.255,17.76 3.745,17.475C3.325,17.25 2.725,16.695 3.73,16.68C4.675,16.665 5.35,17.55 5.575,17.91C6.655,19.725 8.38,19.215 9.07,18.9C9.175,18.12 9.49,17.595 9.835,17.295C7.165,16.995 4.375,15.96 4.375,11.37C4.375,10.065 4.84,8.985 5.605,8.145C5.485,7.845 5.065,6.615 5.725,4.965C5.725,4.965 6.73,4.65 9.025,6.195C9.985,5.925 11.005,5.79 12.025,5.79C13.045,5.79 14.065,5.925 15.025,6.195C17.32,4.635 18.325,4.965 18.325,4.965C18.985,6.615 18.565,7.845 18.445,8.145C19.21,8.985 19.675,10.05 19.675,11.37C19.675,15.975 16.87,16.995 14.2,17.295C14.635,17.67 15.01,18.39 15.01,19.515C15.01,21.12 14.995,22.41 14.995,22.815C14.995,23.13 15.205,23.505 15.82,23.385C20.565,21.795 24,17.31 24,12C24,5.37 18.63,0 12,0Z"
+                                            Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" />
+                                    </Viewbox>
+                                </Button>
+                            </DockPanel>
+
+                            <Separator />
+
+                            <!-- 데이터 폴더 -->
+                            <DockPanel LastChildFill="False">
+                                <TextBlock
+                                    VerticalAlignment="Center"
+                                    FontWeight="Medium"
+                                    Text="{DynamicResource Setting_App_DataFolder}" />
+                                <Button
+                                    DockPanel.Dock="Right"
+                                    Width="32"
+                                    Height="32"
+                                    Padding="0"
+                                    Command="{Binding OpenAppDataFolderCommand}"
+                                    ToolTip="{DynamicResource Setting_App_OpenDataFolder}">
+                                    <ui:FontIcon FontSize="14" Glyph="&#xE8B7;" />
+                                </Button>
+                            </DockPanel>
+
+                            <Separator />
+
+                            <!-- 엔진 정보 -->
+                            <DockPanel LastChildFill="False">
+                                <TextBlock
+                                    VerticalAlignment="Center"
+                                    FontWeight="Medium"
+                                    Text="{DynamicResource Setting_App_Engine}" />
+                                <TextBlock
+                                    DockPanel.Dock="Right"
+                                    FontSize="12"
+                                    Text="{Binding EngineInfoText}"
+                                    TextAlignment="Right" />
+                            </DockPanel>
                         </ui:SimpleStackPanel>
                     </Border>
                 </StackPanel>

@@ -269,5 +269,16 @@ Dithering: Distributes color error from the source across neighboring pixels
     <sys:String x:Key="Setting_App_DelConfirmDesc">Turn ON/OFF file delete confirm dialog.</sys:String>
     <sys:String x:Key="Setting_App_Info">App Info</sys:String>
     <sys:String x:Key="Setting_App_Version">Version</sys:String>
+    <sys:String x:Key="Setting_App_GitHub">GitHub</sys:String>
+    <sys:String x:Key="Setting_App_Engine">Convert Engine</sys:String>
+    <sys:String x:Key="Setting_App_DataFolder">Data Folder</sys:String>
+    <sys:String x:Key="Setting_App_CheckUpdate">Check for updates</sys:String>
+    <sys:String x:Key="Setting_App_OpenGitHub">Open GitHub repository</sys:String>
+    <sys:String x:Key="Setting_App_OpenDataFolder">Open data folder</sys:String>
+    <sys:String x:Key="Setting_App_UpdateChecking">Checking for updates...</sys:String>
+    <sys:String x:Key="Setting_App_UpdateLatest">You are using the latest version.</sys:String>
+    <sys:String x:Key="Setting_App_UpdateAvailable">New version {0} is available.</sys:String>
+    <sys:String x:Key="Setting_App_UpdateNoRelease">No release is registered.</sys:String>
+    <sys:String x:Key="Setting_App_UpdateFailed">Failed to check for updates.</sys:String>
 
 </ResourceDictionary>

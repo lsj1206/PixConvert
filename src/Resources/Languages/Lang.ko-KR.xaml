@@ -269,5 +269,16 @@
     <sys:String x:Key="Setting_App_DelConfirmDesc">파일 삭제 확인 창을 ON/OFF 합니다.</sys:String>
     <sys:String x:Key="Setting_App_Info">앱 정보</sys:String>
     <sys:String x:Key="Setting_App_Version">버전</sys:String>
+    <sys:String x:Key="Setting_App_GitHub">GitHub</sys:String>
+    <sys:String x:Key="Setting_App_Engine">변환 엔진</sys:String>
+    <sys:String x:Key="Setting_App_DataFolder">데이터 폴더</sys:String>
+    <sys:String x:Key="Setting_App_CheckUpdate">업데이트 확인</sys:String>
+    <sys:String x:Key="Setting_App_OpenGitHub">GitHub 저장소 열기</sys:String>
+    <sys:String x:Key="Setting_App_OpenDataFolder">데이터 폴더 열기</sys:String>
+    <sys:String x:Key="Setting_App_UpdateChecking">업데이트 확인 중...</sys:String>
+    <sys:String x:Key="Setting_App_UpdateLatest">최신 버전입니다.</sys:String>
+    <sys:String x:Key="Setting_App_UpdateAvailable">새 버전 {0} 사용 가능</sys:String>
+    <sys:String x:Key="Setting_App_UpdateNoRelease">등록된 릴리스가 없습니다.</sys:String>
+    <sys:String x:Key="Setting_App_UpdateFailed">업데이트 확인에 실패했습니다.</sys:String>
 
 </ResourceDictionary>

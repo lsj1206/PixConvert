@@ -25,13 +25,8 @@ public class SettingService : ISettingService
         _logger = logger;
         _languageService = languageService;
 
-        string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-        string folder = Path.Combine(appData, "PixConvert");
-
-        if (!Directory.Exists(folder))
-            Directory.CreateDirectory(folder);
-
-        _configPath = Path.Combine(folder, "settings.json");
+        AppPaths.EnsureAppDataFolder();
+        _configPath = Path.Combine(AppPaths.AppDataFolder, "settings.json");
     }
 
     /// <summary>

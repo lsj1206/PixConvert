@@ -30,13 +30,8 @@ public class PresetService : IPresetService
         _languageService = languageService;
 
         // %AppData%/PixConvert/presets.json 경로 설정
-        string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-        string folder = Path.Combine(appData, "PixConvert");
-
-        if (!Directory.Exists(folder))
-            Directory.CreateDirectory(folder);
-
-        _configPath = Path.Combine(folder, "presets.json");
+        AppPaths.EnsureAppDataFolder();
+        _configPath = Path.Combine(AppPaths.AppDataFolder, "presets.json");
     }
 
     /// <summary>
