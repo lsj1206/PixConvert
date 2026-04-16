@@ -157,7 +157,7 @@ public class NetVipsProvider : IProviderService, IDisposable
                 SaveGif(image, outputPath, settings, isAnimation);
                 return;
             default:
-                throw new NotSupportedException($"NetVipsProviderì—ì„œ ì§€ì›í•˜ì§€ ì•ŠëŠ” ëŒ€ìƒ í¬ë§·: {targetFormat}");
+                throw new NotSupportedException($"Unsupported target format for NetVipsProvider: {targetFormat}");
         }
     }
 
