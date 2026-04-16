@@ -48,7 +48,9 @@ public class FileAnalyzerService : IFileAnalyzerService
         var rawPaths = paths.ToList();
         result.TotalPathCount = rawPaths.Count;
 
-        var existingSet = existingPaths ?? (IReadOnlySet<string>)new HashSet<string>();
+        var seenPaths = existingPaths != null
+            ? new HashSet<string>(existingPaths, StringComparer.OrdinalIgnoreCase)
+            : new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         int fileCapacity = maxItemCount - currentCount;
 
         if (fileCapacity <= 0)
@@ -66,7 +68,7 @@ public class FileAnalyzerService : IFileAnalyzerService
         if (directFiles.Count > 0)
         {
             var (items, dups, ignored) = await ProcessDirectFilesAsync(
-                directFiles, existingSet, fileCapacity, progress, allItems.Count);
+                directFiles, seenPaths, fileCapacity, progress, allItems.Count);
 
             allItems.AddRange(items);
             result.DuplicateCount += dups;
@@ -78,7 +80,7 @@ public class FileAnalyzerService : IFileAnalyzerService
         if (folders.Count > 0)
         {
             var (items, dups, ignored) = await ProcessFoldersAsync(
-                folders, existingSet, fileCapacity, progress, allItems.Count);
+                folders, seenPaths, fileCapacity, progress, allItems.Count);
 
             allItems.AddRange(items);
             result.DuplicateCount += dups;
@@ -101,24 +103,35 @@ public class FileAnalyzerService : IFileAnalyzerService
     private async Task<(List<FileItem> Items, int DuplicateCount, int IgnoredCount)>
         ProcessDirectFilesAsync(
             List<string> filePaths,
-            IReadOnlySet<string> existingSet,
+            HashSet<string> seenPaths,
             int fileCapacity,
             IProgress<FileProcessingProgress>? progress,
             int alreadyProcessedCount)
     {
-        var duplicates = filePaths.Where(p => existingSet.Contains(p)).ToList();
-        var unique = filePaths.Where(p => !existingSet.Contains(p)).ToList();
+        var unique = new List<string>();
+        int duplicateCount = 0;
+
+        foreach (var path in filePaths)
+        {
+            if (!seenPaths.Add(path))
+            {
+                duplicateCount++;
+                continue;
+            }
+
+            unique.Add(path);
+        }
 
         int canAdd = Math.Min(unique.Count, fileCapacity);
         int ignoredCount = unique.Count - canAdd;
 
         if (canAdd == 0)
-            return (new List<FileItem>(), duplicates.Count, ignoredCount);
+            return (new List<FileItem>(), duplicateCount, ignoredCount);
 
         var targets = unique.Take(canAdd).ToList();
         var items = await CreateItemsBatchAsync(targets, progress, alreadyProcessedCount);
 
-        return (items, duplicates.Count, ignoredCount);
+        return (items, duplicateCount, ignoredCount);
     }
 
     /// <summary>
@@ -127,7 +140,7 @@ public class FileAnalyzerService : IFileAnalyzerService
     private async Task<(List<FileItem> Items, int DuplicateCount, int IgnoredCount)>
         ProcessFoldersAsync(
             List<string> folders,
-            IReadOnlySet<string> existingSet,
+            HashSet<string> seenPaths,
             int fileCapacity,
             IProgress<FileProcessingProgress>? progress,
             int alreadyProcessedCount)
@@ -148,7 +161,7 @@ public class FileAnalyzerService : IFileAnalyzerService
                 // yield return 반복자를 통한 지연 로딩 스캔 (메모리 효율화)
                 foreach (var file in _fileScannerService.GetFilesInFolder(folderPath))
                 {
-                    if (existingSet.Contains(file.FullName))
+                    if (!seenPaths.Add(file.FullName))
                     {
                         duplicateCount++;
                         continue;

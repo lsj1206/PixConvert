@@ -119,14 +119,19 @@ public partial class FileInputViewModel : ViewModelBase
             // 3. 스캔 성공 시 목록에 삽입 및 메시지 출력
             if (result.SuccessCount > 0)
             {
-                AddFilesToList(result.NewItems);
+                int addedCount = AddFilesToList(result.NewItems);
+                if (addedCount == 0)
+                {
+                    _snackbarService.Show(GetString("Msg_NoNewFiles"), SnackbarType.Error);
+                    return;
+                }
 
                 if (result.IgnoredCount > 0)
-                    _snackbarService.Show(string.Format(GetString("Msg_AddWithLimit"), result.SuccessCount, result.IgnoredCount), SnackbarType.Warning);
+                    _snackbarService.Show(string.Format(GetString("Msg_AddWithLimit"), addedCount, result.IgnoredCount), SnackbarType.Warning);
                 else if (result.DuplicateCount > 0)
-                    _snackbarService.Show(string.Format(GetString("Msg_AddWithDuplicate"), result.SuccessCount, result.DuplicateCount), SnackbarType.Warning);
+                    _snackbarService.Show(string.Format(GetString("Msg_AddWithDuplicate"), addedCount, result.DuplicateCount), SnackbarType.Warning);
                 else
-                    _snackbarService.Show(string.Format(GetString("Msg_AddFile"), result.SuccessCount), SnackbarType.Success);
+                    _snackbarService.Show(string.Format(GetString("Msg_AddFile"), addedCount), SnackbarType.Success);
             }
         }
         catch (Exception ex)

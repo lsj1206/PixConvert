@@ -36,9 +36,9 @@ public class FileAnalyzerServiceTests
             .ReturnsAsync(1); // 추가
 
         _service = new FileAnalyzerService(
-            _mockScanner.Object, 
-            _mockLogger.Object, 
-            _mockLang.Object, 
+            _mockScanner.Object,
+            _mockLogger.Object,
+            _mockLang.Object,
             _mockDriveInfo.Object); // 서비스 추가
     }
 
@@ -84,6 +84,68 @@ public class FileAnalyzerServiceTests
         Assert.Equal(0, result.IgnoredCount);
         Assert.Single(result.NewItems);
         Assert.Equal("C:\\new.png", result.NewItems[0].Path);
+    }
+
+    [Fact]
+    public async Task ProcessPathsAsync_WhenDirectInputContainsSamePath_ShouldCountBatchDuplicate()
+    {
+        // Arrange
+        var paths = new[] { "C:\\dup.png", "C:\\dup.png" };
+
+        _mockScanner.Setup(s => s.CreateFileItemAsync("C:\\dup.png"))
+            .ReturnsAsync(new FileItem { Path = "C:\\dup.png" });
+
+        // Act
+        var result = await _service.ProcessPathsAsync(paths, maxItemCount: 10000, currentCount: 0);
+
+        // Assert
+        Assert.Equal(1, result.SuccessCount);
+        Assert.Equal(1, result.DuplicateCount);
+        Assert.Equal(0, result.IgnoredCount);
+        Assert.Single(result.NewItems);
+        _mockScanner.Verify(s => s.CreateFileItemAsync("C:\\dup.png"), Times.Once);
+    }
+
+    [Fact]
+    public async Task ProcessPathsAsync_WhenDirectInputDiffersOnlyByCase_ShouldCountDuplicate()
+    {
+        // Arrange
+        var paths = new[] { "C:\\Photo.png", "c:\\PHOTO.PNG" };
+
+        _mockScanner.Setup(s => s.CreateFileItemAsync("C:\\Photo.png"))
+            .ReturnsAsync(new FileItem { Path = "C:\\Photo.png" });
+
+        // Act
+        var result = await _service.ProcessPathsAsync(paths, maxItemCount: 10000, currentCount: 0);
+
+        // Assert
+        Assert.Equal(1, result.SuccessCount);
+        Assert.Equal(1, result.DuplicateCount);
+        Assert.Equal(0, result.IgnoredCount);
+        Assert.Equal("C:\\Photo.png", result.NewItems[0].Path);
+        _mockScanner.Verify(s => s.CreateFileItemAsync(It.IsAny<string>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task ProcessPathsAsync_WhenExistingAndBatchDuplicatesExist_ShouldCountBoth()
+    {
+        // Arrange
+        var paths = new[] { "C:\\existing.png", "C:\\new.png", "C:\\new.png" };
+        var existing = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "C:\\existing.png" };
+
+        _mockScanner.Setup(s => s.CreateFileItemAsync("C:\\new.png"))
+            .ReturnsAsync(new FileItem { Path = "C:\\new.png" });
+
+        // Act
+        var result = await _service.ProcessPathsAsync(paths, maxItemCount: 10000, currentCount: 0, existing);
+
+        // Assert
+        Assert.Equal(1, result.SuccessCount);
+        Assert.Equal(2, result.DuplicateCount);
+        Assert.Equal(0, result.IgnoredCount);
+        Assert.Single(result.NewItems);
+        Assert.Equal("C:\\new.png", result.NewItems[0].Path);
+        _mockScanner.Verify(s => s.CreateFileItemAsync("C:\\new.png"), Times.Once);
     }
 
     [Fact]
@@ -162,6 +224,97 @@ public class FileAnalyzerServiceTests
         {
             if (Directory.Exists(realTempFolder)) Directory.Delete(realTempFolder);
         }
+    }
+
+    [Fact]
+    public async Task ProcessPathsAsync_WhenDirectFileAndFolderOverlap_ShouldPreferDirectFileAndCountFolderDuplicate()
+    {
+        // Arrange
+        string realTempFolder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+        Directory.CreateDirectory(realTempFolder);
+        try
+        {
+            string directPath = Path.Combine(realTempFolder, "same.png");
+            var paths = new[] { directPath, realTempFolder };
+            var fakeFiles = new List<FileInfo> { new(directPath) };
+
+            _mockScanner.Setup(s => s.GetFilesInFolder(realTempFolder))
+                .Returns(fakeFiles);
+            _mockScanner.Setup(s => s.CreateFileItemAsync(directPath))
+                .ReturnsAsync(new FileItem { Path = directPath });
+
+            // Act
+            var result = await _service.ProcessPathsAsync(paths, maxItemCount: 10000, currentCount: 0);
+
+            // Assert
+            Assert.Equal(1, result.SuccessCount);
+            Assert.Equal(1, result.DuplicateCount);
+            Assert.Equal(0, result.IgnoredCount);
+            Assert.Single(result.NewItems);
+            Assert.Equal(directPath, result.NewItems[0].Path);
+            _mockScanner.Verify(s => s.CreateFileItemAsync(directPath), Times.Once);
+        }
+        finally
+        {
+            if (Directory.Exists(realTempFolder)) Directory.Delete(realTempFolder);
+        }
+    }
+
+    [Fact]
+    public async Task ProcessPathsAsync_WhenTwoFoldersReturnSameFile_ShouldAddOnceAndCountDuplicate()
+    {
+        // Arrange
+        string firstFolder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+        string secondFolder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+        Directory.CreateDirectory(firstFolder);
+        Directory.CreateDirectory(secondFolder);
+        try
+        {
+            string sharedPath = Path.Combine(firstFolder, "shared.png");
+            var fakeFiles = new List<FileInfo> { new(sharedPath) };
+
+            _mockScanner.Setup(s => s.GetFilesInFolder(firstFolder))
+                .Returns(fakeFiles);
+            _mockScanner.Setup(s => s.GetFilesInFolder(secondFolder))
+                .Returns(fakeFiles);
+            _mockScanner.Setup(s => s.CreateFileItemAsync(sharedPath))
+                .ReturnsAsync(new FileItem { Path = sharedPath });
+
+            // Act
+            var result = await _service.ProcessPathsAsync(new[] { firstFolder, secondFolder }, maxItemCount: 10000, currentCount: 0);
+
+            // Assert
+            Assert.Equal(1, result.SuccessCount);
+            Assert.Equal(1, result.DuplicateCount);
+            Assert.Equal(0, result.IgnoredCount);
+            Assert.Single(result.NewItems);
+            _mockScanner.Verify(s => s.CreateFileItemAsync(sharedPath), Times.Once);
+        }
+        finally
+        {
+            if (Directory.Exists(firstFolder)) Directory.Delete(firstFolder);
+            if (Directory.Exists(secondFolder)) Directory.Delete(secondFolder);
+        }
+    }
+
+    [Fact]
+    public async Task ProcessPathsAsync_WhenCapacityLimited_ShouldApplyLimitAfterBatchDuplicates()
+    {
+        // Arrange
+        var paths = new[] { "C:\\a.png", "C:\\a.png", "C:\\b.png", "C:\\c.png" };
+
+        _mockScanner.Setup(s => s.CreateFileItemAsync(It.IsAny<string>()))
+            .ReturnsAsync((string p) => new FileItem { Path = p });
+
+        // Act
+        var result = await _service.ProcessPathsAsync(paths, maxItemCount: 2, currentCount: 0);
+
+        // Assert
+        Assert.Equal(2, result.SuccessCount);
+        Assert.Equal(1, result.DuplicateCount);
+        Assert.Equal(1, result.IgnoredCount);
+        Assert.Equal(new[] { "C:\\a.png", "C:\\b.png" }, result.NewItems.Select(x => x.Path).ToArray());
+        _mockScanner.Verify(s => s.CreateFileItemAsync(It.IsAny<string>()), Times.Exactly(2));
     }
 
     [Fact]
