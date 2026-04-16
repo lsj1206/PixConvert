@@ -12,10 +12,8 @@
         <SolidColorBrush x:Key="ItemHoverBackground" Color="#E5F3FF" />
         <SolidColorBrush x:Key="ItemSelectedBackground" Color="#CCE8FF" />
         <SolidColorBrush x:Key="TextSecondary" Color="#666666" />
-        <SolidColorBrush x:Key="AccentColor" Color="#0078D4" />
 
         <!-- Converter for Status Text -->
-        <converters:EnumToBoolConverter x:Key="EnumToBoolConverter" />
         <converters:FileSizeConverter x:Key="FileSizeConverter" />
         <converters:SizeRatioConverter x:Key="SizeRatioConverter" />
         <converters:SizeRatioStateConverter x:Key="SizeRatioStateConverter" />

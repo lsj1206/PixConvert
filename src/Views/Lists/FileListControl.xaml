@@ -15,7 +15,6 @@
         <SolidColorBrush x:Key="ItemHoverBackground" Color="#E5F3FF" />
         <SolidColorBrush x:Key="ItemSelectedBackground" Color="#CCE8FF" />
         <SolidColorBrush x:Key="TextSecondary" Color="#666666" />
-        <SolidColorBrush x:Key="AccentColor" Color="#0078D4" />
 
         <!-- FileList : Item_ContainerStyle -->
         <Style

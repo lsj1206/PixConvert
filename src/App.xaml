@@ -17,8 +17,6 @@
             </ResourceDictionary.MergedDictionaries>
 
             <!-- App : Global_Converters -->
-            <converters:AppStatusToVisibilityConverter x:Key="AppStatusToVisibilityConverter" />
-            <converters:AppStatusToInverseBooleanConverter x:Key="AppStatusToInverseBooleanConverter" />
             <converters:UpperCaseConverter x:Key="UpperCaseConverter" />
             <converters:EnumToBoolConverter x:Key="EnumToBoolConverter" />
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />

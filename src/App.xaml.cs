@@ -90,7 +90,6 @@ public partial class App : Application
         services.AddLogging(loggingBuilder => loggingBuilder.AddSerilog(dispose: true));
 
         // [Services] 싱글톤 서비스 등록
-        services.AddSingleton<IWindowService, WindowService>();
         services.AddSingleton<IDialogService, DialogService>();
         services.AddSingleton<ISnackbarService, SnackbarService>();
         services.AddSingleton<ILanguageService, LanguageService>();
