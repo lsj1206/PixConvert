@@ -11,6 +11,6 @@ public class AppSettings
     /// <summary>파일 삭제 시 확인 다이얼로그 표시 여부</summary>
     public bool ConfirmDeletion { get; set; } = true;
 
-    /// <summary>애플리케이션 테마 (Light, Dark)</summary>
-    public string Theme { get; set; } = "Light";
+    /// <summary>애플리케이션 테마 (System, Light, Dark)</summary>
+    public string Theme { get; set; } = "System";
 }

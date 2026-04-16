@@ -56,6 +56,32 @@
 
                             <Separator />
 
+                            <!-- 테마 설정 -->
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock FontWeight="Medium" Text="{DynamicResource Setting_App_Theme}"/>
+                                    <TextBlock FontSize="12"
+                                               Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                               Text="{DynamicResource Setting_App_ThemeDesc}"/>
+                                </StackPanel>
+                                <ComboBox
+                                    Grid.Column="1"
+                                    Width="120"
+                                    VerticalAlignment="Center"
+                                    SelectedValue="{Binding CurrentTheme, Mode=TwoWay}"
+                                    SelectedValuePath="Tag">
+                                    <ComboBoxItem Content="{DynamicResource Setting_App_ThemeSystem}" Tag="System" />
+                                    <ComboBoxItem Content="{DynamicResource Setting_App_ThemeLight}" Tag="Light" />
+                                    <ComboBoxItem Content="{DynamicResource Setting_App_ThemeDark}" Tag="Dark" />
+                                </ComboBox>
+                            </Grid>
+
+                            <Separator />
+
                             <!-- 삭제 확인 옵션 -->
                             <Grid>
                                 <Grid.ColumnDefinitions>

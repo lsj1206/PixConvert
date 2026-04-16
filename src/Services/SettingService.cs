@@ -40,11 +40,7 @@ public class SettingService : ISettingService
         // 언어 및 테마 자동 적용
         _languageService.ChangeLanguage(Settings.Language);
 
-        ThemeManager.Current.ApplicationTheme = Settings.Theme switch
-        {
-            "Dark" => ApplicationTheme.Dark,
-            _ => ApplicationTheme.Light
-        };
+        ApplyTheme(Settings.Theme);
     }
 
     /// <summary>
@@ -80,6 +76,11 @@ public class SettingService : ISettingService
                 if (!supportedLanguages.Contains(Settings.Language))
                 {
                     Settings.Language = _languageService.GetSystemLanguage();
+                    _ = SaveAsync();
+                }
+                if (!IsSupportedTheme(Settings.Theme))
+                {
+                    Settings.Theme = "System";
                     _ = SaveAsync();
                 }
                 _logger.LogInformation(_languageService.GetString("Log_Setting_FileLoadSuccess"));
@@ -122,6 +123,21 @@ public class SettingService : ISettingService
     {
         Language = _languageService.GetSystemLanguage(),
         ConfirmDeletion = true,
-        Theme = "Light"
+        Theme = "System"
     };
+
+    private static bool IsSupportedTheme(string theme)
+    {
+        return theme is "System" or "Light" or "Dark";
+    }
+
+    public static void ApplyTheme(string theme)
+    {
+        ThemeManager.Current.ApplicationTheme = theme switch
+        {
+            "Light" => ApplicationTheme.Light,
+            "Dark" => ApplicationTheme.Dark,
+            _ => null
+        };
+    }
 }

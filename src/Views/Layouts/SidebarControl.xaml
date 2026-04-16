@@ -48,7 +48,7 @@
         <Border
             Margin="0"
             Padding="12"
-            Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}"
+            Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
             BorderBrush="{DynamicResource SystemControlBackgroundBaseMediumBrush}"
             BorderThickness="1"
             CornerRadius="8">

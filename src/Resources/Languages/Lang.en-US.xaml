@@ -265,6 +265,11 @@ Dithering: Distributes color error from the source across neighboring pixels
     <sys:String x:Key="Setting_App_General">General</sys:String>
     <sys:String x:Key="Setting_App_Language">Language</sys:String>
     <sys:String x:Key="Setting_App_LanguageDesc">Select the display language.</sys:String>
+    <sys:String x:Key="Setting_App_Theme">Theme</sys:String>
+    <sys:String x:Key="Setting_App_ThemeDesc">Select the app theme.</sys:String>
+    <sys:String x:Key="Setting_App_ThemeSystem">System</sys:String>
+    <sys:String x:Key="Setting_App_ThemeLight">Light</sys:String>
+    <sys:String x:Key="Setting_App_ThemeDark">Dark</sys:String>
     <sys:String x:Key="Setting_App_DelConfirm">Delete Confirm</sys:String>
     <sys:String x:Key="Setting_App_DelConfirmDesc">Turn ON/OFF file delete confirm dialog.</sys:String>
     <sys:String x:Key="Setting_App_Info">App Info</sys:String>

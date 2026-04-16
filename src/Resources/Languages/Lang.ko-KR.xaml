@@ -265,6 +265,11 @@
     <sys:String x:Key="Setting_App_General">일반</sys:String>
     <sys:String x:Key="Setting_App_Language">언어</sys:String>
     <sys:String x:Key="Setting_App_LanguageDesc">표시 언어를 선택합니다.</sys:String>
+    <sys:String x:Key="Setting_App_Theme">테마</sys:String>
+    <sys:String x:Key="Setting_App_ThemeDesc">앱 화면 테마를 선택합니다.</sys:String>
+    <sys:String x:Key="Setting_App_ThemeSystem">시스템</sys:String>
+    <sys:String x:Key="Setting_App_ThemeLight">라이트</sys:String>
+    <sys:String x:Key="Setting_App_ThemeDark">다크</sys:String>
     <sys:String x:Key="Setting_App_DelConfirm">삭제 확인 표시</sys:String>
     <sys:String x:Key="Setting_App_DelConfirmDesc">파일 삭제 확인 창을 ON/OFF 합니다.</sys:String>
     <sys:String x:Key="Setting_App_Info">앱 정보</sys:String>
