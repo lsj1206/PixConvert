@@ -57,27 +57,27 @@
     <Grid>
         <ListView
             x:Name="FileListView"
+            ScrollViewer.CanContentScroll="True"
+            ScrollViewer.HorizontalScrollBarVisibility="Auto"
+            VirtualizingPanel.CacheLength="20,20"
+            VirtualizingPanel.CacheLengthUnit="Item"
+            VirtualizingPanel.IsVirtualizing="True"
+            VirtualizingPanel.VirtualizationMode="Recycling"
             Padding="0,0,12,16"
-            AllowDrop="True"
             Background="Transparent"
             BorderThickness="0"
+            ItemContainerStyle="{StaticResource FileItemContainerStyle}"
+            SelectionMode="Extended"
+            ItemsSource="{Binding Items}"
+            AllowDrop="True"
             DragLeave="FileListView_DragLeave"
             Drop="FileListView_Drop"
             GridViewColumnHeader.Click="Header_Click"
-            ItemContainerStyle="{StaticResource FileItemContainerStyle}"
-            ItemsSource="{Binding Items}"
             KeyDown="ListView_KeyDown"
             MouseMove="FileListView_MouseMove"
             PreviewDragOver="FileListView_PreviewDragOver"
             PreviewMouseLeftButtonDown="FileListView_PreviewMouseLeftButtonDown"
-            PreviewMouseLeftButtonUp="FileListView_PreviewMouseLeftButtonUp"
-            ScrollViewer.CanContentScroll="True"
-            ScrollViewer.HorizontalScrollBarVisibility="Auto"
-            SelectionMode="Extended"
-            VirtualizingPanel.CacheLength="20,20"
-            VirtualizingPanel.CacheLengthUnit="Item"
-            VirtualizingPanel.IsVirtualizing="True"
-            VirtualizingPanel.VirtualizationMode="Recycling">
+            PreviewMouseLeftButtonUp="FileListView_PreviewMouseLeftButtonUp">
             <ListView.View>
                 <!-- FileList : GridView_Main -->
                 <GridView>
@@ -132,7 +132,10 @@
                                         VerticalAlignment="Center" />
 
                                     <!-- FileList : Tags_Container -->
-                                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <StackPanel
+                                        Grid.Column="1"
+                                        VerticalAlignment="Center"
+                                        Orientation="Horizontal">
                                         <!-- FileList : Animation_Badge -->
                                         <Border
                                             Margin="6,0,0,0"
@@ -275,9 +278,9 @@
                 x:Name="DropIndicator"
                 Width="{Binding ActualWidth, ElementName=FileListView}"
                 Height="1"
-                CornerRadius="1.5"
                 HorizontalAlignment="Stretch"
-                Visibility="Collapsed">
+                Visibility="Collapsed"
+                CornerRadius="1.5">
                 <Border.Effect>
                     <DropShadowEffect
                         BlurRadius="4"

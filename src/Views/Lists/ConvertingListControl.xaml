@@ -87,7 +87,10 @@
                         </GridViewColumn.Header>
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock HorizontalAlignment="Center" Foreground="{DynamicResource TextSecondary}" Text="{Binding AddIndex}" />
+                                <TextBlock
+                                    HorizontalAlignment="Center"
+                                    Foreground="{DynamicResource TextSecondary}"
+                                    Text="{Binding AddIndex}" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
@@ -105,7 +108,10 @@
                                         <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
 
-                                    <TextBlock Grid.Column="0" TextTrimming="CharacterEllipsis" VerticalAlignment="Center">
+                                    <TextBlock
+                                        Grid.Column="0"
+                                        VerticalAlignment="Center"
+                                        TextTrimming="CharacterEllipsis">
                                         <TextBlock.Text>
                                             <MultiBinding StringFormat="{}{0}.{1}">
                                                 <Binding Path="Name" />
@@ -114,7 +120,13 @@
                                         </TextBlock.Text>
                                     </TextBlock>
 
-                                    <Border Grid.Column="1" Margin="6,0,0,0" Padding="4,1" VerticalAlignment="Center" Background="#E1BEE7" CornerRadius="4">
+                                    <Border
+                                        Grid.Column="1"
+                                        Margin="6,0,0,0"
+                                        Padding="4,1"
+                                        VerticalAlignment="Center"
+                                        Background="#E1BEE7"
+                                        CornerRadius="4">
                                         <Border.Style>
                                             <Style TargetType="Border">
                                                 <Setter Property="Visibility" Value="Collapsed" />
@@ -125,7 +137,11 @@
                                                 </Style.Triggers>
                                             </Style>
                                         </Border.Style>
-                                        <TextBlock FontSize="9" FontWeight="Bold" Foreground="#6A1B9A" Text="ANI" />
+                                        <TextBlock
+                                            FontSize="9"
+                                            FontWeight="Bold"
+                                            Foreground="#6A1B9A"
+                                            Text="ANI" />
                                     </Border>
                                 </Grid>
                             </DataTemplate>
@@ -175,9 +191,18 @@
                                         Minimum="0"
                                         Value="{Binding Progress}" />
 
-                                    <StackPanel Orientation="Horizontal" Margin="12,0,0,0" VerticalAlignment="Center">
+                                    <StackPanel
+                                        Margin="12,0,0,0"
+                                        VerticalAlignment="Center"
+                                        Orientation="Horizontal">
                                         <!-- Indicator : Red Dot (Visible during Processing) -->
-                                        <Ellipse x:Name="ProcessingIndicator" Width="6" Height="6" Fill="#FF5252" Margin="0,0,8,0" VerticalAlignment="Center" Visibility="Collapsed" />
+                                        <Ellipse
+                                            x:Name="ProcessingIndicator"
+                                            Width="6" Height="6"
+                                            Margin="0,0,8,0"
+                                            VerticalAlignment="Center"
+                                            Visibility="Collapsed"
+                                            Fill="#FF5252" />
                                         
                                         <TextBlock
                                             x:Name="StatusLabel"
@@ -234,19 +259,34 @@
                         </GridViewColumn.Header>
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <Grid x:Name="ResizedContainer" VerticalAlignment="Center" Visibility="Collapsed">
+                                <Grid
+                                    x:Name="ResizedContainer"
+                                    VerticalAlignment="Center"
+                                    Visibility="Collapsed">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto" />
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
 
-                                    <TextBlock Grid.Column="0" VerticalAlignment="Center" FontSize="11"
-                                               Text="{Binding OutputSize, Converter={StaticResource FileSizeConverter}}"
-                                               Foreground="{DynamicResource TextSecondary}" />
+                                    <TextBlock
+                                        Grid.Column="0"
+                                        VerticalAlignment="Center"
+                                        FontSize="11"
+                                        Foreground="{DynamicResource TextSecondary}"
+                                        Text="{Binding OutputSize, Converter={StaticResource FileSizeConverter}}" />
 
-                                    <Border x:Name="RatioBadge" Grid.Column="1" Margin="6,0,0,0" Padding="4,1" VerticalAlignment="Center"
-                                            HorizontalAlignment="Left" CornerRadius="4">
-                                        <TextBlock x:Name="RatioText" FontSize="9" FontWeight="Bold">
+                                    <Border
+                                        x:Name="RatioBadge"
+                                        Grid.Column="1"
+                                        Margin="6,0,0,0"
+                                        Padding="4,1"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Center"
+                                        CornerRadius="4">
+                                        <TextBlock
+                                            x:Name="RatioText"
+                                            FontSize="9"
+                                            FontWeight="Bold">
                                             <TextBlock.Text>
                                                 <MultiBinding Converter="{StaticResource SizeRatioConverter}">
                                                     <Binding Path="Size" />
@@ -306,8 +346,13 @@
                         </GridViewColumn.Header>
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock FontSize="11" FontWeight="Medium" Foreground="{DynamicResource TextSecondary}"
-                                           Text="{Binding ProcessingEngine}" TextAlignment="Center" VerticalAlignment="Center" />
+                                <TextBlock
+                                    VerticalAlignment="Center"
+                                    FontSize="11"
+                                    FontWeight="Medium"
+                                    TextAlignment="Center"
+                                    Foreground="{DynamicResource TextSecondary}"
+                                    Text="{Binding ProcessingEngine}" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

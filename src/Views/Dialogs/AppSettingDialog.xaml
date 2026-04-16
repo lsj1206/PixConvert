@@ -140,8 +140,8 @@
                                         Width="32"
                                         Height="32"
                                         Padding="0"
-                                        Command="{Binding CheckUpdateCommand}"
-                                        ToolTip="{DynamicResource Setting_App_CheckUpdate}">
+                                        ToolTip="{DynamicResource Setting_App_CheckUpdate}"
+                                        Command="{Binding CheckUpdateCommand}">
                                         <ui:FontIcon FontSize="14" Glyph="&#xE72C;" />
                                     </Button>
                                 </StackPanel>
@@ -168,8 +168,8 @@
                                     Width="32"
                                     Height="32"
                                     Padding="0"
-                                    Command="{Binding OpenGitHubCommand}"
-                                    ToolTip="{DynamicResource Setting_App_OpenGitHub}">
+                                    ToolTip="{DynamicResource Setting_App_OpenGitHub}"
+                                    Command="{Binding OpenGitHubCommand}">
                                     <Viewbox Width="16" Height="16">
                                         <Path
                                             Data="M12,0C5.37,0 0,5.37 0,12C0,17.31 3.435,21.795 8.205,23.385C8.805,23.49 9.025,23.13 9.025,22.815C9.025,22.53 9.01,21.585 9.01,20.58C5.995,21.135 5.215,19.845 4.975,19.17C4.84,18.825 4.255,17.76 3.745,17.475C3.325,17.25 2.725,16.695 3.73,16.68C4.675,16.665 5.35,17.55 5.575,17.91C6.655,19.725 8.38,19.215 9.07,18.9C9.175,18.12 9.49,17.595 9.835,17.295C7.165,16.995 4.375,15.96 4.375,11.37C4.375,10.065 4.84,8.985 5.605,8.145C5.485,7.845 5.065,6.615 5.725,4.965C5.725,4.965 6.73,4.65 9.025,6.195C9.985,5.925 11.005,5.79 12.025,5.79C13.045,5.79 14.065,5.925 15.025,6.195C17.32,4.635 18.325,4.965 18.325,4.965C18.985,6.615 18.565,7.845 18.445,8.145C19.21,8.985 19.675,10.05 19.675,11.37C19.675,15.975 16.87,16.995 14.2,17.295C14.635,17.67 15.01,18.39 15.01,19.515C15.01,21.12 14.995,22.41 14.995,22.815C14.995,23.13 15.205,23.505 15.82,23.385C20.565,21.795 24,17.31 24,12C24,5.37 18.63,0 12,0Z"
@@ -191,8 +191,8 @@
                                     Width="32"
                                     Height="32"
                                     Padding="0"
-                                    Command="{Binding OpenAppDataFolderCommand}"
-                                    ToolTip="{DynamicResource Setting_App_OpenDataFolder}">
+                                    ToolTip="{DynamicResource Setting_App_OpenDataFolder}"
+                                    Command="{Binding OpenAppDataFolderCommand}">
                                     <ui:FontIcon FontSize="14" Glyph="&#xE8B7;" />
                                 </Button>
                             </DockPanel>

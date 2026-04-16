@@ -110,8 +110,8 @@
             VerticalAlignment="Center"
             FontSize="14"
             FontWeight="SemiBold"
+            TextAlignment="Center"
             Foreground="White"
-            Text="{Binding Message}"
-            TextAlignment="Center" />
+            Text="{Binding Message}" />
     </Border>
 </UserControl>

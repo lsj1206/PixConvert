@@ -45,11 +45,11 @@
     </UserControl.Resources>
 
     <ScrollViewer
-        Focusable="True"
-        Background="Transparent"
-        MouseDown="ScrollViewer_MouseDown"
         HorizontalScrollBarVisibility="Disabled"
-        VerticalScrollBarVisibility="Auto">
+        VerticalScrollBarVisibility="Auto"
+        Background="Transparent"
+        Focusable="True"
+        MouseDown="ScrollViewer_MouseDown">
         <StackPanel
             Margin="14,14,14,14"
             Background="Transparent"
@@ -59,23 +59,23 @@
                 Margin="0,0,0,6"
                 Orientation="Horizontal">
                 <ComboBox
+                    ui:ControlHelper.Header="{DynamicResource Setting_PresetList}"
                     Margin="0,0,8,0"
                     Width="220"
-                    ui:ControlHelper.Header="{DynamicResource Setting_PresetList}"
                     DisplayMemberPath="Name"
                     ItemsSource="{Binding Presets}"
                     SelectedItem="{Binding SelectedPreset}" />
                 <ctrls:FilterTextBox
+                    ui:ControlHelper.Header="{DynamicResource Setting_PresetName}"
                     Width="200"
                     Margin="0,0,4,0"
-                    ui:ControlHelper.Header="{DynamicResource Setting_PresetName}"
                     Filter="None"
                     Text="{Binding PresetNameEdit, UpdateSourceTrigger=PropertyChanged}" />
                 <Button
                     Width="60"
                     VerticalAlignment="Bottom"
-                    Command="{Binding RenamePresetCommand}"
-                    Content="{DynamicResource Btn_PresetApply}" />
+                    Content="{DynamicResource Btn_PresetApply}"
+                    Command="{Binding RenamePresetCommand}" />
             </StackPanel>
 
             <!-- ConvertSetting : Preset_Buttons -->
@@ -84,16 +84,16 @@
                 Orientation="Horizontal">
                 <Button
                     Margin="0,0,8,0"
-                    Command="{Binding CreatePresetCommand}"
-                    Content="{DynamicResource Btn_PresetCreate}" />
+                    Content="{DynamicResource Btn_PresetCreate}"
+                    Command="{Binding CreatePresetCommand}" />
                 <Button
                     Margin="0,0,8,0"
-                    Command="{Binding CopyPresetCommand}"
-                    Content="{DynamicResource Btn_PresetCopy}" />
+                    Content="{DynamicResource Btn_PresetCopy}"
+                    Command="{Binding CopyPresetCommand}" />
                 <Button
-                    Command="{Binding RemovePresetCommand}"
+                    Foreground="{DynamicResource SystemControlErrorTextForegroundBrush}"
                     Content="{DynamicResource Btn_PresetDelete}"
-                    Foreground="{DynamicResource SystemControlErrorTextForegroundBrush}" />
+                    Command="{Binding RemovePresetCommand}" />
             </StackPanel>
 
             <Separator Margin="0,0,0,8" />
@@ -336,14 +336,14 @@
                     Minimum="1"
                     Value="{Binding StandardQuality}" />
                 <ctrls:FilterTextBox
+                    ui:TextBoxHelper.IsDeleteButtonVisible="False"
+                    ui:ControlHelper.PlaceholderText="90"
                     VerticalAlignment="Center"
                     IsBlank="90"
                     Filter="Digits"
                     FilterMode="Allow"
                     FilterMaxLength="3"
-                    Text="{Binding StandardQuality, UpdateSourceTrigger=PropertyChanged}"
-                    ui:TextBoxHelper.IsDeleteButtonVisible="False"
-                    ui:ControlHelper.PlaceholderText="90" />
+                    Text="{Binding StandardQuality, UpdateSourceTrigger=PropertyChanged}" />
             </StackPanel>
 
             <StackPanel
@@ -418,15 +418,15 @@
                     Minimum="0"
                     Value="{Binding StandardPngCompressionLevel}" />
                 <ctrls:FilterTextBox
+                    ui:TextBoxHelper.IsDeleteButtonVisible="False"
+                    ui:ControlHelper.PlaceholderText="6"
                     MinWidth="32"
                     VerticalAlignment="Center"
                     IsBlank="6"
                     Filter="Digits"
                     FilterMode="Allow"
                     FilterMaxLength="1"
-                    Text="{Binding StandardPngCompressionLevel, UpdateSourceTrigger=PropertyChanged}"
-                    ui:TextBoxHelper.IsDeleteButtonVisible="False"
-                    ui:ControlHelper.PlaceholderText="6" />
+                    Text="{Binding StandardPngCompressionLevel, UpdateSourceTrigger=PropertyChanged}" />
             </StackPanel>
 
             <StackPanel
@@ -501,15 +501,15 @@
                     Minimum="0"
                     Value="{Binding StandardAvifEncodingEffort}" />
                 <ctrls:FilterTextBox
+                    ui:TextBoxHelper.IsDeleteButtonVisible="False"
+                    ui:ControlHelper.PlaceholderText="4"
                     MinWidth="32"
                     VerticalAlignment="Center"
                     IsBlank="4"
                     Filter="Digits"
                     FilterMode="Allow"
                     FilterMaxLength="1"
-                    Text="{Binding StandardAvifEncodingEffort, UpdateSourceTrigger=PropertyChanged}"
-                    ui:TextBoxHelper.IsDeleteButtonVisible="False"
-                    ui:ControlHelper.PlaceholderText="4" />
+                    Text="{Binding StandardAvifEncodingEffort, UpdateSourceTrigger=PropertyChanged}" />
             </StackPanel>
 
             <StackPanel
@@ -732,14 +732,14 @@
                             Minimum="1"
                             Value="{Binding AnimationQuality}" />
                         <ctrls:FilterTextBox
+                            ui:TextBoxHelper.IsDeleteButtonVisible="False"
+                            ui:ControlHelper.PlaceholderText="90"
                             VerticalAlignment="Center"
                             IsBlank="90"
                             Filter="Digits"
                             FilterMode="Allow"
                             FilterMaxLength="3"
-                            Text="{Binding AnimationQuality, UpdateSourceTrigger=PropertyChanged}"
-                            ui:TextBoxHelper.IsDeleteButtonVisible="False"
-                            ui:ControlHelper.PlaceholderText="90" />
+                            Text="{Binding AnimationQuality, UpdateSourceTrigger=PropertyChanged}" />
                     </StackPanel>
                 </StackPanel>
 
@@ -802,15 +802,15 @@
                             TickFrequency="1"
                             Value="{Binding AnimationWebpEncodingEffort}" />
                         <ctrls:FilterTextBox
+                            ui:TextBoxHelper.IsDeleteButtonVisible="False"
+                            ui:ControlHelper.PlaceholderText="4"
                             MinWidth="32"
                             VerticalAlignment="Center"
                             IsBlank="4"
                             Filter="Digits"
                             FilterMode="Allow"
                             FilterMaxLength="1"
-                            Text="{Binding AnimationWebpEncodingEffort, UpdateSourceTrigger=PropertyChanged}"
-                            ui:TextBoxHelper.IsDeleteButtonVisible="False"
-                            ui:ControlHelper.PlaceholderText="4" />
+                            Text="{Binding AnimationWebpEncodingEffort, UpdateSourceTrigger=PropertyChanged}" />
                     </StackPanel>
                 </StackPanel>
 
@@ -883,6 +883,7 @@
                             TickFrequency="0.01"
                             Value="{Binding AnimationGifInterframeMaxError}" />
                         <ctrls:FilterTextBox
+                            ui:TextBoxHelper.IsDeleteButtonVisible="False"
                             Width="56"
                             VerticalAlignment="Center"
                             IsBlank="0"
@@ -891,8 +892,7 @@
                             FilterMaxLength="5"
                             DecimalMaxValue="32"
                             DecimalPlaces="2"
-                            Text="{Binding AnimationGifInterframeMaxErrorText, UpdateSourceTrigger=PropertyChanged}"
-                            ui:TextBoxHelper.IsDeleteButtonVisible="False" />
+                            Text="{Binding AnimationGifInterframeMaxErrorText, UpdateSourceTrigger=PropertyChanged}" />
                     </StackPanel>
                 </StackPanel>
 
@@ -930,6 +930,7 @@
                             TickFrequency="0.01"
                             Value="{Binding AnimationGifInterpaletteMaxError}" />
                         <ctrls:FilterTextBox
+                            ui:TextBoxHelper.IsDeleteButtonVisible="False"
                             Width="56"
                             VerticalAlignment="Center"
                             IsBlank="0"
@@ -938,8 +939,7 @@
                             FilterMaxLength="5"
                             DecimalMaxValue="32"
                             DecimalPlaces="2"
-                            Text="{Binding AnimationGifInterpaletteMaxErrorText, UpdateSourceTrigger=PropertyChanged}"
-                            ui:TextBoxHelper.IsDeleteButtonVisible="False" />
+                            Text="{Binding AnimationGifInterpaletteMaxErrorText, UpdateSourceTrigger=PropertyChanged}" />
                     </StackPanel>
                 </StackPanel>
             </StackPanel>

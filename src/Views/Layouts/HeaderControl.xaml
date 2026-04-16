@@ -9,10 +9,10 @@
 
     <!-- Header : Main_Container -->
     <Border
+        Padding="10,5"
         Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
         BorderBrush="{DynamicResource SystemControlBackgroundBaseMediumBrush}"
-        BorderThickness="0,0,0,1"
-        Padding="10,5">
+        BorderThickness="0,0,0,1">
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="186" /> <!-- Header : Left_Space -->

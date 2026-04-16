@@ -62,23 +62,23 @@
                                     <StackPanel Orientation="Vertical">
                                         <!-- Sidebar : File_Operations_Group -->
                                         <Button
-                                            Command="{Binding FileInput.AddFilesCommand}"
+                                            Style="{StaticResource SidebarButtonStyle}"
                                             Content="{DynamicResource Btn_AddFile}"
-                                            Style="{StaticResource SidebarButtonStyle}" />
+                                            Command="{Binding FileInput.AddFilesCommand}" />
                                         <Button
-                                            Command="{Binding FileInput.AddFolderCommand}"
+                                            Style="{StaticResource SidebarButtonStyle}"
                                             Content="{DynamicResource Btn_AddFolder}"
-                                            Style="{StaticResource SidebarButtonStyle}" />
+                                            Command="{Binding FileInput.AddFolderCommand}" />
 
                                         <Separator Margin="0,0,0,8" />
 
                                         <!-- Sidebar : ActivePreset_Info -->
                                         <TextBlock
-                                            Text="{Binding Conversion.ActivePresetName}"
-                                            TextTrimming="CharacterEllipsis"
-                                            FontWeight="SemiBold"
+                                            Margin="0,0,0,6"
                                             HorizontalAlignment="Center"
-                                            Margin="0,0,0,6">
+                                            FontWeight="SemiBold"
+                                            TextTrimming="CharacterEllipsis"
+                                            Text="{Binding Conversion.ActivePresetName}">
                                             <TextBlock.Style>
                                                 <Style TargetType="TextBlock">
                                                     <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}" />
@@ -93,22 +93,22 @@
 
                                         <!-- Sidebar : Conversion_Group -->
                                         <Button
-                                            Command="{Binding Conversion.OpenConvertSettingCommand}"
+                                            Style="{StaticResource SidebarButtonStyle}"
                                             Content="{DynamicResource Btn_ConvertSetting}"
-                                            Style="{StaticResource SidebarButtonStyle}" />
+                                            Command="{Binding Conversion.OpenConvertSettingCommand}" />
                                         <Button
-                                            Command="{Binding Conversion.ConvertFilesCommand}"
-                                            Content="{DynamicResource Btn_Convert}"
+                                            Style="{StaticResource SidebarButtonStyle}"
                                             Foreground="{DynamicResource SystemControlForegroundAccentBrush}"
-                                            Style="{StaticResource SidebarButtonStyle}" />
+                                            Content="{DynamicResource Btn_Convert}"
+                                            Command="{Binding Conversion.ConvertFilesCommand}" />
 
                                         <Separator Margin="0,0,0,8" />
 
                                         <!-- Sidebar : ListManager_Group -->
                                         <Button
-                                            Command="{Binding ListManager.EnterListManagerCommand}"
+                                            Style="{StaticResource SidebarButtonStyle}"
                                             Content="{DynamicResource Btn_ListManager}"
-                                            Style="{StaticResource SidebarButtonStyle}" />
+                                            Command="{Binding ListManager.EnterListManagerCommand}" />
 
                                         <!-- Sidebar : Sorting_Group -->
                                         <StackPanel Orientation="Vertical">
@@ -154,19 +154,19 @@
 
                                             <!-- Sidebar : Filter_Options -->
                                             <ui:ToggleSwitch
-                                                IsOn="{Binding SortFilter.IsSortAscending}"
                                                 OffContent="{DynamicResource Sort_Desc}"
-                                                OnContent="{DynamicResource Sort_Asc}" />
+                                                OnContent="{DynamicResource Sort_Asc}"
+                                                IsOn="{Binding SortFilter.IsSortAscending}" />
                                             <ui:ToggleSwitch
                                                 Margin="0,0,0,4"
-                                                IsOn="{Binding SortFilter.ShowMismatchOnly}"
                                                 OffContent="{DynamicResource Option_MismatchOnly}"
                                                 OnContent="{DynamicResource Option_MismatchOnly}"
-                                                ToolTip="{DynamicResource Tip_MismatchOnly}" />
+                                                ToolTip="{DynamicResource Tip_MismatchOnly}"
+                                                IsOn="{Binding SortFilter.ShowMismatchOnly}" />
                                             <Button
-                                                Command="{Binding SortFilter.ReorderNumberCommand}"
+                                                Style="{StaticResource SidebarButtonStyle}"
                                                 Content="{DynamicResource Btn_ReorderIndex}"
-                                                Style="{StaticResource SidebarButtonStyle}" />
+                                                Command="{Binding SortFilter.ReorderNumberCommand}" />
                                         </StackPanel>
                                     </StackPanel>
                                 </DataTemplate>
@@ -234,7 +234,8 @@
                                                     <Run Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" Text="{Binding Conversion.TotalConvertCount}" />
                                                 </TextBlock>
 
-                                                <TextBlock Margin="0,0,0,6"
+                                                <TextBlock
+                                                    Margin="0,0,0,6"
                                                     TextAlignment="Right"
                                                     Foreground="#FF5555">
                                                     <TextBlock.Style>
@@ -257,54 +258,64 @@
                                                 <Separator Margin="0,0,0,6" />
 
                                                 <!-- Sidebar : Options Info (Extended) -->
-                                                <TextBlock Margin="0,0,0,2"
-                                                   FontSize="11"
-                                                   Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
-                                                   Text="{DynamicResource Converting_Cpu}"/>
-                                                <TextBlock Margin="8,0,0,2"
-                                                   FontSize="12"
-                                                   FontWeight="SemiBold"
-                                                   Text="{Binding Conversion.CurrentCpuUsage}"/>
+                                                <TextBlock
+                                                    Margin="0,0,0,2"
+                                                    FontSize="11"
+                                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                                    Text="{DynamicResource Converting_Cpu}" />
+                                                <TextBlock
+                                                    Margin="8,0,0,2"
+                                                    FontSize="12"
+                                                    FontWeight="SemiBold"
+                                                    Text="{Binding Conversion.CurrentCpuUsage}" />
 
-                                                <TextBlock Margin="0,0,0,2"
-                                                   FontSize="11"
-                                                   Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
-                                                   Text="{DynamicResource Converting_Duplicates}"/>
-                                                <TextBlock Margin="8,0,0,2"
-                                                   FontSize="12"
-                                                   FontWeight="SemiBold"
-                                                   Text="{Binding Conversion.CurrentOverwritePolicy}"/>
+                                                <TextBlock
+                                                    Margin="0,0,0,2"
+                                                    FontSize="11"
+                                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                                    Text="{DynamicResource Converting_Duplicates}" />
+                                                <TextBlock
+                                                    Margin="8,0,0,2"
+                                                    FontSize="12"
+                                                    FontWeight="SemiBold"
+                                                    Text="{Binding Conversion.CurrentOverwritePolicy}" />
 
-                                                <TextBlock Margin="0,0,0,2"
-                                                   FontSize="11"
-                                                   Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
-                                                   Text="{DynamicResource Converting_SaveMethod}"/>
-                                                <TextBlock Margin="8,0,0,2"
-                                                   FontSize="12"
-                                                   FontWeight="SemiBold"
-                                                   Text="{Binding Conversion.CurrentSaveMethod}"/>
+                                                <TextBlock
+                                                    Margin="0,0,0,2"
+                                                    FontSize="11"
+                                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                                    Text="{DynamicResource Converting_SaveMethod}" />
+                                                <TextBlock
+                                                    Margin="8,0,0,2"
+                                                    FontSize="12"
+                                                    FontWeight="SemiBold"
+                                                    Text="{Binding Conversion.CurrentSaveMethod}" />
 
-                                                <TextBlock Margin="0,0,0,2"
-                                                   FontSize="11"
-                                                   Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
-                                                   Text="{DynamicResource Converting_SaveLocation}"/>
-                                                <TextBlock Margin="8,0,0,2"
-                                                   FontSize="12"
-                                                   FontWeight="SemiBold"
-                                                   TextTrimming="CharacterEllipsis"
-                                                   Text="{Binding Conversion.CurrentSaveLocation}"
-                                                   ToolTip="{Binding Conversion.CurrentSaveLocationTooltip}"/>
+                                                <TextBlock
+                                                    Margin="0,0,0,2"
+                                                    FontSize="11"
+                                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                                    Text="{DynamicResource Converting_SaveLocation}" />
+                                                <TextBlock
+                                                    Margin="8,0,0,2"
+                                                    FontSize="12"
+                                                    FontWeight="SemiBold"
+                                                    TextTrimming="CharacterEllipsis"
+                                                    Text="{Binding Conversion.CurrentSaveLocation}"
+                                                    ToolTip="{Binding Conversion.CurrentSaveLocationTooltip}" />
 
                                                 <Separator Margin="0,6,0,6" />
 
-                                                <TextBlock Margin="0,0,0,2"
-                                                           FontSize="11"
-                                                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
-                                                           Text="{DynamicResource Converting_Format}"/>
-                                                <TextBlock Margin="8,0,0,2"
-                                                           FontSize="12"
-                                                           FontWeight="SemiBold"
-                                                           Text="{Binding Conversion.CurrentTargetFormat}"/>
+                                                <TextBlock
+                                                    Margin="0,0,0,2"
+                                                    FontSize="11"
+                                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                                    Text="{DynamicResource Converting_Format}" />
+                                                <TextBlock
+                                                    Margin="8,0,0,2"
+                                                    FontSize="12"
+                                                    FontWeight="SemiBold"
+                                                    Text="{Binding Conversion.CurrentTargetFormat}" />
 
                                                 <StackPanel Visibility="{Binding Conversion.ShowCurrentStandardOptions, Converter={StaticResource BooleanToVisibilityConverter}}">
                                                     <TextBlock Margin="0,0,0,2"
@@ -345,15 +356,15 @@
                                             <StackPanel Orientation="Vertical">
                                                 <!-- Sidebar : Back_Button -->
                                                 <Button
-                                                    Command="{Binding ListManager.ExitListManagerCommand}"
+                                                    Style="{StaticResource SidebarButtonStyle}"
                                                     Content="{DynamicResource Btn_Back}"
-                                                    Style="{StaticResource SidebarButtonStyle}" />
+                                                    Command="{Binding ListManager.ExitListManagerCommand}" />
                                                 <!-- Sidebar : Clear_All -->
                                                 <Button
-                                                    Command="{Binding ListManager.RemoveAllListCommand}"
-                                                    Content="{DynamicResource Btn_ListClear}"
+                                                    Style="{StaticResource SidebarButtonStyle}"
                                                     Foreground="#FF5555"
-                                                    Style="{StaticResource SidebarButtonStyle}" />
+                                                    Content="{DynamicResource Btn_ListClear}"
+                                                    Command="{Binding ListManager.RemoveAllListCommand}" />
 
                                                 <Separator Margin="0,0,0,8" />
 
@@ -402,9 +413,9 @@
 
                                                 <Button
                                                     Margin="0,0,0,4"
-                                                    Command="{Binding ListManager.ClearSelectedCommand}"
+                                                    Style="{StaticResource SidebarButtonStyle}"
                                                     Content="{DynamicResource Btn_ClearSelected}"
-                                                    Style="{StaticResource SidebarButtonStyle}" />
+                                                    Command="{Binding ListManager.ClearSelectedCommand}" />
 
                                             </StackPanel>
                                         </DataTemplate>
