@@ -176,9 +176,8 @@ public partial class ConversionViewModel : ViewModelBase
     private async Task OpenConvertSettingAsync()
     {
         var vm = _convertSettingVmFactory();
-        var view = new PixConvert.Views.Dialogs.ConvertSettingDialog { DataContext = vm };
 
-        bool isSaved = await _dialogService.ShowCustomDialogAsync(view, "Btn_ConvertSetting", "Dlg_Confirm", "Dlg_Cancel");
+        bool isSaved = await _dialogService.ShowConvertSettingDialogAsync(vm);
 
         if (isSaved)
         {

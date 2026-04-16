@@ -1,9 +1,10 @@
 using System;
 using System.Threading;
 using System.Windows;
-using System.Windows.Controls;
 using System.Threading.Tasks;
 using ModernWpf.Controls;
+using PixConvert.ViewModels;
+using PixConvert.Views.Dialogs;
 
 namespace PixConvert.Services;
 
@@ -12,13 +13,7 @@ namespace PixConvert.Services;
 /// </summary>
 public class DialogService : IDialogService
 {
-    private readonly ILanguageService _languageService;
     private int _isDialogOpen;
-
-    public DialogService(ILanguageService languageService)
-    {
-        _languageService = languageService;
-    }
 
     /// <summary>
     /// 예/아니오 선택이 필요한 확인 창을 표시합니다.
@@ -86,10 +81,19 @@ public class DialogService : IDialogService
         }
     }
 
-    /// <summary>
-    /// 커스텀 UI 요소를 본문으로 하는 다이얼로그를 표시합니다.
-    /// </summary>
-    public async Task<bool> ShowCustomDialogAsync(object content, string titleKey, string? primaryKey = null, string? closeKey = null)
+    public Task<bool> ShowAppSettingDialogAsync(AppSettingViewModel viewModel)
+    {
+        var view = new AppSettingDialog { DataContext = viewModel };
+        return ShowCustomDialogAsync(view, "Dlg_Title_AppSetting", null, "Dlg_Confirm");
+    }
+
+    public Task<bool> ShowConvertSettingDialogAsync(ConvertSettingViewModel viewModel)
+    {
+        var view = new ConvertSettingDialog { DataContext = viewModel };
+        return ShowCustomDialogAsync(view, "Btn_ConvertSetting", "Dlg_Confirm", "Dlg_Cancel");
+    }
+
+    private async Task<bool> ShowCustomDialogAsync(object content, string titleKey, string? primaryKey = null, string? closeKey = null)
     {
         var window = Application.Current.MainWindow;
         if (window == null) return false;

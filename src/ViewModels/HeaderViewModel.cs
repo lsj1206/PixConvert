@@ -104,12 +104,6 @@ public partial class HeaderViewModel : ViewModelBase
     private async Task ShowAppSettingAsync()
     {
         var vm = _settingsFactory();
-        var view = new Views.Dialogs.AppSettingDialog { DataContext = vm };
-
-        await _dialogService.ShowCustomDialogAsync(
-            view,
-            "Dlg_Title_AppSetting",
-            null,
-            "Dlg_Confirm");
+        await _dialogService.ShowAppSettingDialogAsync(vm);
     }
 }

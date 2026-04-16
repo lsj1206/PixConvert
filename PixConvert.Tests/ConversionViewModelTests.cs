@@ -12,6 +12,7 @@ namespace PixConvert.Tests;
 public class ConversionViewModelTests
 {
     private readonly Mock<IPresetService> _mockPreset;
+    private readonly Mock<IDialogService> _mockDialog;
     private readonly FileListViewModel _fileListVm;
     private readonly ConversionViewModel _vm;
 
@@ -21,11 +22,14 @@ public class ConversionViewModelTests
         var mockLogger = new Mock<ILogger<ConversionViewModel>>();
         _mockPreset = new Mock<IPresetService>();
         var mockSnackbar = new Mock<ISnackbarService>();
-        var mockDialog = new Mock<IDialogService>();
+        _mockDialog = new Mock<IDialogService>();
 
         mockLang.Setup(l => l.GetString(It.IsAny<string>())).Returns<string>(s => s);
-        _mockPreset.Setup(p => p.Config).Returns(new PresetConfig());
+        var presetConfig = new PresetConfig();
+        presetConfig.Presets.Add(new ConvertPreset { Name = "Default", Settings = new ConvertSettings() });
+        _mockPreset.Setup(p => p.Config).Returns(presetConfig);
         _mockPreset.Setup(p => p.ActivePreset).Returns((ConvertPreset?)null);
+        _mockPreset.Setup(p => p.SaveAsync()).ReturnsAsync(true);
 
         var mockSkia = new Mock<SkiaSharpProvider>(mockLang.Object, new Mock<ILogger<SkiaSharpProvider>>().Object);
         var mockVips = new Mock<NetVipsProvider>(mockLang.Object, new Mock<ILogger<NetVipsProvider>>().Object);
@@ -38,12 +42,12 @@ public class ConversionViewModelTests
         _vm = new ConversionViewModel(
             mockLogger.Object,
             mockLang.Object,
-            mockDialog.Object,
+            _mockDialog.Object,
             mockSnackbar.Object,
             _mockPreset.Object,
             _fileListVm,
             engineSelector,
-            () => null!);
+            () => CreateConvertSettingViewModel(mockLang));
     }
 
     [Fact]
@@ -80,6 +84,21 @@ public class ConversionViewModelTests
         Assert.False(_vm.OpenConvertSettingCommand.CanExecute(null));
         Assert.False(_vm.ConvertFilesCommand.CanExecute(null));
         Assert.True(_vm.CancelConvertCommand.CanExecute(null));
+    }
+
+    [Fact]
+    public async Task OpenConvertSettingCommand_WhenConfirmed_ShouldSavePreset()
+    {
+        _mockDialog
+            .Setup(service => service.ShowConvertSettingDialogAsync(It.IsAny<ConvertSettingViewModel>()))
+            .ReturnsAsync(true);
+
+        await _vm.OpenConvertSettingCommand.ExecuteAsync(null);
+
+        _mockDialog.Verify(
+            service => service.ShowConvertSettingDialogAsync(It.IsAny<ConvertSettingViewModel>()),
+            Times.Once);
+        _mockPreset.Verify(service => service.SaveAsync(), Times.Once);
     }
 
     [Fact]
@@ -201,4 +220,13 @@ public class ConversionViewModelTests
     }
 
     private static string Key(string key) => key;
+
+    private ConvertSettingViewModel CreateConvertSettingViewModel(Mock<ILanguageService> language)
+    {
+        return new ConvertSettingViewModel(
+            language.Object,
+            new Mock<ILogger<ConvertSettingViewModel>>().Object,
+            _mockPreset.Object,
+            new Mock<IPathPickerService>().Object);
+    }
 }
