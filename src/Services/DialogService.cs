@@ -32,26 +32,11 @@ public class DialogService : IDialogService
 
             if (!string.IsNullOrWhiteSpace(warningMessage))
             {
-                var stackPanel = new System.Windows.Controls.StackPanel { Margin = new System.Windows.Thickness(0, 4, 0, 0) };
-
-                stackPanel.Children.Add(new System.Windows.Controls.TextBlock
+                dialogContent = new ConfirmationWarningContent
                 {
-                    Text = message,
-                    FontSize = 14,
-                    TextWrapping = System.Windows.TextWrapping.Wrap
-                });
-
-                stackPanel.Children.Add(new System.Windows.Controls.TextBlock
-                {
-                    Text = warningMessage,
-                    FontSize = 12,
-                    Foreground = new System.Windows.Media.SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#D97706")), // Dark Orange/Yellow
-                    FontFamily = new System.Windows.Media.FontFamily("Segoe UI Emoji, Segoe UI"), // For emoji
-                    Margin = new System.Windows.Thickness(0, 12, 0, 0),
-                    TextWrapping = System.Windows.TextWrapping.Wrap
-                });
-
-                dialogContent = stackPanel;
+                    Message = message,
+                    WarningMessage = warningMessage
+                };
             }
 
             var dialog = new ContentDialog

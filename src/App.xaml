@@ -20,6 +20,7 @@
             <converters:UpperCaseConverter x:Key="UpperCaseConverter" />
             <converters:EnumToBoolConverter x:Key="EnumToBoolConverter" />
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+            <SolidColorBrush x:Key="DialogWarningForegroundBrush" Color="#D97706" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

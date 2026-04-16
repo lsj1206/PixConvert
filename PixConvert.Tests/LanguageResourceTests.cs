@@ -5,6 +5,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Markup;
 using System.Xml.Linq;
+using PixConvert.Views.Dialogs;
 
 namespace PixConvert.Tests;
 
@@ -88,6 +89,40 @@ public class LanguageResourceTests
         thread.Join();
 
         Assert.Null(exception);
+    }
+
+    [Fact]
+    public void ConfirmationWarningContent_ShouldLoadAsWpfControl()
+    {
+        Exception? exception = null;
+        string? message = null;
+        string? warning = null;
+
+        var thread = new Thread(() =>
+        {
+            try
+            {
+                var content = new ConfirmationWarningContent
+                {
+                    Message = "Message",
+                    WarningMessage = "Warning"
+                };
+                message = content.Message;
+                warning = content.WarningMessage;
+            }
+            catch (Exception ex)
+            {
+                exception = ex;
+            }
+        });
+
+        thread.SetApartmentState(ApartmentState.STA);
+        thread.Start();
+        thread.Join();
+
+        Assert.Null(exception);
+        Assert.Equal("Message", message);
+        Assert.Equal("Warning", warning);
     }
 
     [Fact]
