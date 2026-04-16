@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Microsoft.Win32;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using PixConvert.Models;
@@ -21,6 +20,7 @@ public partial class FileInputViewModel : ViewModelBase
     private readonly IFileAnalyzerService _fileAnalyzerService;
     private readonly FileListViewModel _fileList;
     private readonly SortFilterViewModel _sortFilter;
+    private readonly IPathPickerService _pathPickerService;
 
     /// <summary>파일들을 개별적으로 선택하여 목록에 추가하는 명령</summary>
     public IAsyncRelayCommand AddFilesCommand { get; }
@@ -36,13 +36,15 @@ public partial class FileInputViewModel : ViewModelBase
         ISnackbarService snackbarService,
         IFileAnalyzerService fileAnalyzerService,
         FileListViewModel fileList,
-        SortFilterViewModel sortFilter)
+        SortFilterViewModel sortFilter,
+        IPathPickerService pathPickerService)
         : base(languageService, logger)
     {
         _snackbarService = snackbarService;
         _fileAnalyzerService = fileAnalyzerService;
         _fileList = fileList;
         _sortFilter = sortFilter;
+        _pathPickerService = pathPickerService;
 
         // 명령 초기화: 작업 중이 아닐 때만 실행 가능
         AddFilesCommand = new AsyncRelayCommand(AddFilesAsync, () => CurrentStatus != AppStatus.Converting);
@@ -61,8 +63,8 @@ public partial class FileInputViewModel : ViewModelBase
     /// </summary>
     private async Task AddFilesAsync()
     {
-        var dialog = new OpenFileDialog { Multiselect = true, Title = GetString("Dlg_Title_AddFile") };
-        if (dialog.ShowDialog() == true) await ProcessFiles(dialog.FileNames);
+        var paths = _pathPickerService.PickFiles(GetString("Dlg_Title_AddFile"));
+        if (paths.Length > 0) await ProcessFiles(paths);
     }
 
     /// <summary>
@@ -70,8 +72,8 @@ public partial class FileInputViewModel : ViewModelBase
     /// </summary>
     private async Task AddFolderAsync()
     {
-        var dialog = new OpenFolderDialog { Multiselect = true, Title = GetString("Dlg_Title_AddFolder") };
-        if (dialog.ShowDialog() == true) await ProcessFiles(dialog.FolderNames);
+        var paths = _pathPickerService.PickFolders(GetString("Dlg_Title_AddFolder"));
+        if (paths.Length > 0) await ProcessFiles(paths);
     }
 
     /// <summary>

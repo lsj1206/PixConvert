@@ -16,6 +16,7 @@ public enum BackgroundColorOption { White, Black, Custom }
 public partial class ConvertSettingViewModel : ViewModelBase
 {
     private readonly IPresetService _presetService;
+    private readonly IPathPickerService _pathPickerService;
     private bool _isSyncingTargetTags;
 
     public ObservableCollection<ConvertPreset> Presets => new(_presetService.Config.Presets);
@@ -128,10 +129,12 @@ public partial class ConvertSettingViewModel : ViewModelBase
     public ConvertSettingViewModel(
         ILanguageService languageService,
         ILogger<ConvertSettingViewModel> logger,
-        IPresetService presetService)
+        IPresetService presetService,
+        IPathPickerService pathPickerService)
         : base(languageService, logger)
     {
         _presetService = presetService;
+        _pathPickerService = pathPickerService;
 
         InitializeTags();
 
@@ -392,13 +395,9 @@ public partial class ConvertSettingViewModel : ViewModelBase
 
     private void ChangeOutputPath()
     {
-        var dialog = new Microsoft.Win32.OpenFolderDialog
-        {
-            Title = _languageService.GetString("Dlg_Title_SelectOutputPath")
-        };
-
-        if (dialog.ShowDialog() == true)
-            CustomOutputPath = dialog.FolderName;
+        string? path = _pathPickerService.PickFolder(_languageService.GetString("Dlg_Title_SelectOutputPath"));
+        if (!string.IsNullOrWhiteSpace(path))
+            CustomOutputPath = path;
     }
 
     private void OnTargetFormatsChanged()

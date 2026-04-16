@@ -10,7 +10,7 @@ namespace PixConvert.Tests;
 
 public class ConvertSettingViewModelTests
 {
-    private static ConvertSettingViewModel CreateViewModel()
+    private static ConvertSettingViewModel CreateViewModel(Mock<IPathPickerService>? pathPicker = null)
     {
         var languageMock = new Mock<ILanguageService>();
         languageMock.Setup(x => x.GetString(It.IsAny<string>())).Returns((string key) => key);
@@ -27,7 +27,8 @@ public class ConvertSettingViewModelTests
         return new ConvertSettingViewModel(
             languageMock.Object,
             NullLogger<ConvertSettingViewModel>.Instance,
-            presetMock.Object);
+            presetMock.Object,
+            (pathPicker ?? new Mock<IPathPickerService>()).Object);
     }
 
     [Fact]
@@ -91,5 +92,34 @@ public class ConvertSettingViewModelTests
         vm.AnimationWebpEncodingEffort = input;
 
         Assert.Equal(expected, vm.AnimationWebpEncodingEffort);
+    }
+
+    [Fact]
+    public void ChangeOutputPathCommand_WhenFolderSelected_ShouldUpdateCustomOutputPath()
+    {
+        var pathPicker = new Mock<IPathPickerService>();
+        pathPicker
+            .Setup(service => service.PickFolder("Dlg_Title_SelectOutputPath"))
+            .Returns(@"C:\Output");
+        var vm = CreateViewModel(pathPicker);
+
+        vm.ChangeOutputPathCommand.Execute(null);
+
+        Assert.Equal(@"C:\Output", vm.CustomOutputPath);
+    }
+
+    [Fact]
+    public void ChangeOutputPathCommand_WhenCancelled_ShouldKeepCurrentOutputPath()
+    {
+        var pathPicker = new Mock<IPathPickerService>();
+        pathPicker
+            .Setup(service => service.PickFolder("Dlg_Title_SelectOutputPath"))
+            .Returns((string?)null);
+        var vm = CreateViewModel(pathPicker);
+        vm.CustomOutputPath = @"C:\Existing";
+
+        vm.ChangeOutputPathCommand.Execute(null);
+
+        Assert.Equal(@"C:\Existing", vm.CustomOutputPath);
     }
 }

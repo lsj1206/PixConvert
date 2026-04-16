@@ -99,6 +99,7 @@ public partial class App : Application
         services.AddSingleton<IFileScannerService, FileScannerService>();
         services.AddSingleton<IFileAnalyzerService, FileAnalyzerService>();
         services.AddSingleton<ISortingService, SortingService>();
+        services.AddSingleton<IPathPickerService, PathPickerService>();
         services.AddSingleton(_ =>
         {
             var httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(8) };
