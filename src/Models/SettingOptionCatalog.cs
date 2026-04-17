@@ -20,6 +20,7 @@ public enum SettingOptionKey
     AvifEncodingEffort,
     AvifBitDepth,
     GifPalettePreset,
+    GifEncodingEffort,
     GifInterframeMaxError,
     GifInterpaletteMaxError,
     WebpEncodingEffort,
@@ -34,9 +35,6 @@ public sealed record SettingOptionDefinition(
 
 public static class SettingOptionCatalog
 {
-    // TODO:
-    // - 한쪽 엔진만 지원하는 옵션은 사용자 설정으로 노출하지 않고 내부 자동세팅 후보로 유지합니다.
-    // - 후속 후보: PNG compression, JPEG subsampling, AVIF effort, GIF dither, GIF reuse, WebP near-lossless
     public static readonly IReadOnlyList<SettingOptionDefinition> All =
     [
         new(
@@ -82,6 +80,10 @@ public static class SettingOptionCatalog
         new(
             SettingOptionSection.Animation,
             SettingOptionKey.GifPalettePreset,
+            new[] { "GIF" }),
+        new(
+            SettingOptionSection.Animation,
+            SettingOptionKey.GifEncodingEffort,
             new[] { "GIF" }),
         new(
             SettingOptionSection.Animation,

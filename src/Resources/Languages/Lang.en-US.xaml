@@ -158,6 +158,11 @@
     <sys:String x:Key="SettingTip_WebpEncodingEffort_Body" xml:space="preserve">• 0: Fast encoding, larger file
 • 4: Default
 • 6: Slow encoding, smaller file</sys:String>
+    <sys:String x:Key="SettingTip_GifEncodingEffort_Title">Determines how much CPU time is spent searching for better compression results.</sys:String>
+    <sys:String x:Key="SettingTip_GifEncodingEffort_Body" xml:space="preserve">• 0: Fast encoding, larger file
+• 6: Default
+• 9: Slow encoding, smaller file</sys:String>
+    <sys:String x:Key="SettingTip_GifEncodingEffort_Caution">⚠️Higher values result in longer encoding times.</sys:String>
     <sys:String x:Key="SettingTip_GifPalettePreset_Title">Sets bit depth and dithering.</sys:String>
     <sys:String x:Key="SettingTip_GifPalettePreset_Body" xml:space="preserve">Bit depth: Upper limit for colors per frame
 Dithering: Distributes color error from the source across neighboring pixels

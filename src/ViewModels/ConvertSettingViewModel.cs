@@ -40,6 +40,7 @@ public partial class ConvertSettingViewModel : ViewModelBase
     [ObservableProperty] private WebpPresetMode _animationWebpPreset = WebpPresetMode.Default;
     [ObservableProperty] private bool _animationWebpPreserveTransparentPixels;
     [ObservableProperty] private GifPalettePreset _animationGifPalettePreset = GifPalettePreset.Standard;
+    [ObservableProperty] private int _animationGifEncodingEffort = 6;
     [ObservableProperty] private double _animationGifInterframeMaxError;
     [ObservableProperty] private double _animationGifInterpaletteMaxError;
     [ObservableProperty] private string _animationGifInterframeMaxErrorText = "0";
@@ -103,6 +104,10 @@ public partial class ConvertSettingViewModel : ViewModelBase
     public bool AnimationShowGifPalettePreset =>
         ShowAnimationOptionsSection &&
         SettingOptionCatalog.Supports(SettingOptionSection.Animation, SettingOptionKey.GifPalettePreset, AnimationTargetFormat);
+
+    public bool AnimationShowGifEncodingEffort =>
+        ShowAnimationOptionsSection &&
+        SettingOptionCatalog.Supports(SettingOptionSection.Animation, SettingOptionKey.GifEncodingEffort, AnimationTargetFormat);
 
     public bool AnimationShowGifInterframeMaxError =>
         ShowAnimationOptionsSection &&
@@ -195,6 +200,13 @@ public partial class ConvertSettingViewModel : ViewModelBase
         int coerced = Math.Clamp(value, 0, 6);
         if (value != coerced)
             AnimationWebpEncodingEffort = coerced;
+    }
+
+    partial void OnAnimationGifEncodingEffortChanged(int value)
+    {
+        int coerced = Math.Clamp(value, 0, 9);
+        if (value != coerced)
+            AnimationGifEncodingEffort = coerced;
     }
 
     partial void OnAnimationGifInterframeMaxErrorChanged(double value)
@@ -303,6 +315,7 @@ public partial class ConvertSettingViewModel : ViewModelBase
         AnimationWebpPreset = settings.AnimationWebpPreset;
         AnimationWebpPreserveTransparentPixels = settings.AnimationWebpPreserveTransparentPixels;
         AnimationGifPalettePreset = settings.AnimationGifPalettePreset;
+        AnimationGifEncodingEffort = settings.AnimationGifEncodingEffort;
         AnimationGifInterframeMaxError = settings.AnimationGifInterframeMaxError;
         AnimationGifInterpaletteMaxError = settings.AnimationGifInterpaletteMaxError;
         AnimationGifInterframeMaxErrorText = FormatGifErrorValue(AnimationGifInterframeMaxError);
@@ -342,6 +355,7 @@ public partial class ConvertSettingViewModel : ViewModelBase
         settings.AnimationWebpPreset = AnimationWebpPreset;
         settings.AnimationWebpPreserveTransparentPixels = AnimationWebpPreserveTransparentPixels;
         settings.AnimationGifPalettePreset = AnimationGifPalettePreset;
+        settings.AnimationGifEncodingEffort = AnimationGifEncodingEffort;
         settings.AnimationGifInterframeMaxError = AnimationGifInterframeMaxError;
         settings.AnimationGifInterpaletteMaxError = AnimationGifInterpaletteMaxError;
 
@@ -417,6 +431,7 @@ public partial class ConvertSettingViewModel : ViewModelBase
         OnPropertyChanged(nameof(AnimationShowLossless));
         OnPropertyChanged(nameof(AnimationShowQuality));
         OnPropertyChanged(nameof(AnimationShowGifPalettePreset));
+        OnPropertyChanged(nameof(AnimationShowGifEncodingEffort));
         OnPropertyChanged(nameof(AnimationShowGifInterframeMaxError));
         OnPropertyChanged(nameof(AnimationShowGifInterpaletteMaxError));
         OnPropertyChanged(nameof(AnimationShowWebpEncodingEffort));

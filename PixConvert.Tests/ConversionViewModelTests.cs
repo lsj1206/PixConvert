@@ -193,6 +193,7 @@ public class ConversionViewModelTests
         {
             AnimationTargetFormat = "GIF",
             AnimationGifPalettePreset = GifPalettePreset.Balance,
+            AnimationGifEncodingEffort = 9,
             AnimationGifInterframeMaxError = 1.25,
             AnimationGifInterpaletteMaxError = 2.5
         };
@@ -203,6 +204,7 @@ public class ConversionViewModelTests
         Assert.Equal(
             string.Join(Environment.NewLine,
                 "Setting_PalettePreset Setting_GifPalette_Balance",
+                "Setting_EncodingEffort 9",
                 "Setting_InterframeMaxError 1.25",
                 "Setting_InterpaletteMaxError 2.5"),
             summary);

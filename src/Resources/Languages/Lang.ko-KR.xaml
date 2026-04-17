@@ -158,6 +158,11 @@
     <sys:String x:Key="SettingTip_WebpEncodingEffort_Body" xml:space="preserve">• 0: 인코딩 빠름, 용량 큼
 • 4: 기본값
 • 6: 인코딩 느림, 용량 작음</sys:String>
+    <sys:String x:Key="SettingTip_GifEncodingEffort_Title">얼마나 CPU 시간을 소모해 더 좋은 압축 결과를 찾을 지 결정하는 옵션입니다.</sys:String>
+    <sys:String x:Key="SettingTip_GifEncodingEffort_Body" xml:space="preserve">• 0: 인코딩 빠름, 용량 큼
+• 6: 기본값
+• 9: 인코딩 느림, 용량 작음</sys:String>
+    <sys:String x:Key="SettingTip_GifEncodingEffort_Caution">⚠️값이 높을수록 인코딩 시간이 길어집니다.</sys:String>
     <sys:String x:Key="SettingTip_GifPalettePreset_Title">비트 심도와 디더링을 설정합니다.</sys:String>
     <sys:String x:Key="SettingTip_GifPalettePreset_Body" xml:space="preserve">비트 심도: 프레임당 색상 수의 상한
 디더링: 원본과의 색 오차를 주변 픽셀로 분산

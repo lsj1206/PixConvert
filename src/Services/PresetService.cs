@@ -178,6 +178,13 @@ public class PresetService : IPresetService
             return false;
         }
 
+        if (settings.AnimationGifEncodingEffort < 0 || settings.AnimationGifEncodingEffort > 9)
+        {
+            _logger.LogError(_languageService.GetString("Log_Preset_InvalidQuality"), settings.AnimationGifEncodingEffort);
+            errorMessageKey = "Msg_Error_ConfigInvalid";
+            return false;
+        }
+
         if (settings.AnimationWebpEncodingEffort < 0 || settings.AnimationWebpEncodingEffort > 6)
         {
             _logger.LogError(_languageService.GetString("Log_Preset_InvalidQuality"), settings.AnimationWebpEncodingEffort);

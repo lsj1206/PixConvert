@@ -341,6 +341,31 @@ public class PresetServiceTests
     [Theory]
     [InlineData(-1, false)]
     [InlineData(0, true)]
+    [InlineData(6, true)]
+    [InlineData(9, true)]
+    [InlineData(10, false)]
+    public void ValidPresetData_ShouldValidateAnimationGifEncodingEffort(int effort, bool expected)
+    {
+        var settings = new ConvertSettings
+        {
+            StandardTargetFormat = "JPEG",
+            AnimationTargetFormat = "GIF",
+            StandardBackgroundColor = "#FFFFFF",
+            AnimationGifEncodingEffort = effort
+        };
+
+        var result = _presetService.ValidPresetData(settings, out string errorKey);
+
+        Assert.Equal(expected, result);
+        if (!expected)
+            Assert.Equal("Msg_Error_ConfigInvalid", errorKey);
+        else
+            Assert.True(string.IsNullOrEmpty(errorKey));
+    }
+
+    [Theory]
+    [InlineData(-1, false)]
+    [InlineData(0, true)]
     [InlineData(4, true)]
     [InlineData(6, true)]
     [InlineData(7, false)]

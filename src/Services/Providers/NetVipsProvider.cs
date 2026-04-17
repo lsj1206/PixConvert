@@ -138,6 +138,7 @@ public class NetVipsProvider : IProviderService, IDisposable
                     outputPath,
                     q: quality,
                     subsampleMode: ResolveJpegSubsampleMode(settings, isAnimation),
+                    optimizeCoding: true,
                     keep: Enums.ForeignKeep.None);
                 return;
             case "PNG":
@@ -249,6 +250,7 @@ public class NetVipsProvider : IProviderService, IDisposable
             outputPath,
             dither: dither,
             bitdepth: bitDepth,
+            effort: ResolveGifEncodingEffort(settings, isAnimation),
             interframeMaxerror: ResolveGifInterframeMaxError(settings, isAnimation),
             interpaletteMaxerror: ResolveGifInterpaletteMaxError(settings, isAnimation),
             keep: Enums.ForeignKeep.None);
@@ -396,6 +398,9 @@ public class NetVipsProvider : IProviderService, IDisposable
             _ => (0.0, 8)
         };
     }
+
+    private static int ResolveGifEncodingEffort(ConvertSettings settings, bool isAnimation) =>
+        isAnimation ? Math.Clamp(settings.AnimationGifEncodingEffort, 0, 9) + 1 : 7;
 
     private static double ResolveGifInterframeMaxError(ConvertSettings settings, bool isAnimation) =>
         isAnimation ? settings.AnimationGifInterframeMaxError : 0.0;

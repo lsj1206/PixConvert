@@ -255,6 +255,7 @@ public class NetVipsProviderTests : IDisposable
         {
             AnimationTargetFormat = "GIF",
             AnimationGifPalettePreset = GifPalettePreset.Simple,
+            AnimationGifEncodingEffort = 9,
             AnimationGifInterframeMaxError = 4.0,
             AnimationGifInterpaletteMaxError = 2.0,
             SaveLocation = SaveLocationType.SameAsOriginal,

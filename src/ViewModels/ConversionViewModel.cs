@@ -602,6 +602,7 @@ public partial class ConversionViewModel : ViewModelBase
                 break;
             case "GIF":
                 parts.Add($"{getString("Setting_PalettePreset")} {getString($"Setting_GifPalette_{settings.AnimationGifPalettePreset}")}");
+                parts.Add($"{getString("Setting_EncodingEffort")} {settings.AnimationGifEncodingEffort}");
                 parts.Add($"{getString("Setting_InterframeMaxError")} {FormatErrorValue(settings.AnimationGifInterframeMaxError)}");
                 parts.Add($"{getString("Setting_InterpaletteMaxError")} {FormatErrorValue(settings.AnimationGifInterpaletteMaxError)}");
                 break;

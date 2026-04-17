@@ -48,6 +48,9 @@ public class ConvertSettings
     /// <summary>애니메이션 GIF 팔레트 프리셋입니다.</summary>
     public GifPalettePreset AnimationGifPalettePreset { get; set; } = GifPalettePreset.Standard;
 
+    /// <summary>애니메이션 GIF 인코딩 강도입니다. UI 값 0~9를 libvips effort 1~10으로 매핑합니다.</summary>
+    public int AnimationGifEncodingEffort { get; set; } = 6;
+
     /// <summary>GIF 프레임 간 차이 허용값입니다.</summary>
     public double AnimationGifInterframeMaxError { get; set; }
 

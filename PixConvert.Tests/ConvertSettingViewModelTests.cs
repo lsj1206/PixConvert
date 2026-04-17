@@ -41,6 +41,7 @@ public class ConvertSettingViewModelTests
         Assert.False(vm.AnimationShowWebpEncodingEffort);
         Assert.False(vm.AnimationShowWebpPreset);
         Assert.False(vm.AnimationShowWebpPreserveTransparentPixels);
+        Assert.False(vm.AnimationShowGifEncodingEffort);
     }
 
     [Fact]
@@ -53,6 +54,7 @@ public class ConvertSettingViewModelTests
         Assert.False(vm.AnimationShowWebpEncodingEffort);
         Assert.False(vm.AnimationShowWebpPreset);
         Assert.False(vm.AnimationShowWebpPreserveTransparentPixels);
+        Assert.True(vm.AnimationShowGifEncodingEffort);
     }
 
     [Fact]
@@ -66,6 +68,7 @@ public class ConvertSettingViewModelTests
         Assert.True(vm.AnimationShowWebpEncodingEffort);
         Assert.True(vm.AnimationShowWebpPreset);
         Assert.False(vm.AnimationShowWebpPreserveTransparentPixels);
+        Assert.False(vm.AnimationShowGifEncodingEffort);
     }
 
     [Fact]
@@ -79,6 +82,7 @@ public class ConvertSettingViewModelTests
         Assert.True(vm.AnimationShowWebpEncodingEffort);
         Assert.False(vm.AnimationShowWebpPreset);
         Assert.True(vm.AnimationShowWebpPreserveTransparentPixels);
+        Assert.False(vm.AnimationShowGifEncodingEffort);
     }
 
     [Theory]
@@ -92,6 +96,20 @@ public class ConvertSettingViewModelTests
         vm.AnimationWebpEncodingEffort = input;
 
         Assert.Equal(expected, vm.AnimationWebpEncodingEffort);
+    }
+
+    [Theory]
+    [InlineData(-1, 0)]
+    [InlineData(0, 0)]
+    [InlineData(6, 6)]
+    [InlineData(10, 9)]
+    public void AnimationGifEncodingEffort_ShouldClampToSupportedRange(int input, int expected)
+    {
+        var vm = CreateViewModel();
+
+        vm.AnimationGifEncodingEffort = input;
+
+        Assert.Equal(expected, vm.AnimationGifEncodingEffort);
     }
 
     [Fact]

@@ -852,6 +852,53 @@
                 <StackPanel
                     Margin="0,8,0,0"
                     Orientation="Horizontal"
+                    Visibility="{Binding AnimationShowGifEncodingEffort, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <StackPanel
+                        Margin="0,0,12,4"
+                        VerticalAlignment="Center"
+                        Orientation="Horizontal">
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            FontWeight="SemiBold"
+                            Text="{DynamicResource Setting_EncodingEffort}" />
+                        <Button Style="{StaticResource InfoIconButtonStyle}">
+                            <Button.ToolTip>
+                                <ToolTip>
+                                    <ctrls:OptionToolTip
+                                        Title="{DynamicResource SettingTip_GifEncodingEffort_Title}"
+                                        Body="{DynamicResource SettingTip_GifEncodingEffort_Body}"
+                                        Caution="{DynamicResource SettingTip_GifEncodingEffort_Caution}" />
+                                </ToolTip>
+                            </Button.ToolTip>
+                            <ui:FontIcon FontSize="12" Glyph="&#xE946;" />
+                        </Button>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Slider
+                            Margin="0,0,8,0"
+                            Width="120"
+                            Maximum="9"
+                            Minimum="0"
+                            IsSnapToTickEnabled="True"
+                            SmallChange="1"
+                            TickFrequency="1"
+                            Value="{Binding AnimationGifEncodingEffort}" />
+                        <ctrls:FilterTextBox
+                            ui:TextBoxHelper.IsDeleteButtonVisible="False"
+                            ui:ControlHelper.PlaceholderText="6"
+                            MinWidth="32"
+                            VerticalAlignment="Center"
+                            IsBlank="6"
+                            Filter="Digits"
+                            FilterMode="Allow"
+                            FilterMaxLength="1"
+                            Text="{Binding AnimationGifEncodingEffort, UpdateSourceTrigger=PropertyChanged}" />
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel
+                    Margin="0,8,0,0"
+                    Orientation="Horizontal"
                     Visibility="{Binding AnimationShowGifInterframeMaxError, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <StackPanel
                         Margin="0,0,12,4"
