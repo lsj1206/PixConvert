@@ -37,10 +37,11 @@ public class SettingService : ISettingService
     {
         await LoadAsync();
 
-        // 언어 및 테마 자동 적용
+        // 언어 자동 적용
         _languageService.ChangeLanguage(Settings.Language);
 
-        ApplyTheme(Settings.Theme);
+        // 현재 릴리스 UI는 Light 전용 팔레트로 고정합니다.
+        ThemeManager.Current.ApplicationTheme = ApplicationTheme.Light;
     }
 
     /// <summary>
@@ -76,11 +77,6 @@ public class SettingService : ISettingService
                 if (!supportedLanguages.Contains(Settings.Language))
                 {
                     Settings.Language = _languageService.GetSystemLanguage();
-                    _ = SaveAsync();
-                }
-                if (!IsSupportedTheme(Settings.Theme))
-                {
-                    Settings.Theme = "System";
                     _ = SaveAsync();
                 }
                 _logger.LogInformation(_languageService.GetString("Log_Setting_FileLoadSuccess"));
@@ -122,22 +118,6 @@ public class SettingService : ISettingService
     private AppSettings CreateDefaultSettings() => new()
     {
         Language = _languageService.GetSystemLanguage(),
-        ConfirmDeletion = true,
-        Theme = "System"
+        ConfirmDeletion = true
     };
-
-    private static bool IsSupportedTheme(string theme)
-    {
-        return theme is "System" or "Light" or "Dark";
-    }
-
-    public static void ApplyTheme(string theme)
-    {
-        ThemeManager.Current.ApplicationTheme = theme switch
-        {
-            "Light" => ApplicationTheme.Light,
-            "Dark" => ApplicationTheme.Dark,
-            _ => null
-        };
-    }
 }

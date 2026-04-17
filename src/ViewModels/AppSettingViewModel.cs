@@ -27,9 +27,6 @@ public partial class AppSettingViewModel : ViewModelBase
     /// <summary>현재 선택된 언어 코드 (en-US, ko-KR 등)</summary>
     [ObservableProperty] private string _currentLanguageCode;
 
-    /// <summary>현재 선택된 테마 옵션 (System, Light, Dark)</summary>
-    [ObservableProperty] private string _currentTheme;
-
     /// <summary>파일 삭제 시 확인 메시지 표시 여부 (ListManagerViewModel 연동)</summary>
     public bool ConfirmDeletion
     {
@@ -68,9 +65,6 @@ public partial class AppSettingViewModel : ViewModelBase
 
         // 저장된 언어로 초기값 설정
         CurrentLanguageCode = _languageService.GetCurrentLanguage();
-        CurrentTheme = IsSupportedTheme(_settingService.Settings.Theme)
-            ? _settingService.Settings.Theme
-            : "System";
         EngineInfoText = string.Join(
             Environment.NewLine,
             _appInfoService.GetEngineInfo().Select(engine => $"{engine.Name} {engine.Version}"));
@@ -90,27 +84,9 @@ public partial class AppSettingViewModel : ViewModelBase
     }
 
     /// <summary>
-    /// 현재 테마 옵션이 변경되었을 때 호출되는 메서드
-    /// </summary>
-    partial void OnCurrentThemeChanged(string value)
-    {
-        if (!string.IsNullOrEmpty(value) && IsSupportedTheme(value) && _settingService.Settings.Theme != value)
-        {
-            _settingService.Settings.Theme = value;
-            SettingService.ApplyTheme(value);
-            _ = SaveSettingsAsync();
-        }
-    }
-
-    /// <summary>
     /// 현재 설정 상태를 settings.json에 저장합니다.
     /// </summary>
     private Task SaveSettingsAsync() => _settingService.SaveAsync();
-
-    private static bool IsSupportedTheme(string theme)
-    {
-        return theme is "System" or "Light" or "Dark";
-    }
 
     [RelayCommand(CanExecute = nameof(CanCheckUpdate))]
     private async Task CheckUpdateAsync()

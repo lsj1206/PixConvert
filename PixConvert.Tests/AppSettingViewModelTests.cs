@@ -1,5 +1,4 @@
 using Microsoft.Extensions.Logging.Abstractions;
-using ModernWpf;
 using Moq;
 using PixConvert.Models;
 using PixConvert.Services;
@@ -53,40 +52,6 @@ public class AppSettingViewModelTests
         launcher.Verify(service => service.OpenFolder(@"C:\Users\Test\AppData\Roaming\PixConvert"), Times.Once);
     }
 
-    [Fact]
-    public void Constructor_ShouldExposeSavedTheme()
-    {
-        var vm = CreateViewModel(settings: new AppSettings { Theme = "Dark" });
-
-        Assert.Equal("Dark", vm.CurrentTheme);
-    }
-
-    [Theory]
-    [InlineData("System")]
-    [InlineData("Light")]
-    [InlineData("Dark")]
-    public void CurrentTheme_WhenChanged_ShouldSaveAndApplyTheme(string selectedTheme)
-    {
-        var previousTheme = ThemeManager.Current.ApplicationTheme;
-        var initialTheme = selectedTheme == "Light" ? "Dark" : "Light";
-        var settings = new AppSettings { Theme = initialTheme };
-        var settingService = CreateSettingService(settings);
-        var vm = CreateViewModel(settingService: settingService);
-
-        try
-        {
-            vm.CurrentTheme = selectedTheme;
-
-            Assert.Equal(selectedTheme, settings.Theme);
-            Assert.Equal(ToApplicationTheme(selectedTheme), ThemeManager.Current.ApplicationTheme);
-            settingService.Verify(service => service.SaveAsync(), Times.Once);
-        }
-        finally
-        {
-            ThemeManager.Current.ApplicationTheme = previousTheme;
-        }
-    }
-
     private static AppSettingViewModel CreateViewModel(
         Mock<IAppInfoService>? appInfo = null,
         Mock<IExternalLauncher>? launcher = null,
@@ -124,16 +89,6 @@ public class AppSettingViewModelTests
         settingService.Setup(service => service.Settings).Returns(settings);
         settingService.Setup(service => service.SaveAsync()).ReturnsAsync(true);
         return settingService;
-    }
-
-    private static ApplicationTheme? ToApplicationTheme(string theme)
-    {
-        return theme switch
-        {
-            "Light" => ApplicationTheme.Light,
-            "Dark" => ApplicationTheme.Dark,
-            _ => null
-        };
     }
 
     private static Mock<IAppInfoService> CreateAppInfoService()
