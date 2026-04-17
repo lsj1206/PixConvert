@@ -294,9 +294,7 @@ public partial class ConvertSettingViewModel : ViewModelBase
 
     private void LoadFromSettings(ConvertSettings settings)
     {
-        StandardTargetFormat = string.IsNullOrWhiteSpace(settings.StandardTargetFormat)
-            ? "JPEG"
-            : settings.StandardTargetFormat;
+        StandardTargetFormat = settings.StandardTargetFormat;
         AnimationTargetFormat = settings.AnimationTargetFormat;
 
         StandardQuality = settings.StandardQuality;
@@ -306,7 +304,7 @@ public partial class ConvertSettingViewModel : ViewModelBase
         StandardAvifChromaSubsampling = settings.StandardAvifChromaSubsampling;
         StandardAvifEncodingEffort = settings.StandardAvifEncodingEffort;
         StandardAvifBitDepth = settings.StandardAvifBitDepth;
-        StandardCustomBackgroundColor = settings.StandardBackgroundColor ?? "#FFFFFF";
+        StandardCustomBackgroundColor = settings.StandardBackgroundColor;
         StandardBgColorOption = ParseBackgroundColorOption(StandardCustomBackgroundColor);
 
         AnimationQuality = settings.AnimationQuality;
@@ -324,8 +322,8 @@ public partial class ConvertSettingViewModel : ViewModelBase
         OverwritePolicy = settings.OverwritePolicy;
         SaveLocation = settings.SaveLocation;
         FolderMethod = settings.FolderMethod;
-        OutputSubFolderName = settings.OutputSubFolderName ?? "PixConvert";
-        CustomOutputPath = settings.CustomOutputPath ?? string.Empty;
+        OutputSubFolderName = settings.OutputSubFolderName;
+        CustomOutputPath = settings.CustomOutputPath;
         CpuUsage = settings.CpuUsage;
 
         SyncTargetTags();
