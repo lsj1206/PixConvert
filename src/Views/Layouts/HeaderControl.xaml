@@ -10,8 +10,8 @@
     <!-- Header : Main_Container -->
     <Border
         Padding="10,5"
-        Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
-        BorderBrush="{DynamicResource SystemControlBackgroundBaseMediumBrush}"
+        Background="{DynamicResource AppSurfaceBrush}"
+        BorderBrush="{DynamicResource AppBorderDefaultBrush}"
         BorderThickness="0,0,0,1">
         <Grid>
             <Grid.ColumnDefinitions>
@@ -34,13 +34,13 @@
                         Margin="0,0,8,0"
                         VerticalAlignment="Center"
                         FontSize="13"
-                        Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                        Foreground="{DynamicResource AppTextSecondaryBrush}"
                         Text="{DynamicResource Status_Total}" />
                     <TextBlock
                         VerticalAlignment="Center"
                         FontSize="13"
                         FontWeight="SemiBold"
-                        Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}"
+                        Foreground="{DynamicResource AppTextPrimaryBrush}"
                         Text="{Binding Header.TotalCount}" />
                 </StackPanel>
                 <!-- Header : Unknown_Status -->
@@ -49,13 +49,13 @@
                         Margin="0,0,8,0"
                         VerticalAlignment="Center"
                         FontSize="13"
-                        Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                        Foreground="{DynamicResource AppTextSecondaryBrush}"
                         Text="{DynamicResource Status_Unknown}" />
                     <TextBlock
                         VerticalAlignment="Center"
                         FontSize="13"
                         FontWeight="SemiBold"
-                        Foreground="#FF5555"
+                        Foreground="{DynamicResource AppDangerBrush}"
                         Text="{Binding Header.UnsupportedCount}" />
                 </StackPanel>
             </StackPanel>
@@ -77,13 +77,13 @@
                             Margin="0,0,4,0"
                             VerticalAlignment="Center"
                             FontSize="13"
-                            Foreground="{DynamicResource SystemControlForegroundAccentBrush}"
+                            Foreground="{DynamicResource AppAccentBrush}"
                             Glyph="&#xE950;" />
                         <TextBlock
                             Margin="0,0,6,0"
                             VerticalAlignment="Center"
                             FontSize="13"
-                            Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                            Foreground="{DynamicResource AppTextSecondaryBrush}"
                             Text="{DynamicResource Header_Label_Cpu}" />
                         <TextBlock
                             VerticalAlignment="Center"
@@ -98,13 +98,13 @@
                             Margin="0,0,4,0"
                             VerticalAlignment="Center"
                             FontSize="12"
-                            Foreground="{DynamicResource SystemControlForegroundAccentBrush}"
+                            Foreground="{DynamicResource AppAccentBrush}"
                             Glyph="&#xE964;" />
                         <TextBlock
                             Margin="0,0,6,0"
                             VerticalAlignment="Center"
                             FontSize="13"
-                            Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                            Foreground="{DynamicResource AppTextSecondaryBrush}"
                             Text="{DynamicResource Header_Label_Ram}" />
                         <TextBlock
                             VerticalAlignment="Center"
@@ -126,7 +126,7 @@
                     VerticalAlignment="Center"
                     FontSize="14"
                     FontWeight="Normal"
-                    Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                    Foreground="{DynamicResource AppTextSecondaryBrush}"
                     Text="{x:Static local:App.Version}" />
 
                 <!-- Header : Settings_Button -->
@@ -138,7 +138,7 @@
                     Command="{Binding Header.ShowAppSettingCommand}">
                     <ui:FontIcon
                         FontSize="16"
-                        Foreground="{DynamicResource SystemControlForegroundAccentBrush}"
+                        Foreground="{DynamicResource AppAccentBrush}"
                         Glyph="&#xE713;" />
                 </Button>
             </StackPanel>

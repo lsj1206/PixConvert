@@ -1,0 +1,36 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <SolidColorBrush x:Key="AppSurfaceBrush" Color="#FFFFFFFF" />
+    <SolidColorBrush x:Key="AppSidebarSurfaceBrush" Color="#FFEEEEEE" />
+    <SolidColorBrush x:Key="AppBorderDefaultBrush" Color="#99000000" />
+    <SolidColorBrush x:Key="AppBorderSubtleBrush" Color="#33000000" />
+    <SolidColorBrush x:Key="AppTextPrimaryBrush" Color="#FF000000" />
+    <SolidColorBrush x:Key="AppTextSecondaryBrush" Color="#99000000" />
+    <SolidColorBrush x:Key="AppTextTertiaryBrush" Color="#999999" />
+    <SolidColorBrush x:Key="AppAccentBrush" Color="#FF0078D4" />
+    <SolidColorBrush x:Key="AppAccentForegroundBrush" Color="#FFFFFFFF" />
+    <SolidColorBrush x:Key="AppDangerBrush" Color="#FF5555" />
+    <SolidColorBrush x:Key="AppErrorForegroundBrush" Color="#C62828" />
+    <SolidColorBrush x:Key="AppErrorBackgroundBrush" Color="#FFEBEE" />
+    <SolidColorBrush x:Key="AppWarningForegroundBrush" Color="#D97706" />
+    <SolidColorBrush x:Key="AppSnackbarSuccessBrush" Color="#107C10" />
+    <SolidColorBrush x:Key="AppSnackbarWarningBrush" Color="#C19C00" />
+    <SolidColorBrush x:Key="AppSnackbarErrorBrush" Color="#C42B1C" />
+    <SolidColorBrush x:Key="AppListItemHoverBackgroundBrush" Color="#E5F3FF" />
+    <SolidColorBrush x:Key="AppListItemSelectedBackgroundBrush" Color="#CCE8FF" />
+    <SolidColorBrush x:Key="AppAnimationBadgeBackgroundBrush" Color="#E1BEE7" />
+    <SolidColorBrush x:Key="AppAnimationBadgeForegroundBrush" Color="#6A1B9A" />
+    <SolidColorBrush x:Key="AppProgressIdleBrush" Color="#1A4CAF50" />
+    <SolidColorBrush x:Key="AppProgressProcessingBrush" Color="#334CAF50" />
+    <SolidColorBrush x:Key="AppProgressSuccessBrush" Color="#4D4CAF50" />
+    <SolidColorBrush x:Key="AppProgressWarningBrush" Color="#4DFFC107" />
+    <SolidColorBrush x:Key="AppSuccessForegroundBrush" Color="#2E7D32" />
+    <SolidColorBrush x:Key="AppSuccessLinkBrush" Color="#1B5E20" />
+    <SolidColorBrush x:Key="AppSuccessBadgeBackgroundBrush" Color="#E8F5E9" />
+    <SolidColorBrush x:Key="AppWarningBadgeBackgroundBrush" Color="#FFF3E0" />
+    <SolidColorBrush x:Key="AppWarningBadgeForegroundBrush" Color="#E65100" />
+    <Color x:Key="AppAccentColor">#FF0078D4</Color>
+    <Color x:Key="AppTransparentColor">Transparent</Color>
+</ResourceDictionary>

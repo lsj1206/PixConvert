@@ -11,7 +11,7 @@
             Margin="0,12,0,0"
             FontFamily="Segoe UI Emoji, Segoe UI"
             FontSize="12"
-            Foreground="{DynamicResource DialogWarningForegroundBrush}"
+            Foreground="{DynamicResource AppWarningForegroundBrush}"
             Text="{Binding WarningMessage, ElementName=Root}"
             TextWrapping="Wrap" />
     </StackPanel>

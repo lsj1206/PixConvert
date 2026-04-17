@@ -20,7 +20,7 @@
             <Setter Property="FontWeight" Value="SemiBold" />
             <Setter Property="Cursor" Value="Hand" />
             <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="BorderBrush" Value="{DynamicResource SystemControlBackgroundBaseLowBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource AppBorderSubtleBrush}" />
         </Style>
     </UserControl.Resources>
 
@@ -48,8 +48,8 @@
         <Border
             Margin="0"
             Padding="12"
-            Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
-            BorderBrush="{DynamicResource SystemControlBackgroundBaseMediumBrush}"
+            Background="{DynamicResource AppSidebarSurfaceBrush}"
+            BorderBrush="{DynamicResource AppBorderSubtleBrush}"
             BorderThickness="1"
             CornerRadius="8">
 
@@ -81,10 +81,10 @@
                                             Text="{Binding Conversion.ActivePresetName}">
                                             <TextBlock.Style>
                                                 <Style TargetType="TextBlock">
-                                                    <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+                                                    <Setter Property="Foreground" Value="{DynamicResource AppTextPrimaryBrush}" />
                                                     <Style.Triggers>
                                                         <DataTrigger Binding="{Binding Conversion.IsActivePresetValid}" Value="False">
-                                                            <Setter Property="Foreground" Value="#FF5555" />
+                                                            <Setter Property="Foreground" Value="{DynamicResource AppDangerBrush}" />
                                                         </DataTrigger>
                                                     </Style.Triggers>
                                                 </Style>
@@ -98,7 +98,7 @@
                                             Command="{Binding Conversion.OpenConvertSettingCommand}" />
                                         <Button
                                             Style="{StaticResource SidebarButtonStyle}"
-                                            Foreground="{DynamicResource SystemControlForegroundAccentBrush}"
+                                            Foreground="{DynamicResource AppAccentBrush}"
                                             Content="{DynamicResource Btn_Convert}"
                                             Command="{Binding Conversion.ConvertFilesCommand}" />
 
@@ -117,7 +117,7 @@
                                                 VerticalAlignment="Center"
                                                 FontSize="12"
                                                 FontWeight="SemiBold"
-                                                Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}"
+                                                Foreground="{DynamicResource AppTextPrimaryBrush}"
                                                 Text="{DynamicResource Sort_Label}" />
 
                                             <!-- Sidebar : Sort_Selection -->
@@ -187,13 +187,13 @@
                                                         <Style TargetType="Button" BasedOn="{StaticResource SidebarButtonStyle}">
                                                             <Setter Property="Content" Value="{DynamicResource Btn_Cancel}" />
                                                             <Setter Property="Command" Value="{Binding Conversion.CancelConvertCommand}" />
-                                                            <Setter Property="Foreground" Value="#FF5555" />
+                                                            <Setter Property="Foreground" Value="{DynamicResource AppDangerBrush}" />
                                                             <Style.Triggers>
                                                                 <DataTrigger Binding="{Binding Conversion.IsConversionCompleted}" Value="True">
                                                                     <Setter Property="Content" Value="{DynamicResource Dlg_Confirm}" />
                                                                     <Setter Property="Command" Value="{Binding Conversion.ConfirmCompletionCommand}" />
-                                                                    <Setter Property="Background" Value="{DynamicResource SystemControlForegroundAccentBrush}" />
-                                                                    <Setter Property="Foreground" Value="Azure" />
+                                                                    <Setter Property="Background" Value="{DynamicResource AppAccentBrush}" />
+                                                                    <Setter Property="Foreground" Value="{DynamicResource AppAccentForegroundBrush}" />
                                                                 </DataTrigger>
                                                             </Style.Triggers>
                                                         </Style>
@@ -205,7 +205,7 @@
                                                 <TextBlock
                                                     FontSize="14"
                                                     FontWeight="SemiBold"
-                                                    Foreground="{DynamicResource SystemControlForegroundAccentBrush}"
+                                                    Foreground="{DynamicResource AppAccentBrush}"
                                                     Text="{DynamicResource Converting_Title}" />
 
                                                 <!-- Sidebar : Converting_Details -->
@@ -214,7 +214,7 @@
                                                     TextAlignment="Right"
                                                     FontSize="12"
                                                     FontWeight="Medium"
-                                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                                    Foreground="{DynamicResource AppTextSecondaryBrush}"
                                                     Text="{Binding Conversion.ConvertingTime}" />
                                                 <ProgressBar Margin="0"
                                                              Padding="0"
@@ -228,16 +228,16 @@
                                                     TextAlignment="Right">
                                                     <Run
                                                         FontWeight="SemiBold"
-                                                        Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}"
+                                                        Foreground="{DynamicResource AppTextPrimaryBrush}"
                                                         Text="{Binding Conversion.ProcessedCount}" />
-                                                    <Run Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" Text="/" />
-                                                    <Run Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" Text="{Binding Conversion.TotalConvertCount}" />
+                                                    <Run Foreground="{DynamicResource AppTextSecondaryBrush}" Text="/" />
+                                                    <Run Foreground="{DynamicResource AppTextSecondaryBrush}" Text="{Binding Conversion.TotalConvertCount}" />
                                                 </TextBlock>
 
                                                 <TextBlock
                                                     Margin="0,0,0,6"
                                                     TextAlignment="Right"
-                                                    Foreground="#FF5555">
+                                                    Foreground="{DynamicResource AppDangerBrush}">
                                                     <TextBlock.Style>
                                                         <Style TargetType="TextBlock">
                                                             <Setter Property="Visibility" Value="Visible" />
@@ -261,7 +261,7 @@
                                                 <TextBlock
                                                     Margin="0,0,0,2"
                                                     FontSize="11"
-                                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                                    Foreground="{DynamicResource AppTextSecondaryBrush}"
                                                     Text="{DynamicResource Converting_Cpu}" />
                                                 <TextBlock
                                                     Margin="8,0,0,2"
@@ -272,7 +272,7 @@
                                                 <TextBlock
                                                     Margin="0,0,0,2"
                                                     FontSize="11"
-                                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                                    Foreground="{DynamicResource AppTextSecondaryBrush}"
                                                     Text="{DynamicResource Converting_Duplicates}" />
                                                 <TextBlock
                                                     Margin="8,0,0,2"
@@ -283,7 +283,7 @@
                                                 <TextBlock
                                                     Margin="0,0,0,2"
                                                     FontSize="11"
-                                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                                    Foreground="{DynamicResource AppTextSecondaryBrush}"
                                                     Text="{DynamicResource Converting_SaveMethod}" />
                                                 <TextBlock
                                                     Margin="8,0,0,2"
@@ -294,7 +294,7 @@
                                                 <TextBlock
                                                     Margin="0,0,0,2"
                                                     FontSize="11"
-                                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                                    Foreground="{DynamicResource AppTextSecondaryBrush}"
                                                     Text="{DynamicResource Converting_SaveLocation}" />
                                                 <TextBlock
                                                     Margin="8,0,0,2"
@@ -309,7 +309,7 @@
                                                 <TextBlock
                                                     Margin="0,0,0,2"
                                                     FontSize="11"
-                                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                                    Foreground="{DynamicResource AppTextSecondaryBrush}"
                                                     Text="{DynamicResource Converting_Format}" />
                                                 <TextBlock
                                                     Margin="8,0,0,2"
@@ -320,7 +320,7 @@
                                                 <StackPanel Visibility="{Binding Conversion.ShowCurrentStandardOptions, Converter={StaticResource BooleanToVisibilityConverter}}">
                                                     <TextBlock Margin="0,0,0,2"
                                                                FontSize="11"
-                                                               Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                                               Foreground="{DynamicResource AppTextSecondaryBrush}"
                                                                Text="{DynamicResource Converting_StandardOptions}"/>
                                                     <TextBlock Margin="8,0,0,2"
                                                                FontSize="12"
@@ -332,7 +332,7 @@
                                                 <StackPanel Visibility="{Binding Conversion.ShowCurrentAnimationOptions, Converter={StaticResource BooleanToVisibilityConverter}}">
                                                     <TextBlock Margin="0,0,0,2"
                                                                FontSize="11"
-                                                               Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                                               Foreground="{DynamicResource AppTextSecondaryBrush}"
                                                                Text="{DynamicResource Converting_AnimationOptions}"/>
                                                     <TextBlock Margin="8,0,0,2"
                                                                FontSize="12"
@@ -362,7 +362,7 @@
                                                 <!-- Sidebar : Clear_All -->
                                                 <Button
                                                     Style="{StaticResource SidebarButtonStyle}"
-                                                    Foreground="#FF5555"
+                                                    Foreground="{DynamicResource AppDangerBrush}"
                                                     Content="{DynamicResource Btn_ListClear}"
                                                     Command="{Binding ListManager.RemoveAllListCommand}" />
 
@@ -371,13 +371,13 @@
                                                 <TextBlock
                                                     FontSize="14"
                                                     FontWeight="SemiBold"
-                                                    Foreground="{DynamicResource SystemControlForegroundAccentBrush}"
+                                                    Foreground="{DynamicResource AppAccentBrush}"
                                                     Text="{DynamicResource ListManager_Title}" />
 
                                                 <TextBlock
                                                     Margin="0,0,0,8"
                                                     FontSize="11"
-                                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                                    Foreground="{DynamicResource AppTextSecondaryBrush}"
                                                     Text="{DynamicResource ListManager_Desc}"
                                                     TextWrapping="Wrap" />
 
@@ -408,7 +408,7 @@
                                                     Margin="0,0,0,8"
                                                     Content="{DynamicResource ListManager_Unsupported}"
                                                     FontWeight="SemiBold"
-                                                    Foreground="#FF5555"
+                                                    Foreground="{DynamicResource AppDangerBrush}"
                                                     IsChecked="{Binding ListManager.RemoveUnsupported, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
                                                 <Button

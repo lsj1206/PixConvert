@@ -24,8 +24,8 @@
 
                     <Border
                         Padding="16"
-                        Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
-                        BorderBrush="{DynamicResource SystemControlBackgroundBaseLowBrush}"
+                        Background="{DynamicResource AppSurfaceBrush}"
+                        BorderBrush="{DynamicResource AppBorderSubtleBrush}"
                         BorderThickness="1"
                         CornerRadius="4">
                         <ui:SimpleStackPanel
@@ -40,7 +40,7 @@
                                 <StackPanel>
                                     <TextBlock FontWeight="Medium" Text="{DynamicResource Setting_App_Language}"/>
                                     <TextBlock FontSize="12"
-                                               Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                               Foreground="{DynamicResource AppTextSecondaryBrush}"
                                                Text="{DynamicResource Setting_App_LanguageDesc}"/>
                                 </StackPanel>
                                 <ComboBox
@@ -65,7 +65,7 @@
                                 <StackPanel>
                                     <TextBlock FontWeight="Medium" Text="{DynamicResource Setting_App_Theme}"/>
                                     <TextBlock FontSize="12"
-                                               Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                               Foreground="{DynamicResource AppTextSecondaryBrush}"
                                                Text="{DynamicResource Setting_App_ThemeDesc}"/>
                                 </StackPanel>
                                 <ComboBox
@@ -91,7 +91,7 @@
                                 <StackPanel Grid.Column="0" HorizontalAlignment="Left" >
                                     <TextBlock FontWeight="Medium" Text="{DynamicResource Setting_App_DelConfirm}"/>
                                     <TextBlock FontSize="12"
-                                               Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                               Foreground="{DynamicResource AppTextSecondaryBrush}"
                                                Text="{DynamicResource Setting_App_DelConfirmDesc}"/>
                                 </StackPanel>
                                 <ui:ToggleSwitch
@@ -117,8 +117,8 @@
 
                     <Border
                         Padding="16"
-                        Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
-                        BorderBrush="{DynamicResource SystemControlBackgroundBaseLowBrush}"
+                        Background="{DynamicResource AppSurfaceBrush}"
+                        BorderBrush="{DynamicResource AppBorderSubtleBrush}"
                         BorderThickness="1"
                         CornerRadius="4">
                         <ui:SimpleStackPanel Spacing="12">
@@ -150,7 +150,7 @@
                                     Margin="0,6,24,0"
                                     VerticalAlignment="Bottom"
                                     FontSize="12"
-                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                    Foreground="{DynamicResource AppTextSecondaryBrush}"
                                     Text="{Binding UpdateStatusText}"
                                     TextWrapping="Wrap" />
                             </DockPanel>

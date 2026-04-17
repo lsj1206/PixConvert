@@ -51,8 +51,8 @@
             <lists:FileListControl
                 Grid.Column="1"
                 Margin="6,0,0,0"
-                Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
-                BorderBrush="{DynamicResource SystemControlBackgroundBaseMediumBrush}"
+                Background="{DynamicResource AppSurfaceBrush}"
+                BorderBrush="{DynamicResource AppBorderDefaultBrush}"
                 BorderThickness="1"
                 DataContext="{Binding FileList}"
                 Visibility="{Binding CurrentStatus, Converter={StaticResource MultiStatusVisibilityConverter}, ConverterParameter=!Converting}" />
@@ -61,8 +61,8 @@
             <lists:ConvertingListControl
                 Grid.Column="1"
                 Margin="6,0,0,0"
-                Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
-                BorderBrush="{DynamicResource SystemControlBackgroundBaseMediumBrush}"
+                Background="{DynamicResource AppSurfaceBrush}"
+                BorderBrush="{DynamicResource AppBorderDefaultBrush}"
                 BorderThickness="1"
                 DataContext="{Binding Conversion}"
                 Visibility="{Binding CurrentStatus, Converter={StaticResource MultiStatusVisibilityConverter}, ConverterParameter=Converting}" />

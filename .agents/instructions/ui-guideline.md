@@ -1,14 +1,15 @@
 # XAML Coding Guideline (C# / MVVM / WPF / ModernWPF)
+
 > **Scope**: New and modified files. (Apply only to changed parts in existing files.)
 
 ## Naming Conventions
 
-| Target | Rule | Example |
-|---|---|---|
-| `x:Name` | PascalCase + Descriptive name | `SubmitButton`, `SearchTextBox` |
-| `Style` Key | PascalCase + `Style` suffix | `PrimaryButtonStyle` |
-| `DataTemplate` Key | PascalCase + `Template` suffix | `FileItemTemplate` |
-| `Converter` Key | PascalCase + `Converter` suffix | `BoolToVisibilityConverter` |
+| Target             | Rule                            | Example                         |
+| ------------------ | ------------------------------- | ------------------------------- |
+| `x:Name`           | PascalCase + Descriptive name   | `SubmitButton`, `SearchTextBox` |
+| `Style` Key        | PascalCase + `Style` suffix     | `PrimaryButtonStyle`            |
+| `DataTemplate` Key | PascalCase + `Template` suffix  | `FileItemTemplate`              |
+| `Converter` Key    | PascalCase + `Converter` suffix | `BoolToVisibilityConverter`     |
 
 - [MUST] Use `x:Name` only when necessary for Code-behind or `ElementName` bindings. Avoid unnecessary `x:Name` declarations.
 - [AVOID] Vague abbreviations or numbered identifiers (e.g., `Btn1`, `TxtBox`, `Ctrl1`).
@@ -17,15 +18,15 @@
 
 ### 1st Order : Category (apply top-to-bottom)
 
-| Priority | Category | Attribute |
-|---|---|---|
-| 1 | Key / Name | `x:Name`, `x:Key` |
-| 2 | Attached Properties | `Grid.Row`, `Grid.Column`, `Grid.RowSpan`, `DockPanel.Dock`, `ui:ControlHelper.*` |
-| 3 | Layout | `Width`, `Height`, `MinWidth`, `MaxWidth`, `MinHeight`, `MaxHeight`, `Margin`, `Padding`, `HorizontalAlignment`, `VerticalAlignment`, `HorizontalContentAlignment`, `VerticalContentAlignment`, `Visibility` |
-| 4 | Appearance | `Background`, `Foreground`, `BorderBrush`, `BorderThickness`, `Opacity`, `Style`, `Template` |
-| 5 | Content | `Content`, `Header`, `Text`, `Icon`, `ToolTip` |
-| 6 | Data | `ItemsSource`, `DataContext`, `SelectedItem`, `{Binding ...}` |
-| 7 | Events / Commands | `Command`, `CommandParameter`, `Click`, `SelectionChanged`, `i:Interaction.Triggers` |
+| Priority | Category            | Attribute                                                                                                                                                                                                    |
+| -------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1        | Key / Name          | `x:Name`, `x:Key`                                                                                                                                                                                            |
+| 2        | Attached Properties | `Grid.Row`, `Grid.Column`, `Grid.RowSpan`, `DockPanel.Dock`, `ui:ControlHelper.*`                                                                                                                            |
+| 3        | Layout              | `Width`, `Height`, `MinWidth`, `MaxWidth`, `MinHeight`, `MaxHeight`, `Margin`, `Padding`, `HorizontalAlignment`, `VerticalAlignment`, `HorizontalContentAlignment`, `VerticalContentAlignment`, `Visibility` |
+| 4        | Appearance          | `Background`, `Foreground`, `BorderBrush`, `BorderThickness`, `Opacity`, `Style`, `Template`                                                                                                                 |
+| 5        | Content             | `Content`, `Header`, `Text`, `Icon`, `ToolTip`                                                                                                                                                               |
+| 6        | Data                | `ItemsSource`, `DataContext`, `SelectedItem`, `{Binding ...}`                                                                                                                                                |
+| 7        | Events / Commands   | `Command`, `CommandParameter`, `Click`, `SelectionChanged`, `i:Interaction.Triggers`                                                                                                                         |
 
 ### 2nd Order: keep logical pairs adjacent
 
@@ -46,6 +47,7 @@ HorizontalContentAlignment / VerticalContentAlignment
 - [MUST] Add hierarchical scope comments at the beginning of sections in large XAML files.
 
 ### Comment Format Example
+
 ```xml
 <!-- [Scope] : [Function]_[Detail] -->
 <!-- Sidebar : Sort_Dropdown -->
@@ -89,14 +91,14 @@ xmlns:conv="clr-namespace:YourApp.Converters"
 
 ## Anti-patterns
 
-| Anti-pattern | Correct Pattern |
-|---|---|
-| `Background="White"` | `Background="{DynamicResource SystemControlBackgroundBrush}"` |
-| Referencing theme colors with `StaticResource` | Replace with `DynamicResource` |
-| Assigning `x:Name` to all elements | Use only for Code-behind/ElementName bindings |
-| Handling events via `Click="Button_Click"` | `Command="{Binding SomeCommand}"` + `EventTrigger` |
-| Listing 4+ attributes on a single line | Place one attribute per line |
-| Inline `Style` definitions | Extract to a `ResourceDictionary` with an `x:Key` |
+| Anti-pattern                                   | Correct Pattern                                               |
+| ---------------------------------------------- | ------------------------------------------------------------- |
+| `Background="White"`                           | `Background="{DynamicResource SystemControlBackgroundBrush}"` |
+| Referencing theme colors with `StaticResource` | Replace with `DynamicResource`                                |
+| Assigning `x:Name` to all elements             | Use only for Code-behind/ElementName bindings                 |
+| Handling events via `Click="Button_Click"`     | `Command="{Binding SomeCommand}"` + `EventTrigger`            |
+| Listing 4+ attributes on a single line         | Place one attribute per line                                  |
+| Inline `Style` definitions                     | Extract to a `ResourceDictionary` with an `x:Key`             |
 
 ## Examples
 
@@ -111,7 +113,7 @@ xmlns:conv="clr-namespace:YourApp.Converters"
         Width="100" Height="32"
         Margin="8,0"
         Background="{DynamicResource SystemControlBackgroundAccentBrush}"
-        Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}"
+        Foreground="#FF000000"
         Content="완료"
         Command="{Binding SubmitCommand}" />
 ```

@@ -12,6 +12,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <ui:ThemeResources />
                 <ui:XamlControlsResources />
+                <ResourceDictionary Source="Themes/AppColors.xaml" />
                 <ResourceDictionary Source="Themes/Generic.xaml" />
                 <ResourceDictionary Source="Resources/Languages/Lang.Serilog.xaml" />
             </ResourceDictionary.MergedDictionaries>
@@ -20,7 +21,6 @@
             <converters:UpperCaseConverter x:Key="UpperCaseConverter" />
             <converters:EnumToBoolConverter x:Key="EnumToBoolConverter" />
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
-            <SolidColorBrush x:Key="DialogWarningForegroundBrush" Color="#D97706" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

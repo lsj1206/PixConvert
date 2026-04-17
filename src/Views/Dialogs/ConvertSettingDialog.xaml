@@ -34,7 +34,7 @@
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="Cursor" Value="Help" />
-            <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource AppTextSecondaryBrush}" />
             <Setter Property="HorizontalContentAlignment" Value="Center" />
             <Setter Property="VerticalContentAlignment" Value="Center" />
             <Setter Property="ToolTipService.InitialShowDelay" Value="300" />
@@ -91,7 +91,7 @@
                     Content="{DynamicResource Btn_PresetCopy}"
                     Command="{Binding CopyPresetCommand}" />
                 <Button
-                    Foreground="{DynamicResource SystemControlErrorTextForegroundBrush}"
+                    Foreground="{DynamicResource AppErrorForegroundBrush}"
                     Content="{DynamicResource Btn_PresetDelete}"
                     Command="{Binding RemovePresetCommand}" />
             </StackPanel>
@@ -275,7 +275,7 @@
             <StackPanel
                 Margin="0,-6,0,6"
                 Visibility="{Binding StandardShowAvifEncodingEffort, Converter={StaticResource BooleanToVisibilityConverter}}">
-                <TextBlock Foreground="#D97706" Text="{DynamicResource Tip_Avif}" />
+                <TextBlock Foreground="{DynamicResource AppWarningForegroundBrush}" Text="{DynamicResource Tip_Avif}" />
             </StackPanel>
 
             <TextBlock Margin="0,0,0,4"

@@ -31,7 +31,7 @@ public class OptionToolTip : StackPanel
 
         _bodyText.Margin = new Thickness(0, 2, 0, 0);
         _cautionText.Margin = new Thickness(0, 2, 0, 0);
-        _cautionText.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#D97706"));
+        _cautionText.SetResourceReference(TextBlock.ForegroundProperty, "AppWarningForegroundBrush");
         _cautionText.FontFamily = new FontFamily("Segoe UI Emoji, Segoe UI");
 
         Children.Add(_titleText);

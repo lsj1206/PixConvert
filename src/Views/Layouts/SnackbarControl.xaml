@@ -16,7 +16,7 @@
         <Style
             x:Key="SnackbarBorderStyle"
             TargetType="Border">
-            <Setter Property="Background" Value="#0078D4" /> <!-- Default Dark -->
+            <Setter Property="Background" Value="{DynamicResource AppAccentBrush}" />
             <Setter Property="CornerRadius" Value="4" />
             <Setter Property="Padding" Value="16,8" />
             <Setter Property="MaxWidth" Value="600" />
@@ -33,19 +33,19 @@
                 <DataTrigger
                     Binding="{Binding Type}"
                     Value="{x:Static services:SnackbarType.Success}">
-                    <Setter Property="Background" Value="#107C10" />
+                    <Setter Property="Background" Value="{DynamicResource AppSnackbarSuccessBrush}" />
                 </DataTrigger>
                 <!-- Snackbar : Warning_Trigger -->
                 <DataTrigger
                     Binding="{Binding Type}"
                     Value="{x:Static services:SnackbarType.Warning}">
-                    <Setter Property="Background" Value="#C19C00" />
+                    <Setter Property="Background" Value="{DynamicResource AppSnackbarWarningBrush}" />
                 </DataTrigger>
                 <!-- Snackbar : Error_Trigger -->
                 <DataTrigger
                     Binding="{Binding Type}"
                     Value="{x:Static services:SnackbarType.Error}">
-                    <Setter Property="Background" Value="#C42B1C" />
+                    <Setter Property="Background" Value="{DynamicResource AppSnackbarErrorBrush}" />
                 </DataTrigger>
             </Style.Triggers>
         </Style>
@@ -111,7 +111,7 @@
             FontSize="14"
             FontWeight="SemiBold"
             TextAlignment="Center"
-            Foreground="White"
+            Foreground="{DynamicResource AppAccentForegroundBrush}"
             Text="{Binding Message}" />
     </Border>
 </UserControl>
