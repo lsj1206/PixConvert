@@ -133,7 +133,8 @@ public partial class FileItem : ObservableObject
         OnPropertyChanged(nameof(IsMismatch));
 
         // 시그니처가 없으면 미지원 상태로 설정
-        IsUnsupported = (value == "-");
+        if (value == "-")
+            IsUnsupported = true;
     }
 
     /// <summary>현재 Path를 기반으로 파일의 세부 구성 정보를 파싱합니다.</summary>

@@ -133,7 +133,7 @@
                                         Orientation="Horizontal">
                                         <!-- FileList : Animation_Badge -->
                                         <Border
-                                            Margin="6,0,0,0"
+                                            Margin="4,0,0,0"
                                             Padding="4,1"
                                             Background="{DynamicResource AppAnimationBadgeBackgroundBrush}"
                                             CornerRadius="4">
@@ -156,7 +156,7 @@
 
                                         <!-- FileList : Unsupported_Badge (N/A) -->
                                         <Border
-                                            Margin="6,0,0,0"
+                                            Margin="4,0,0,0"
                                             Padding="4,1"
                                             Background="{DynamicResource AppErrorBackgroundBrush}"
                                             CornerRadius="4">
