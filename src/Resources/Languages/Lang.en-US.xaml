@@ -29,6 +29,7 @@
     <sys:String x:Key="Status_Skipped">Skipped</sys:String>
     <!-- List : Badge-->
     <sys:String x:Key="List_Badge_Ani">ANI</sys:String>
+    <sys:String x:Key="List_Badge_N/A">N/A</sys:String>
 
     <!-- Sidebar : Button -->
     <sys:String x:Key="Btn_AddFile">Add File</sys:String>

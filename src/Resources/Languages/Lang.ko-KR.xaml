@@ -29,6 +29,7 @@
     <sys:String x:Key="Status_Skipped">건너뜀</sys:String>
     <!-- 리스트 : 뱃지 -->
     <sys:String x:Key="List_Badge_Ani">ANI</sys:String>
+    <sys:String x:Key="List_Badge_N/A">N/A</sys:String>
 
     <!-- 사이드바 : 버튼 -->
     <sys:String x:Key="Btn_AddFile">파일 추가</sys:String>

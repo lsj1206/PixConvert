@@ -174,7 +174,7 @@
                                                 FontSize="9"
                                                 FontWeight="Bold"
                                                 Foreground="{DynamicResource AppErrorForegroundBrush}"
-                                                Text="N/A" />
+                                                Text="{DynamicResource List_Badge_N/A}" />
                                         </Border>
                                     </StackPanel>
                                 </Grid>
