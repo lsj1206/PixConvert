@@ -86,7 +86,7 @@ internal static class OutputPathResolver
         {
             case OverwritePolicy.Overwrite:
             {
-                var (path, collision) = session.ReserveForce(basePath);
+                var (path, collision) = session.ReserveOverwrite(basePath);
                 return (path, collision);
             }
 

@@ -72,7 +72,7 @@ public class ConversionSessionTests : IDisposable
         // Assert
         var uniquePaths = new System.Collections.Generic.HashSet<string>(paths);
         Assert.Equal(100, uniquePaths.Count);
-        
+
         foreach (var p in uniquePaths)
         {
             Assert.NotNull(p);
@@ -81,7 +81,7 @@ public class ConversionSessionTests : IDisposable
     }
 
     [Fact]
-    public void OverwritePolicy_ParallelRequests_ShouldLogCollision()
+    public void OverwritePolicy_ParallelRequests_ShouldAssignUniquePathsAndLogCollision()
     {
         // Arrange
         using var session = new ConversionSession();
@@ -89,21 +89,68 @@ public class ConversionSessionTests : IDisposable
 
         // Act
         int collisionCount = 0;
+        var paths = new string[100];
         Parallel.For(0, 100, i =>
         {
             var (path, isCollision) = OutputPathResolver.ApplyOverwritePolicy(
                 basePath, OverwritePolicy.Overwrite, session, $"dummy{i}.original");
-            
+
             if (isCollision)
             {
                 System.Threading.Interlocked.Increment(ref collisionCount);
             }
-            Assert.Equal(basePath, path);
+            paths[i] = path!;
         });
 
         // Assert
-        // 첫 번째 예약은 충돌이 아니고 그 후 99번은 모두 충돌
+        var uniquePaths = new System.Collections.Generic.HashSet<string>(paths);
+        Assert.Equal(100, uniquePaths.Count);
+        Assert.Contains(basePath, uniquePaths);
         Assert.Equal(99, collisionCount);
+        foreach (var p in uniquePaths)
+        {
+            Assert.StartsWith(Path.Combine(_tempDir, "CollisionTest"), p);
+        }
+    }
+
+    [Fact]
+    public void OverwritePolicy_SequentialRequests_ShouldUseBaseThenSuffixes()
+    {
+        using var session = new ConversionSession();
+        string basePath = Path.Combine(_tempDir, "OverwriteSequential.png");
+
+        var first = OutputPathResolver.ApplyOverwritePolicy(
+            basePath, OverwritePolicy.Overwrite, session, "dummy1.original");
+        var second = OutputPathResolver.ApplyOverwritePolicy(
+            basePath, OverwritePolicy.Overwrite, session, "dummy2.original");
+        var third = OutputPathResolver.ApplyOverwritePolicy(
+            basePath, OverwritePolicy.Overwrite, session, "dummy3.original");
+
+        Assert.Equal(basePath, first.Path);
+        Assert.False(first.IsCollision);
+        Assert.Equal(Path.Combine(_tempDir, "OverwriteSequential_1.png"), second.Path);
+        Assert.True(second.IsCollision);
+        Assert.Equal(Path.Combine(_tempDir, "OverwriteSequential_2.png"), third.Path);
+        Assert.True(third.IsCollision);
+    }
+
+    [Fact]
+    public void OverwritePolicy_CollisionSuffix_WhenSuffixExistsOnDisk_ShouldUseNextAvailable()
+    {
+        using var session = new ConversionSession();
+        string basePath = Path.Combine(_tempDir, "OverwriteExistingSuffix.jpg");
+        string existingSuffix = Path.Combine(_tempDir, "OverwriteExistingSuffix_1.jpg");
+        File.WriteAllText(existingSuffix, "exists");
+
+        var first = OutputPathResolver.ApplyOverwritePolicy(
+            basePath, OverwritePolicy.Overwrite, session, "dummy1.original");
+        var second = OutputPathResolver.ApplyOverwritePolicy(
+            basePath, OverwritePolicy.Overwrite, session, "dummy2.original");
+
+        Assert.Equal(basePath, first.Path);
+        Assert.False(first.IsCollision);
+        Assert.Equal(Path.Combine(_tempDir, "OverwriteExistingSuffix_2.jpg"), second.Path);
+        Assert.True(second.IsCollision);
     }
 
     // ── 직접 테스트 (Direct Tests) ──────────────────────────────────────────
@@ -193,27 +240,27 @@ public class ConversionSessionTests : IDisposable
     }
 
     [Fact]
-    public void ReserveForce_FirstCall_ShouldNotCollide()
+    public void ReserveOverwrite_FirstCall_ShouldNotCollide()
     {
         using var session = new ConversionSession();
         string path = Path.Combine(_tempDir, "ForceFirst.jpg");
 
-        var (reservedPath, isCollision) = session.ReserveForce(path);
+        var (reservedPath, isCollision) = session.ReserveOverwrite(path);
 
         Assert.Equal(path, reservedPath);
         Assert.False(isCollision);
     }
 
     [Fact]
-    public void ReserveForce_SecondCallSamePath_ShouldCollide()
+    public void ReserveOverwrite_SecondCallSamePath_ShouldCollideAndUseSuffix()
     {
         using var session = new ConversionSession();
         string path = Path.Combine(_tempDir, "ForceSecond.jpg");
-        session.ReserveForce(path);
+        session.ReserveOverwrite(path);
 
-        var (reservedPath, isCollision) = session.ReserveForce(path);
+        var (reservedPath, isCollision) = session.ReserveOverwrite(path);
 
-        Assert.Equal(path, reservedPath);
+        Assert.Equal(Path.Combine(_tempDir, "ForceSecond_1.jpg"), reservedPath);
         Assert.True(isCollision);
     }
 

@@ -42,15 +42,17 @@ public sealed class ConversionSession : IDisposable
     // ── Overwrite 정책용 ────────────────────────────────────────────────────
     /// <summary>
     /// [원자 연산: check + reserve]
-    /// 디스크 존재 여부와 무관하게 예약 등록.
-    /// 세션 내 이미 예약된 경우 isCollision=true를 반환하여 로깅에 활용.
+    /// 디스크 존재 여부와 무관하게 첫 요청은 기본 경로를 예약합니다.
+    /// 같은 배치 내 충돌은 Suffix 정책과 동일하게 비어 있는 접미사 경로로 우회합니다.
     /// </summary>
-    public (string Path, bool IsCollision) ReserveForce(string path)
+    public (string Path, bool IsCollision) ReserveOverwrite(string path)
     {
         lock (_gate)
         {
-            bool collision = !_reserved.Add(path);
-            return (path, collision);
+            if (_reserved.Add(path))
+                return (path, false);
+
+            return (FindAndReserveSuffixedCore(path), true);
         }
     }
 
@@ -65,33 +67,38 @@ public sealed class ConversionSession : IDisposable
     {
         lock (_gate)
         {
-            string dir  = Path.GetDirectoryName(basePath) ?? string.Empty;
-            string name = Path.GetFileNameWithoutExtension(basePath);
-            string ext  = Path.GetExtension(basePath);
-
-            // suffix 없는 원본 경로 먼저 시도
-            if (!_reserved.Contains(basePath) && !File.Exists(basePath))
-            {
-                _reserved.Add(basePath);
-                return basePath;
-            }
-
-            for (int i = 1; i <= 9999; i++)
-            {
-                string candidate = Path.Combine(dir, $"{name}_{i}{ext}");
-                if (!_reserved.Contains(candidate) && !File.Exists(candidate))
-                {
-                    _reserved.Add(candidate);
-                    return candidate;
-                }
-            }
-
-            // 9999회 충돌 시 타임스탬프 폴백 (실질적 도달 불가)
-            string fallback = Path.Combine(dir,
-                $"{name}_{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}{ext}");
-            _reserved.Add(fallback);
-            return fallback;
+            return FindAndReserveSuffixedCore(basePath);
         }
+    }
+
+    private string FindAndReserveSuffixedCore(string basePath)
+    {
+        string dir  = Path.GetDirectoryName(basePath) ?? string.Empty;
+        string name = Path.GetFileNameWithoutExtension(basePath);
+        string ext  = Path.GetExtension(basePath);
+
+        // suffix 없는 원본 경로 먼저 시도
+        if (!_reserved.Contains(basePath) && !File.Exists(basePath))
+        {
+            _reserved.Add(basePath);
+            return basePath;
+        }
+
+        for (int i = 1; i <= 9999; i++)
+        {
+            string candidate = Path.Combine(dir, $"{name}_{i}{ext}");
+            if (!_reserved.Contains(candidate) && !File.Exists(candidate))
+            {
+                _reserved.Add(candidate);
+                return candidate;
+            }
+        }
+
+        // 9999회 충돌 시 타임스탬프 폴백 (실질적 도달 불가)
+        string fallback = Path.Combine(dir,
+            $"{name}_{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}{ext}");
+        _reserved.Add(fallback);
+        return fallback;
     }
 
     public void Dispose()

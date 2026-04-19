@@ -122,6 +122,59 @@ public class SkiaSharpProviderTests : IDisposable
     }
 
     [Fact]
+    public async Task ConvertAsync_WhenOverwriteBatchOutputCollides_ShouldKeepAllOutputsWithSuffix()
+    {
+        string inputDirA = Path.Combine(_testDir, "A");
+        string inputDirB = Path.Combine(_testDir, "B");
+        string outputDir = Path.Combine(_testDir, "Out");
+        Directory.CreateDirectory(inputDirA);
+        Directory.CreateDirectory(inputDirB);
+        Directory.CreateDirectory(outputDir);
+
+        string firstInput = Path.Combine(inputDirA, "photo.png");
+        string secondInput = Path.Combine(inputDirB, "photo.png");
+        File.Copy(_inputPath, firstInput);
+        File.Copy(_inputPath, secondInput);
+
+        string baseOutput = Path.Combine(outputDir, "photo.jpg");
+        string suffixedOutput = Path.Combine(outputDir, "photo_1.jpg");
+        File.WriteAllText(baseOutput, "existing");
+
+        var first = new FileItem { Path = firstInput, FileSignature = "PNG" };
+        var second = new FileItem { Path = secondInput, FileSignature = "PNG" };
+        var settings = new ConvertSettings
+        {
+            StandardTargetFormat = "JPEG",
+            SaveLocation = SaveLocationType.Custom,
+            CustomOutputPath = outputDir,
+            FolderMethod = SaveFolderMethod.NoFolder,
+            OverwritePolicy = OverwritePolicy.Overwrite
+        };
+
+        using var session = new ConversionSession();
+        await Task.WhenAll(
+            _provider.ConvertAsync(first, settings, session, CancellationToken.None),
+            _provider.ConvertAsync(second, settings, session, CancellationToken.None));
+
+        var outputPaths = new System.Collections.Generic.HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        outputPaths.Add(first.OutputPath!);
+        outputPaths.Add(second.OutputPath!);
+
+        Assert.Equal(FileConvertStatus.Success, first.Status);
+        Assert.Equal(FileConvertStatus.Success, second.Status);
+        Assert.Equal(2, outputPaths.Count);
+        Assert.Contains(baseOutput, outputPaths);
+        Assert.Contains(suffixedOutput, outputPaths);
+
+        using var baseStream = File.OpenRead(baseOutput);
+        using var baseBitmap = SKBitmap.Decode(baseStream);
+        using var suffixStream = File.OpenRead(suffixedOutput);
+        using var suffixBitmap = SKBitmap.Decode(suffixStream);
+        Assert.NotNull(baseBitmap);
+        Assert.NotNull(suffixBitmap);
+    }
+
+    [Fact]
     public async Task ConvertAsync_WhenTargetIsJpeg_ShouldCompositeBackground()
     {
         var file = new FileItem { Path = _inputPath, FileSignature = "PNG" };
