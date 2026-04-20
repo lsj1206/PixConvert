@@ -186,8 +186,25 @@ public partial class App : Application
         }
         catch { }
 
+        DisposeServices(Services);
+
         Log.CloseAndFlush();
         base.OnExit(e);
+    }
+
+    internal static void DisposeServices(IServiceProvider services)
+    {
+        try
+        {
+            if (services is IDisposable disposable)
+            {
+                disposable.Dispose();
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Service provider dispose failed.");
+        }
     }
 
     /// <summary>

@@ -19,14 +19,30 @@ public partial class SnackbarControl : UserControl
         InitializeComponent();
 
         // DataContext가 설정되거나 변경될 때 ViewModel의 속성 변경 알림을 연결합니다.
-        DataContextChanged += (s, e) =>
+        DataContextChanged += OnDataContextChanged;
+        Unloaded += OnUnloaded;
+    }
+
+    private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+    {
+        if (e.OldValue is INotifyPropertyChanged oldViewModel)
         {
-            if (DataContext is INotifyPropertyChanged npc)
-            {
-                npc.PropertyChanged -= OnViewModelPropertyChanged; // 중복 방지
-                npc.PropertyChanged += OnViewModelPropertyChanged;
-            }
-        };
+            oldViewModel.PropertyChanged -= OnViewModelPropertyChanged;
+        }
+
+        if (e.NewValue is INotifyPropertyChanged newViewModel)
+        {
+            newViewModel.PropertyChanged -= OnViewModelPropertyChanged; // 중복 방지
+            newViewModel.PropertyChanged += OnViewModelPropertyChanged;
+        }
+    }
+
+    private void OnUnloaded(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is INotifyPropertyChanged viewModel)
+        {
+            viewModel.PropertyChanged -= OnViewModelPropertyChanged;
+        }
     }
 
     /// <summary>
