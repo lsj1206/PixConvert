@@ -245,7 +245,6 @@ public partial class ConversionViewModel : ViewModelBase
         {
             RestorePendingFiles();
             _snackbarService.Show(GetString("Msg_Convert_Cancelled"), SnackbarType.Info);
-            ResetConversionState();
         }
         finally
         {
@@ -402,8 +401,7 @@ public partial class ConversionViewModel : ViewModelBase
     /// </summary>
     private void NotifyCompletionResult(bool isCancelled, ConversionContext context)
     {
-        _timer.Stop();
-        _stopwatch.Stop();
+        StopConversionClock();
 
         if (isCancelled)
         {
@@ -423,6 +421,12 @@ public partial class ConversionViewModel : ViewModelBase
             _snackbarService.Show(string.Format(GetString("Msg_OperationComplete"), successCount), SnackbarType.Success);
     }
 
+    private void StopConversionClock()
+    {
+        _timer.Stop();
+        _stopwatch.Stop();
+    }
+
     /// <summary>
     /// 취소 시 Processing 상태로 남은 파일을 Pending으로 복구합니다.
     /// </summary>
@@ -437,6 +441,8 @@ public partial class ConversionViewModel : ViewModelBase
     /// </summary>
     private void ResetConversionState()
     {
+        StopConversionClock();
+
         IsConversionCompleted = false;
         ConfirmCompletionCommand.NotifyCanExecuteChanged();
         CancelConvertCommand.NotifyCanExecuteChanged();
