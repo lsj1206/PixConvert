@@ -10,6 +10,7 @@
     <UserControl.Resources>
         <!-- Converters -->
         <converters:FileSizeConverter x:Key="FileSizeConverter" />
+        <CollectionViewSource x:Key="FilteredItems" Source="{Binding Items}" Filter="CollectionViewSource_Filter" />
 
         <!-- FileList : Item_ContainerStyle -->
         <Style
@@ -63,7 +64,7 @@
             BorderThickness="0"
             ItemContainerStyle="{StaticResource FileItemContainerStyle}"
             SelectionMode="Extended"
-            ItemsSource="{Binding Items}"
+            ItemsSource="{Binding Source={StaticResource FilteredItems}}"
             AllowDrop="True"
             DragLeave="FileListView_DragLeave"
             Drop="FileListView_Drop"

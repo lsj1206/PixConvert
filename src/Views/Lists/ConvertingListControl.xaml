@@ -205,7 +205,7 @@
                                             FontSize="11"
                                             FontWeight="SemiBold"
                                             Foreground="{DynamicResource AppTextSecondaryBrush}"
-                                            Text="{Binding StatusText}"
+                                            Text="{DynamicResource Status_Pending}"
                                             TextTrimming="CharacterEllipsis" />
                                     </StackPanel>
 
@@ -227,12 +227,14 @@
                                     <DataTrigger Binding="{Binding Status}" Value="Processing">
                                         <Setter TargetName="StatusProgressBar" Property="Foreground" Value="{DynamicResource AppProgressProcessingBrush}" />
                                         <Setter TargetName="StatusLabel" Property="Foreground" Value="{DynamicResource AppSuccessForegroundBrush}" />
+                                        <Setter TargetName="StatusLabel" Property="Text" Value="{DynamicResource Status_Processing}" />
                                         <Setter TargetName="ProcessingIndicator" Property="Visibility" Value="Visible" />
                                     </DataTrigger>
 
                                     <!-- Success State -->
                                     <DataTrigger Binding="{Binding Status}" Value="Success">
                                         <Setter TargetName="StatusProgressBar" Property="Foreground" Value="{DynamicResource AppProgressSuccessBrush}" />
+                                        <Setter TargetName="StatusLabel" Property="Text" Value="{DynamicResource Status_Success}" />
                                         <Setter TargetName="StatusLabel" Property="Visibility" Value="Collapsed" />
                                         <Setter TargetName="SuccessLinkLabel" Property="Visibility" Value="Visible" />
                                     </DataTrigger>
@@ -241,6 +243,12 @@
                                     <DataTrigger Binding="{Binding Status}" Value="Error">
                                         <Setter TargetName="StatusProgressBar" Property="Foreground" Value="{DynamicResource AppProgressWarningBrush}" />
                                         <Setter TargetName="StatusLabel" Property="Foreground" Value="{DynamicResource AppWarningForegroundBrush}" />
+                                        <Setter TargetName="StatusLabel" Property="Text" Value="{DynamicResource Status_Error}" />
+                                    </DataTrigger>
+
+                                    <!-- Skipped State -->
+                                    <DataTrigger Binding="{Binding Status}" Value="Skipped">
+                                        <Setter TargetName="StatusLabel" Property="Text" Value="{DynamicResource Status_Skipped}" />
                                     </DataTrigger>
                                 </DataTemplate.Triggers>
                             </DataTemplate>

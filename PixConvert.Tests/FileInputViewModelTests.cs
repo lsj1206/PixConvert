@@ -77,6 +77,52 @@ public class FileInputViewModelTests
             Times.Once);
     }
 
+    [Fact]
+    public async Task DropFilesCommand_WhenFilesDropped_ShouldAnalyzeDroppedPaths()
+    {
+        string[] paths = [@"C:\Drop\a.png", @"C:\Drop\b.jpg"];
+        var pathPicker = new Mock<IPathPickerService>();
+        var analyzer = CreateAnalyzerReturning(paths[0]);
+        var vm = CreateViewModel(pathPicker, analyzer);
+
+        await vm.DropFilesCommand.ExecuteAsync(paths);
+
+        analyzer.Verify(
+            service => service.ProcessPathsAsync(
+                It.Is<IEnumerable<string>>(value => value.SequenceEqual(paths)),
+                10000,
+                0,
+                It.IsAny<IReadOnlySet<string>?>(),
+                It.IsAny<IProgress<FileProcessingProgress>?>()),
+            Times.Once);
+    }
+
+    [Fact]
+    public async Task DropFilesCommand_WhenConverting_ShouldNotAnalyzeDroppedPaths()
+    {
+        string[] paths = [@"C:\Drop\a.png"];
+        var pathPicker = new Mock<IPathPickerService>();
+        var analyzer = CreateAnalyzerReturning(paths[0]);
+        var vm = CreateViewModel(pathPicker, analyzer);
+
+        vm.CurrentStatus = AppStatus.Converting;
+
+        Assert.False(vm.DropFilesCommand.CanExecute(paths));
+        if (vm.DropFilesCommand.CanExecute(paths))
+        {
+            await vm.DropFilesCommand.ExecuteAsync(paths);
+        }
+
+        analyzer.Verify(
+            service => service.ProcessPathsAsync(
+                It.IsAny<IEnumerable<string>>(),
+                It.IsAny<int>(),
+                It.IsAny<int>(),
+                It.IsAny<IReadOnlySet<string>?>(),
+                It.IsAny<IProgress<FileProcessingProgress>?>()),
+            Times.Never);
+    }
+
     private static FileInputViewModel CreateViewModel(
         Mock<IPathPickerService> pathPicker,
         Mock<IFileAnalyzerService> analyzer)

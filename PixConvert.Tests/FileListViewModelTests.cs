@@ -205,6 +205,23 @@ public class FileListViewModelTests
         Assert.Equal("C:\\b.jpg", _vm.Items[2].Path); // B는 밀려서 세 번째
     }
 
+    [Fact]
+    public void MoveItemsCommand_WhenRequestProvided_ShouldReorderItems()
+    {
+        var a = new FileItem { Path = "C:\\a.jpg" };
+        var b = new FileItem { Path = "C:\\b.jpg" };
+        var c = new FileItem { Path = "C:\\c.jpg" };
+        _vm.AddItem(a);
+        _vm.AddItem(b);
+        _vm.AddItem(c);
+
+        _vm.MoveItemsCommand.Execute(new MoveItemsRequest([c], 0, false));
+
+        Assert.Equal("C:\\c.jpg", _vm.Items[0].Path);
+        Assert.Equal("C:\\a.jpg", _vm.Items[1].Path);
+        Assert.Equal("C:\\b.jpg", _vm.Items[2].Path);
+    }
+
     // ─────────────────────────────────────────────────
     // ReorderIndex 테스트
     // ─────────────────────────────────────────────────

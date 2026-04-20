@@ -105,28 +105,6 @@ public partial class FileItem : ObservableObject
     [ObservableProperty]
     private long _outputSize;
 
-    /// <summary>지역화된 상태 텍스트를 가져옵니다. (안전한 제3방식)</summary>
-    public string StatusText => SafeGetResource($"Status_{Status}");
-
-    /// <summary>UI 갱신을 위해 StatusText 속성 변경 알림을 강제로 발생시킵니다.</summary>
-    public void RefreshStatusText() => OnPropertyChanged(nameof(StatusText));
-
-    /// <summary>
-    /// 안전하게 애플리케이션 리소스를 조회합니다.
-    /// 유닛 테스트 환경(App.Current가 null)에서도 크래시가 발생하지 않도록 설계되었습니다.
-    /// </summary>
-    private string SafeGetResource(string key)
-    {
-        if (System.Windows.Application.Current == null) return key;
-        return System.Windows.Application.Current.TryFindResource(key) as string ?? key;
-    }
-
-    /// <summary>Status 변경 시 StatusText 동기화 알림</summary>
-    partial void OnStatusChanged(FileConvertStatus value)
-    {
-        RefreshStatusText();
-    }
-
     /// <summary>FileSignature 변경 시 IsMismatch 및 상태 갱신</summary>
     partial void OnFileSignatureChanged(string value)
     {

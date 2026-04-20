@@ -4,9 +4,10 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Controls;
+using System.Windows.Data;
+using CommunityToolkit.Mvvm.Input;
 using PixConvert.Models;
 using PixConvert.Services;
-using PixConvert.ViewModels;
 
 namespace PixConvert.Views.Lists;
 
@@ -17,6 +18,55 @@ public partial class FileListControl : UserControl
 {
     private Point _startPoint;
     private bool _isPotentialDrag;
+
+    public static readonly DependencyProperty DeleteSelectedCommandProperty =
+        DependencyProperty.Register(nameof(DeleteSelectedCommand), typeof(ICommand), typeof(FileListControl), new PropertyMetadata(null));
+
+    public static readonly DependencyProperty DropFilesCommandProperty =
+        DependencyProperty.Register(nameof(DropFilesCommand), typeof(ICommand), typeof(FileListControl), new PropertyMetadata(null));
+
+    public static readonly DependencyProperty MoveItemsCommandProperty =
+        DependencyProperty.Register(nameof(MoveItemsCommand), typeof(ICommand), typeof(FileListControl), new PropertyMetadata(null));
+
+    public static readonly DependencyProperty SortByColumnCommandProperty =
+        DependencyProperty.Register(nameof(SortByColumnCommand), typeof(ICommand), typeof(FileListControl), new PropertyMetadata(null));
+
+    public static readonly DependencyProperty IsMismatchFilterActiveProperty =
+        DependencyProperty.Register(
+            nameof(IsMismatchFilterActive),
+            typeof(bool),
+            typeof(FileListControl),
+            new PropertyMetadata(false, OnIsMismatchFilterActiveChanged));
+
+    public ICommand? DeleteSelectedCommand
+    {
+        get => (ICommand?)GetValue(DeleteSelectedCommandProperty);
+        set => SetValue(DeleteSelectedCommandProperty, value);
+    }
+
+    public ICommand? DropFilesCommand
+    {
+        get => (ICommand?)GetValue(DropFilesCommandProperty);
+        set => SetValue(DropFilesCommandProperty, value);
+    }
+
+    public ICommand? MoveItemsCommand
+    {
+        get => (ICommand?)GetValue(MoveItemsCommandProperty);
+        set => SetValue(MoveItemsCommandProperty, value);
+    }
+
+    public ICommand? SortByColumnCommand
+    {
+        get => (ICommand?)GetValue(SortByColumnCommandProperty);
+        set => SetValue(SortByColumnCommandProperty, value);
+    }
+
+    public bool IsMismatchFilterActive
+    {
+        get => (bool)GetValue(IsMismatchFilterActiveProperty);
+        set => SetValue(IsMismatchFilterActiveProperty, value);
+    }
 
     /// <summary>
     /// FileListControl의 새 인스턴스를 초기화합니다.
@@ -33,14 +83,7 @@ public partial class FileListControl : UserControl
     {
         if (e.Key == Key.Delete)
         {
-            if (Window.GetWindow(this)?.DataContext is MainViewModel vm)
-            {
-                var list = (sender as ListView)?.SelectedItems;
-                if (vm.ListManager.DeleteFilesCommand.CanExecute(list))
-                {
-                    vm.ListManager.DeleteFilesCommand.Execute(list);
-                }
-            }
+            ExecuteCommand(DeleteSelectedCommand, (sender as ListView)?.SelectedItems);
         }
     }
 
@@ -112,7 +155,7 @@ public partial class FileListControl : UserControl
                     if (selectedItems.Count > 0)
                     {
                         // [데이터 보호] 필터링 중에는 순서 변경을 위한 드래그를 금지함
-                        if (Window.GetWindow(this)?.DataContext is MainViewModel vm && vm.SortFilter.ShowMismatchOnly)
+                        if (IsMismatchFilterActive)
                         {
                             return;
                         }
@@ -262,17 +305,14 @@ public partial class FileListControl : UserControl
         {
             if (e.Data.GetData(DataFormats.FileDrop) is string[] files)
             {
-                if (Window.GetWindow(this)?.DataContext is MainViewModel vm)
+                try
                 {
-                    try
-                    {
-                        await vm.FileInput.DropFilesAsync(files);
-                    }
-                    catch (Exception ex)
-                    {
-                        // 비동기 처리 중 발생하는 예외를 캡처하여 로그 등에 기록하고 사용자에게 알림
-                        System.Diagnostics.Debug.WriteLine($"DropFilesAsync failed: {ex.Message}");
-                    }
+                    await ExecuteDropFilesCommandAsync(files);
+                }
+                catch (Exception ex)
+                {
+                    // 비동기 처리 중 발생하는 예외를 캡처하여 로그 등에 기록하고 사용자에게 알림
+                    System.Diagnostics.Debug.WriteLine($"DropFilesAsync failed: {ex.Message}");
                 }
             }
         }
@@ -298,10 +338,7 @@ public partial class FileListControl : UserControl
 
                 if (targetIndex != -1)
                 {
-                    if (DataContext is FileListViewModel vm)
-                    {
-                        vm.MoveItems(itemsToMove, targetIndex, isBottom);
-                    }
+                    ExecuteCommand(MoveItemsCommand, new MoveItemsRequest(itemsToMove, targetIndex, isBottom));
                 }
             }
         }
@@ -319,15 +356,52 @@ public partial class FileListControl : UserControl
             if (!string.IsNullOrEmpty(sortTypeName) &&
                 Enum.TryParse(sortTypeName, out SortType sortType))
             {
-                if (Window.GetWindow(this)?.DataContext is MainViewModel vm)
-                {
-                    // ViewModel의 정렬 명령 실행
-                    if (vm.SortFilter.SortByColumnCommand.CanExecute(sortType))
-                    {
-                        vm.SortFilter.SortByColumnCommand.Execute(sortType);
-                    }
-                }
+                ExecuteCommand(SortByColumnCommand, sortType);
             }
         }
+    }
+
+    private static void OnIsMismatchFilterActiveChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is FileListControl control)
+        {
+            control.RefreshFilter();
+        }
+    }
+
+    private void CollectionViewSource_Filter(object sender, FilterEventArgs e)
+    {
+        e.Accepted = !IsMismatchFilterActive || e.Item is FileItem { IsMismatch: true };
+    }
+
+    private void RefreshFilter()
+    {
+        if (Resources["FilteredItems"] is CollectionViewSource source)
+        {
+            source.View?.Refresh();
+        }
+    }
+
+    private static void ExecuteCommand(ICommand? command, object? parameter)
+    {
+        if (command?.CanExecute(parameter) == true)
+        {
+            command.Execute(parameter);
+        }
+    }
+
+    private async System.Threading.Tasks.Task ExecuteDropFilesCommandAsync(string[] files)
+    {
+        if (DropFilesCommand is IAsyncRelayCommand<string[]> asyncCommand)
+        {
+            if (asyncCommand.CanExecute(files))
+            {
+                await asyncCommand.ExecuteAsync(files);
+            }
+
+            return;
+        }
+
+        ExecuteCommand(DropFilesCommand, files);
     }
 }

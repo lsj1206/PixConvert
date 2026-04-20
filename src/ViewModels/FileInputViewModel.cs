@@ -26,6 +26,7 @@ public partial class FileInputViewModel : ViewModelBase
     public IAsyncRelayCommand AddFilesCommand { get; }
     /// <summary>폴더를 선택하여 내부의 파일들을 목록에 추가하는 명령</summary>
     public IAsyncRelayCommand AddFolderCommand { get; }
+    public IAsyncRelayCommand<string[]> DropFilesCommand { get; }
 
     /// <summary>
     /// FileInputViewModel의 새 인스턴스를 초기화합니다.
@@ -49,6 +50,9 @@ public partial class FileInputViewModel : ViewModelBase
         // 명령 초기화: 작업 중이 아닐 때만 실행 가능
         AddFilesCommand = new AsyncRelayCommand(AddFilesAsync, () => CurrentStatus != AppStatus.Converting);
         AddFolderCommand = new AsyncRelayCommand(AddFolderAsync, () => CurrentStatus != AppStatus.Converting);
+        DropFilesCommand = new AsyncRelayCommand<string[]>(
+            paths => DropFilesAsync(paths ?? Array.Empty<string>()),
+            paths => paths is { Length: > 0 } && CurrentStatus != AppStatus.Converting);
     }
 
     /// <summary>상태 변경 시 파일 추가 명령들의 실행 가능 여부를 갱신합니다.</summary>
@@ -56,6 +60,7 @@ public partial class FileInputViewModel : ViewModelBase
     {
         AddFilesCommand.NotifyCanExecuteChanged();
         AddFolderCommand.NotifyCanExecuteChanged();
+        DropFilesCommand.NotifyCanExecuteChanged();
     }
 
     /// <summary>

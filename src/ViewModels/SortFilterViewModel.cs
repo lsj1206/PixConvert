@@ -65,7 +65,6 @@ public partial class SortFilterViewModel : ViewModelBase
     /// <summary>필터 조건이 변경되면 즉시 필터를 재적용하며, 재정렬 명령의 실행 가능 여부를 갱신합니다.</summary>
     partial void OnShowMismatchOnlyChanged(bool value)
     {
-        ApplyFilter();
         ReorderNumberCommand.NotifyCanExecuteChanged();
     }
 
@@ -93,17 +92,6 @@ public partial class SortFilterViewModel : ViewModelBase
     public void ApplySortAndFilter()
     {
         _fileList.Sorting(_sortingService, SelectedSortType, IsSortAscending);
-        ApplyFilter();
-    }
-
-    /// <summary>현재 필터 옵션(ShowMismatchOnly)을 CollectionView에 적용합니다.</summary>
-    public void ApplyFilter()
-    {
-        var view = System.Windows.Data.CollectionViewSource.GetDefaultView(_fileList.Items);
-        view.Filter = ShowMismatchOnly
-            ? item => item is FileItem fi && fi.IsMismatch
-            : null;
-        view.Refresh();
     }
 
     /// <summary>

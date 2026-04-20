@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Microsoft.Extensions.Logging;
+using CommunityToolkit.Mvvm.Input;
 using PixConvert.Models;
 using PixConvert.Services;
 
@@ -37,6 +38,8 @@ public class FileListViewModel : ViewModelBase
     /// <summary>다음에 추가될 아이템의 기본 순번</summary>
     private int _nextAddIndex = 1;
 
+    public IRelayCommand<MoveItemsRequest> MoveItemsCommand { get; }
+
     /// <summary>
     /// FileListViewModel의 새 인스턴스를 초기화합니다.
     /// </summary>
@@ -44,6 +47,7 @@ public class FileListViewModel : ViewModelBase
     : base(languageService, logger)
     {
         Items = new ReadOnlyObservableCollection<FileItem>(_items);
+        MoveItemsCommand = new RelayCommand<MoveItemsRequest>(MoveItems);
 
         // 컬렉션 변경 시 통계 갱신 및 UI 알림
         _items.CollectionChanged += (s, e) =>
@@ -53,17 +57,6 @@ public class FileListViewModel : ViewModelBase
             OnPropertyChanged(nameof(UnsupportedCount));
         };
 
-        // 언어 변경 시 목록 전체의 상태 텍스트 쇄신 (안전한 제3방식)
-        _languageService.LanguageChanged += OnLanguageChanged;
-    }
-
-    /// <summary>언어 변경 시 모든 아이템의 상태 텍스트를 다시 그리도록 알림을 발생시킵니다.</summary>
-    private void OnLanguageChanged()
-    {
-        foreach (var item in _items)
-        {
-            item.RefreshStatusText();
-        }
     }
 
     /// <summary>
@@ -229,5 +222,12 @@ public class FileListViewModel : ViewModelBase
         {
             _items.Insert(Math.Min(insertIndex + i, _items.Count), actualMoving[i]);
         }
+    }
+
+    private void MoveItems(MoveItemsRequest? request)
+    {
+        if (request == null) return;
+
+        MoveItems(request.ItemsToMove.ToList(), request.TargetIndex, request.IsBottom);
     }
 }
