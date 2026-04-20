@@ -1,56 +1,75 @@
 using System;
-using System.Windows;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Threading;
 using Microsoft.Extensions.Logging;
 using PixConvert.ViewModels;
 
 namespace PixConvert.Services;
 
 /// <summary>
-/// 스낵바 알림의 상태와 애니메이션 시간을 제어하는 서비스 클래스입니다.
+/// Controls snackbar state and animation timing.
 /// </summary>
-public class SnackbarService : ISnackbarService
+public class SnackbarService : ISnackbarService, IDisposable
 {
     private readonly SnackbarViewModel _viewModel;
     private readonly ILogger<SnackbarService> _logger;
     private readonly ILanguageService _languageService;
-    private long _currentSessionId; // 현재 활성화된 알림 세션 번호
+    private readonly Func<Dispatcher?> _dispatcherProvider;
+    private readonly object _sessionLock = new();
+    private long _currentSessionId;
     private CancellationTokenSource? _sessionCts;
+    private volatile bool _disposed;
 
-    // 애니메이션 지속 시간 (XAML Storyboard 시간과 조율)
     private const int AnimationGap = 50;
 
     public SnackbarService(SnackbarViewModel viewModel, ILogger<SnackbarService> logger, ILanguageService languageService)
+        : this(viewModel, logger, languageService, () => Application.Current?.Dispatcher)
+    {
+    }
+
+    internal SnackbarService(
+        SnackbarViewModel viewModel,
+        ILogger<SnackbarService> logger,
+        ILanguageService languageService,
+        Func<Dispatcher?> dispatcherProvider)
     {
         _viewModel = viewModel;
         _logger = logger;
         _languageService = languageService;
+        _dispatcherProvider = dispatcherProvider;
     }
 
     /// <summary>
-    /// 새로운 메시지를 표시합니다. 진행 중인 다른 알림이 있다면 즉시 교체합니다.
-    /// (Fire-and-forget: 호출자는 애니메이션 완료를 기다리지 않음)
+    /// Shows a timed snackbar. Fire-and-forget by design.
     /// </summary>
     public async void Show(string message, SnackbarType type = SnackbarType.Info, int durationMs = 3000)
     {
+        Dispatcher? dispatcher = GetActiveDispatcher();
+        if (dispatcher == null || !TryStartTimedSession(out long sessionId, out CancellationToken cts))
+        {
+            return;
+        }
+
         try
         {
-            // 1. 새로운 세션 시작 및 이전 작업 취소
-            long sessionId = Interlocked.Increment(ref _currentSessionId);
-            _sessionCts?.Cancel();
-            _sessionCts = new CancellationTokenSource();
-            var cts = _sessionCts.Token;
-
-            // 2. UI 상태를 원자적으로(Atomically) 변경
-            // await await: DispatcherOperation<Task>를 unwrap하여 내부 람다의 예외 전파 보장
-            await await Application.Current.Dispatcher.InvokeAsync(async () =>
+            await await dispatcher.InvokeAsync(async () =>
             {
+                if (!IsSessionActive(sessionId) || IsDispatcherUnavailable(dispatcher))
+                {
+                    return;
+                }
+
                 if (_viewModel.IsVisible)
                 {
-                    // 부드러운 교체를 위해 아주 짧은 지연 후 데이터 갱신
                     _viewModel.IsAnimating = false;
                     await Task.Delay(AnimationGap);
+                }
+
+                if (!IsSessionActive(sessionId) || IsDispatcherUnavailable(dispatcher))
+                {
+                    return;
                 }
 
                 _viewModel.Message = message;
@@ -59,28 +78,36 @@ public class SnackbarService : ISnackbarService
                 _viewModel.IsAnimating = true;
             });
 
-            // 3. 지정된 시간 동안 대기 (새 알림이 오면 여기서 취소됨)
             await Task.Delay(durationMs, cts);
 
-            // 4. 대기 후 내가 여전히 최신 알림인지 확인하고 퇴장
-            if (Interlocked.Read(ref _currentSessionId) == sessionId)
+            if (IsSessionActive(sessionId) && !IsDispatcherUnavailable(dispatcher))
             {
-                // await await 적용: 내부 람다 예외 전파 보장
-                await await Application.Current.Dispatcher.InvokeAsync(async () =>
+                await await dispatcher.InvokeAsync(async () =>
                 {
-                    // 마지막 확인 (Dispatcher 큐 진입 시간차 고려)
-                    if (Interlocked.Read(ref _currentSessionId) == sessionId)
+                    if (!IsSessionActive(sessionId) || IsDispatcherUnavailable(dispatcher))
                     {
-                        _viewModel.IsAnimating = false;
-                        await Task.Delay(400); // 퇴장 애니메이션 대기
+                        return;
+                    }
 
-                        if (Interlocked.Read(ref _currentSessionId) == sessionId)
-                            _viewModel.IsVisible = false;
+                    _viewModel.IsAnimating = false;
+                    await Task.Delay(400);
+
+                    if (IsSessionActive(sessionId) && !IsDispatcherUnavailable(dispatcher))
+                    {
+                        _viewModel.IsVisible = false;
                     }
                 });
             }
         }
-        catch (OperationCanceledException) { /* 신규 알림에 밀려남 */ }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (ObjectDisposedException) when (cts.IsCancellationRequested || IsExpectedLifecycleException(dispatcher))
+        {
+        }
+        catch (InvalidOperationException) when (IsExpectedLifecycleException(dispatcher))
+        {
+        }
         catch (Exception ex)
         {
             _logger.LogError(ex, _languageService.GetString("Log_Snackbar_ShowError"));
@@ -88,24 +115,39 @@ public class SnackbarService : ISnackbarService
     }
 
     /// <summary>
-    /// 진행률 표시 모드를 시작합니다.
+    /// Shows a persistent progress snackbar. Fire-and-forget by design.
     /// </summary>
     public async void ShowProgress(string message)
     {
+        Dispatcher? dispatcher = GetActiveDispatcher();
+        if (dispatcher == null || !TryStartProgressSession())
+        {
+            return;
+        }
+
         try
         {
-            // 세션을 갱신하여 이전의 모든 비동기 업데이트 무효화
-            Interlocked.Increment(ref _currentSessionId);
-            _sessionCts?.Cancel();
-            _sessionCts = null; // 진행률은 명시적 종료까지 계속 유지됨
-
-            await Application.Current.Dispatcher.InvokeAsync(() =>
+            await dispatcher.InvokeAsync(() =>
             {
+                if (_disposed || IsDispatcherUnavailable(dispatcher))
+                {
+                    return;
+                }
+
                 _viewModel.Message = message;
                 _viewModel.Type = SnackbarType.Info;
                 _viewModel.IsVisible = true;
                 _viewModel.IsAnimating = true;
             });
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (ObjectDisposedException) when (IsExpectedLifecycleException(dispatcher))
+        {
+        }
+        catch (InvalidOperationException) when (IsExpectedLifecycleException(dispatcher))
+        {
         }
         catch (Exception ex)
         {
@@ -114,20 +156,141 @@ public class SnackbarService : ISnackbarService
     }
 
     /// <summary>
-    /// 현재 세션이 유지되고 있을 때만 메시지를 업데이트합니다.
+    /// Updates the active progress snackbar if the current session is still valid.
     /// </summary>
     public void UpdateProgress(string message)
     {
-        // 호출 시점의 ID 캡처
+        if (_disposed)
+        {
+            return;
+        }
+
+        Dispatcher? dispatcher = GetActiveDispatcher();
+        if (dispatcher == null)
+        {
+            return;
+        }
+
         long capturedId = Interlocked.Read(ref _currentSessionId);
 
-        // Dispatcher가 바빠서 늦게 실행되더라도, ID를 비교하여 과거 유령 데이터면 무시함
-        Application.Current?.Dispatcher?.BeginInvoke(() =>
+        try
         {
-            if (Interlocked.Read(ref _currentSessionId) == capturedId && _viewModel.IsVisible)
+            dispatcher.BeginInvoke(() =>
             {
-                _viewModel.Message = message;
+                if (IsSessionActive(capturedId) && _viewModel.IsVisible)
+                {
+                    _viewModel.Message = message;
+                }
+            });
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (ObjectDisposedException) when (IsExpectedLifecycleException(dispatcher))
+        {
+        }
+        catch (InvalidOperationException) when (IsExpectedLifecycleException(dispatcher))
+        {
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, _languageService.GetString("Log_Snackbar_ShowProgressError"));
+        }
+    }
+
+    public void Dispose()
+    {
+        lock (_sessionLock)
+        {
+            if (_disposed)
+            {
+                return;
             }
-        });
+
+            _disposed = true;
+            Interlocked.Increment(ref _currentSessionId);
+            CancelAndDispose(_sessionCts);
+            _sessionCts = null;
+        }
+    }
+
+    private bool TryStartTimedSession(out long sessionId, out CancellationToken token)
+    {
+        var nextCts = new CancellationTokenSource();
+
+        lock (_sessionLock)
+        {
+            if (_disposed)
+            {
+                nextCts.Dispose();
+                sessionId = 0;
+                token = CancellationToken.None;
+                return false;
+            }
+
+            sessionId = Interlocked.Increment(ref _currentSessionId);
+            CancelAndDispose(_sessionCts);
+            _sessionCts = nextCts;
+            token = nextCts.Token;
+            return true;
+        }
+    }
+
+    private bool TryStartProgressSession()
+    {
+        lock (_sessionLock)
+        {
+            if (_disposed)
+            {
+                return false;
+            }
+
+            Interlocked.Increment(ref _currentSessionId);
+            CancelAndDispose(_sessionCts);
+            _sessionCts = null;
+            return true;
+        }
+    }
+
+    private Dispatcher? GetActiveDispatcher()
+    {
+        try
+        {
+            Dispatcher? dispatcher = _dispatcherProvider();
+            return dispatcher == null || IsDispatcherUnavailable(dispatcher) ? null : dispatcher;
+        }
+        catch (InvalidOperationException)
+        {
+            return null;
+        }
+    }
+
+    private bool IsSessionActive(long sessionId) =>
+        !_disposed && Interlocked.Read(ref _currentSessionId) == sessionId;
+
+    private bool IsExpectedLifecycleException(Dispatcher dispatcher) =>
+        _disposed || IsDispatcherUnavailable(dispatcher);
+
+    private static bool IsDispatcherUnavailable(Dispatcher dispatcher) =>
+        dispatcher.HasShutdownStarted || dispatcher.HasShutdownFinished;
+
+    private static void CancelAndDispose(CancellationTokenSource? cts)
+    {
+        if (cts == null)
+        {
+            return;
+        }
+
+        try
+        {
+            cts.Cancel();
+        }
+        catch (ObjectDisposedException)
+        {
+        }
+        finally
+        {
+            cts.Dispose();
+        }
     }
 }
