@@ -60,7 +60,7 @@
                 IsMismatchFilterActive="{Binding DataContext.SortFilter.ShowMismatchOnly, RelativeSource={RelativeSource AncestorType=Window}}"
                 MoveItemsCommand="{Binding DataContext.FileList.MoveItemsCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                 SortByColumnCommand="{Binding DataContext.SortFilter.SortByColumnCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                Visibility="{Binding CurrentStatus, Converter={StaticResource MultiStatusVisibilityConverter}, ConverterParameter=!Converting}" />
+                Visibility="{Binding DataContext.CurrentStatus, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource MultiStatusVisibilityConverter}, ConverterParameter=!Converting}" />
 
             <!-- Window : Converting_List_Section -->
             <lists:ConvertingListControl
@@ -70,7 +70,7 @@
                 BorderBrush="{DynamicResource AppBorderDefaultBrush}"
                 BorderThickness="1"
                 DataContext="{Binding Conversion}"
-                Visibility="{Binding CurrentStatus, Converter={StaticResource MultiStatusVisibilityConverter}, ConverterParameter=Converting}" />
+                Visibility="{Binding DataContext.CurrentStatus, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource MultiStatusVisibilityConverter}, ConverterParameter=Converting}" />
         </Grid>
 
         <!-- Window : Snackbar_Overlay -->

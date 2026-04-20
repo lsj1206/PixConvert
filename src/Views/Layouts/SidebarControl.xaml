@@ -6,6 +6,7 @@
              xmlns:services="clr-namespace:PixConvert.Services"
              xmlns:ui="http://schemas.modernwpf.com/2019"
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             Width="180"
              mc:Ignorable="d">
 
     <!-- 사이드바 버튼 스타일 정의 -->
@@ -23,21 +24,6 @@
             <Setter Property="BorderBrush" Value="{DynamicResource AppBorderSubtleBrush}" />
         </Style>
     </UserControl.Resources>
-
-    <UserControl.Style>
-        <Style TargetType="UserControl">
-            <!-- Sidebar : Default_Width -->
-            <Setter Property="Width" Value="180" />
-            <Style.Triggers>
-                <!-- Sidebar : Width_Expansion_Trigger -->
-                <DataTrigger
-                    Binding="{Binding CurrentStatus}"
-                    Value="">
-                    <Setter Property="Width" Value="360" />
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
-    </UserControl.Style>
 
     <!-- Sidebar : Main_Layout -->
     <ScrollViewer
@@ -240,7 +226,7 @@
                                                     Foreground="{DynamicResource AppDangerBrush}">
                                                     <TextBlock.Style>
                                                         <Style TargetType="TextBlock">
-                                                            <Setter Property="Visibility" Value="Visible" />
+                                                            <Setter Property="Visibility" Value="Collapsed" />
                                                             <Style.Triggers>
                                                                 <DataTrigger
                                                                     Binding="{Binding Conversion.HasFailures}"
