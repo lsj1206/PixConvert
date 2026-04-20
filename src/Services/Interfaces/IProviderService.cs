@@ -21,6 +21,6 @@ public interface IProviderService
     /// <param name="settings">변환 설정</param>
     /// <param name="session">병렬 덮어쓰기 충돌 방지용 경로 예약 세션</param>
     /// <param name="token">작업 취소 토큰</param>
-    /// <returns>변환 작업 Task</returns>
-    Task ConvertAsync(FileItem file, ConvertSettings settings, ConversionSession session, CancellationToken token);
+    /// <returns>변환 결과 정보</returns>
+    Task<ConversionResult> ConvertAsync(FileItem file, ConvertSettings settings, ConversionSession session, CancellationToken token);
 }

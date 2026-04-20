@@ -85,10 +85,10 @@ public class ConversionMatrixTests : IDisposable
         var provider = _selector.GetProvider(file, settings);
         Assert.Equal(ExpectedStaticProviderName(sourceFormat, targetFormat), provider.Name);
 
-        await provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
+        var result = await provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
 
-        AssertSuccessfulOutput(file, targetFormat);
-        AssertImageCanReopen(file.OutputPath!);
+        AssertSuccessfulOutput(result, targetFormat);
+        AssertImageCanReopen(result.OutputPath!);
     }
 
     [Theory]
@@ -103,11 +103,11 @@ public class ConversionMatrixTests : IDisposable
         var provider = _selector.GetProvider(file, settings);
         Assert.Equal("NetVips", provider.Name);
 
-        await provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
+        var result = await provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
 
-        AssertSuccessfulOutput(file, targetFormat);
-        AssertImageCanReopen(file.OutputPath!);
-        Assert.True(GetLoadedFrameCount(file.OutputPath!) >= 2, $"{sourceFormat} -> {targetFormat} collapsed to a single frame.");
+        AssertSuccessfulOutput(result, targetFormat);
+        AssertImageCanReopen(result.OutputPath!);
+        Assert.True(GetLoadedFrameCount(result.OutputPath!) >= 2, $"{sourceFormat} -> {targetFormat} collapsed to a single frame.");
     }
 
     public void Dispose()
@@ -236,14 +236,13 @@ public class ConversionMatrixTests : IDisposable
             ? "NetVips"
             : "SkiaSharp";
 
-    private static void AssertSuccessfulOutput(FileItem file, string targetFormat)
+    private static void AssertSuccessfulOutput(ConversionResult result, string targetFormat)
     {
-        Assert.Equal(FileConvertStatus.Success, file.Status);
-        Assert.Equal(100, file.Progress);
-        Assert.False(string.IsNullOrWhiteSpace(file.OutputPath));
-        Assert.True(File.Exists(file.OutputPath), $"Missing output file: {file.OutputPath}");
-        Assert.True(new FileInfo(file.OutputPath!).Length > 0, $"Output file is empty: {file.OutputPath}");
-        Assert.Equal("." + GetExtension(targetFormat), Path.GetExtension(file.OutputPath));
+        Assert.Equal(FileConvertStatus.Success, result.Status);
+        Assert.False(string.IsNullOrWhiteSpace(result.OutputPath));
+        Assert.True(File.Exists(result.OutputPath), $"Missing output file: {result.OutputPath}");
+        Assert.True(result.OutputSize > 0, $"Output file is empty: {result.OutputPath}");
+        Assert.Equal("." + GetExtension(targetFormat), Path.GetExtension(result.OutputPath));
     }
 
     private static void AssertImageCanReopen(string outputPath)

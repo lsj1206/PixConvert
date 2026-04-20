@@ -26,7 +26,7 @@ public class SkiaSharpProvider : IProviderService, IDisposable
         _logger = logger;
     }
 
-    public async Task ConvertAsync(FileItem file, ConvertSettings settings, ConversionSession session, CancellationToken token)
+    public async Task<ConversionResult> ConvertAsync(FileItem file, ConvertSettings settings, ConversionSession session, CancellationToken token)
     {
         token.ThrowIfCancellationRequested();
 
@@ -40,8 +40,7 @@ public class SkiaSharpProvider : IProviderService, IDisposable
 
         if (outputPath is null)
         {
-            file.Status = FileConvertStatus.Skipped;
-            return;
+            return new ConversionResult(FileConvertStatus.Skipped);
         }
 
         string outputDir = Path.GetDirectoryName(outputPath)!;
@@ -55,18 +54,10 @@ public class SkiaSharpProvider : IProviderService, IDisposable
         {
             token.ThrowIfCancellationRequested();
 
-            try
-            {
-                await using var inputStream = new FileStream(
-                    file.Path, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, useAsync: true);
-                srcBitmap = SKBitmap.Decode(inputStream)
-                    ?? throw new InvalidOperationException($"SKBitmap.Decode returned null: {file.Path}");
-            }
-            catch (Exception)
-            {
-                file.Status = FileConvertStatus.Error;
-                throw;
-            }
+            await using var inputStream = new FileStream(
+                file.Path, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, useAsync: true);
+            srcBitmap = SKBitmap.Decode(inputStream)
+                ?? throw new InvalidOperationException($"SKBitmap.Decode returned null: {file.Path}");
 
             token.ThrowIfCancellationRequested();
 
@@ -88,35 +79,24 @@ public class SkiaSharpProvider : IProviderService, IDisposable
                 bitmapToEncode = srcBitmap;
             }
 
-            try
+            if (targetFormat.Equals("BMP", StringComparison.OrdinalIgnoreCase))
             {
-                if (targetFormat.Equals("BMP", StringComparison.OrdinalIgnoreCase))
-                {
-                    await BmpEncoder.SaveAsync(bitmapToEncode, outputPath);
-                }
-                else
-                {
-                    using var data = EncodeBitmap(bitmapToEncode, targetFormat, settings, file.IsAnimation);
-
-                    await using var outputStream = new FileStream(
-                        outputPath, FileMode.Create, FileAccess.Write, FileShare.None, 4096, useAsync: true);
-                    data.SaveTo(outputStream);
-                }
-
-                if (System.IO.File.Exists(outputPath))
-                {
-                    file.OutputSize = new System.IO.FileInfo(outputPath).Length;
-                }
-
-                file.Progress = 100;
-                file.OutputPath = outputPath;
-                file.Status = FileConvertStatus.Success;
+                await BmpEncoder.SaveAsync(bitmapToEncode, outputPath);
             }
-            catch (Exception)
+            else
             {
-                file.Status = FileConvertStatus.Error;
-                throw;
+                using var data = EncodeBitmap(bitmapToEncode, targetFormat, settings, file.IsAnimation);
+
+                await using var outputStream = new FileStream(
+                    outputPath, FileMode.Create, FileAccess.Write, FileShare.None, 4096, useAsync: true);
+                data.SaveTo(outputStream);
             }
+
+            long outputSize = System.IO.File.Exists(outputPath)
+                ? new System.IO.FileInfo(outputPath).Length
+                : 0;
+
+            return new ConversionResult(FileConvertStatus.Success, outputPath, outputSize);
         }
         finally
         {

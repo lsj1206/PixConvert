@@ -26,11 +26,12 @@ public partial class ConversionViewModel : ViewModelBase
     private readonly ISnackbarService _snackbarService;
     private readonly IPresetService _presetService;
     private readonly FileListViewModel _fileList;
-    private readonly EngineSelector _engineSelector;
+    private readonly IEngineSelector _engineSelector;
     private readonly Func<ConvertSettingViewModel> _convertSettingVmFactory;
     private CancellationTokenSource? _convertCts;
     private readonly Stopwatch _stopwatch = new();
     private readonly DispatcherTimer _timer;
+    private readonly Dispatcher _uiDispatcher;
 
     private static bool CanConvertFile(FileItem item, ConvertSettings settings)
     {
@@ -54,6 +55,8 @@ public partial class ConversionViewModel : ViewModelBase
         public int ProcessedCount;
         /// <summary>Interlocked 연산에 사용되는 실패 수 카운터</summary>
         public int FailCount;
+        /// <summary>UI에 마지막으로 반영된 처리 완료 수</summary>
+        public int LastAppliedProcessed;
         /// <summary>Interlocked 연산에 사용되는 마지막 진행 알림 시각 (Ticks)</summary>
         public long LastUpdateTicks;
 
@@ -110,7 +113,7 @@ public partial class ConversionViewModel : ViewModelBase
         ISnackbarService snackbarService,
         IPresetService presetService,
         FileListViewModel fileList,
-        EngineSelector engineSelector,
+        IEngineSelector engineSelector,
         Func<ConvertSettingViewModel> convertSettingVmFactory)
         : base(languageService, logger)
     {
@@ -120,6 +123,7 @@ public partial class ConversionViewModel : ViewModelBase
         _fileList = fileList;
         _engineSelector = engineSelector;
         _convertSettingVmFactory = convertSettingVmFactory;
+        _uiDispatcher = Dispatcher.CurrentDispatcher;
 
         _timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(200) };
         _timer.Tick += (s, e) =>
@@ -243,7 +247,7 @@ public partial class ConversionViewModel : ViewModelBase
         }
         catch (OperationCanceledException)
         {
-            RestorePendingFiles();
+            await RunOnUiAsync(RestorePendingFiles);
             _snackbarService.Show(GetString("Msg_Convert_Cancelled"), SnackbarType.Info);
         }
         finally
@@ -332,40 +336,86 @@ public partial class ConversionViewModel : ViewModelBase
         FileItem item, ConvertSettings settings, ConversionSession session,
         ConversionContext context, CancellationToken token)
     {
-        item.Status = FileConvertStatus.Processing;
-        item.Progress = 0;
-
         var provider = _engineSelector.GetProvider(item, settings);
-        item.ProcessingEngine = provider.Name;
-        CurrentFileName = Path.GetFileName(item.Path);
 
-        // 진행 상황 사전 알림 (너무 잦은 업데이트 방지)
-        long currentTicks = DateTime.UtcNow.Ticks;
-        if (new TimeSpan(currentTicks - Interlocked.Read(ref context.LastUpdateTicks)).TotalMilliseconds > 100)
+        await RunOnUiAsync(() =>
         {
-            Interlocked.Exchange(ref context.LastUpdateTicks, currentTicks);
-            SendProgressMessage(item, context.ProcessedCount, context.TotalCount, context.FailCount, context.PresetName);
-        }
+            item.Status = FileConvertStatus.Processing;
+            item.Progress = 0;
+            item.ProcessingEngine = provider.Name;
+            CurrentFileName = Path.GetFileName(item.Path);
+
+            // 진행 상황 사전 알림 (너무 잦은 업데이트 방지)
+            long currentTicks = DateTime.UtcNow.Ticks;
+            if (new TimeSpan(currentTicks - Interlocked.Read(ref context.LastUpdateTicks)).TotalMilliseconds > 100)
+            {
+                Interlocked.Exchange(ref context.LastUpdateTicks, currentTicks);
+                SendProgressMessage(item, context.ProcessedCount, context.TotalCount, context.FailCount, context.PresetName);
+            }
+        });
 
         try
         {
-            await provider.ConvertAsync(item, settings, session, token);
+            var result = await provider.ConvertAsync(item, settings, session, token);
+            await ApplyConversionResultAsync(item, result);
         }
         catch (OperationCanceledException)
         {
-            item.Status = FileConvertStatus.Pending;
+            await RunOnUiAsync(() => item.Status = FileConvertStatus.Pending);
             throw;
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, GetString("Log_Conversion_FileError"), item.Path);
             Interlocked.Increment(ref context.FailCount);
+            await RunOnUiAsync(() => item.Status = FileConvertStatus.Error);
         }
         finally
         {
             int currentProcessed = Interlocked.Increment(ref context.ProcessedCount);
             int currentFail = Interlocked.CompareExchange(ref context.FailCount, 0, 0);
-            int newPercent = (int)((double)currentProcessed / context.TotalCount * 100.0);
+            await ApplyProgressUpdateAsync(item, context, currentProcessed, currentFail);
+        }
+    }
+
+    private Task ApplyConversionResultAsync(FileItem item, ConversionResult result)
+    {
+        return RunOnUiAsync(() =>
+        {
+            switch (result.Status)
+            {
+                case FileConvertStatus.Success:
+                    item.OutputSize = result.OutputSize;
+                    item.OutputPath = result.OutputPath;
+                    item.Progress = 100;
+                    item.Status = FileConvertStatus.Success;
+                    break;
+
+                case FileConvertStatus.Skipped:
+                    item.Status = FileConvertStatus.Skipped;
+                    break;
+
+                default:
+                    item.Status = result.Status;
+                    break;
+            }
+        });
+    }
+
+    private Task ApplyProgressUpdateAsync(
+        FileItem item,
+        ConversionContext context,
+        int currentProcessed,
+        int currentFail)
+    {
+        int newPercent = (int)((double)currentProcessed / context.TotalCount * 100.0);
+
+        return RunOnUiAsync(() =>
+        {
+            if (currentProcessed < context.LastAppliedProcessed)
+                return;
+
+            context.LastAppliedProcessed = currentProcessed;
 
             ProcessedCount = currentProcessed;
             TotalConvertCount = context.TotalCount;
@@ -378,7 +428,18 @@ public partial class ConversionViewModel : ViewModelBase
                 ConvertProgressPercent = newPercent;
                 SendProgressMessage(item, currentProcessed, context.TotalCount, currentFail, context.PresetName);
             }
+        });
+    }
+
+    private Task RunOnUiAsync(Action action)
+    {
+        if (_uiDispatcher.CheckAccess())
+        {
+            action();
+            return Task.CompletedTask;
         }
+
+        return _uiDispatcher.InvokeAsync(action).Task;
     }
 
     /// <summary>

@@ -5,6 +5,10 @@ using PixConvert.Services.Interfaces;
 using PixConvert.Services.Providers;
 using PixConvert.ViewModels;
 using Moq;
+using System.Collections.Concurrent;
+using System.ComponentModel;
+using System.Threading;
+using System.Windows.Threading;
 using Xunit;
 
 namespace PixConvert.Tests;
@@ -99,6 +103,102 @@ public class ConversionViewModelTests
             service => service.ShowConvertSettingDialogAsync(It.IsAny<ConvertSettingViewModel>()),
             Times.Once);
         _mockPreset.Verify(service => service.SaveAsync(), Times.Once);
+    }
+
+    [Fact]
+    public async Task ConvertFilesCommand_WhenParallelProvidersComplete_ShouldUpdateBindingsOnUiThread()
+    {
+        await RunOnStaDispatcherAsync(async () =>
+        {
+            int uiThreadId = Environment.CurrentManagedThreadId;
+            var files = CreateFiles(6);
+            var provider = new ScriptedProvider(async (file, token) =>
+            {
+                int delay = (7 - int.Parse(file.Name.Replace("file", string.Empty))) * 10;
+                await Task.Delay(delay, token);
+                return new ConversionResult(FileConvertStatus.Success, file.Path + ".out", 10);
+            });
+            var vm = CreateConversionViewModel(files, provider);
+            var violations = TrackBindingThreadViolations(vm, files, uiThreadId, out var progressValues);
+
+            await vm.ConvertFilesCommand.ExecuteAsync(null).WaitAsync(TimeSpan.FromSeconds(10));
+
+            Assert.Empty(violations);
+            Assert.All(files, file =>
+            {
+                Assert.Equal(FileConvertStatus.Success, file.Status);
+                Assert.Equal(100, file.Progress);
+                Assert.False(string.IsNullOrWhiteSpace(file.OutputPath));
+            });
+            Assert.Equal(files.Count, vm.ProcessedCount);
+            Assert.Equal(files.Count, vm.TotalConvertCount);
+            Assert.Equal(0, vm.FailCount);
+            Assert.Equal(100, vm.ConvertProgressPercent);
+            Assert.True(vm.IsConversionCompleted);
+            AssertProgressDoesNotRegress(progressValues);
+        });
+    }
+
+    [Fact]
+    public async Task ConvertFilesCommand_WhenProviderFails_ShouldSetErrorAndFailCountOnUiThread()
+    {
+        await RunOnStaDispatcherAsync(async () =>
+        {
+            int uiThreadId = Environment.CurrentManagedThreadId;
+            var files = CreateFiles(3);
+            var provider = new ScriptedProvider(async (file, token) =>
+            {
+                await Task.Delay(10, token);
+                if (file.Name == "file2")
+                    throw new InvalidOperationException("fake failure");
+
+                return new ConversionResult(FileConvertStatus.Success, file.Path + ".out", 10);
+            });
+            var vm = CreateConversionViewModel(files, provider);
+            var violations = TrackBindingThreadViolations(vm, files, uiThreadId, out _);
+
+            await vm.ConvertFilesCommand.ExecuteAsync(null).WaitAsync(TimeSpan.FromSeconds(10));
+
+            Assert.Empty(violations);
+            Assert.Equal(FileConvertStatus.Error, files.Single(file => file.Name == "file2").Status);
+            Assert.Equal(2, files.Count(file => file.Status == FileConvertStatus.Success));
+            Assert.Equal(1, vm.FailCount);
+            Assert.Equal(files.Count, vm.ProcessedCount);
+            Assert.Equal(100, vm.ConvertProgressPercent);
+        });
+    }
+
+    [Fact]
+    public async Task ConvertFilesCommand_WhenCancelled_ShouldRestorePendingOnUiThread()
+    {
+        await RunOnStaDispatcherAsync(async () =>
+        {
+            int uiThreadId = Environment.CurrentManagedThreadId;
+            var files = CreateFiles(1);
+            var started = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+            var provider = new ScriptedProvider(async (_, token) =>
+            {
+                started.TrySetResult();
+                await Task.Delay(Timeout.InfiniteTimeSpan, token);
+                return new ConversionResult(FileConvertStatus.Success, "unused", 1);
+            });
+            var vm = CreateConversionViewModel(files, provider, cancelConfirmed: true);
+            var violations = TrackBindingThreadViolations(vm, files, uiThreadId, out _);
+
+            var convertTask = vm.ConvertFilesCommand.ExecuteAsync(null);
+            await started.Task.WaitAsync(TimeSpan.FromSeconds(5));
+
+            vm.CurrentStatus = AppStatus.Converting;
+            await vm.CancelConvertCommand.ExecuteAsync(null);
+            await convertTask.WaitAsync(TimeSpan.FromSeconds(10));
+
+            Assert.Empty(violations);
+            Assert.Equal(FileConvertStatus.Pending, files[0].Status);
+            Assert.Equal(0, vm.ProcessedCount);
+            Assert.Equal(0, vm.TotalConvertCount);
+            Assert.Equal(0, vm.ConvertProgressPercent);
+            Assert.False(vm.IsConversionCompleted);
+        });
     }
 
     [Fact]
@@ -222,6 +322,189 @@ public class ConversionViewModelTests
     }
 
     private static string Key(string key) => key;
+
+    private static async Task RunOnStaDispatcherAsync(Func<Task> action)
+    {
+        var completion = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        var thread = new Thread(() =>
+        {
+            var dispatcher = Dispatcher.CurrentDispatcher;
+            SynchronizationContext.SetSynchronizationContext(new DispatcherSynchronizationContext(dispatcher));
+
+            dispatcher.InvokeAsync(async () =>
+            {
+                try
+                {
+                    await action();
+                    completion.SetResult();
+                }
+                catch (Exception ex)
+                {
+                    completion.SetException(ex);
+                }
+                finally
+                {
+                    dispatcher.BeginInvokeShutdown(DispatcherPriority.Background);
+                }
+            });
+
+            Dispatcher.Run();
+        })
+        {
+            IsBackground = true
+        };
+
+        thread.SetApartmentState(ApartmentState.STA);
+        thread.Start();
+
+        await completion.Task.WaitAsync(TimeSpan.FromSeconds(20));
+        Assert.True(thread.Join(TimeSpan.FromSeconds(5)));
+    }
+
+    private static List<FileItem> CreateFiles(int count)
+    {
+        return Enumerable.Range(1, count)
+            .Select(i => new FileItem
+            {
+                Path = $@"C:\input\file{i}.png",
+                FileSignature = "PNG",
+                IsUnsupported = false
+            })
+            .ToList();
+    }
+
+    private static ConversionViewModel CreateConversionViewModel(
+        IReadOnlyList<FileItem> files,
+        IProviderService provider,
+        bool cancelConfirmed = false)
+    {
+        var language = new Mock<ILanguageService>();
+        var logger = new Mock<ILogger<ConversionViewModel>>();
+        var dialog = new Mock<IDialogService>();
+        var snackbar = new Mock<ISnackbarService>();
+        var presetService = new Mock<IPresetService>();
+        var engineSelector = new FakeEngineSelector(provider);
+
+        language.Setup(service => service.GetString(It.IsAny<string>())).Returns<string>(key => key);
+        dialog
+            .Setup(service => service.ShowConfirmationAsync(It.IsAny<string>(), "Dlg_Title_Convert", It.IsAny<string?>()))
+            .ReturnsAsync(true);
+        dialog
+            .Setup(service => service.ShowConfirmationAsync(It.IsAny<string>(), "Dlg_Title_CancelConvert", It.IsAny<string?>()))
+            .ReturnsAsync(cancelConfirmed);
+
+        var settings = new ConvertSettings
+        {
+            StandardTargetFormat = "PNG",
+            CpuUsage = CpuUsageOption.Max
+        };
+        var preset = new ConvertPreset { Name = "Default", Settings = settings };
+        var config = new PresetConfig();
+        config.Presets.Add(preset);
+        presetService.Setup(service => service.Config).Returns(config);
+        presetService.Setup(service => service.ActivePreset).Returns(preset);
+        presetService.Setup(service => service.SaveAsync()).ReturnsAsync(true);
+        string errorKey = string.Empty;
+        presetService
+            .Setup(service => service.ValidPresetData(It.IsAny<ConvertSettings>(), out errorKey))
+            .Returns(true);
+
+        var fileList = new FileListViewModel(language.Object, new Mock<ILogger<FileListViewModel>>().Object);
+        foreach (var file in files)
+        {
+            fileList.AddItem(file);
+        }
+
+        return new ConversionViewModel(
+            logger.Object,
+            language.Object,
+            dialog.Object,
+            snackbar.Object,
+            presetService.Object,
+            fileList,
+            engineSelector,
+            () => new ConvertSettingViewModel(
+                language.Object,
+                new Mock<ILogger<ConvertSettingViewModel>>().Object,
+                presetService.Object,
+                new Mock<IPathPickerService>().Object));
+    }
+
+    private static ConcurrentQueue<string> TrackBindingThreadViolations(
+        ConversionViewModel vm,
+        IEnumerable<FileItem> files,
+        int uiThreadId,
+        out ConcurrentQueue<int> progressValues)
+    {
+        var violations = new ConcurrentQueue<string>();
+        progressValues = new ConcurrentQueue<int>();
+        var capturedProgressValues = progressValues;
+
+        void Track(object? sender, PropertyChangedEventArgs args)
+        {
+            if (Environment.CurrentManagedThreadId != uiThreadId)
+            {
+                violations.Enqueue($"{sender?.GetType().Name}.{args.PropertyName}");
+            }
+
+            if (ReferenceEquals(sender, vm) && args.PropertyName == nameof(ConversionViewModel.ConvertProgressPercent))
+            {
+                capturedProgressValues.Enqueue(vm.ConvertProgressPercent);
+            }
+        }
+
+        vm.PropertyChanged += Track;
+        foreach (var file in files)
+        {
+            file.PropertyChanged += Track;
+        }
+
+        return violations;
+    }
+
+    private static void AssertProgressDoesNotRegress(IEnumerable<int> progressValues)
+    {
+        int previous = 0;
+        foreach (int current in progressValues)
+        {
+            Assert.True(current >= previous, $"Progress regressed from {previous} to {current}.");
+            previous = current;
+        }
+    }
+
+    private sealed class FakeEngineSelector : IEngineSelector
+    {
+        private readonly IProviderService _provider;
+
+        public FakeEngineSelector(IProviderService provider)
+        {
+            _provider = provider;
+        }
+
+        public IProviderService GetProvider(FileItem file, ConvertSettings settings) => _provider;
+    }
+
+    private sealed class ScriptedProvider : IProviderService
+    {
+        private readonly Func<FileItem, CancellationToken, Task<ConversionResult>> _convert;
+
+        public ScriptedProvider(Func<FileItem, CancellationToken, Task<ConversionResult>> convert)
+        {
+            _convert = convert;
+        }
+
+        public string Name => "Fake";
+
+        public Task<ConversionResult> ConvertAsync(
+            FileItem file,
+            ConvertSettings settings,
+            ConversionSession session,
+            CancellationToken token)
+        {
+            return _convert(file, token);
+        }
+    }
 
     private ConvertSettingViewModel CreateConvertSettingViewModel(Mock<ILanguageService> language)
     {

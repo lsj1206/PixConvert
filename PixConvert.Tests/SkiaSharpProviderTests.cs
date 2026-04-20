@@ -70,11 +70,12 @@ public class SkiaSharpProviderTests : IDisposable
             OverwritePolicy = OverwritePolicy.Overwrite
         };
 
-        await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
+        string expectedName = format == "PNG" ? "input_1." + expectedExt : "input." + expectedExt;
+        string expectedPath = Path.Combine(_testDir, expectedName);
+        var result = await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
 
-        string expectedPath = Path.Combine(_testDir, "input." + expectedExt);
-        Assert.True(File.Exists(expectedPath));
-        Assert.Equal(FileConvertStatus.Success, file.Status);
+        AssertSuccessResult(result, expectedPath);
+        AssertProviderDidNotMutateFileItem(file);
     }
 
     [Fact]
@@ -92,9 +93,10 @@ public class SkiaSharpProviderTests : IDisposable
         string basePath = Path.Combine(_testDir, "input.jpg");
         File.WriteAllText(basePath, "existing");
 
-        await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
-
         string suffixedPath = Path.Combine(_testDir, "input_1.jpg");
+        var result = await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
+
+        AssertSuccessResult(result, suffixedPath);
         Assert.True(File.Exists(suffixedPath));
         Assert.True(File.Exists(basePath));
     }
@@ -115,10 +117,12 @@ public class SkiaSharpProviderTests : IDisposable
         File.WriteAllText(basePath, "existing");
         var lastWriteTime = File.GetLastWriteTime(basePath);
 
-        await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
+        var result = await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
 
         Assert.Equal(lastWriteTime, File.GetLastWriteTime(basePath));
-        Assert.Equal(FileConvertStatus.Skipped, file.Status);
+        Assert.Equal(FileConvertStatus.Skipped, result.Status);
+        Assert.Null(result.OutputPath);
+        AssertProviderDidNotMutateFileItem(file);
     }
 
     [Fact]
@@ -152,16 +156,15 @@ public class SkiaSharpProviderTests : IDisposable
         };
 
         using var session = new ConversionSession();
-        await Task.WhenAll(
+        var results = await Task.WhenAll(
             _provider.ConvertAsync(first, settings, session, CancellationToken.None),
             _provider.ConvertAsync(second, settings, session, CancellationToken.None));
 
         var outputPaths = new System.Collections.Generic.HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        outputPaths.Add(first.OutputPath!);
-        outputPaths.Add(second.OutputPath!);
+        outputPaths.Add(results[0].OutputPath!);
+        outputPaths.Add(results[1].OutputPath!);
 
-        Assert.Equal(FileConvertStatus.Success, first.Status);
-        Assert.Equal(FileConvertStatus.Success, second.Status);
+        Assert.All(results, result => Assert.Equal(FileConvertStatus.Success, result.Status));
         Assert.Equal(2, outputPaths.Count);
         Assert.Contains(baseOutput, outputPaths);
         Assert.Contains(suffixedOutput, outputPaths);
@@ -186,9 +189,10 @@ public class SkiaSharpProviderTests : IDisposable
             FolderMethod = SaveFolderMethod.NoFolder
         };
 
-        await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
-
         string outputPath = Path.Combine(_testDir, "input.jpg");
+        var result = await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
+        AssertSuccessResult(result, outputPath);
+
         using var stream = File.OpenRead(outputPath);
         using var bitmap = SKBitmap.Decode(stream);
 
@@ -210,9 +214,10 @@ public class SkiaSharpProviderTests : IDisposable
             FolderMethod = SaveFolderMethod.NoFolder
         };
 
-        await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
-
         string outputPath = Path.Combine(_testDir, "input.webp");
+        var result = await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
+        AssertSuccessResult(result, outputPath);
+
         using var stream = File.OpenRead(outputPath);
         using var bitmap = SKBitmap.Decode(stream);
 
@@ -233,11 +238,10 @@ public class SkiaSharpProviderTests : IDisposable
             FolderMethod = SaveFolderMethod.NoFolder
         };
 
-        await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
-
         string outputPath = Path.Combine(_testDir, "input.jpg");
-        Assert.True(File.Exists(outputPath));
-        Assert.Equal(FileConvertStatus.Success, file.Status);
+        var result = await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
+
+        AssertSuccessResult(result, outputPath);
     }
 
     [Fact]
@@ -253,11 +257,10 @@ public class SkiaSharpProviderTests : IDisposable
             FolderMethod = SaveFolderMethod.NoFolder
         };
 
-        await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
-
         string outputPath = Path.Combine(_testDir, "input.jpg");
-        Assert.True(File.Exists(outputPath));
-        Assert.Equal(FileConvertStatus.Success, file.Status);
+        var result = await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
+
+        AssertSuccessResult(result, outputPath);
     }
 
     [Fact]
@@ -273,11 +276,10 @@ public class SkiaSharpProviderTests : IDisposable
             OverwritePolicy = OverwritePolicy.Suffix
         };
 
-        await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
-
         string outputPath = Path.Combine(_testDir, "input_1.png");
-        Assert.True(File.Exists(outputPath));
-        Assert.Equal(FileConvertStatus.Success, file.Status);
+        var result = await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
+
+        AssertSuccessResult(result, outputPath);
     }
 
     [Fact]
@@ -304,7 +306,7 @@ public class SkiaSharpProviderTests : IDisposable
             await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None));
 
         Assert.Contains("SKBitmap.Decode returned null", ex.Message);
-        Assert.Equal(FileConvertStatus.Error, file.Status);
+        AssertProviderDidNotMutateFileItem(file);
     }
 
     [Fact]
@@ -319,9 +321,10 @@ public class SkiaSharpProviderTests : IDisposable
             FolderMethod = SaveFolderMethod.NoFolder
         };
 
-        await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
-
         string outputPath = Path.Combine(_testDir, "input.jpg");
+        var result = await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
+        AssertSuccessResult(result, outputPath);
+
         using var stream = File.OpenRead(outputPath);
         using var bitmap = SKBitmap.Decode(stream);
 
@@ -344,15 +347,13 @@ public class SkiaSharpProviderTests : IDisposable
             OverwritePolicy = OverwritePolicy.Overwrite
         };
 
-        await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
-
         string dateStr = DateTime.Today.ToString("yyyy-MM-dd");
         string expectedDir = Path.Combine(_testDir, $"PixConvert_{dateStr}");
         string expectedPath = Path.Combine(expectedDir, "input.jpg");
+        var result = await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
 
         Assert.True(Directory.Exists(expectedDir));
-        Assert.True(File.Exists(expectedPath));
-        Assert.Equal(FileConvertStatus.Success, file.Status);
+        AssertSuccessResult(result, expectedPath);
     }
 
     [Fact]
@@ -367,10 +368,10 @@ public class SkiaSharpProviderTests : IDisposable
             FolderMethod = SaveFolderMethod.NoFolder
         };
 
-        await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
-
         string outputPath = Path.Combine(_testDir, "input.bmp");
-        Assert.True(File.Exists(outputPath));
+        var result = await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
+        AssertSuccessResult(result, outputPath);
+
         using var stream = File.OpenRead(outputPath);
         using var bitmap = SKBitmap.Decode(stream);
 
@@ -379,5 +380,21 @@ public class SkiaSharpProviderTests : IDisposable
         Assert.Equal(0, pixel.Green);
         Assert.Equal(255, pixel.Blue);
         Assert.Equal(255, pixel.Alpha);
+    }
+
+    private static void AssertSuccessResult(ConversionResult result, string expectedPath)
+    {
+        Assert.Equal(FileConvertStatus.Success, result.Status);
+        Assert.Equal(expectedPath, result.OutputPath);
+        Assert.True(result.OutputSize > 0);
+        Assert.True(File.Exists(result.OutputPath), $"Missing output file: {result.OutputPath}");
+    }
+
+    private static void AssertProviderDidNotMutateFileItem(FileItem file)
+    {
+        Assert.Equal(FileConvertStatus.Pending, file.Status);
+        Assert.Equal(0, file.Progress);
+        Assert.Null(file.OutputPath);
+        Assert.Equal(0, file.OutputSize);
     }
 }

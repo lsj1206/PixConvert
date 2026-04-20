@@ -81,11 +81,11 @@ public class NetVipsProviderTests : IDisposable
             FolderMethod = SaveFolderMethod.NoFolder
         };
 
-        await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
-
         string expectedPath = Path.Combine(_testDir, "input.avif");
-        Assert.True(File.Exists(expectedPath));
-        Assert.Equal(FileConvertStatus.Success, file.Status);
+        var result = await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
+
+        AssertSuccessResult(result, expectedPath);
+        AssertProviderDidNotMutateFileItem(file);
     }
 
     [Fact]
@@ -100,11 +100,10 @@ public class NetVipsProviderTests : IDisposable
             FolderMethod = SaveFolderMethod.NoFolder
         };
 
-        await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
-
         string expectedPath = Path.Combine(_testDir, "input.jpg");
-        Assert.True(File.Exists(expectedPath));
-        Assert.Equal(FileConvertStatus.Success, file.Status);
+        var result = await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
+
+        AssertSuccessResult(result, expectedPath);
     }
 
     [Fact]
@@ -119,11 +118,10 @@ public class NetVipsProviderTests : IDisposable
             FolderMethod = SaveFolderMethod.NoFolder
         };
 
-        await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
-
         string expectedPath = Path.Combine(_testDir, "input.jpg");
-        Assert.True(File.Exists(expectedPath));
-        Assert.Equal(FileConvertStatus.Success, file.Status);
+        var result = await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
+
+        AssertSuccessResult(result, expectedPath);
     }
 
     [Fact]
@@ -139,11 +137,10 @@ public class NetVipsProviderTests : IDisposable
             OverwritePolicy = OverwritePolicy.Suffix
         };
 
-        await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
-
         string expectedPath = Path.Combine(_testDir, "input_1.png");
-        Assert.True(File.Exists(expectedPath));
-        Assert.Equal(FileConvertStatus.Success, file.Status);
+        var result = await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
+
+        AssertSuccessResult(result, expectedPath);
     }
 
     [Fact]
@@ -157,16 +154,20 @@ public class NetVipsProviderTests : IDisposable
             FolderMethod = SaveFolderMethod.NoFolder
         };
 
+        ConversionResult? result = null;
+        Exception? exception = null;
+
         try
         {
-            await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
+            result = await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            exception = ex;
         }
 
-        Assert.True(file.Status == FileConvertStatus.Success || file.Status == FileConvertStatus.Error);
-        Assert.NotEqual(FileConvertStatus.Pending, file.Status);
+        Assert.True(result?.Status == FileConvertStatus.Success || exception is not null);
+        AssertProviderDidNotMutateFileItem(file);
     }
 
     [Fact]
@@ -181,11 +182,10 @@ public class NetVipsProviderTests : IDisposable
             FolderMethod = SaveFolderMethod.NoFolder
         };
 
-        await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
-
         string expectedPath = Path.Combine(_testDir, "animated.webp");
-        Assert.True(File.Exists(expectedPath));
-        Assert.Equal(FileConvertStatus.Success, file.Status);
+        var result = await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
+
+        AssertSuccessResult(result, expectedPath);
 
         using (var output = NetVips.Image.NewFromFile(expectedPath))
         {
@@ -210,11 +210,10 @@ public class NetVipsProviderTests : IDisposable
             OverwritePolicy = OverwritePolicy.Suffix
         };
 
-        await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
-
         string expectedPath = Path.Combine(_testDir, "animated.webp");
-        Assert.True(File.Exists(expectedPath));
-        Assert.Equal(FileConvertStatus.Success, file.Status);
+        var result = await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
+
+        AssertSuccessResult(result, expectedPath);
 
         using var output = NetVips.Image.NewFromFile(expectedPath);
         Assert.NotNull(output);
@@ -236,11 +235,10 @@ public class NetVipsProviderTests : IDisposable
             OverwritePolicy = OverwritePolicy.Suffix
         };
 
-        await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
-
         string expectedPath = Path.Combine(_testDir, "animated.webp");
-        Assert.True(File.Exists(expectedPath));
-        Assert.Equal(FileConvertStatus.Success, file.Status);
+        var result = await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
+
+        AssertSuccessResult(result, expectedPath);
 
         using var output = NetVips.Image.NewFromFile(expectedPath);
         Assert.NotNull(output);
@@ -263,11 +261,10 @@ public class NetVipsProviderTests : IDisposable
             OverwritePolicy = OverwritePolicy.Suffix
         };
 
-        await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
-
         string expectedPath = Path.Combine(_testDir, "animated_1.gif");
-        Assert.True(File.Exists(expectedPath));
-        Assert.Equal(FileConvertStatus.Success, file.Status);
+        var result = await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
+
+        AssertSuccessResult(result, expectedPath);
 
         using var output = NetVips.Image.NewFromFile(expectedPath);
         Assert.NotNull(output);
@@ -285,10 +282,9 @@ public class NetVipsProviderTests : IDisposable
             StandardBackgroundColor = "#000000"
         };
 
-        await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
-
         string expectedPath = Path.Combine(_testDir, "input.jpg");
-        Assert.True(File.Exists(expectedPath));
+        var result = await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
+        AssertSuccessResult(result, expectedPath);
 
         using var output = NetVips.Image.NewFromFile(expectedPath);
         Assert.False(output.HasAlpha());
@@ -314,10 +310,25 @@ public class NetVipsProviderTests : IDisposable
         var file = new FileItem { Path = corruptPath, FileSignature = "PNG" };
         var settings = new ConvertSettings { StandardTargetFormat = "JPEG" };
 
-        try { await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None); }
-        catch { }
+        await Assert.ThrowsAnyAsync<Exception>(async () =>
+            await _provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None));
+        AssertProviderDidNotMutateFileItem(file);
+    }
 
-        Assert.Equal(FileConvertStatus.Error, file.Status);
+    private static void AssertSuccessResult(ConversionResult result, string expectedPath)
+    {
+        Assert.Equal(FileConvertStatus.Success, result.Status);
+        Assert.Equal(expectedPath, result.OutputPath);
+        Assert.True(result.OutputSize > 0);
+        Assert.True(File.Exists(result.OutputPath), $"Missing output file: {result.OutputPath}");
+    }
+
+    private static void AssertProviderDidNotMutateFileItem(FileItem file)
+    {
+        Assert.Equal(FileConvertStatus.Pending, file.Status);
+        Assert.Equal(0, file.Progress);
+        Assert.Null(file.OutputPath);
+        Assert.Equal(0, file.OutputSize);
     }
 
     private string CreateAnimatedGif(int framesCount)

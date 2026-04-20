@@ -10,7 +10,7 @@ namespace PixConvert.Services;
 /// <summary>
 /// 파일의 특성에 따라 적절한 변환 엔진(Provider)을 제공하는 팩토리 클래스입니다.
 /// </summary>
-public class EngineSelector
+public class EngineSelector : IEngineSelector
 {
     private readonly SkiaSharpProvider _skiaSharp;
     private readonly NetVipsProvider _netVips;

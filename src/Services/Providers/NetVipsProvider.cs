@@ -27,7 +27,7 @@ public class NetVipsProvider : IProviderService, IDisposable
         _logger = logger;
     }
 
-    public async Task ConvertAsync(FileItem file, ConvertSettings settings, ConversionSession session, CancellationToken token)
+    public async Task<ConversionResult> ConvertAsync(FileItem file, ConvertSettings settings, ConversionSession session, CancellationToken token)
     {
         token.ThrowIfCancellationRequested();
 
@@ -41,36 +41,20 @@ public class NetVipsProvider : IProviderService, IDisposable
 
         if (outputPath is null)
         {
-            file.Status = FileConvertStatus.Skipped;
-            return;
+            return new ConversionResult(FileConvertStatus.Skipped);
         }
 
         string outputDir = Path.GetDirectoryName(outputPath)!;
         if (!string.IsNullOrEmpty(outputDir))
             Directory.CreateDirectory(outputDir);
 
-        try
-        {
-            await Task.Run(() => ExecuteConversion(file, settings, outputPath, token), token);
+        await Task.Run(() => ExecuteConversion(file, settings, outputPath, token), token);
 
-            if (System.IO.File.Exists(outputPath))
-            {
-                file.OutputSize = new System.IO.FileInfo(outputPath).Length;
-            }
+        long outputSize = System.IO.File.Exists(outputPath)
+            ? new System.IO.FileInfo(outputPath).Length
+            : 0;
 
-            file.Progress = 100;
-            file.OutputPath = outputPath;
-            file.Status = FileConvertStatus.Success;
-        }
-        catch (OperationCanceledException)
-        {
-            throw;
-        }
-        catch (Exception)
-        {
-            file.Status = FileConvertStatus.Error;
-            throw;
-        }
+        return new ConversionResult(FileConvertStatus.Success, outputPath, outputSize);
     }
 
     private void ExecuteConversion(FileItem file, ConvertSettings settings, string outputPath, CancellationToken token)

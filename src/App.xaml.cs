@@ -113,6 +113,7 @@ public partial class App : Application
         services.AddSingleton<SkiaSharpProvider>();
         services.AddSingleton<NetVipsProvider>();
         services.AddSingleton<EngineSelector>();
+        services.AddSingleton<IEngineSelector>(sp => sp.GetRequiredService<EngineSelector>());
 
         // [ViewModel] 화면 상태 관리 뷰모델 등록
         services.AddTransient<MainViewModel>();
