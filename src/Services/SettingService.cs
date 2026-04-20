@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using ModernWpf;
@@ -17,16 +18,34 @@ public class SettingService : ISettingService
     private readonly ILogger<SettingService> _logger;
     private readonly ILanguageService _languageService;
     private readonly string _configPath;
+    private readonly SemaphoreSlim _saveGate = new(1, 1);
 
     public AppSettings Settings { get; private set; } = new();
 
     public SettingService(ILogger<SettingService> logger, ILanguageService languageService)
+        : this(logger, languageService, Path.Combine(AppPaths.AppDataFolder, "settings.json"), ensureDefaultAppDataFolder: true)
+    {
+    }
+
+    internal SettingService(ILogger<SettingService> logger, ILanguageService languageService, string configPath)
+        : this(logger, languageService, configPath, ensureDefaultAppDataFolder: false)
+    {
+    }
+
+    private SettingService(
+        ILogger<SettingService> logger,
+        ILanguageService languageService,
+        string configPath,
+        bool ensureDefaultAppDataFolder)
     {
         _logger = logger;
         _languageService = languageService;
+        _configPath = configPath;
 
-        AppPaths.EnsureAppDataFolder();
-        _configPath = Path.Combine(AppPaths.AppDataFolder, "settings.json");
+        if (ensureDefaultAppDataFolder)
+        {
+            AppPaths.EnsureAppDataFolder();
+        }
     }
 
     /// <summary>
@@ -56,18 +75,26 @@ public class SettingService : ISettingService
             {
                 _logger.LogInformation(_languageService.GetString("Log_Setting_FileNotFound"));
                 Settings = CreateDefaultSettings();
-                _ = SaveAsync();
+                await SaveAsync();
                 return;
             }
 
             string json = await File.ReadAllTextAsync(_configPath);
+            if (string.IsNullOrWhiteSpace(json))
+            {
+                _logger.LogWarning(_languageService.GetString("Log_Setting_FileEmpty"));
+                Settings = CreateDefaultSettings();
+                await SaveAsync();
+                return;
+            }
+
             var loaded = JsonSerializer.Deserialize<AppSettings>(json);
 
             if (loaded == null)
             {
                 _logger.LogWarning(_languageService.GetString("Log_Setting_FileEmpty"));
                 Settings = CreateDefaultSettings();
-                _ = SaveAsync();
+                await SaveAsync();
             }
             else
             {
@@ -77,7 +104,7 @@ public class SettingService : ISettingService
                 if (!supportedLanguages.Contains(Settings.Language))
                 {
                     Settings.Language = _languageService.GetSystemLanguage();
-                    _ = SaveAsync();
+                    await SaveAsync();
                 }
                 _logger.LogInformation(_languageService.GetString("Log_Setting_FileLoadSuccess"));
             }
@@ -86,7 +113,7 @@ public class SettingService : ISettingService
         {
             _logger.LogError(ex, _languageService.GetString("Log_Setting_FileLoadError"));
             Settings = CreateDefaultSettings();
-            _ = SaveAsync();
+            await SaveAsync();
         }
     }
 
@@ -96,8 +123,15 @@ public class SettingService : ISettingService
     /// <returns>저장 성공 시 true, 실패 시 false.</returns>
     public async Task<bool> SaveAsync()
     {
+        await _saveGate.WaitAsync();
         try
         {
+            string? directory = Path.GetDirectoryName(_configPath);
+            if (!string.IsNullOrWhiteSpace(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+
             var options = new JsonSerializerOptions { WriteIndented = true };
             string json = JsonSerializer.Serialize(Settings, options);
             await File.WriteAllTextAsync(_configPath, json);
@@ -108,6 +142,10 @@ public class SettingService : ISettingService
         {
             _logger.LogError(ex, _languageService.GetString("Log_Setting_FileSaveError"));
             return false;
+        }
+        finally
+        {
+            _saveGate.Release();
         }
     }
 

@@ -15,6 +15,10 @@ public class DialogService : IDialogService
 {
     private int _isDialogOpen;
 
+    internal static DialogButtonResources AppSettingButtonResources { get; } = new(null, "Dlg_Confirm");
+
+    internal static DialogButtonResources ConvertSettingButtonResources { get; } = new("Dlg_Cancel", "Dlg_Confirm");
+
     /// <summary>
     /// 예/아니오 선택이 필요한 확인 창을 표시합니다.
     /// 경고 메시지가 전달되면 2단(기본+노란색 경고 텍스트)으로 구성하여 렌더링합니다.
@@ -69,16 +73,16 @@ public class DialogService : IDialogService
     public Task<bool> ShowAppSettingDialogAsync(AppSettingViewModel viewModel)
     {
         var view = new AppSettingDialog { DataContext = viewModel };
-        return ShowCustomDialogAsync(view, "Dlg_Title_AppSetting", null, "Dlg_Confirm");
+        return ShowCustomDialogAsync(view, "Dlg_Title_AppSetting", AppSettingButtonResources);
     }
 
     public Task<bool> ShowConvertSettingDialogAsync(ConvertSettingViewModel viewModel)
     {
         var view = new ConvertSettingDialog { DataContext = viewModel };
-        return ShowCustomDialogAsync(view, "Btn_ConvertSetting", "Dlg_Confirm", "Dlg_Cancel");
+        return ShowCustomDialogAsync(view, "Btn_ConvertSetting", ConvertSettingButtonResources);
     }
 
-    private async Task<bool> ShowCustomDialogAsync(object content, string titleKey, string? primaryKey = null, string? closeKey = null)
+    private async Task<bool> ShowCustomDialogAsync(object content, string titleKey, DialogButtonResources buttons)
     {
         var window = Application.Current.MainWindow;
         if (window == null) return false;
@@ -97,13 +101,13 @@ public class DialogService : IDialogService
             dialog.SetResourceReference(ContentDialog.TitleProperty, titleKey);
 
             // 좌측(PrimaryButton, 취소)
-            dialog.SetResourceReference(ContentDialog.PrimaryButtonTextProperty, closeKey ?? "Dlg_Cancel");
+            if (!string.IsNullOrEmpty(buttons.PrimaryButtonTextKey))
+            {
+                dialog.SetResourceReference(ContentDialog.PrimaryButtonTextProperty, buttons.PrimaryButtonTextKey);
+            }
 
             // 우측(CloseButton, 확인)
-            if (!string.IsNullOrEmpty(primaryKey))
-                dialog.SetResourceReference(ContentDialog.CloseButtonTextProperty, primaryKey);
-            else
-                dialog.SetResourceReference(ContentDialog.CloseButtonTextProperty, "Dlg_Confirm");
+            dialog.SetResourceReference(ContentDialog.CloseButtonTextProperty, buttons.CloseButtonTextKey);
 
             var contentWidth = GetPreferredContentWidth(content);
             if (contentWidth > 0)
@@ -152,7 +156,7 @@ public class DialogService : IDialogService
         // ContentDialog 템플릿의 기본 폭 제한을 우회하기 위해 폭을 고정한다.
         dialog.Resources["ContentDialogMaxWidth"] = width;
         dialog.Resources["ContentDialogMinWidth"] = width;
-        dialog.Width = width;
-        dialog.MaxWidth = width;
     }
 }
+
+internal readonly record struct DialogButtonResources(string? PrimaryButtonTextKey, string CloseButtonTextKey);
