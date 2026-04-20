@@ -473,11 +473,14 @@ public partial class ConversionViewModel : ViewModelBase
         // context.ActiveFiles는 이미 시작 시점에 1개 이상임이 보장됨 (ValidateBeforeConvertAsync)
         int successCount = context.ActiveFiles.Count(i => i.Status == FileConvertStatus.Success);
         int skippedCount = context.ActiveFiles.Count(i => i.Status == FileConvertStatus.Skipped);
+        int failedCount = context.FailCount;
 
-        if (skippedCount > 0 && context.FailCount == 0)
+        if (skippedCount > 0 && failedCount > 0)
+            _snackbarService.Show(string.Format(GetString("Msg_OperationCompleteWithSkippedAndFailures"), successCount, skippedCount, failedCount), SnackbarType.Warning);
+        else if (failedCount > 0)
+            _snackbarService.Show(string.Format(GetString("Msg_OperationCompleteWithFailures"), successCount, failedCount), SnackbarType.Warning);
+        else if (skippedCount > 0)
             _snackbarService.Show(string.Format(GetString("Msg_OperationCompleteWithSkipped"), successCount, skippedCount), SnackbarType.Warning);
-        else if (context.FailCount > 0)
-            _snackbarService.Show(string.Format(GetString("Msg_OperationComplete"), successCount), SnackbarType.Warning);
         else
             _snackbarService.Show(string.Format(GetString("Msg_OperationComplete"), successCount), SnackbarType.Success);
     }

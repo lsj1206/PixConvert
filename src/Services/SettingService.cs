@@ -112,6 +112,7 @@ public class SettingService : ISettingService
         catch (Exception ex)
         {
             _logger.LogError(ex, _languageService.GetString("Log_Setting_FileLoadError"));
+            BackupCorruptedSettingsFile();
             Settings = CreateDefaultSettings();
             await SaveAsync();
         }
@@ -158,4 +159,23 @@ public class SettingService : ISettingService
         Language = _languageService.GetSystemLanguage(),
         ConfirmDeletion = true
     };
+
+    private void BackupCorruptedSettingsFile()
+    {
+        if (!File.Exists(_configPath))
+        {
+            return;
+        }
+
+        try
+        {
+            string backupPath = _configPath + ".bak";
+            File.Copy(_configPath, backupPath, overwrite: true);
+            _logger.LogInformation(_languageService.GetString("Log_Setting_FileBackupCreated"), backupPath);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, _languageService.GetString("Log_Setting_FileBackupFailed"), _configPath);
+        }
+    }
 }

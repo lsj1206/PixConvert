@@ -214,10 +214,12 @@
     <sys:String x:Key="Msg_AddFile">{0:N0}개의 파일을 추가했습니다.</sys:String>
     <sys:String x:Key="Msg_AddWithLimit">{0:N0}개의 파일이 추가되고, {1:N0}개의 파일은 제외되었습니다.</sys:String>
     <sys:String x:Key="Msg_AddWithDuplicate">{0:N0}개의 파일이 추가되고, {1:N0}개의 파일은 중복으로 제외되었습니다.</sys:String>
+    <sys:String x:Key="Msg_AddFileFailed">{0:N0}개의 파일을 불러오지 못했습니다.</sys:String>
+    <sys:String x:Key="Msg_AddWithFailure">{0:N0}개의 파일이 추가되고, {1:N0}개의 파일은 불러오지 못했습니다.</sys:String>
     <sys:String x:Key="Msg_AlreadyExists">목록에 이미 존재하는 파일입니다.</sys:String>
     <sys:String x:Key="Msg_NoNewFiles">추가 가능한 파일이 없습니다.</sys:String>
     <sys:String x:Key="Msg_LimitReached">더 이상 파일을 추가할 수 없습니다.</sys:String>
-    <sys:String x:Key="Msg_FileAddError">파일 추가 오류: {0}</sys:String>
+    <sys:String x:Key="Msg_FileAddError">파일 추가 중 오류가 발생했습니다.</sys:String>
     <!-- 스낵바 : 목록 작업 -->
     <sys:String x:Key="Msg_ReorderIndex">번호를 재정렬합니다.</sys:String>
     <sys:String x:Key="Msg_RemoveFile">{0}개의 파일을 목록에서 제거합니다.</sys:String>
@@ -225,6 +227,8 @@
     <!-- 스낵바 : 변환 작업 -->
     <sys:String x:Key="Msg_OperationComplete">{0}개의 작업이 완료되었습니다.</sys:String>
     <sys:String x:Key="Msg_OperationCompleteWithSkipped">{0}개 변환 완료, {1}개 건너뜀</sys:String>
+    <sys:String x:Key="Msg_OperationCompleteWithFailures">{0}개 변환 완료, {1}개 실패</sys:String>
+    <sys:String x:Key="Msg_OperationCompleteWithSkippedAndFailures">{0}개 변환 완료, {1}개 건너뜀, {2}개 실패</sys:String>
     <sys:String x:Key="Msg_Convert_Cancelling">작업을 취소하고 있습니다...</sys:String>
     <sys:String x:Key="Msg_Convert_Cancelled">작업을 취소했습니다.</sys:String>
     <!-- 스낵바 : 프리셋 -->

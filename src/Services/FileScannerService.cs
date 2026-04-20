@@ -75,6 +75,16 @@ public class FileScannerService : IFileScannerService
                 };
             }
         }
+        catch (UnauthorizedAccessException ex)
+        {
+            _logger.LogWarning(ex, GetString("Log_File_MetaFail"), path);
+            return null;
+        }
+        catch (IOException ex)
+        {
+            _logger.LogWarning(ex, GetString("Log_File_MetaFail"), path);
+            return null;
+        }
         catch (Exception ex)
         {
             _logger.LogError(ex, GetString("Log_File_MetaFail"), path);

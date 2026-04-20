@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Windows;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using ModernWpf.Controls;
 using PixConvert.ViewModels;
 using PixConvert.Views.Dialogs;
@@ -13,11 +14,21 @@ namespace PixConvert.Services;
 /// </summary>
 public class DialogService : IDialogService
 {
+    internal const string LogNoMainWindow = "Dialog display skipped because MainWindow is not available.";
+    internal const string LogAlreadyOpen = "Dialog display skipped because another ContentDialog is already open.";
+    internal const string LogShowFailed = "Dialog display failed.";
+
+    private readonly ILogger<DialogService> _logger;
     private int _isDialogOpen;
 
     internal static DialogButtonResources AppSettingButtonResources { get; } = new(null, "Dlg_Confirm");
 
     internal static DialogButtonResources ConvertSettingButtonResources { get; } = new("Dlg_Cancel", "Dlg_Confirm");
+
+    public DialogService(ILogger<DialogService> logger)
+    {
+        _logger = logger;
+    }
 
     /// <summary>
     /// 예/아니오 선택이 필요한 확인 창을 표시합니다.
@@ -26,8 +37,8 @@ public class DialogService : IDialogService
     public async Task<bool> ShowConfirmationAsync(string message, string titleKey, string? warningMessage = null)
     {
         // 현재 활성화된 메인 윈도우를 찾아 다이얼로그의 부모로 설정합니다.
-        var window = Application.Current.MainWindow;
-        if (window == null) return false;
+        var window = Application.Current?.MainWindow;
+        if (!HasDialogOwner(window, _logger)) return false;
         if (!TryReserveDialog()) return false;
 
         try
@@ -62,6 +73,12 @@ public class DialogService : IDialogService
         }
         catch (InvalidOperationException ex) when (IsContentDialogAlreadyOpenException(ex))
         {
+            _logger.LogWarning(ex, LogAlreadyOpen);
+            return false;
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogWarning(ex, LogShowFailed);
             return false;
         }
         finally
@@ -84,8 +101,8 @@ public class DialogService : IDialogService
 
     private async Task<bool> ShowCustomDialogAsync(object content, string titleKey, DialogButtonResources buttons)
     {
-        var window = Application.Current.MainWindow;
-        if (window == null) return false;
+        var window = Application.Current?.MainWindow;
+        if (!HasDialogOwner(window, _logger)) return false;
         if (!TryReserveDialog()) return false;
 
         try
@@ -121,6 +138,12 @@ public class DialogService : IDialogService
         }
         catch (InvalidOperationException ex) when (IsContentDialogAlreadyOpenException(ex))
         {
+            _logger.LogWarning(ex, LogAlreadyOpen);
+            return false;
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogWarning(ex, LogShowFailed);
             return false;
         }
         finally
@@ -131,7 +154,7 @@ public class DialogService : IDialogService
 
     private bool TryReserveDialog()
     {
-        return Interlocked.CompareExchange(ref _isDialogOpen, 1, 0) == 0;
+        return TryReserveDialog(ref _isDialogOpen, _logger);
     }
 
     private void ReleaseDialog()
@@ -142,6 +165,28 @@ public class DialogService : IDialogService
     private static bool IsContentDialogAlreadyOpenException(InvalidOperationException ex)
     {
         return ex.Message.Contains("Only a single ContentDialog", StringComparison.Ordinal);
+    }
+
+    internal static bool HasDialogOwner(Window? window, ILogger<DialogService> logger)
+    {
+        if (window != null)
+        {
+            return true;
+        }
+
+        logger.LogWarning(LogNoMainWindow);
+        return false;
+    }
+
+    internal static bool TryReserveDialog(ref int isDialogOpen, ILogger<DialogService> logger)
+    {
+        if (Interlocked.CompareExchange(ref isDialogOpen, 1, 0) == 0)
+        {
+            return true;
+        }
+
+        logger.LogWarning(LogAlreadyOpen);
+        return false;
     }
 
     private static double GetPreferredContentWidth(object content)

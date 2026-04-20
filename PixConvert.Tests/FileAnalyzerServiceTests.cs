@@ -30,6 +30,9 @@ public class FileAnalyzerServiceTests
         _mockDriveInfo = new Mock<IDriveInfoService>(); // 추가
 
         _mockLang.Setup(x => x.GetString(It.IsAny<string>())).Returns((string key) => key);
+        _mockLang
+            .Setup(x => x.GetString("Log_Process_Summary"))
+            .Returns("[FileAnalyzerService] File analysis completed. InputPaths={InputPaths}, Added={Added}, Duplicate={Dup}, Ignored={Ignored}, Failed={Failed}, ElapsedMs={Time}");
 
         // 테스트 시 병렬도를 1로 고정하여 결정론적 결과 확인
         _mockDriveInfo.Setup(x => x.GetOptimalParallelismAsync(It.IsAny<string>()))
@@ -60,7 +63,107 @@ public class FileAnalyzerServiceTests
         Assert.Equal(2, result.SuccessCount);
         Assert.Equal(0, result.IgnoredCount);
         Assert.Equal(0, result.DuplicateCount);
+        Assert.Equal(0, result.FailedCount);
         Assert.Equal(2, result.NewItems.Count);
+    }
+
+    [Fact]
+    public async Task ProcessPathsAsync_WhenSomeFileItemsFail_ShouldCountFailuresAndKeepSuccessfulItems()
+    {
+        // Arrange
+        var paths = new[] { "C:\\ok.png", "C:\\bad.png", "C:\\ok2.png" };
+
+        _mockScanner.Setup(s => s.CreateFileItemAsync(It.IsAny<string>()))
+            .Returns((string p) => Task.FromResult<FileItem?>(
+                p.Contains("bad", StringComparison.OrdinalIgnoreCase)
+                    ? null
+                    : new FileItem { Path = p }));
+
+        // Act
+        var result = await _service.ProcessPathsAsync(paths, maxItemCount: 10000, currentCount: 0);
+
+        // Assert
+        Assert.Equal(2, result.SuccessCount);
+        Assert.Equal(1, result.FailedCount);
+        Assert.Equal(0, result.IgnoredCount);
+        Assert.Equal(0, result.DuplicateCount);
+        Assert.Equal(new[] { "C:\\ok.png", "C:\\ok2.png" }, result.NewItems.Select(item => item.Path).ToArray());
+    }
+
+    [Fact]
+    public async Task ProcessPathsAsync_ShouldLogSummaryWithFailedCount()
+    {
+        // Arrange
+        var paths = new[] { "C:\\ok.png", "C:\\bad.png" };
+
+        _mockScanner.Setup(s => s.CreateFileItemAsync(It.IsAny<string>()))
+            .Returns((string p) => Task.FromResult<FileItem?>(
+                p.Contains("bad", StringComparison.OrdinalIgnoreCase)
+                    ? null
+                    : new FileItem { Path = p }));
+
+        // Act
+        await _service.ProcessPathsAsync(paths, maxItemCount: 10000, currentCount: 0);
+
+        // Assert
+        _mockLogger.Verify(
+            logger => logger.Log(
+                It.Is<LogLevel>(level => level == LogLevel.Information),
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((value, _) =>
+                    value.ToString()!.Contains("InputPaths=2", StringComparison.Ordinal) &&
+                    value.ToString()!.Contains("Added=1", StringComparison.Ordinal) &&
+                    value.ToString()!.Contains("Duplicate=0", StringComparison.Ordinal) &&
+                    value.ToString()!.Contains("Ignored=0", StringComparison.Ordinal) &&
+                    value.ToString()!.Contains("Failed=1", StringComparison.Ordinal) &&
+                    value.ToString()!.Contains("ElapsedMs=", StringComparison.Ordinal)),
+                It.IsAny<Exception?>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+            Times.Once);
+    }
+
+    [Fact]
+    public async Task ProcessPathsAsync_WhenAllFileItemsFail_ShouldCountFailures()
+    {
+        // Arrange
+        var paths = new[] { "C:\\bad1.png", "C:\\bad2.png" };
+
+        _mockScanner.Setup(s => s.CreateFileItemAsync(It.IsAny<string>()))
+            .ReturnsAsync((FileItem?)null);
+
+        // Act
+        var result = await _service.ProcessPathsAsync(paths, maxItemCount: 10000, currentCount: 0);
+
+        // Assert
+        Assert.Equal(0, result.SuccessCount);
+        Assert.Equal(2, result.FailedCount);
+        Assert.Empty(result.NewItems);
+    }
+
+    [Fact]
+    public async Task ProcessPathsAsync_WhenFolderIsEmpty_ShouldReturnZeroCounts()
+    {
+        // Arrange
+        string realTempFolder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+        Directory.CreateDirectory(realTempFolder);
+        try
+        {
+            _mockScanner.Setup(s => s.GetFilesInFolder(realTempFolder))
+                .Returns(Array.Empty<FileInfo>());
+
+            // Act
+            var result = await _service.ProcessPathsAsync([realTempFolder], maxItemCount: 10000, currentCount: 0);
+
+            // Assert
+            Assert.Equal(0, result.SuccessCount);
+            Assert.Equal(0, result.FailedCount);
+            Assert.Equal(0, result.IgnoredCount);
+            Assert.Equal(0, result.DuplicateCount);
+        }
+        finally
+        {
+            if (Directory.Exists(realTempFolder)) Directory.Delete(realTempFolder);
+        }
     }
 
     [Fact]

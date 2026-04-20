@@ -192,6 +192,28 @@ public class FileScannerServiceTests : IDisposable
         Assert.True(item.IsUnsupported);
     }
 
+    [Fact]
+    public async Task CreateFileItemAsync_WhenFileIsLocked_ShouldReturnNullAndLogWarning()
+    {
+        string path = WriteFile("locked.png", [0x89, 0x50]);
+        await using var locked = new FileStream(path, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+
+        FileItem? item = await _fileScannerService.CreateFileItemAsync(path);
+
+        Assert.Null(item);
+        VerifyLog(LogLevel.Warning, Times.Once());
+        VerifyLog(LogLevel.Error, Times.Never());
+    }
+
+    [Fact]
+    public async Task CreateFileItemAsync_WhenUnexpectedExceptionOccurs_ShouldReturnNullAndLogError()
+    {
+        FileItem? item = await _fileScannerService.CreateFileItemAsync("bad\0path.png");
+
+        Assert.Null(item);
+        VerifyLog(LogLevel.Error, Times.Once());
+    }
+
     private string WriteFile(string fileName, byte[] bytes)
     {
         string path = Path.Combine(_tempDirectory, fileName);
@@ -208,6 +230,18 @@ public class FileScannerServiceTests : IDisposable
         Assert.Equal(format, result.Format);
         Assert.Equal(isAnimation, result.IsAnimation);
         Assert.Equal(isUnsupported, result.IsUnsupported);
+    }
+
+    private void VerifyLog(LogLevel level, Times times)
+    {
+        _mockLogger.Verify(
+            x => x.Log(
+                It.Is<LogLevel>(l => l == level),
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => true),
+                It.IsAny<Exception?>(),
+                It.Is<Func<It.IsAnyType, Exception?, string>>((v, t) => true)),
+            times);
     }
 
     private static byte[] Png(params (string Type, byte[] Data)[] chunks)

@@ -99,6 +99,7 @@ public partial class FileInputViewModel : ViewModelBase
     {
         if (CurrentStatus == AppStatus.Converting) return; // 변환 중에는 무시
 
+        var previousStatus = CurrentStatus;
         RequestStatus(AppStatus.FileAdd);
         try
         {
@@ -114,10 +115,14 @@ public partial class FileInputViewModel : ViewModelBase
             var result = await _fileAnalyzerService.ProcessPathsAsync(paths, 10000, _fileList.Items.Count, _fileList.PathSet, progress);
 
             // 2. 추가 가능한 파일이 없는 경우 결과 처리
-            if (result.SuccessCount == 0 && (result.IgnoredCount > 0 || result.DuplicateCount > 0))
+            if (result.SuccessCount == 0)
             {
-                if (result.IgnoredCount > 0)
+                if (result.FailedCount > 0)
+                    _snackbarService.Show(string.Format(GetString("Msg_AddFileFailed"), result.FailedCount), SnackbarType.Error);
+                else if (result.IgnoredCount > 0)
                     _snackbarService.Show(GetString("Msg_LimitReached"), SnackbarType.Error);
+                else if (result.DuplicateCount > 0)
+                    _snackbarService.Show(GetString("Msg_NoNewFiles"), SnackbarType.Error);
                 else
                     _snackbarService.Show(GetString("Msg_NoNewFiles"), SnackbarType.Error);
                 return;
@@ -133,7 +138,9 @@ public partial class FileInputViewModel : ViewModelBase
                     return;
                 }
 
-                if (result.IgnoredCount > 0)
+                if (result.FailedCount > 0)
+                    _snackbarService.Show(string.Format(GetString("Msg_AddWithFailure"), addedCount, result.FailedCount), SnackbarType.Warning);
+                else if (result.IgnoredCount > 0)
                     _snackbarService.Show(string.Format(GetString("Msg_AddWithLimit"), addedCount, result.IgnoredCount), SnackbarType.Warning);
                 else if (result.DuplicateCount > 0)
                     _snackbarService.Show(string.Format(GetString("Msg_AddWithDuplicate"), addedCount, result.DuplicateCount), SnackbarType.Warning);
@@ -144,11 +151,11 @@ public partial class FileInputViewModel : ViewModelBase
         catch (Exception ex)
         {
             _logger.LogError(ex, GetString("Log_Sidebar_ProcessError"));
-            _snackbarService.Show(string.Format(GetString("Msg_Error_Occurred"), ex.Message), SnackbarType.Error);
+            _snackbarService.Show(GetString("Msg_FileAddError"), SnackbarType.Error);
         }
         finally
         {
-            RequestStatus(AppStatus.Idle);
+            RequestStatus(previousStatus == AppStatus.ListManager ? AppStatus.ListManager : AppStatus.Idle);
         }
     }
 

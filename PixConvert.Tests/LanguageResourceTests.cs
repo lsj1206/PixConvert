@@ -62,6 +62,24 @@ public class LanguageResourceTests
         AssertNoMissingKeys("Lang.en-US.xaml", expectedKeys, enKeys);
     }
 
+    [Fact]
+    public void LanguageResources_ShouldContainUserMessageKeys()
+    {
+        string[] expectedKeys =
+        [
+            "Msg_FileAddError",
+            "Msg_AddFileFailed",
+            "Msg_AddWithFailure",
+            "Msg_OperationCompleteWithFailures",
+            "Msg_OperationCompleteWithSkippedAndFailures"
+        ];
+        var koKeys = LoadLanguageKeys("Lang.ko-KR.xaml").ToHashSet(StringComparer.Ordinal);
+        var enKeys = LoadLanguageKeys("Lang.en-US.xaml").ToHashSet(StringComparer.Ordinal);
+
+        AssertNoMissingKeys("Lang.ko-KR.xaml", expectedKeys, koKeys);
+        AssertNoMissingKeys("Lang.en-US.xaml", expectedKeys, enKeys);
+    }
+
     [Theory]
     [InlineData("Lang.ko-KR.xaml")]
     [InlineData("Lang.en-US.xaml")]

@@ -22,6 +22,9 @@ public class FileProcessingResult
     /// <summary>최대 개수 제한 등으로 인해 무시된 파일 수</summary>
     public int IgnoredCount { get; set; }
 
+    /// <summary>파일 정보 생성에 실패한 파일 수</summary>
+    public int FailedCount { get; set; }
+
     /// <summary>성공적으로 추가된 실질적인 개수</summary>
     public int SuccessCount => NewItems.Count;
 }

@@ -214,10 +214,12 @@ Dithering: Distributes color error from the source across neighboring pixels
     <sys:String x:Key="Msg_AddFile">{0:N0} file(s) added</sys:String>
     <sys:String x:Key="Msg_AddWithLimit">{0:N0} file(s) added, {1:N0} excluded</sys:String>
     <sys:String x:Key="Msg_AddWithDuplicate">{0:N0} file(s) added, {1:N0} duplicates skipped</sys:String>
+    <sys:String x:Key="Msg_AddFileFailed">{0:N0} file(s) could not be loaded</sys:String>
+    <sys:String x:Key="Msg_AddWithFailure">{0:N0} file(s) added, {1:N0} could not be loaded</sys:String>
     <sys:String x:Key="Msg_AlreadyExists">Already exists in the list.</sys:String>
     <sys:String x:Key="Msg_NoNewFiles">No files available to add.</sys:String>
     <sys:String x:Key="Msg_LimitReached">Cannot add more files.</sys:String>
-    <sys:String x:Key="Msg_FileAddError">Error adding file: {0}</sys:String>
+    <sys:String x:Key="Msg_FileAddError">An error occurred while adding files.</sys:String>
     <!-- Snackbar : List Action -->
     <sys:String x:Key="Msg_ReorderIndex">Reordering index.</sys:String>
     <sys:String x:Key="Msg_RemoveFile">Removing {0} file(s) from list.</sys:String>
@@ -225,6 +227,8 @@ Dithering: Distributes color error from the source across neighboring pixels
     <!-- Snackbar : Conversion -->
     <sys:String x:Key="Msg_OperationComplete">{0} operation(s) complete.</sys:String>
     <sys:String x:Key="Msg_OperationCompleteWithSkipped">{0} converted, {1} skipped</sys:String>
+    <sys:String x:Key="Msg_OperationCompleteWithFailures">{0} converted, {1} failed</sys:String>
+    <sys:String x:Key="Msg_OperationCompleteWithSkippedAndFailures">{0} converted, {1} skipped, {2} failed</sys:String>
     <sys:String x:Key="Msg_Convert_Cancelling">Cancelling operation...</sys:String>
     <sys:String x:Key="Msg_Convert_Cancelled">Operation has been cancelled.</sys:String>
     <!-- Snackbar : Preset -->

@@ -1,3 +1,4 @@
+using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using PixConvert.Models;
@@ -7,6 +8,7 @@ using Xunit;
 
 namespace PixConvert.Tests;
 
+[Collection("MessengerTests")]
 public class FileInputViewModelTests
 {
     [Fact]
@@ -98,6 +100,119 @@ public class FileInputViewModelTests
     }
 
     [Fact]
+    public async Task DropFilesCommand_WhenAnalyzerThrows_ShouldShowGenericFileAddError()
+    {
+        string[] paths = [@"C:\Drop\a.png"];
+        var pathPicker = new Mock<IPathPickerService>();
+        var analyzer = new Mock<IFileAnalyzerService>();
+        var snackbar = new Mock<ISnackbarService>();
+        analyzer
+            .Setup(service => service.ProcessPathsAsync(
+                It.IsAny<IEnumerable<string>>(),
+                It.IsAny<int>(),
+                It.IsAny<int>(),
+                It.IsAny<IReadOnlySet<string>?>(),
+                It.IsAny<IProgress<FileProcessingProgress>?>()))
+            .ThrowsAsync(new InvalidOperationException("raw failure"));
+        var vm = CreateViewModel(pathPicker, analyzer, snackbar);
+
+        await vm.DropFilesCommand.ExecuteAsync(paths);
+
+        snackbar.Verify(
+            service => service.Show("Msg_FileAddError", SnackbarType.Error, It.IsAny<int>()),
+            Times.Once);
+        snackbar.Verify(
+            service => service.Show(It.Is<string>(message => message.Contains("raw failure", StringComparison.OrdinalIgnoreCase)), It.IsAny<SnackbarType>(), It.IsAny<int>()),
+            Times.Never);
+    }
+
+    [Fact]
+    public async Task DropFilesCommand_WhenAllFilesFail_ShouldShowFailedCountMessage()
+    {
+        string[] paths = [@"C:\Drop\a.png", @"C:\Drop\b.jpg"];
+        var pathPicker = new Mock<IPathPickerService>();
+        var analyzer = CreateAnalyzerReturning(new FileProcessingResult { FailedCount = 2 });
+        var snackbar = new Mock<ISnackbarService>();
+        var vm = CreateViewModel(pathPicker, analyzer, snackbar);
+
+        await vm.DropFilesCommand.ExecuteAsync(paths);
+
+        snackbar.Verify(
+            service => service.Show("Msg_AddFileFailed", SnackbarType.Error, It.IsAny<int>()),
+            Times.Once);
+    }
+
+    [Fact]
+    public async Task DropFilesCommand_WhenSomeFilesFail_ShouldShowFailureSummary()
+    {
+        string[] paths = [@"C:\Drop\a.png", @"C:\Drop\b.jpg"];
+        var pathPicker = new Mock<IPathPickerService>();
+        var analyzer = CreateAnalyzerReturning(new FileProcessingResult
+        {
+            NewItems = [new FileItem { Path = paths[0] }],
+            FailedCount = 1
+        });
+        var snackbar = new Mock<ISnackbarService>();
+        var vm = CreateViewModel(pathPicker, analyzer, snackbar);
+
+        await vm.DropFilesCommand.ExecuteAsync(paths);
+
+        snackbar.Verify(
+            service => service.Show("Msg_AddWithFailure", SnackbarType.Warning, It.IsAny<int>()),
+            Times.Once);
+    }
+
+    [Fact]
+    public async Task DropFilesCommand_WhenAnalyzerReturnsNoCounts_ShouldShowNoNewFiles()
+    {
+        string[] paths = [@"C:\EmptyFolder"];
+        var pathPicker = new Mock<IPathPickerService>();
+        var analyzer = CreateAnalyzerReturning(new FileProcessingResult());
+        var snackbar = new Mock<ISnackbarService>();
+        var vm = CreateViewModel(pathPicker, analyzer, snackbar);
+
+        await vm.DropFilesCommand.ExecuteAsync(paths);
+
+        snackbar.Verify(
+            service => service.Show("Msg_NoNewFiles", SnackbarType.Error, It.IsAny<int>()),
+            Times.Once);
+    }
+
+    [Fact]
+    public async Task DropFilesCommand_WhenStartedFromListManager_ShouldRequestListManagerAfterCompletion()
+    {
+        string[] paths = [@"C:\Drop\a.png"];
+        var pathPicker = new Mock<IPathPickerService>();
+        var analyzer = CreateAnalyzerReturning(paths[0]);
+        var vm = CreateViewModel(pathPicker, analyzer);
+        using var statusRequests = new StatusRequestRecorder();
+
+        vm.CurrentStatus = AppStatus.ListManager;
+
+        await vm.DropFilesCommand.ExecuteAsync(paths);
+
+        Assert.Equal(
+            [AppStatus.FileAdd, AppStatus.ListManager],
+            statusRequests.Requests);
+    }
+
+    [Fact]
+    public async Task DropFilesCommand_WhenStartedFromIdle_ShouldRequestIdleAfterCompletion()
+    {
+        string[] paths = [@"C:\Drop\a.png"];
+        var pathPicker = new Mock<IPathPickerService>();
+        var analyzer = CreateAnalyzerReturning(paths[0]);
+        var vm = CreateViewModel(pathPicker, analyzer);
+        using var statusRequests = new StatusRequestRecorder();
+
+        await vm.DropFilesCommand.ExecuteAsync(paths);
+
+        Assert.Equal(
+            [AppStatus.FileAdd, AppStatus.Idle],
+            statusRequests.Requests);
+    }
+
+    [Fact]
     public async Task DropFilesCommand_WhenConverting_ShouldNotAnalyzeDroppedPaths()
     {
         string[] paths = [@"C:\Drop\a.png"];
@@ -125,7 +240,8 @@ public class FileInputViewModelTests
 
     private static FileInputViewModel CreateViewModel(
         Mock<IPathPickerService> pathPicker,
-        Mock<IFileAnalyzerService> analyzer)
+        Mock<IFileAnalyzerService> analyzer,
+        Mock<ISnackbarService>? snackbar = null)
     {
         var language = new Mock<ILanguageService>();
         language.Setup(service => service.GetString(It.IsAny<string>())).Returns<string>(key => key);
@@ -146,7 +262,7 @@ public class FileInputViewModelTests
         return new FileInputViewModel(
             NullLogger<FileInputViewModel>.Instance,
             language.Object,
-            new Mock<ISnackbarService>().Object,
+            (snackbar ?? new Mock<ISnackbarService>()).Object,
             analyzer.Object,
             fileList,
             sortFilter,
@@ -154,6 +270,14 @@ public class FileInputViewModelTests
     }
 
     private static Mock<IFileAnalyzerService> CreateAnalyzerReturning(string path)
+    {
+        return CreateAnalyzerReturning(new FileProcessingResult
+        {
+            NewItems = [new FileItem { Path = path }]
+        });
+    }
+
+    private static Mock<IFileAnalyzerService> CreateAnalyzerReturning(FileProcessingResult result)
     {
         var analyzer = new Mock<IFileAnalyzerService>();
         analyzer
@@ -163,10 +287,30 @@ public class FileInputViewModelTests
                 It.IsAny<int>(),
                 It.IsAny<IReadOnlySet<string>?>(),
                 It.IsAny<IProgress<FileProcessingProgress>?>()))
-            .ReturnsAsync(new FileProcessingResult
-            {
-                NewItems = [new FileItem { Path = path }]
-            });
+            .ReturnsAsync(result);
         return analyzer;
     }
+
+    private sealed class StatusRequestRecorder : IDisposable
+    {
+        public List<AppStatus> Requests { get; } = [];
+
+        public StatusRequestRecorder()
+        {
+            WeakReferenceMessenger.Default.Register<AppStatusRequestMessage>(
+                this,
+                static (recipient, message) =>
+                    ((StatusRequestRecorder)recipient).Requests.Add(message.NewStatus));
+        }
+
+        public void Dispose()
+        {
+            WeakReferenceMessenger.Default.UnregisterAll(this);
+        }
+    }
+}
+
+[CollectionDefinition("MessengerTests", DisableParallelization = true)]
+public sealed class MessengerTestCollectionDefinition
+{
 }

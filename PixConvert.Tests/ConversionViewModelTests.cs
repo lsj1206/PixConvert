@@ -169,6 +169,61 @@ public class ConversionViewModelTests
     }
 
     [Fact]
+    public async Task ConvertFilesCommand_WhenProviderFails_ShouldShowFailureSummaryWithoutExceptionDetails()
+    {
+        await RunOnStaDispatcherAsync(async () =>
+        {
+            var files = CreateFiles(3);
+            var snackbar = new Mock<ISnackbarService>();
+            var provider = new ScriptedProvider(async (file, token) =>
+            {
+                await Task.Delay(10, token);
+                if (file.Name == "file2")
+                    throw new InvalidOperationException("fake failure");
+
+                return new ConversionResult(FileConvertStatus.Success, file.Path + ".out", 10);
+            });
+            var vm = CreateConversionViewModel(files, provider, snackbar: snackbar);
+
+            await vm.ConvertFilesCommand.ExecuteAsync(null).WaitAsync(TimeSpan.FromSeconds(10));
+
+            snackbar.Verify(
+                service => service.Show("Msg_OperationCompleteWithFailures", SnackbarType.Warning, It.IsAny<int>()),
+                Times.Once);
+            snackbar.Verify(
+                service => service.Show(It.Is<string>(message => message.Contains("fake failure", StringComparison.OrdinalIgnoreCase)), It.IsAny<SnackbarType>(), It.IsAny<int>()),
+                Times.Never);
+        });
+    }
+
+    [Fact]
+    public async Task ConvertFilesCommand_WhenProviderSkipsAndFails_ShouldShowSkippedAndFailureSummary()
+    {
+        await RunOnStaDispatcherAsync(async () =>
+        {
+            var files = CreateFiles(3);
+            var snackbar = new Mock<ISnackbarService>();
+            var provider = new ScriptedProvider(async (file, token) =>
+            {
+                await Task.Delay(10, token);
+                return file.Name switch
+                {
+                    "file1" => new ConversionResult(FileConvertStatus.Success, file.Path + ".out", 10),
+                    "file2" => new ConversionResult(FileConvertStatus.Skipped),
+                    _ => throw new InvalidOperationException("fake failure")
+                };
+            });
+            var vm = CreateConversionViewModel(files, provider, snackbar: snackbar);
+
+            await vm.ConvertFilesCommand.ExecuteAsync(null).WaitAsync(TimeSpan.FromSeconds(10));
+
+            snackbar.Verify(
+                service => service.Show("Msg_OperationCompleteWithSkippedAndFailures", SnackbarType.Warning, It.IsAny<int>()),
+                Times.Once);
+        });
+    }
+
+    [Fact]
     public async Task ConvertFilesCommand_WhenCancelled_ShouldRestorePendingOnUiThread()
     {
         await RunOnStaDispatcherAsync(async () =>
@@ -377,12 +432,13 @@ public class ConversionViewModelTests
     private static ConversionViewModel CreateConversionViewModel(
         IReadOnlyList<FileItem> files,
         IProviderService provider,
-        bool cancelConfirmed = false)
+        bool cancelConfirmed = false,
+        Mock<ISnackbarService>? snackbar = null)
     {
         var language = new Mock<ILanguageService>();
         var logger = new Mock<ILogger<ConversionViewModel>>();
         var dialog = new Mock<IDialogService>();
-        var snackbar = new Mock<ISnackbarService>();
+        snackbar ??= new Mock<ISnackbarService>();
         var presetService = new Mock<IPresetService>();
         var engineSelector = new FakeEngineSelector(provider);
 

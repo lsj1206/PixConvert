@@ -27,7 +27,7 @@
     <system:String x:Key="Log_Process_WmiException">[DriveInfoService] WMI disk check failed. Path={RootPath}</system:String>
     <system:String x:Key="Log_Process_WmiUnknown">[DriveInfoService] WMI disk type unknown. Disk={DiskNumber}</system:String>
     <system:String x:Key="Log_Process_Parallelism">[DriveInfoService] Parallelism selected. DriveType={DriveType}, Parallelism={Parallelism}</system:String>
-    <system:String x:Key="Log_Process_Summary">[FileAnalyzerService] File analysis completed. Total={Total}, Added={Added}, Duplicate={Dup}, Ignored={Ignored}, ElapsedMs={Time}</system:String>
+    <system:String x:Key="Log_Process_Summary">[FileAnalyzerService] File analysis completed. InputPaths={InputPaths}, Added={Added}, Duplicate={Dup}, Ignored={Ignored}, Failed={Failed}, ElapsedMs={Time}</system:String>
     <system:String x:Key="Log_Process_LimitReached">[FileAnalyzerService] File limit reached. Limit={Limit}, Ignored={Count}</system:String>
 
     <!-- PresetService.cs -->
@@ -57,6 +57,8 @@
     <system:String x:Key="Log_Setting_FileLoadError">[SettingService] Settings file load failed. Using defaults.</system:String>
     <system:String x:Key="Log_Setting_FileSaveSuccess">[SettingService] Settings file saved.</system:String>
     <system:String x:Key="Log_Setting_FileSaveError">[SettingService] Settings file save failed.</system:String>
+    <system:String x:Key="Log_Setting_FileBackupCreated">[SettingService] Corrupted settings file backed up. Path={BackupPath}</system:String>
+    <system:String x:Key="Log_Setting_FileBackupFailed">[SettingService] Failed to back up corrupted settings file. Path={Path}</system:String>
 
     <!-- SnackbarService.cs -->
     <system:String x:Key="Log_Snackbar_ShowError">[SnackbarService] Show failed.</system:String>

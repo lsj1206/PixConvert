@@ -67,24 +67,26 @@ public class FileAnalyzerService : IFileAnalyzerService
         // 1단계: 직접 선택된 파일 처리
         if (directFiles.Count > 0)
         {
-            var (items, dups, ignored) = await ProcessDirectFilesAsync(
+            var (items, dups, ignored, failed) = await ProcessDirectFilesAsync(
                 directFiles, seenPaths, fileCapacity, progress, allItems.Count);
 
             allItems.AddRange(items);
             result.DuplicateCount += dups;
             result.IgnoredCount += ignored;
+            result.FailedCount += failed;
             fileCapacity -= items.Count;
         }
 
         // 2단계: 폴더 스캔 처리
         if (folders.Count > 0)
         {
-            var (items, dups, ignored) = await ProcessFoldersAsync(
+            var (items, dups, ignored, failed) = await ProcessFoldersAsync(
                 folders, seenPaths, fileCapacity, progress, allItems.Count);
 
             allItems.AddRange(items);
             result.DuplicateCount += dups;
             result.IgnoredCount += ignored;
+            result.FailedCount += failed;
         }
 
         result.NewItems = allItems;
@@ -92,7 +94,7 @@ public class FileAnalyzerService : IFileAnalyzerService
 
         _logger.LogInformation(GetString("Log_Process_Summary"),
             result.TotalPathCount, result.SuccessCount,
-            result.DuplicateCount, result.IgnoredCount, sw.ElapsedMilliseconds);
+            result.DuplicateCount, result.IgnoredCount, result.FailedCount, sw.ElapsedMilliseconds);
 
         return result;
     }
@@ -100,7 +102,7 @@ public class FileAnalyzerService : IFileAnalyzerService
     /// <summary>
     /// 직접 선택된 파일 경로 목록에서 중복을 제거하고 FileItem 배치를 생성합니다.
     /// </summary>
-    private async Task<(List<FileItem> Items, int DuplicateCount, int IgnoredCount)>
+    private async Task<(List<FileItem> Items, int DuplicateCount, int IgnoredCount, int FailedCount)>
         ProcessDirectFilesAsync(
             List<string> filePaths,
             HashSet<string> seenPaths,
@@ -126,18 +128,18 @@ public class FileAnalyzerService : IFileAnalyzerService
         int ignoredCount = unique.Count - canAdd;
 
         if (canAdd == 0)
-            return (new List<FileItem>(), duplicateCount, ignoredCount);
+            return (new List<FileItem>(), duplicateCount, ignoredCount, 0);
 
         var targets = unique.Take(canAdd).ToList();
-        var items = await CreateItemsBatchAsync(targets, progress, alreadyProcessedCount);
+        var (items, failedCount) = await CreateItemsBatchAsync(targets, progress, alreadyProcessedCount);
 
-        return (items, duplicateCount, ignoredCount);
+        return (items, duplicateCount, ignoredCount, failedCount);
     }
 
     /// <summary>
     /// 폴더 경로 목록을 재귀 스캔하여 중복·용량 한도 처리 후 FileItem 배치를 생성합니다.
     /// </summary>
-    private async Task<(List<FileItem> Items, int DuplicateCount, int IgnoredCount)>
+    private async Task<(List<FileItem> Items, int DuplicateCount, int IgnoredCount, int FailedCount)>
         ProcessFoldersAsync(
             List<string> folders,
             HashSet<string> seenPaths,
@@ -146,7 +148,7 @@ public class FileAnalyzerService : IFileAnalyzerService
             int alreadyProcessedCount)
     {
         if (fileCapacity <= 0)
-            return (new List<FileItem>(), 0, folders.Count);
+            return (new List<FileItem>(), 0, folders.Count, 0);
 
         var folderFiles = new List<FileInfo>();
         int duplicateCount = 0;
@@ -184,25 +186,25 @@ public class FileAnalyzerService : IFileAnalyzerService
         });
 
         if (folderFiles.Count == 0)
-            return (new List<FileItem>(), duplicateCount, ignoredCount);
+            return (new List<FileItem>(), duplicateCount, ignoredCount, 0);
 
         var paths = folderFiles.Select(f => f.FullName).ToList();
-        var items = await CreateItemsBatchAsync(paths, progress, alreadyProcessedCount);
+        var (items, failedCount) = await CreateItemsBatchAsync(paths, progress, alreadyProcessedCount);
 
-        return (items, duplicateCount, ignoredCount);
+        return (items, duplicateCount, ignoredCount, failedCount);
     }
 
     /// <summary>
     /// 파일 경로 목록을 Parallel.ForEachAsync로 병렬 처리하여 FileItem 컬렉션을 반환합니다.
     /// 병렬도는 IDriveInfoService에 위임합니다. 진행률 보고를 포함합니다.
     /// </summary>
-    private async Task<List<FileItem>> CreateItemsBatchAsync(
+    private async Task<(List<FileItem> Items, int FailedCount)> CreateItemsBatchAsync(
         List<string> filePaths,
         IProgress<FileProcessingProgress>? progress,
         int baseOffset)
     {
         int count = filePaths.Count;
-        if (count == 0) return new List<FileItem>();
+        if (count == 0) return (new List<FileItem>(), 0);
 
         var items = new FileItem?[count];
         int processedCount = 0;
@@ -249,7 +251,8 @@ public class FileAnalyzerService : IFileAnalyzerService
                 });
         }
 
-        return items.Where(item => item != null).ToList()!;
+        var successfulItems = items.OfType<FileItem>().ToList();
+        return (successfulItems, count - successfulItems.Count);
     }
 
     private sealed class DrivePathGroup
