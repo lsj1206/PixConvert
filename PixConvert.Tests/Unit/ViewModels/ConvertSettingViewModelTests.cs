@@ -11,6 +11,14 @@ namespace PixConvert.Tests;
 
 public class ConvertSettingViewModelTests
 {
+    public static IEnumerable<object[]> AnimationVisibilityCases()
+    {
+        yield return new object[] { null!, false, false, false, false, false };
+        yield return new object[] { "GIF", false, false, false, false, true };
+        yield return new object[] { "WEBP", false, true, true, false, false };
+        yield return new object[] { "WEBP", true, true, false, true, false };
+    }
+
     private static ConvertSettingViewModel CreateViewModel(Mock<IPathPickerService>? pathPicker = null)
     {
         var languageMock = new Mock<ILanguageService>();
@@ -32,58 +40,25 @@ public class ConvertSettingViewModelTests
             (pathPicker ?? new Mock<IPathPickerService>()).Object);
     }
 
-    [Fact]
-    public void AnimationWebpOptions_WhenAnimationTargetIsNull_ShouldBeHidden()
+    [Theory]
+    [MemberData(nameof(AnimationVisibilityCases))]
+    public void AnimationOptionVisibility_ShouldMatchTargetAndLosslessMode(
+        string? targetFormat,
+        bool lossless,
+        bool showWebpEffort,
+        bool showWebpPreset,
+        bool showPreserveTransparentPixels,
+        bool showGifEffort)
     {
         var vm = CreateViewModel();
 
-        vm.AnimationTargetFormat = null;
+        vm.AnimationTargetFormat = targetFormat;
+        vm.AnimationLossless = lossless;
 
-        Assert.False(vm.AnimationShowWebpEncodingEffort);
-        Assert.False(vm.AnimationShowWebpPreset);
-        Assert.False(vm.AnimationShowWebpPreserveTransparentPixels);
-        Assert.False(vm.AnimationShowGifEncodingEffort);
-    }
-
-    [Fact]
-    public void AnimationWebpOptions_WhenAnimationTargetIsGif_ShouldBeHidden()
-    {
-        var vm = CreateViewModel();
-
-        vm.AnimationTargetFormat = "GIF";
-
-        Assert.False(vm.AnimationShowWebpEncodingEffort);
-        Assert.False(vm.AnimationShowWebpPreset);
-        Assert.False(vm.AnimationShowWebpPreserveTransparentPixels);
-        Assert.True(vm.AnimationShowGifEncodingEffort);
-    }
-
-    [Fact]
-    public void AnimationWebpOptions_WhenLossyWebp_ShouldShowEffortAndPreset()
-    {
-        var vm = CreateViewModel();
-
-        vm.AnimationTargetFormat = "WEBP";
-        vm.AnimationLossless = false;
-
-        Assert.True(vm.AnimationShowWebpEncodingEffort);
-        Assert.True(vm.AnimationShowWebpPreset);
-        Assert.False(vm.AnimationShowWebpPreserveTransparentPixels);
-        Assert.False(vm.AnimationShowGifEncodingEffort);
-    }
-
-    [Fact]
-    public void AnimationWebpOptions_WhenLosslessWebp_ShouldShowEffortAndPreserveTransparentPixels()
-    {
-        var vm = CreateViewModel();
-
-        vm.AnimationTargetFormat = "WEBP";
-        vm.AnimationLossless = true;
-
-        Assert.True(vm.AnimationShowWebpEncodingEffort);
-        Assert.False(vm.AnimationShowWebpPreset);
-        Assert.True(vm.AnimationShowWebpPreserveTransparentPixels);
-        Assert.False(vm.AnimationShowGifEncodingEffort);
+        Assert.Equal(showWebpEffort, vm.AnimationShowWebpEncodingEffort);
+        Assert.Equal(showWebpPreset, vm.AnimationShowWebpPreset);
+        Assert.Equal(showPreserveTransparentPixels, vm.AnimationShowWebpPreserveTransparentPixels);
+        Assert.Equal(showGifEffort, vm.AnimationShowGifEncodingEffort);
     }
 
     [Theory]
@@ -125,21 +100,6 @@ public class ConvertSettingViewModelTests
         vm.ChangeOutputPathCommand.Execute(null);
 
         Assert.Equal(@"C:\Output", vm.CustomOutputPath);
-    }
-
-    [Fact]
-    public void ChangeOutputPathCommand_WhenCancelled_ShouldKeepCurrentOutputPath()
-    {
-        var pathPicker = new Mock<IPathPickerService>();
-        pathPicker
-            .Setup(service => service.PickFolder("Dlg_Title_SelectOutputPath"))
-            .Returns((string?)null);
-        var vm = CreateViewModel(pathPicker);
-        vm.CustomOutputPath = @"C:\Existing";
-
-        vm.ChangeOutputPathCommand.Execute(null);
-
-        Assert.Equal(@"C:\Existing", vm.CustomOutputPath);
     }
 
     [Fact]

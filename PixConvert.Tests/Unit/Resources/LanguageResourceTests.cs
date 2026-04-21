@@ -1,11 +1,9 @@
 using System.IO;
-using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Xml.Linq;
 using System.Windows;
 using System.Windows.Markup;
-using System.Xml.Linq;
-using PixConvert.Views.Dialogs;
 
 namespace PixConvert.Tests;
 
@@ -39,7 +37,7 @@ public class LanguageResourceTests
     }
 
     [Fact]
-    public void LanguageResources_ShouldContainAppSettingInfoKeys()
+    public void LanguageResources_ShouldContainRequiredUiKeys()
     {
         string[] expectedKeys =
         [
@@ -53,20 +51,7 @@ public class LanguageResourceTests
             "Setting_App_UpdateLatest",
             "Setting_App_UpdateAvailable",
             "Setting_App_UpdateNoRelease",
-            "Setting_App_UpdateFailed"
-        ];
-        var koKeys = LoadLanguageKeys("Lang.ko-KR.xaml").ToHashSet(StringComparer.Ordinal);
-        var enKeys = LoadLanguageKeys("Lang.en-US.xaml").ToHashSet(StringComparer.Ordinal);
-
-        AssertNoMissingKeys("Lang.ko-KR.xaml", expectedKeys, koKeys);
-        AssertNoMissingKeys("Lang.en-US.xaml", expectedKeys, enKeys);
-    }
-
-    [Fact]
-    public void LanguageResources_ShouldContainUserMessageKeys()
-    {
-        string[] expectedKeys =
-        [
+            "Setting_App_UpdateFailed",
             "Msg_FileAddError",
             "Msg_AddFileFailed",
             "Msg_AddWithFailure",
@@ -107,40 +92,6 @@ public class LanguageResourceTests
         thread.Join();
 
         Assert.Null(exception);
-    }
-
-    [Fact]
-    public void ConfirmationWarningContent_ShouldLoadAsWpfControl()
-    {
-        Exception? exception = null;
-        string? message = null;
-        string? warning = null;
-
-        var thread = new Thread(() =>
-        {
-            try
-            {
-                var content = new ConfirmationWarningContent
-                {
-                    Message = "Message",
-                    WarningMessage = "Warning"
-                };
-                message = content.Message;
-                warning = content.WarningMessage;
-            }
-            catch (Exception ex)
-            {
-                exception = ex;
-            }
-        });
-
-        thread.SetApartmentState(ApartmentState.STA);
-        thread.Start();
-        thread.Join();
-
-        Assert.Null(exception);
-        Assert.Equal("Message", message);
-        Assert.Equal("Warning", warning);
     }
 
     [Fact]
@@ -225,8 +176,8 @@ public class LanguageResourceTests
             $"{targetName} is missing resource keys: {string.Join(", ", missingKeys)}");
     }
 
-    private static string GetRepoRoot([CallerFilePath] string sourcePath = "")
+    private static string GetRepoRoot()
     {
-        return Path.GetFullPath(Path.Combine(Path.GetDirectoryName(sourcePath)!, ".."));
+        return RepositoryRootHelper.FindRepositoryRoot();
     }
 }

@@ -1,7 +1,9 @@
 using System;
 using System.Buffers.Binary;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Moq;
 using PixConvert.Models;
@@ -14,38 +16,37 @@ public class FileScannerServiceTests : IDisposable
 {
     private readonly FileScannerService _fileScannerService;
     private readonly Mock<ILogger<FileScannerService>> _mockLogger;
-    private readonly string _tempDirectory;
+    private readonly TempDirectoryFixture _tempDirectory = new("PixConvertTests_");
 
     public FileScannerServiceTests()
     {
         _mockLogger = new Mock<ILogger<FileScannerService>>();
-
-        var mockLanguage = new Mock<ILanguageService>();
-        mockLanguage.Setup(x => x.GetString(It.IsAny<string>())).Returns((string key) => key);
-
-        _fileScannerService = new FileScannerService(_mockLogger.Object, mockLanguage.Object);
-        _tempDirectory = Path.Combine(Path.GetTempPath(), "PixConvertTests_" + Guid.NewGuid().ToString("N"));
-        Directory.CreateDirectory(_tempDirectory);
+        _fileScannerService = new FileScannerService(_mockLogger.Object, new FakeLanguageService());
     }
 
-    [Fact]
-    public async Task AnalyzeSignatureAsync_GivenRealJpgByteHeader_ShouldReturnJpeg()
+    public static IEnumerable<object[]> SupportedSignatureCases()
     {
-        string path = WriteFile("fake_image.png", [0xFF, 0xD8, 0xFF, 0x00]);
+        yield return new object[] { "fake_image.png", new byte[] { 0xFF, 0xD8, 0xFF, 0x00 }, "JPEG", false, false };
+        yield return new object[] { "static.png", Png(("IHDR", new byte[13]), ("IDAT", [])), "PNG", false, false };
+        yield return new object[] { "fake.jpg", new byte[] { 0x42, 0x4D, 0x00, 0x00 }, "BMP", false, false };
+        yield return new object[] { "static.webp", Webp(isAnimation: false), "WEBP", false, false };
+        yield return new object[] { "static.avif", Avif("avif", "mif1", "miaf"), "AVIF", false, false };
+    }
+
+    [Theory]
+    [MemberData(nameof(SupportedSignatureCases))]
+    public async Task AnalyzeSignatureAsync_WhenSupportedHeaderMatches_ShouldReturnExpectedSignature(
+        string fileName,
+        byte[] content,
+        string format,
+        bool isAnimation,
+        bool isUnsupported)
+    {
+        string path = WriteFile(fileName, content);
 
         FileSignatureResult result = await _fileScannerService.AnalyzeSignatureAsync(path);
 
-        AssertSignature(result, "JPEG", isAnimation: false, isUnsupported: false);
-    }
-
-    [Fact]
-    public async Task AnalyzeSignatureAsync_GivenStaticPng_ShouldReturnSupportedPng()
-    {
-        string path = WriteFile("static.png", Png(("IHDR", new byte[13]), ("IDAT", [])));
-
-        FileSignatureResult result = await _fileScannerService.AnalyzeSignatureAsync(path);
-
-        AssertSignature(result, "PNG", isAnimation: false, isUnsupported: false);
+        AssertSignature(result, format, isAnimation, isUnsupported);
     }
 
     [Fact]
@@ -86,14 +87,7 @@ public class FileScannerServiceTests : IDisposable
         FileSignatureResult result = await _fileScannerService.AnalyzeSignatureAsync("C:\\NonExistentPath\\Fake.jpg");
 
         AssertSignature(result, "-", isAnimation: false, isUnsupported: true);
-        _mockLogger.Verify(
-            x => x.Log(
-                It.Is<LogLevel>(l => l == LogLevel.Error),
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => true),
-                It.IsAny<Exception>(),
-                It.Is<Func<It.IsAnyType, Exception?, string>>((v, t) => true)),
-            Times.Once);
+        VerifyLog(LogLevel.Error, Times.Once());
     }
 
     [Fact]
@@ -127,26 +121,6 @@ public class FileScannerServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task AnalyzeSignatureAsync_GivenBmpHeader_ShouldReturnBmpSupported()
-    {
-        string path = WriteFile("fake.jpg", [0x42, 0x4D, 0x00, 0x00]);
-
-        FileSignatureResult result = await _fileScannerService.AnalyzeSignatureAsync(path);
-
-        AssertSignature(result, "BMP", isAnimation: false, isUnsupported: false);
-    }
-
-    [Fact]
-    public async Task AnalyzeSignatureAsync_GivenStaticWebpHeader_ShouldReturnWebpSupported()
-    {
-        string path = WriteFile("static.webp", Webp(isAnimation: false));
-
-        FileSignatureResult result = await _fileScannerService.AnalyzeSignatureAsync(path);
-
-        AssertSignature(result, "WEBP", isAnimation: false, isUnsupported: false);
-    }
-
-    [Fact]
     public async Task AnalyzeSignatureAsync_GivenAnimatedWebpHeader_ShouldReturnWebpAnimationSupported()
     {
         string path = WriteFile("animated.webp", Webp(isAnimation: true));
@@ -154,16 +128,6 @@ public class FileScannerServiceTests : IDisposable
         FileSignatureResult result = await _fileScannerService.AnalyzeSignatureAsync(path);
 
         AssertSignature(result, "WEBP", isAnimation: true, isUnsupported: false);
-    }
-
-    [Fact]
-    public async Task AnalyzeSignatureAsync_GivenAvifBrand_ShouldReturnAvifSupported()
-    {
-        string path = WriteFile("static.avif", Avif("avif", "mif1", "miaf"));
-
-        FileSignatureResult result = await _fileScannerService.AnalyzeSignatureAsync(path);
-
-        AssertSignature(result, "AVIF", isAnimation: false, isUnsupported: false);
     }
 
     [Fact]
@@ -214,9 +178,14 @@ public class FileScannerServiceTests : IDisposable
         VerifyLog(LogLevel.Error, Times.Once());
     }
 
+    public void Dispose()
+    {
+        _tempDirectory.Dispose();
+    }
+
     private string WriteFile(string fileName, byte[] bytes)
     {
-        string path = Path.Combine(_tempDirectory, fileName);
+        string path = _tempDirectory.CreatePath(fileName);
         File.WriteAllBytes(path, bytes);
         return path;
     }
@@ -317,11 +286,5 @@ public class FileScannerServiceTests : IDisposable
             ms.Write(Encoding.ASCII.GetBytes(brand));
 
         return ms.ToArray();
-    }
-
-    public void Dispose()
-    {
-        if (Directory.Exists(_tempDirectory))
-            Directory.Delete(_tempDirectory, true);
     }
 }

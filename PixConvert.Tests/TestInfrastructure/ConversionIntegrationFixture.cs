@@ -3,135 +3,43 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging.Abstractions;
 using NetVips;
-using SkiaSharp;
-using Xunit;
 using PixConvert.Models;
 using PixConvert.Services;
 using PixConvert.Services.Interfaces;
 using PixConvert.Services.Providers;
+using SkiaSharp;
 
 namespace PixConvert.Tests;
 
-public class ConversionMatrixTests : IDisposable
+public sealed class ConversionIntegrationFixture : IDisposable
 {
     private const int Width = 48;
     private const int Height = 36;
     private const int AnimationFrames = 3;
 
-    private readonly string _testDir;
+    private readonly TempDirectoryFixture _tempDirectory = new("PixConvertMatrix_");
     private readonly SkiaSharpProvider _skiaSharp;
     private readonly NetVipsProvider _netVips;
     private readonly EngineSelector _selector;
 
-    private sealed class MockLanguageService : ILanguageService
+    public ConversionIntegrationFixture()
     {
-        public string GetString(string key) => key;
-        public void ChangeLanguage(string culture) { }
-        public string GetSystemLanguage() => "ko-KR";
-        public string GetCurrentLanguage() => "ko-KR";
-        public event Action LanguageChanged = delegate { };
-    }
-
-    public ConversionMatrixTests()
-    {
-        var languageService = new MockLanguageService();
-        _testDir = Path.Combine(Path.GetTempPath(), "PixConvertMatrix_" + Guid.NewGuid().ToString("N"));
-        Directory.CreateDirectory(_testDir);
-
+        var languageService = new FakeLanguageService();
         _skiaSharp = new SkiaSharpProvider(languageService, NullLogger<SkiaSharpProvider>.Instance);
         _netVips = new NetVipsProvider(languageService, NullLogger<NetVipsProvider>.Instance);
         _selector = new EngineSelector(_skiaSharp, _netVips);
     }
 
-    public static IEnumerable<object[]> StaticConversionCases()
+    public string CreateScenarioDirectory(string scenarioName) =>
+        _tempDirectory.EnsureDirectory(scenarioName);
+
+    public async Task<FileItem> CreateStaticInputAsync(string sourceFormat, string scenarioName)
     {
-        string[] sourceFormats = { "JPEG", "PNG", "BMP", "WEBP", "AVIF" };
-        string[] targetFormats = { "JPEG", "PNG", "BMP", "WEBP", "AVIF" };
-
-        foreach (string sourceFormat in sourceFormats)
-        {
-            foreach (string targetFormat in targetFormats)
-            {
-                yield return new object[] { sourceFormat, targetFormat };
-            }
-        }
-    }
-
-    public static IEnumerable<object[]> AnimatedConversionCases()
-    {
-        string[] sourceFormats = { "GIF", "WEBP" };
-        string[] targetFormats = { "GIF", "WEBP" };
-
-        foreach (string sourceFormat in sourceFormats)
-        {
-            foreach (string targetFormat in targetFormats)
-            {
-                yield return new object[] { sourceFormat, targetFormat };
-            }
-        }
-    }
-
-    [Theory]
-    [MemberData(nameof(StaticConversionCases))]
-    public async Task StaticConversionMatrix_ShouldConvertEverySupportedCombination(string sourceFormat, string targetFormat)
-    {
-        FileItem file = await CreateStaticInputAsync(sourceFormat);
-        var settings = CreateStaticSettings(targetFormat);
-
-        var provider = _selector.GetProvider(file, settings);
-        Assert.Equal(ExpectedStaticProviderName(sourceFormat, targetFormat), provider.Name);
-
-        var result = await provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
-
-        AssertSuccessfulOutput(result, targetFormat);
-        AssertImageCanReopen(result.OutputPath!);
-    }
-
-    [Theory]
-    [MemberData(nameof(AnimatedConversionCases))]
-    public async Task AnimatedConversionMatrix_ShouldConvertEverySupportedCombinationAndKeepMultipleFrames(
-        string sourceFormat,
-        string targetFormat)
-    {
-        FileItem file = CreateAnimatedInput(sourceFormat);
-        var settings = CreateAnimationSettings(targetFormat);
-
-        var provider = _selector.GetProvider(file, settings);
-        Assert.Equal("NetVips", provider.Name);
-
-        var result = await provider.ConvertAsync(file, settings, new ConversionSession(), CancellationToken.None);
-
-        AssertSuccessfulOutput(result, targetFormat);
-        AssertImageCanReopen(result.OutputPath!);
-        Assert.True(GetLoadedFrameCount(result.OutputPath!) >= 2, $"{sourceFormat} -> {targetFormat} collapsed to a single frame.");
-    }
-
-    public void Dispose()
-    {
-        GC.Collect();
-        GC.WaitForPendingFinalizers();
-
-        if (!Directory.Exists(_testDir))
-            return;
-
-        try
-        {
-            Directory.Delete(_testDir, true);
-        }
-        catch (IOException)
-        {
-            Thread.Sleep(500);
-            try { Directory.Delete(_testDir, true); } catch { }
-        }
-    }
-
-    private async Task<FileItem> CreateStaticInputAsync(string sourceFormat)
-    {
-        string path = Path.Combine(_testDir, "source." + GetExtension(sourceFormat));
+        string directory = CreateScenarioDirectory(scenarioName);
+        string path = Path.Combine(directory, "source." + GetExtension(sourceFormat));
 
         switch (sourceFormat)
         {
@@ -144,7 +52,7 @@ public class ConversionMatrixTests : IDisposable
             case "BMP":
                 using (var bitmap = CreateRasterBitmap(hasAlpha: false))
                 {
-                    await BmpEncoder.SaveAsync(bitmap, path);
+                    BmpEncoder.SaveAsync(bitmap, path).GetAwaiter().GetResult();
                 }
                 break;
             case "WEBP":
@@ -166,24 +74,23 @@ public class ConversionMatrixTests : IDisposable
         };
     }
 
-    private FileItem CreateAnimatedInput(string sourceFormat)
+    public FileItem CreateAnimatedInput(string sourceFormat, string scenarioName)
     {
-        string path = Path.Combine(_testDir, "animated." + GetExtension(sourceFormat));
+        string directory = CreateScenarioDirectory(scenarioName);
+        string path = Path.Combine(directory, "animated." + GetExtension(sourceFormat));
 
-        using (var image = CreateAnimatedVipsImage())
+        using var image = CreateAnimatedVipsImage();
+        if (sourceFormat == "GIF")
         {
-            if (sourceFormat == "GIF")
-            {
-                image.Gifsave(path, keep: Enums.ForeignKeep.None);
-            }
-            else if (sourceFormat == "WEBP")
-            {
-                image.Webpsave(path, q: 80, lossless: false, keep: Enums.ForeignKeep.None);
-            }
-            else
-            {
-                throw new ArgumentOutOfRangeException(nameof(sourceFormat), sourceFormat, null);
-            }
+            image.Gifsave(path, keep: Enums.ForeignKeep.None);
+        }
+        else if (sourceFormat == "WEBP")
+        {
+            image.Webpsave(path, q: 80, lossless: false, keep: Enums.ForeignKeep.None);
+        }
+        else
+        {
+            throw new ArgumentOutOfRangeException(nameof(sourceFormat), sourceFormat, null);
         }
 
         return new FileItem
@@ -195,7 +102,10 @@ public class ConversionMatrixTests : IDisposable
         };
     }
 
-    private static ConvertSettings CreateStaticSettings(string targetFormat) =>
+    public IProviderService GetProvider(FileItem file, ConvertSettings settings) =>
+        _selector.GetProvider(file, settings);
+
+    public static ConvertSettings CreateStaticSettings(string targetFormat) =>
         new()
         {
             StandardTargetFormat = targetFormat,
@@ -212,7 +122,7 @@ public class ConversionMatrixTests : IDisposable
             OverwritePolicy = OverwritePolicy.Suffix
         };
 
-    private static ConvertSettings CreateAnimationSettings(string targetFormat) =>
+    public static ConvertSettings CreateAnimationSettings(string targetFormat) =>
         new()
         {
             AnimationTargetFormat = targetFormat,
@@ -228,12 +138,12 @@ public class ConversionMatrixTests : IDisposable
             OverwritePolicy = OverwritePolicy.Suffix
         };
 
-    private static string ExpectedStaticProviderName(string sourceFormat, string targetFormat) =>
+    public static string ExpectedStaticProviderName(string sourceFormat, string targetFormat) =>
         sourceFormat == "AVIF" || targetFormat == "AVIF"
             ? "NetVips"
             : "SkiaSharp";
 
-    private static void AssertSuccessfulOutput(ConversionResult result, string targetFormat)
+    public static void AssertSuccessfulOutput(ConversionResult result, string targetFormat)
     {
         Assert.Equal(FileConvertStatus.Success, result.Status);
         Assert.False(string.IsNullOrWhiteSpace(result.OutputPath));
@@ -242,7 +152,7 @@ public class ConversionMatrixTests : IDisposable
         Assert.Equal("." + GetExtension(targetFormat), Path.GetExtension(result.OutputPath));
     }
 
-    private static void AssertImageCanReopen(string outputPath)
+    public static void AssertImageCanReopen(string outputPath)
     {
         try
         {
@@ -262,7 +172,7 @@ public class ConversionMatrixTests : IDisposable
         }
     }
 
-    private static int GetLoadedFrameCount(string path)
+    public static int GetLoadedFrameCount(string path)
     {
         var loaderOptions = new VOption();
         loaderOptions.Add("n", -1);
@@ -276,6 +186,11 @@ public class ConversionMatrixTests : IDisposable
         return pageHeight > 0
             ? Math.Max(1, image.Height / pageHeight)
             : 1;
+    }
+
+    public void Dispose()
+    {
+        _tempDirectory.Dispose();
     }
 
     private static int TryGetIntMetadata(Image image, string key)
