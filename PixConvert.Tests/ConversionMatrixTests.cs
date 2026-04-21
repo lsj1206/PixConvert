@@ -112,9 +112,6 @@ public class ConversionMatrixTests : IDisposable
 
     public void Dispose()
     {
-        _netVips.Dispose();
-        _skiaSharp.Dispose();
-
         GC.Collect();
         GC.WaitForPendingFinalizers();
 

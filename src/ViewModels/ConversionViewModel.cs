@@ -631,6 +631,8 @@ public partial class ConversionViewModel : ViewModelBase
         RequestStatus(AppStatus.Idle);
     }
 
+    /// <summary>
+    /// 완료 확인 이후 변환 관련 상태를 초기 상태로 되돌립니다.
     /// </summary>
     private void ConfirmCompletion()
     {
@@ -662,8 +664,8 @@ public partial class ConversionViewModel : ViewModelBase
         CurrentCpuUsage = GetString($"Setting_Cpu_{settings.CpuUsage}");
         CurrentTargetFormat = ConversionSummaryBuilder.BuildTargetFormatSummary(settings, activeFiles);
         ApplyOptionSummaries(
-            BuildStandardOptionsSummary(settings, activeFiles, GetString),
-            BuildAnimationOptionsSummary(settings, activeFiles, GetString));
+            ConversionSummaryBuilder.BuildStandardOptionsSummary(settings, activeFiles, GetString),
+            ConversionSummaryBuilder.BuildAnimationOptionsSummary(settings, activeFiles, GetString));
         CurrentOverwritePolicy = GetString($"Setting_Overwrite_{settings.OverwritePolicy}");
         CurrentSaveMethod = ConversionSummaryBuilder.BuildSaveMethodSummary(settings, GetString);
         ApplySaveLocationSummary(ConversionSummaryBuilder.BuildSaveLocationSummary(settings, GetString));
@@ -683,15 +685,4 @@ public partial class ConversionViewModel : ViewModelBase
         CurrentSaveLocationTooltip = summary.TooltipText;
     }
 
-    internal static string BuildStandardOptionsSummary(
-        ConvertSettings settings,
-        IReadOnlyList<FileItem> activeFiles,
-        Func<string, string> getString) =>
-        ConversionSummaryBuilder.BuildStandardOptionsSummary(settings, activeFiles, getString);
-
-    internal static string BuildAnimationOptionsSummary(
-        ConvertSettings settings,
-        IReadOnlyList<FileItem> activeFiles,
-        Func<string, string> getString) =>
-        ConversionSummaryBuilder.BuildAnimationOptionsSummary(settings, activeFiles, getString);
 }

@@ -13,11 +13,10 @@ namespace PixConvert.Services.Providers;
 /// NetVips 엔진을 사용하는 애니메이션 및 고압축 이미지 변환 공급자입니다.
 /// 애니메이션(GIF, WebP)의 모든 프레임을 보존하며, libvips의 고성능 인코더를 활용합니다.
 /// </summary>
-public class NetVipsProvider : IProviderService, IDisposable
+public class NetVipsProvider : IProviderService
 {
     private readonly ILanguageService _languageService;
     private readonly ILogger<NetVipsProvider> _logger;
-    private bool _isDisposed;
 
     public string Name => "NetVips";
 
@@ -31,39 +30,23 @@ public class NetVipsProvider : IProviderService, IDisposable
     {
         token.ThrowIfCancellationRequested();
 
-        string basePath = OutputPathResolver.Resolve(file, settings);
-        var (outputPath, isCollision) = OutputPathResolver.ApplyOverwritePolicy(basePath, settings.OverwritePolicy, session, file.Path);
-
-        if (isCollision && outputPath is not null)
-        {
-            _logger.LogWarning(_languageService.GetString("Log_Conversion_PathCollision"), outputPath);
-        }
-
+        string? outputPath = ProviderConversionHelper.PrepareOutputPath(file, settings, session, _logger, _languageService);
         if (outputPath is null)
-        {
             return new ConversionResult(FileConvertStatus.Skipped);
-        }
-
-        string outputDir = Path.GetDirectoryName(outputPath)!;
-        if (!string.IsNullOrEmpty(outputDir))
-            Directory.CreateDirectory(outputDir);
 
         await Task.Run(() => ExecuteConversion(file, settings, outputPath, token), token);
 
-        long outputSize = System.IO.File.Exists(outputPath)
-            ? new System.IO.FileInfo(outputPath).Length
-            : 0;
-
-        return new ConversionResult(FileConvertStatus.Success, outputPath, outputSize);
+        return new ConversionResult(
+            FileConvertStatus.Success,
+            outputPath,
+            ProviderConversionHelper.GetOutputSize(outputPath));
     }
 
     private void ExecuteConversion(FileItem file, ConvertSettings settings, string outputPath, CancellationToken token)
     {
         token.ThrowIfCancellationRequested();
 
-        string targetFormat = file.IsAnimation
-            ? settings.AnimationTargetFormat ?? throw new InvalidOperationException("AnimationTargetFormat is required for animation output.")
-            : settings.StandardTargetFormat;
+        string targetFormat = ProviderConversionHelper.ResolveTargetFormat(file, settings);
 
         var loaderOptions = new VOption();
         if (file.IsAnimation)
@@ -85,8 +68,13 @@ public class NetVipsProvider : IProviderService, IDisposable
 
             if (!targetSupportsAlpha && image.HasAlpha())
             {
-                var bgColor = ParseBackgroundColor(settings, file.IsAnimation);
-                workImage = image.Flatten(background: bgColor);
+                ProviderBackgroundColor backgroundColor = ProviderConversionHelper.GetBackgroundColor(settings);
+                workImage = image.Flatten(background:
+                [
+                    backgroundColor.Red,
+                    backgroundColor.Green,
+                    backgroundColor.Blue
+                ]);
                 isNewImage = true;
             }
 
@@ -109,8 +97,8 @@ public class NetVipsProvider : IProviderService, IDisposable
 
     private static void SaveWithFormat(Image image, string outputPath, string targetFormat, ConvertSettings settings, bool isAnimation)
     {
-        int quality = GetQuality(settings, isAnimation);
-        bool lossless = GetLossless(settings, isAnimation);
+        int quality = ProviderConversionHelper.GetQuality(settings, isAnimation);
+        bool lossless = ProviderConversionHelper.GetLossless(settings, isAnimation);
 
         switch (targetFormat.ToUpperInvariant())
         {
@@ -277,50 +265,6 @@ public class NetVipsProvider : IProviderService, IDisposable
         }
     }
 
-    private static double[] ParseBackgroundColor(ConvertSettings settings, bool isAnimation)
-    {
-        string backgroundColor = settings.StandardBackgroundColor ?? "#FFFFFF";
-
-        return TryParseHexToArray(backgroundColor);
-    }
-
-    private static double[] TryParseHexToArray(string hex)
-    {
-        try
-        {
-            string clean = hex.TrimStart('#');
-            if (clean.Length == 6)
-            {
-                return
-                [
-                    Convert.ToByte(clean[0..2], 16),
-                    Convert.ToByte(clean[2..4], 16),
-                    Convert.ToByte(clean[4..6], 16)
-                ];
-            }
-            if (clean.Length == 8)
-            {
-                return
-                [
-                    Convert.ToByte(clean[2..4], 16),
-                    Convert.ToByte(clean[4..6], 16),
-                    Convert.ToByte(clean[6..8], 16)
-                ];
-            }
-        }
-        catch
-        {
-        }
-
-        return [255.0, 255.0, 255.0];
-    }
-
-    private static int GetQuality(ConvertSettings settings, bool isAnimation) =>
-        isAnimation ? settings.AnimationQuality : settings.StandardQuality;
-
-    private static bool GetLossless(ConvertSettings settings, bool isAnimation) =>
-        isAnimation ? settings.AnimationLossless : settings.StandardLossless;
-
     private static Enums.ForeignSubsample ResolveJpegSubsampleMode(ConvertSettings settings, bool isAnimation)
     {
         if (isAnimation)
@@ -432,10 +376,4 @@ public class NetVipsProvider : IProviderService, IDisposable
         return Image.NewFromMemory(rgbPixels, w, h, 3, Enums.BandFormat.Uchar);
     }
 
-    public void Dispose()
-    {
-        if (_isDisposed) return;
-        _isDisposed = true;
-        GC.SuppressFinalize(this);
-    }
 }

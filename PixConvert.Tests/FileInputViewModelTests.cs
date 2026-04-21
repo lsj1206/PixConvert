@@ -179,6 +179,58 @@ public class FileInputViewModelTests
     }
 
     [Fact]
+    public async Task DropFilesCommand_WhenOnlyLimitReached_ShouldShowLimitReached()
+    {
+        string[] paths = [@"C:\Drop\a.png"];
+        var pathPicker = new Mock<IPathPickerService>();
+        var analyzer = CreateAnalyzerReturning(new FileProcessingResult { IgnoredCount = 1 });
+        var snackbar = new Mock<ISnackbarService>();
+        var vm = CreateViewModel(pathPicker, analyzer, snackbar);
+
+        await vm.DropFilesCommand.ExecuteAsync(paths);
+
+        snackbar.Verify(
+            service => service.Show("Msg_LimitReached", SnackbarType.Error, It.IsAny<int>()),
+            Times.Once);
+    }
+
+    [Fact]
+    public async Task DropFilesCommand_WhenOnlyDuplicatesFound_ShouldShowNoNewFiles()
+    {
+        string[] paths = [@"C:\Drop\a.png"];
+        var pathPicker = new Mock<IPathPickerService>();
+        var analyzer = CreateAnalyzerReturning(new FileProcessingResult { DuplicateCount = 1 });
+        var snackbar = new Mock<ISnackbarService>();
+        var vm = CreateViewModel(pathPicker, analyzer, snackbar);
+
+        await vm.DropFilesCommand.ExecuteAsync(paths);
+
+        snackbar.Verify(
+            service => service.Show("Msg_NoNewFiles", SnackbarType.Error, It.IsAny<int>()),
+            Times.Once);
+    }
+
+    [Fact]
+    public async Task DropFilesCommand_WhenSomeFilesAreDuplicates_ShouldShowDuplicateSummary()
+    {
+        string[] paths = [@"C:\Drop\a.png", @"C:\Drop\b.jpg"];
+        var pathPicker = new Mock<IPathPickerService>();
+        var analyzer = CreateAnalyzerReturning(new FileProcessingResult
+        {
+            NewItems = [new FileItem { Path = paths[0] }],
+            DuplicateCount = 1
+        });
+        var snackbar = new Mock<ISnackbarService>();
+        var vm = CreateViewModel(pathPicker, analyzer, snackbar);
+
+        await vm.DropFilesCommand.ExecuteAsync(paths);
+
+        snackbar.Verify(
+            service => service.Show("Msg_AddWithDuplicate", SnackbarType.Warning, It.IsAny<int>()),
+            Times.Once);
+    }
+
+    [Fact]
     public async Task DropFilesCommand_WhenStartedFromListManager_ShouldRequestListManagerAfterCompletion()
     {
         string[] paths = [@"C:\Drop\a.png"];

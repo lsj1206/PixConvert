@@ -268,7 +268,7 @@ public class ConversionViewModelTests
         };
         var files = new List<FileItem> { new() { Path = @"C:\test.png", FileSignature = "PNG" } };
 
-        string summary = ConversionViewModel.BuildStandardOptionsSummary(settings, files, Key);
+        string summary = ConversionSummaryBuilder.BuildStandardOptionsSummary(settings, files, Key);
 
         Assert.Equal(
             string.Join(Environment.NewLine,
@@ -290,7 +290,7 @@ public class ConversionViewModelTests
         };
         var files = new List<FileItem> { new() { Path = @"C:\test.avif", FileSignature = "AVIF" } };
 
-        string summary = ConversionViewModel.BuildStandardOptionsSummary(settings, files, Key);
+        string summary = ConversionSummaryBuilder.BuildStandardOptionsSummary(settings, files, Key);
 
         Assert.Contains("Setting_ChromaSubsampling Converting_Jpeg422AvifAuto", summary);
     }
@@ -308,7 +308,7 @@ public class ConversionViewModelTests
         };
         var files = new List<FileItem> { new() { Path = @"C:\test.png", FileSignature = "PNG" } };
 
-        string summary = ConversionViewModel.BuildStandardOptionsSummary(settings, files, Key);
+        string summary = ConversionSummaryBuilder.BuildStandardOptionsSummary(settings, files, Key);
 
         Assert.Equal(
             string.Join(Environment.NewLine,
@@ -331,7 +331,7 @@ public class ConversionViewModelTests
         };
         var files = new List<FileItem> { new() { Path = @"C:\test.gif", FileSignature = "GIF", IsAnimation = true } };
 
-        string summary = ConversionViewModel.BuildAnimationOptionsSummary(settings, files, Key);
+        string summary = ConversionSummaryBuilder.BuildAnimationOptionsSummary(settings, files, Key);
 
         Assert.Equal(
             string.Join(Environment.NewLine,
@@ -354,7 +354,7 @@ public class ConversionViewModelTests
         };
         var files = new List<FileItem> { new() { Path = @"C:\test.gif", FileSignature = "GIF", IsAnimation = true } };
 
-        string summary = ConversionViewModel.BuildAnimationOptionsSummary(settings, files, Key);
+        string summary = ConversionSummaryBuilder.BuildAnimationOptionsSummary(settings, files, Key);
 
         Assert.Equal(
             string.Join(Environment.NewLine,
@@ -371,7 +371,7 @@ public class ConversionViewModelTests
         var settings = new ConvertSettings { AnimationTargetFormat = null };
         var files = new List<FileItem> { new() { Path = @"C:\test.gif", FileSignature = "GIF", IsAnimation = true } };
 
-        string summary = ConversionViewModel.BuildAnimationOptionsSummary(settings, files, Key);
+        string summary = ConversionSummaryBuilder.BuildAnimationOptionsSummary(settings, files, Key);
 
         Assert.Equal(string.Empty, summary);
     }
