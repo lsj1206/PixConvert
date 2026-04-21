@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Controls;
@@ -95,7 +96,7 @@ public partial class FileListControl : UserControl
         _startPoint = e.GetPosition(null);
         _isPotentialDrag = false;
 
-        ListViewItem? listViewItem = FindAnchestor<ListViewItem>((DependencyObject)e.OriginalSource);
+        ListViewItem? listViewItem = FindAncestor<ListViewItem>((DependencyObject)e.OriginalSource);
         if (listViewItem != null && listViewItem.IsSelected)
         {
             // 더블 클릭 시에는 WPF 기본 동작(수동 편집 등)을 위해 방해하지 않음
@@ -114,7 +115,7 @@ public partial class FileListControl : UserControl
     {
         if (_isPotentialDrag && sender is ListView listView)
         {
-            ListViewItem? listViewItem = FindAnchestor<ListViewItem>((DependencyObject)e.OriginalSource);
+            ListViewItem? listViewItem = FindAncestor<ListViewItem>((DependencyObject)e.OriginalSource);
             if (listViewItem != null)
             {
                 var item = listView.ItemContainerGenerator.ItemFromContainer(listViewItem);
@@ -130,49 +131,16 @@ public partial class FileListControl : UserControl
     /// </summary>
     private void FileListView_MouseMove(object sender, MouseEventArgs e)
     {
-        if (e.LeftButton == MouseButtonState.Pressed && sender is ListView listView)
-        {
-            Point mousePos = e.GetPosition(null);
-            Vector diff = _startPoint - mousePos;
+        if (!ShouldStartInternalDrag(sender, e, out var listView))
+            return;
 
-            // 최소 드래그 임계값 확인
-            if (Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance ||
-                Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance)
-            {
-                ListViewItem? listViewItem = FindAnchestor<ListViewItem>((DependencyObject)e.OriginalSource);
-
-                if (listViewItem != null)
-                {
-                    var selectedItems = listView.SelectedItems.Cast<FileItem>().ToList();
-                    var clickedItem = listView.ItemContainerGenerator.ItemFromContainer(listViewItem) as FileItem;
-
-                    // 단일 클릭 후 즉시 드래그 시 clickedItem만 대상으로 설정
-                    if (clickedItem != null && !selectedItems.Contains(clickedItem))
-                    {
-                        selectedItems = new List<FileItem> { clickedItem };
-                    }
-
-                    if (selectedItems.Count > 0)
-                    {
-                        // [데이터 보호] 필터링 중에는 순서 변경을 위한 드래그를 금지함
-                        if (IsMismatchFilterActive)
-                        {
-                            return;
-                        }
-
-                        _isPotentialDrag = false;
-                        var dragData = new DataObject("InternalMove", selectedItems);
-                        DragDrop.DoDragDrop(listViewItem, dragData, DragDropEffects.Move);
-                    }
-                }
-            }
-        }
+        TryStartInternalDrag(listView, (DependencyObject)e.OriginalSource);
     }
 
     /// <summary>
     /// 비주얼 트리에서 지정된 형식의 조상 요소를 찾습니다.
     /// </summary>
-    private static T? FindAnchestor<T>(DependencyObject? current) where T : DependencyObject
+    private static T? FindAncestor<T>(DependencyObject? current) where T : DependencyObject
     {
         do
         {
@@ -207,7 +175,7 @@ public partial class FileListControl : UserControl
     /// </summary>
     private void FileListView_DragLeave(object sender, DragEventArgs e)
     {
-        DropIndicator.Visibility = Visibility.Collapsed;
+        HideDropIndicator();
     }
 
     /// <summary>
@@ -217,22 +185,19 @@ public partial class FileListControl : UserControl
     {
         e.Handled = true;
 
-        if (e.Data.GetDataPresent(DataFormats.FileDrop))
+        if (IsExternalFileDrop(e))
         {
-            e.Effects = DragDropEffects.Copy;
-            DropIndicator.Visibility = Visibility.Collapsed;
+            HandleExternalFileDrag(e);
+            return;
         }
-        else if (e.Data.GetDataPresent("InternalMove"))
+
+        if (IsInternalMoveDrop(e))
         {
-            e.Effects = DragDropEffects.Move;
-            UpdateDropIndicator(e);
-            HandleAutoScroll(e);
+            HandleInternalMoveDrag(e);
+            return;
         }
-        else
-        {
-            e.Effects = DragDropEffects.None;
-            DropIndicator.Visibility = Visibility.Collapsed;
-        }
+
+        RejectDrag(e);
     }
 
     /// <summary>
@@ -261,7 +226,7 @@ public partial class FileListControl : UserControl
     /// </summary>
     private void UpdateDropIndicator(DragEventArgs e)
     {
-        ListViewItem? listViewItem = FindAnchestor<ListViewItem>((DependencyObject)e.OriginalSource);
+        ListViewItem? listViewItem = FindAncestor<ListViewItem>((DependencyObject)e.OriginalSource);
         if (listViewItem != null)
         {
             Point point = e.GetPosition(listViewItem);
@@ -271,25 +236,11 @@ public partial class FileListControl : UserControl
             bool isBottom = point.Y > height / 2;
             double yPos = isBottom ? screenPoint.Y + height : screenPoint.Y;
 
-            DropIndicator.Visibility = Visibility.Visible;
-            Canvas.SetTop(DropIndicator, yPos - 1);
+            ShowDropIndicator(yPos - 1);
         }
         else
         {
-            if (FileListView != null && FileListView.Items.Count > 0)
-            {
-                var lastItem = FileListView.ItemContainerGenerator.ContainerFromIndex(FileListView.Items.Count - 1) as FrameworkElement;
-                if (lastItem != null)
-                {
-                    Point screenPoint = lastItem.TranslatePoint(new Point(0, lastItem.ActualHeight), FileListView);
-                    DropIndicator.Visibility = Visibility.Visible;
-                    Canvas.SetTop(DropIndicator, screenPoint.Y - 1);
-                }
-            }
-            else
-            {
-                DropIndicator.Visibility = Visibility.Collapsed;
-            }
+            ShowDropIndicatorAtListEnd();
         }
     }
 
@@ -298,50 +249,12 @@ public partial class FileListControl : UserControl
     /// </summary>
     private async void FileListView_Drop(object sender, DragEventArgs e)
     {
-        DropIndicator.Visibility = Visibility.Collapsed;
+        HideDropIndicator();
 
-        // 1. 외부 탐색기 등에서 파일이 드롭된 경우
-        if (e.Data.GetDataPresent(DataFormats.FileDrop))
-        {
-            if (e.Data.GetData(DataFormats.FileDrop) is string[] files)
-            {
-                try
-                {
-                    await ExecuteDropFilesCommandAsync(files);
-                }
-                catch (Exception ex)
-                {
-                    // 비동기 처리 중 발생하는 예외를 캡처하여 로그 등에 기록하고 사용자에게 알림
-                    System.Diagnostics.Debug.WriteLine($"DropFilesAsync failed: {ex.Message}");
-                }
-            }
-        }
-        // 2. 리스트 내부에서 아이템 순서 변경을 위해 드롭된 경우
-        else if (e.Data.GetDataPresent("InternalMove"))
-        {
-            if (e.Data.GetData("InternalMove") is List<FileItem> itemsToMove)
-            {
-                ListViewItem? listViewItem = FindAnchestor<ListViewItem>((DependencyObject)e.OriginalSource);
-                int targetIndex = -1;
-                bool isBottom = false;
+        if (await TryHandleExternalFileDropAsync(e))
+            return;
 
-                if (listViewItem != null)
-                {
-                    targetIndex = FileListView.ItemContainerGenerator.IndexFromContainer(listViewItem);
-                    Point point = e.GetPosition(listViewItem);
-                    isBottom = point.Y > listViewItem.ActualHeight / 2;
-                }
-                else
-                {
-                    targetIndex = FileListView.Items.Count;
-                }
-
-                if (targetIndex != -1)
-                {
-                    ExecuteCommand(MoveItemsCommand, new MoveItemsRequest(itemsToMove, targetIndex, isBottom));
-                }
-            }
-        }
+        HandleInternalMoveDrop(e);
     }
 
     /// <summary>
@@ -361,6 +274,9 @@ public partial class FileListControl : UserControl
         }
     }
 
+    /// <summary>
+    /// 불일치만 보기 토글이 바뀌면 필터된 뷰를 새로고침합니다.
+    /// </summary>
     private static void OnIsMismatchFilterActiveChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
         if (d is FileListControl control)
@@ -369,11 +285,17 @@ public partial class FileListControl : UserControl
         }
     }
 
+    /// <summary>
+    /// 불일치 보기 모드일 때 불일치 항목만 보이도록 컬렉션을 필터링합니다.
+    /// </summary>
     private void CollectionViewSource_Filter(object sender, FilterEventArgs e)
     {
         e.Accepted = !IsMismatchFilterActive || e.Item is FileItem { IsMismatch: true };
     }
 
+    /// <summary>
+    /// 불일치 필터 상태가 바뀐 뒤 컬렉션 뷰를 새로고침합니다.
+    /// </summary>
     private void RefreshFilter()
     {
         if (Resources["FilteredItems"] is CollectionViewSource source)
@@ -382,6 +304,202 @@ public partial class FileListControl : UserControl
         }
     }
 
+    /// <summary>
+    /// 현재 마우스 이동이 내부 드래그 시작 조건을 만족하는지 확인합니다.
+    /// </summary>
+    private bool ShouldStartInternalDrag(object sender, MouseEventArgs e, out ListView listView)
+    {
+        listView = null!;
+
+        if (e.LeftButton != MouseButtonState.Pressed || sender is not ListView resolvedListView)
+            return false;
+
+        Point mousePos = e.GetPosition(null);
+        Vector diff = _startPoint - mousePos;
+        bool exceededThreshold =
+            Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance ||
+            Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance;
+
+        if (!exceededThreshold)
+            return false;
+
+        listView = resolvedListView;
+        return true;
+    }
+
+    /// <summary>
+    /// 현재 화면 상태에서 드래그가 가능하면 선택된 목록 항목 드래그를 시작합니다.
+    /// </summary>
+    private void TryStartInternalDrag(ListView listView, DependencyObject originalSource)
+    {
+        if (IsMismatchFilterActive)
+            return;
+
+        ListViewItem? listViewItem = FindAncestor<ListViewItem>(originalSource);
+        if (listViewItem == null)
+            return;
+
+        var selectedItems = GetDraggedItems(listView, listViewItem);
+        if (selectedItems.Count == 0)
+            return;
+
+        _isPotentialDrag = false;
+        var dragData = new DataObject("InternalMove", selectedItems);
+        DragDrop.DoDragDrop(listViewItem, dragData, DragDropEffects.Move);
+    }
+
+    /// <summary>
+    /// 드래그 대상 항목 집합을 만들고 필요하면 클릭한 항목 하나만 대상으로 사용합니다.
+    /// </summary>
+    private static List<FileItem> GetDraggedItems(ListView listView, ListViewItem listViewItem)
+    {
+        var selectedItems = listView.SelectedItems.Cast<FileItem>().ToList();
+        var clickedItem = listView.ItemContainerGenerator.ItemFromContainer(listViewItem) as FileItem;
+
+        // 단일 클릭 후 즉시 드래그 시 clickedItem만 대상으로 설정
+        if (clickedItem != null && !selectedItems.Contains(clickedItem))
+            return new List<FileItem> { clickedItem };
+
+        return selectedItems;
+    }
+
+    /// <summary>
+    /// 현재 드래그 데이터가 외부 파일 경로인지 확인합니다.
+    /// </summary>
+    private static bool IsExternalFileDrop(DragEventArgs e) =>
+        e.Data.GetDataPresent(DataFormats.FileDrop);
+
+    /// <summary>
+    /// 현재 드래그 데이터가 내부 재정렬 작업인지 확인합니다.
+    /// </summary>
+    private static bool IsInternalMoveDrop(DragEventArgs e) =>
+        e.Data.GetDataPresent("InternalMove");
+
+    /// <summary>
+    /// 외부 파일을 드롭할 때 사용할 드래그 피드백을 설정합니다.
+    /// </summary>
+    private void HandleExternalFileDrag(DragEventArgs e)
+    {
+        e.Effects = DragDropEffects.Copy;
+        HideDropIndicator();
+    }
+
+    /// <summary>
+    /// 목록 내부 항목 재정렬에 사용할 드래그 피드백을 설정합니다.
+    /// </summary>
+    private void HandleInternalMoveDrag(DragEventArgs e)
+    {
+        e.Effects = DragDropEffects.Move;
+        UpdateDropIndicator(e);
+        HandleAutoScroll(e);
+    }
+
+    /// <summary>
+    /// 지원하지 않는 드래그 데이터를 거부하고 드롭 인디케이터를 숨깁니다.
+    /// </summary>
+    private void RejectDrag(DragEventArgs e)
+    {
+        e.Effects = DragDropEffects.None;
+        HideDropIndicator();
+    }
+
+    /// <summary>
+    /// 파일 경로가 목록에 드롭되면 외부 파일 드롭 명령을 실행합니다.
+    /// </summary>
+    private async Task<bool> TryHandleExternalFileDropAsync(DragEventArgs e)
+    {
+        if (!IsExternalFileDrop(e) || e.Data.GetData(DataFormats.FileDrop) is not string[] files)
+            return false;
+
+        try
+        {
+            await ExecuteDropFilesCommandAsync(files);
+        }
+        catch (Exception ex)
+        {
+            // 비동기 처리 중 발생하는 예외를 캡처하여 로그 등에 기록하고 사용자에게 알림
+            System.Diagnostics.Debug.WriteLine($"DropFilesAsync failed: {ex.Message}");
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// 끌어온 항목이 목록 안에 드롭되면 내부 이동 명령을 실행합니다.
+    /// </summary>
+    private void HandleInternalMoveDrop(DragEventArgs e)
+    {
+        if (!IsInternalMoveDrop(e) || e.Data.GetData("InternalMove") is not List<FileItem> itemsToMove)
+            return;
+
+        if (!TryGetInternalDropTarget(e, out int targetIndex, out bool isBottom))
+            return;
+
+        ExecuteCommand(MoveItemsCommand, new MoveItemsRequest(itemsToMove, targetIndex, isBottom));
+    }
+
+    /// <summary>
+    /// 내부 재정렬 드롭 위치의 대상 인덱스와 위아래 경계를 계산합니다.
+    /// </summary>
+    private bool TryGetInternalDropTarget(DragEventArgs e, out int targetIndex, out bool isBottom)
+    {
+        ListViewItem? listViewItem = FindAncestor<ListViewItem>((DependencyObject)e.OriginalSource);
+        if (listViewItem != null)
+        {
+            // 항목 위에 드롭되면 상/하단 절반 기준으로 삽입 위치를 계산한다.
+            targetIndex = FileListView.ItemContainerGenerator.IndexFromContainer(listViewItem);
+            Point point = e.GetPosition(listViewItem);
+            isBottom = point.Y > listViewItem.ActualHeight / 2;
+            return targetIndex != -1;
+        }
+
+        targetIndex = FileListView.Items.Count;
+        isBottom = false;
+        return true;
+    }
+
+    /// <summary>
+    /// 목록 마지막 아래로 드롭할 때 마지막 항목 뒤에 드롭 인디케이터를 표시합니다.
+    /// </summary>
+    private void ShowDropIndicatorAtListEnd()
+    {
+        if (FileListView == null || FileListView.Items.Count == 0)
+        {
+            HideDropIndicator();
+            return;
+        }
+
+        var lastItem = FileListView.ItemContainerGenerator.ContainerFromIndex(FileListView.Items.Count - 1) as FrameworkElement;
+        if (lastItem == null)
+        {
+            HideDropIndicator();
+            return;
+        }
+
+        Point screenPoint = lastItem.TranslatePoint(new Point(0, lastItem.ActualHeight), FileListView);
+        ShowDropIndicator(screenPoint.Y - 1);
+    }
+
+    /// <summary>
+    /// 지정한 목록 기준 Y 좌표에 수평 드롭 인디케이터를 표시합니다.
+    /// </summary>
+    private void ShowDropIndicator(double top)
+    {
+        DropIndicator.Visibility = Visibility.Visible;
+        Canvas.SetTop(DropIndicator, top);
+    }
+
+    /// <summary>
+    /// 드래그 앤 드롭 재정렬에 쓰는 수평 드롭 인디케이터를 숨깁니다.
+    /// </summary>
+    private void HideDropIndicator()
+    {
+        DropIndicator.Visibility = Visibility.Collapsed;
+    }
+
+    /// <summary>
+    /// 명령이 존재하고 실행 가능할 때만 실행합니다.
+    /// </summary>
     private static void ExecuteCommand(ICommand? command, object? parameter)
     {
         if (command?.CanExecute(parameter) == true)
@@ -390,6 +508,9 @@ public partial class FileListControl : UserControl
         }
     }
 
+    /// <summary>
+    /// 가능하면 비동기 명령 경로를 우선 사용해 파일 드롭 명령을 실행합니다.
+    /// </summary>
     private async System.Threading.Tasks.Task ExecuteDropFilesCommandAsync(string[] files)
     {
         if (DropFilesCommand is IAsyncRelayCommand<string[]> asyncCommand)

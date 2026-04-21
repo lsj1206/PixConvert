@@ -22,6 +22,10 @@ namespace PixConvert.ViewModels;
 /// </summary>
 public partial class ConversionViewModel : ViewModelBase
 {
+    private readonly record struct ConversionPreparation(ConvertSettings Settings, string PresetName);
+
+    private readonly record struct ConversionCompletionResult(int SuccessCount, int SkippedCount, int FailedCount);
+
     private readonly IDialogService _dialogService;
     private readonly ISnackbarService _snackbarService;
     private readonly IPresetService _presetService;
@@ -144,6 +148,11 @@ public partial class ConversionViewModel : ViewModelBase
         RefreshActivePresetUI();
     }
 
+    partial void OnFailCountChanged(int value)
+    {
+        OnPropertyChanged(nameof(HasFailures));
+    }
+
     /// <summary>
     /// 현재 활성 프리셋의 상태를 UI 프로퍼티에 반영합니다.
     /// </summary>
@@ -209,46 +218,34 @@ public partial class ConversionViewModel : ViewModelBase
     /// </summary>
     private async Task ConvertFilesAsync()
     {
-        if (!await ValidateBeforeConvertAsync())
+        var preparation = await ValidateBeforeConvertAsync();
+        if (preparation == null)
             return;
 
         RequestStatus(AppStatus.Converting);
         _convertCts = new CancellationTokenSource();
         var cts = _convertCts;
 
-        IsConversionCompleted = false;
-        ConfirmCompletionCommand.NotifyCanExecuteChanged();
-        CancelConvertCommand.NotifyCanExecuteChanged();
+        PrepareConversionState();
 
         using var session = new ConversionSession();
 
         try
         {
-            // ValidateBeforeConvertAsync에서 이미 null 체크 완료
-            var settings = _presetService.ActivePreset!.Settings;
-            var context = new ConversionContext(_fileList, settings, _presetService.ActivePreset.Name);
-            var parallelOptions = BuildParallelOptions(settings.CpuUsage, cts.Token);
+            var context = CreateConversionContext(preparation.Value);
+            var parallelOptions = BuildParallelOptions(preparation.Value.Settings.CpuUsage, cts.Token);
 
             _logger.LogInformation(GetString("Log_Conversion_BatchStart"), context.ActiveFiles.Count);
-            UpdateSidebarJobSummary(settings, context.ActiveFiles);
+            UpdateSidebarJobSummary(preparation.Value.Settings, context.ActiveFiles);
 
-            _stopwatch.Restart();
-            ConvertingTime = "00:00:00";
-            _timer.Start();
+            StartConversionClock();
 
-            await Parallel.ForEachAsync(context.ActiveFiles, parallelOptions,
-                (item, token) => ProcessSingleFileAsync(item, settings, session, context, token));
-
-            IsConversionCompleted = true;
-            ConfirmCompletionCommand.NotifyCanExecuteChanged();
-            CancelConvertCommand.NotifyCanExecuteChanged();
-
-            NotifyCompletionResult(cts.IsCancellationRequested, context);
+            await RunConversionBatchAsync(context, preparation.Value.Settings, session, parallelOptions);
+            CompleteConversion(cts.IsCancellationRequested, context);
         }
         catch (OperationCanceledException)
         {
-            await RunOnUiAsync(RestorePendingFiles);
-            _snackbarService.Show(GetString("Msg_Convert_Cancelled"), SnackbarType.Info);
+            await HandleCancelledConversionAsync();
         }
         finally
         {
@@ -262,48 +259,119 @@ public partial class ConversionViewModel : ViewModelBase
     /// <summary>
     /// 변환 시작 전 조건을 검사합니다. (파일 수, 사용자 확인, 프리셋 유효성)
     /// </summary>
-    private async Task<bool> ValidateBeforeConvertAsync()
+    private async Task<ConversionPreparation?> ValidateBeforeConvertAsync()
     {
-        if (_fileList.Items.Count == 0)
+        if (!HasInputFiles())
         {
-            _snackbarService.Show(GetString("Msg_Error_NoTargetFiles"), SnackbarType.Warning);
-            return false;
+            ShowNoTargetFilesMessage();
+            return null;
         }
 
-        if (_presetService.ActivePreset == null)
+        if (!TryGetActivePreset(out var preset))
         {
-            _snackbarService.Show(GetString("Msg_Error_EmptyPreset"), SnackbarType.Error);
-            return false;
+            ShowEmptyPresetMessage();
+            return null;
         }
 
-        var settings = _presetService.ActivePreset.Settings;
-        var availableCount = _fileList.Items.Count(item => CanConvertFile(item, settings));
+        var activePreset = preset!;
+        var settings = activePreset.Settings;
+        int availableCount = CountConvertibleFiles(settings);
         if (availableCount <= 0)
         {
-            _snackbarService.Show(GetString("Msg_Error_NoTargetFiles"), SnackbarType.Warning);
-            return false;
+            ShowNoTargetFilesMessage();
+            return null;
         }
 
-        bool isConfirmed = await _dialogService.ShowConfirmationAsync(
-            string.Format(GetString("Dlg_Ask_Convert"), availableCount), "Dlg_Title_Convert");
-        if (!isConfirmed)
-            return false;
-
-        // 프리셋 존재 여부 확인 (ActivePreset == null이면 Empty 상태)
-        if (_presetService.ActivePreset == null)
-        {
-            _snackbarService.Show(GetString("Msg_Error_EmptyPreset"), SnackbarType.Error);
-            return false;
-        }
+        if (!await ConfirmConvertAsync(availableCount))
+            return null;
 
         // 프리셋 데이터 유효성 검사 (자동 보정 없이 에러만 표시)
-        if (!_presetService.ValidPresetData(settings, out string errorKey))
-        {
-            _snackbarService.Show(GetString(errorKey), SnackbarType.Error);
-            return false;
-        }
+        if (!ValidatePresetData(settings))
+            return null;
 
-        return true;
+        return new ConversionPreparation(settings, activePreset.Name);
+    }
+
+    private bool HasInputFiles() => _fileList.Items.Count > 0;
+
+    private int CountConvertibleFiles(ConvertSettings settings) =>
+        _fileList.Items.Count(item => CanConvertFile(item, settings));
+
+    private bool TryGetActivePreset(out ConvertPreset? preset)
+    {
+        preset = _presetService.ActivePreset;
+        return preset != null;
+    }
+
+    private async Task<bool> ConfirmConvertAsync(int availableCount)
+    {
+        return await _dialogService.ShowConfirmationAsync(
+            string.Format(GetString("Dlg_Ask_Convert"), availableCount),
+            "Dlg_Title_Convert");
+    }
+
+    private bool ValidatePresetData(ConvertSettings settings)
+    {
+        if (_presetService.ValidPresetData(settings, out string errorKey))
+            return true;
+
+        _snackbarService.Show(GetString(errorKey), SnackbarType.Error);
+        return false;
+    }
+
+    private void ShowNoTargetFilesMessage()
+    {
+        _snackbarService.Show(GetString("Msg_Error_NoTargetFiles"), SnackbarType.Warning);
+    }
+
+    private void ShowEmptyPresetMessage()
+    {
+        _snackbarService.Show(GetString("Msg_Error_EmptyPreset"), SnackbarType.Error);
+    }
+
+    private void PrepareConversionState()
+    {
+        IsConversionCompleted = false;
+        ConfirmCompletionCommand.NotifyCanExecuteChanged();
+        CancelConvertCommand.NotifyCanExecuteChanged();
+    }
+
+    private ConversionContext CreateConversionContext(ConversionPreparation preparation)
+    {
+        return new ConversionContext(_fileList, preparation.Settings, preparation.PresetName);
+    }
+
+    private void StartConversionClock()
+    {
+        _stopwatch.Restart();
+        ConvertingTime = "00:00:00";
+        _timer.Start();
+    }
+
+    private Task RunConversionBatchAsync(
+        ConversionContext context,
+        ConvertSettings settings,
+        ConversionSession session,
+        ParallelOptions parallelOptions)
+    {
+        return Parallel.ForEachAsync(
+            context.ActiveFiles,
+            parallelOptions,
+            (item, token) => ProcessSingleFileAsync(item, settings, session, context, token));
+    }
+
+    private void CompleteConversion(bool isCancelled, ConversionContext context)
+    {
+        IsConversionCompleted = true;
+        ConfirmCompletionCommand.NotifyCanExecuteChanged();
+        CancelConvertCommand.NotifyCanExecuteChanged();
+        NotifyCompletionResult(isCancelled, context);
+    }
+
+    private async Task HandleCancelledConversionAsync()
+    {
+        await RunOnUiAsync(RestorePendingFiles);
+        _snackbarService.Show(GetString("Msg_Convert_Cancelled"), SnackbarType.Info);
     }
 
     /// <summary>
@@ -338,21 +406,7 @@ public partial class ConversionViewModel : ViewModelBase
     {
         var provider = _engineSelector.GetProvider(item, settings);
 
-        await RunOnUiAsync(() =>
-        {
-            item.Status = FileConvertStatus.Processing;
-            item.Progress = 0;
-            item.ProcessingEngine = provider.Name;
-            CurrentFileName = Path.GetFileName(item.Path);
-
-            // 진행 상황 사전 알림 (너무 잦은 업데이트 방지)
-            long currentTicks = DateTime.UtcNow.Ticks;
-            if (new TimeSpan(currentTicks - Interlocked.Read(ref context.LastUpdateTicks)).TotalMilliseconds > 100)
-            {
-                Interlocked.Exchange(ref context.LastUpdateTicks, currentTicks);
-                SendProgressMessage(item, context.ProcessedCount, context.TotalCount, context.FailCount, context.PresetName);
-            }
-        });
+        await MarkFileAsProcessingAsync(item, provider.Name, context);
 
         try
         {
@@ -372,10 +426,34 @@ public partial class ConversionViewModel : ViewModelBase
         }
         finally
         {
-            int currentProcessed = Interlocked.Increment(ref context.ProcessedCount);
-            int currentFail = Interlocked.CompareExchange(ref context.FailCount, 0, 0);
-            await ApplyProgressUpdateAsync(item, context, currentProcessed, currentFail);
+            await RecordProcessedFileAsync(item, context);
         }
+    }
+
+    private Task MarkFileAsProcessingAsync(FileItem item, string providerName, ConversionContext context)
+    {
+        return RunOnUiAsync(() =>
+        {
+            item.Status = FileConvertStatus.Processing;
+            item.Progress = 0;
+            item.ProcessingEngine = providerName;
+            CurrentFileName = Path.GetFileName(item.Path);
+
+            // 진행 상황 사전 알림 (너무 잦은 업데이트 방지)
+            long currentTicks = DateTime.UtcNow.Ticks;
+            if (new TimeSpan(currentTicks - Interlocked.Read(ref context.LastUpdateTicks)).TotalMilliseconds > 100)
+            {
+                Interlocked.Exchange(ref context.LastUpdateTicks, currentTicks);
+                SendProgressMessage(item, context.ProcessedCount, context.TotalCount, context.FailCount, context.PresetName);
+            }
+        });
+    }
+
+    private Task RecordProcessedFileAsync(FileItem item, ConversionContext context)
+    {
+        int currentProcessed = Interlocked.Increment(ref context.ProcessedCount);
+        int currentFail = Interlocked.CompareExchange(ref context.FailCount, 0, 0);
+        return ApplyProgressUpdateAsync(item, context, currentProcessed, currentFail);
     }
 
     private Task ApplyConversionResultAsync(FileItem item, ConversionResult result)
@@ -420,7 +498,6 @@ public partial class ConversionViewModel : ViewModelBase
             ProcessedCount = currentProcessed;
             TotalConvertCount = context.TotalCount;
             FailCount = currentFail;
-            OnPropertyChanged(nameof(HasFailures));
 
             // 퍼센트 변경 시 또는 마지막 파일일 때만 UI 업데이트
             if (newPercent != ConvertProgressPercent || currentProcessed == context.TotalCount)
@@ -470,19 +547,46 @@ public partial class ConversionViewModel : ViewModelBase
             return;
         }
 
-        // context.ActiveFiles는 이미 시작 시점에 1개 이상임이 보장됨 (ValidateBeforeConvertAsync)
-        int successCount = context.ActiveFiles.Count(i => i.Status == FileConvertStatus.Success);
-        int skippedCount = context.ActiveFiles.Count(i => i.Status == FileConvertStatus.Skipped);
-        int failedCount = context.FailCount;
+        ShowCompletionSummary(BuildCompletionResult(context));
+    }
 
-        if (skippedCount > 0 && failedCount > 0)
-            _snackbarService.Show(string.Format(GetString("Msg_OperationCompleteWithSkippedAndFailures"), successCount, skippedCount, failedCount), SnackbarType.Warning);
-        else if (failedCount > 0)
-            _snackbarService.Show(string.Format(GetString("Msg_OperationCompleteWithFailures"), successCount, failedCount), SnackbarType.Warning);
-        else if (skippedCount > 0)
-            _snackbarService.Show(string.Format(GetString("Msg_OperationCompleteWithSkipped"), successCount, skippedCount), SnackbarType.Warning);
-        else
-            _snackbarService.Show(string.Format(GetString("Msg_OperationComplete"), successCount), SnackbarType.Success);
+    private ConversionCompletionResult BuildCompletionResult(ConversionContext context)
+    {
+        return new ConversionCompletionResult(
+            context.ActiveFiles.Count(item => item.Status == FileConvertStatus.Success),
+            context.ActiveFiles.Count(item => item.Status == FileConvertStatus.Skipped),
+            context.FailCount);
+    }
+
+    private void ShowCompletionSummary(ConversionCompletionResult result)
+    {
+        if (result.SkippedCount > 0 && result.FailedCount > 0)
+        {
+            _snackbarService.Show(
+                string.Format(GetString("Msg_OperationCompleteWithSkippedAndFailures"), result.SuccessCount, result.SkippedCount, result.FailedCount),
+                SnackbarType.Warning);
+            return;
+        }
+
+        if (result.FailedCount > 0)
+        {
+            _snackbarService.Show(
+                string.Format(GetString("Msg_OperationCompleteWithFailures"), result.SuccessCount, result.FailedCount),
+                SnackbarType.Warning);
+            return;
+        }
+
+        if (result.SkippedCount > 0)
+        {
+            _snackbarService.Show(
+                string.Format(GetString("Msg_OperationCompleteWithSkipped"), result.SuccessCount, result.SkippedCount),
+                SnackbarType.Warning);
+            return;
+        }
+
+        _snackbarService.Show(
+            string.Format(GetString("Msg_OperationComplete"), result.SuccessCount),
+            SnackbarType.Success);
     }
 
     private void StopConversionClock()
@@ -522,7 +626,6 @@ public partial class ConversionViewModel : ViewModelBase
         CurrentAnimationOptions = string.Empty;
         ShowCurrentStandardOptions = false;
         ShowCurrentAnimationOptions = false;
-        OnPropertyChanged(nameof(HasFailures));
         _convertCts?.Dispose();
         _convertCts = null;
         RequestStatus(AppStatus.Idle);
@@ -557,170 +660,38 @@ public partial class ConversionViewModel : ViewModelBase
     private void UpdateSidebarJobSummary(ConvertSettings settings, List<FileItem> activeFiles)
     {
         CurrentCpuUsage = GetString($"Setting_Cpu_{settings.CpuUsage}");
+        CurrentTargetFormat = ConversionSummaryBuilder.BuildTargetFormatSummary(settings, activeFiles);
+        ApplyOptionSummaries(
+            BuildStandardOptionsSummary(settings, activeFiles, GetString),
+            BuildAnimationOptionsSummary(settings, activeFiles, GetString));
+        CurrentOverwritePolicy = GetString($"Setting_Overwrite_{settings.OverwritePolicy}");
+        CurrentSaveMethod = ConversionSummaryBuilder.BuildSaveMethodSummary(settings, GetString);
+        ApplySaveLocationSummary(ConversionSummaryBuilder.BuildSaveLocationSummary(settings, GetString));
+    }
 
-        bool hasStandard = activeFiles.Any(f => !f.IsAnimation);
-        bool hasAnimation = activeFiles.Any(f => f.IsAnimation);
-
-        if (hasStandard && hasAnimation)
-            CurrentTargetFormat = $"{settings.StandardTargetFormat} / {settings.AnimationTargetFormat}";
-        else if (hasAnimation)
-            CurrentTargetFormat = settings.AnimationTargetFormat ?? string.Empty;
-        else
-            CurrentTargetFormat = settings.StandardTargetFormat;
-
-        CurrentStandardOptions = BuildStandardOptionsSummary(settings, activeFiles, GetString);
-        CurrentAnimationOptions = BuildAnimationOptionsSummary(settings, activeFiles, GetString);
+    private void ApplyOptionSummaries(string standardOptions, string animationOptions)
+    {
+        CurrentStandardOptions = standardOptions;
+        CurrentAnimationOptions = animationOptions;
         ShowCurrentStandardOptions = !string.IsNullOrWhiteSpace(CurrentStandardOptions);
         ShowCurrentAnimationOptions = !string.IsNullOrWhiteSpace(CurrentAnimationOptions);
-        CurrentOverwritePolicy = GetString($"Setting_Overwrite_{settings.OverwritePolicy}");
-        CurrentSaveMethod = settings.FolderMethod == SaveFolderMethod.CreateFolder
-            ? settings.OutputSubFolderName
-            : GetString($"Setting_SaveMethod_{settings.FolderMethod}");
+    }
 
-        if (settings.SaveLocation == SaveLocationType.SameAsOriginal)
-        {
-            string sameText = GetString("Setting_SaveLocation_Same");
-            CurrentSaveLocation = sameText.StartsWith("...") ? sameText : $"...{sameText}";
-            CurrentSaveLocationTooltip = string.Empty;
-        }
-        else
-        {
-            string targetPath = settings.CustomOutputPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-            string folderName = Path.GetFileName(targetPath);
-            if (string.IsNullOrEmpty(folderName))
-                folderName = settings.CustomOutputPath;
-
-            CurrentSaveLocation = $"...{folderName}";
-            CurrentSaveLocationTooltip = settings.CustomOutputPath;
-        }
+    private void ApplySaveLocationSummary(SaveLocationSummary summary)
+    {
+        CurrentSaveLocation = summary.DisplayText;
+        CurrentSaveLocationTooltip = summary.TooltipText;
     }
 
     internal static string BuildStandardOptionsSummary(
         ConvertSettings settings,
         IReadOnlyList<FileItem> activeFiles,
-        Func<string, string> getString)
-    {
-        if (!activeFiles.Any(f => !f.IsAnimation))
-            return string.Empty;
-
-        var parts = new List<string>();
-        string format = settings.StandardTargetFormat.ToUpperInvariant();
-
-        switch (format)
-        {
-            case "JPEG":
-                parts.Add($"{getString("Setting_Quality")} {settings.StandardQuality}");
-                parts.Add($"{getString("Setting_ChromaSubsampling")} {ResolveJpegChromaSummary(settings, activeFiles, getString)}");
-                parts.Add($"{getString("Converting_BgColor")} {settings.StandardBackgroundColor}");
-                break;
-            case "PNG":
-                parts.Add($"{getString("Setting_CompressionLevel")} {settings.StandardPngCompressionLevel}");
-                break;
-            case "WEBP":
-                parts.Add(settings.StandardLossless
-                    ? getString("Setting_Lossless")
-                    : $"{getString("Setting_Quality")} {settings.StandardQuality}");
-                break;
-            case "AVIF":
-                if (settings.StandardLossless)
-                {
-                    parts.Add(getString("Setting_Lossless"));
-                }
-                else
-                {
-                    parts.Add($"{getString("Setting_Quality")} {settings.StandardQuality}");
-                    parts.Add($"{getString("Setting_ChromaSubsampling")} {ResolveAvifChromaSummary(settings.StandardAvifChromaSubsampling, getString)}");
-                }
-
-                parts.Add($"{getString("Setting_EncodingEffort")} {settings.StandardAvifEncodingEffort}");
-                parts.Add($"{getString("Setting_BitDepth")} {ResolveAvifBitDepthSummary(settings.StandardAvifBitDepth, getString)}");
-                break;
-            case "BMP":
-                parts.Add($"{getString("Converting_BgColor")} {settings.StandardBackgroundColor}");
-                break;
-        }
-
-        return string.Join(Environment.NewLine, parts);
-    }
+        Func<string, string> getString) =>
+        ConversionSummaryBuilder.BuildStandardOptionsSummary(settings, activeFiles, getString);
 
     internal static string BuildAnimationOptionsSummary(
         ConvertSettings settings,
         IReadOnlyList<FileItem> activeFiles,
-        Func<string, string> getString)
-    {
-        if (!activeFiles.Any(f => f.IsAnimation) || string.IsNullOrWhiteSpace(settings.AnimationTargetFormat))
-            return string.Empty;
-
-        var parts = new List<string>();
-        string format = settings.AnimationTargetFormat.ToUpperInvariant();
-
-        switch (format)
-        {
-            case "WEBP":
-                if (settings.AnimationLossless)
-                {
-                    parts.Add(getString("Setting_Lossless"));
-                    parts.Add($"{getString("Setting_EncodingEffort")} {settings.AnimationWebpEncodingEffort}");
-                    parts.Add($"{getString("Setting_PreserveTransparentPixels")} {ResolveBooleanSummary(settings.AnimationWebpPreserveTransparentPixels, getString)}");
-                }
-                else
-                {
-                    parts.Add($"{getString("Setting_Quality")} {settings.AnimationQuality}");
-                    parts.Add($"{getString("Setting_EncodingEffort")} {settings.AnimationWebpEncodingEffort}");
-                    parts.Add($"{getString("Setting_WebpPreset")} {getString($"Setting_WebpPreset_{settings.AnimationWebpPreset}")}");
-                }
-                break;
-            case "GIF":
-                parts.Add($"{getString("Setting_PalettePreset")} {getString($"Setting_GifPalette_{settings.AnimationGifPalettePreset}")}");
-                parts.Add($"{getString("Setting_EncodingEffort")} {settings.AnimationGifEncodingEffort}");
-                parts.Add($"{getString("Setting_InterframeMaxError")} {FormatErrorValue(settings.AnimationGifInterframeMaxError)}");
-                parts.Add($"{getString("Setting_InterpaletteMaxError")} {FormatErrorValue(settings.AnimationGifInterpaletteMaxError)}");
-                break;
-        }
-
-        return string.Join(Environment.NewLine, parts);
-    }
-
-    private static string ResolveJpegChromaSummary(
-        ConvertSettings settings,
-        IReadOnlyList<FileItem> activeFiles,
-        Func<string, string> getString)
-    {
-        bool hasAvifInput = activeFiles.Any(f =>
-            !f.IsAnimation &&
-            string.Equals(f.FileSignature, "AVIF", StringComparison.OrdinalIgnoreCase));
-
-        if (settings.StandardJpegChromaSubsampling == JpegChromaSubsamplingMode.Chroma422 && hasAvifInput)
-            return getString("Converting_Jpeg422AvifAuto");
-
-        return settings.StandardJpegChromaSubsampling switch
-        {
-            JpegChromaSubsamplingMode.Chroma420 => getString("Setting_Subsampling_420"),
-            JpegChromaSubsamplingMode.Chroma422 => getString("Setting_Subsampling_422"),
-            _ => getString("Setting_Subsampling_444")
-        };
-    }
-
-    private static string ResolveAvifChromaSummary(AvifChromaSubsamplingMode mode, Func<string, string> getString) =>
-        mode switch
-        {
-            AvifChromaSubsamplingMode.On => getString("Setting_Subsampling_On"),
-            AvifChromaSubsamplingMode.Off => getString("Setting_Subsampling_Off"),
-            _ => getString("Setting_Subsampling_Auto")
-        };
-
-    private static string ResolveAvifBitDepthSummary(AvifBitDepthMode mode, Func<string, string> getString) =>
-        mode switch
-        {
-            AvifBitDepthMode.Bit8 => getString("Setting_BitDepth_8"),
-            AvifBitDepthMode.Bit10 => getString("Setting_BitDepth_10"),
-            AvifBitDepthMode.Bit12 => getString("Setting_BitDepth_12"),
-            _ => getString("Setting_BitDepth_Auto")
-        };
-
-    private static string ResolveBooleanSummary(bool value, Func<string, string> getString) =>
-        getString(value ? "Setting_Subsampling_On" : "Setting_Subsampling_Off");
-
-    private static string FormatErrorValue(double value) =>
-        value.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
+        Func<string, string> getString) =>
+        ConversionSummaryBuilder.BuildAnimationOptionsSummary(settings, activeFiles, getString);
 }

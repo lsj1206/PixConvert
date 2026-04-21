@@ -4,6 +4,7 @@ using PixConvert.Models;
 using PixConvert.Services;
 using PixConvert.Services.Interfaces;
 using PixConvert.ViewModels;
+using System.Linq;
 using Xunit;
 
 namespace PixConvert.Tests;
@@ -139,5 +140,29 @@ public class ConvertSettingViewModelTests
         vm.ChangeOutputPathCommand.Execute(null);
 
         Assert.Equal(@"C:\Existing", vm.CustomOutputPath);
+    }
+
+    [Fact]
+    public void StandardTargetTag_WhenDeselected_ShouldRestoreRequiredSelection()
+    {
+        var vm = CreateViewModel();
+        var jpegTag = vm.StandardTargetTags.Single(tag => tag.Format == "JPEG");
+
+        jpegTag.IsSelected = false;
+
+        Assert.True(jpegTag.IsSelected);
+        Assert.Equal("JPEG", vm.StandardTargetFormat);
+    }
+
+    [Fact]
+    public void AnimationTargetTag_WhenDeselected_ShouldAllowEmptySelection()
+    {
+        var vm = CreateViewModel();
+        var gifTag = vm.AnimationTargetTags.Single(tag => tag.Format == "GIF");
+
+        gifTag.IsSelected = false;
+
+        Assert.False(gifTag.IsSelected);
+        Assert.Null(vm.AnimationTargetFormat);
     }
 }

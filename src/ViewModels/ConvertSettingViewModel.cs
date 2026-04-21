@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Collections.ObjectModel;
 using System.Globalization;
@@ -15,6 +16,47 @@ public enum BackgroundColorOption { White, Black, Custom }
 
 public partial class ConvertSettingViewModel : ViewModelBase
 {
+    // 포맷/무손실 변경 시 함께 다시 계산해야 하는 UI 표시 속성들을 그룹으로 관리한다.
+    private static readonly string[] StandardTargetFormats = ["JPEG", "PNG", "BMP", "WEBP", "AVIF"];
+    private static readonly string[] AnimationTargetFormats = ["GIF", "WEBP"];
+    private static readonly string[] StandardTargetDependentProperties =
+    [
+        nameof(StandardShowLossless),
+        nameof(StandardShowQuality),
+        nameof(StandardShowBackgroundColor),
+        nameof(StandardShowJpegChromaSubsampling),
+        nameof(StandardShowPngCompression),
+        nameof(StandardShowAvifChromaSubsampling),
+        nameof(StandardCanEditAvifChromaSubsampling),
+        nameof(StandardShowAvifEncodingEffort),
+        nameof(StandardShowAvifBitDepth)
+    ];
+    private static readonly string[] AnimationTargetDependentProperties =
+    [
+        nameof(ShowAnimationOptionsSection),
+        nameof(AnimationShowLossless),
+        nameof(AnimationShowQuality),
+        nameof(AnimationShowGifPalettePreset),
+        nameof(AnimationShowGifEncodingEffort),
+        nameof(AnimationShowGifInterframeMaxError),
+        nameof(AnimationShowGifInterpaletteMaxError),
+        nameof(AnimationShowWebpEncodingEffort),
+        nameof(AnimationShowWebpPreset),
+        nameof(AnimationShowWebpPreserveTransparentPixels)
+    ];
+    private static readonly string[] StandardLosslessDependentProperties =
+    [
+        nameof(StandardShowAvifChromaSubsampling),
+        nameof(StandardShowQuality),
+        nameof(StandardCanEditAvifChromaSubsampling)
+    ];
+    private static readonly string[] AnimationLosslessDependentProperties =
+    [
+        nameof(AnimationShowQuality),
+        nameof(AnimationShowWebpPreset),
+        nameof(AnimationShowWebpPreserveTransparentPixels)
+    ];
+
     private readonly IPresetService _presetService;
     private readonly IPathPickerService _pathPickerService;
     private bool _isSyncingTargetTags;
@@ -131,6 +173,9 @@ public partial class ConvertSettingViewModel : ViewModelBase
         AnimationLossless &&
         SettingOptionCatalog.Supports(SettingOptionSection.Animation, SettingOptionKey.WebpPreserveTransparentPixels, AnimationTargetFormat);
 
+    /// <summary>
+    /// 프리셋 편집기를 생성하고 명령, 태그, 마지막 선택 프리셋을 초기화합니다.
+    /// </summary>
     public ConvertSettingViewModel(
         ILanguageService languageService,
         ILogger<ConvertSettingViewModel> logger,
@@ -153,6 +198,9 @@ public partial class ConvertSettingViewModel : ViewModelBase
         SelectedPreset = lastPreset;
     }
 
+    /// <summary>
+    /// 선택된 프리셋을 편집 상태에 반영하고 명령 실행 가능 상태를 갱신합니다.
+    /// </summary>
     partial void OnSelectedPresetChanged(ConvertPreset? value)
     {
         if (value == null)
@@ -167,6 +215,9 @@ public partial class ConvertSettingViewModel : ViewModelBase
         RenamePresetCommand.NotifyCanExecuteChanged();
     }
 
+    /// <summary>
+    /// 일반 이미지 품질 값을 허용 범위로 보정합니다.
+    /// </summary>
     partial void OnStandardQualityChanged(int value)
     {
         int coerced = Math.Clamp(value, 1, 100);
@@ -174,6 +225,9 @@ public partial class ConvertSettingViewModel : ViewModelBase
             StandardQuality = coerced;
     }
 
+    /// <summary>
+    /// 애니메이션 품질 값을 허용 범위로 보정합니다.
+    /// </summary>
     partial void OnAnimationQualityChanged(int value)
     {
         int coerced = Math.Clamp(value, 1, 100);
@@ -181,6 +235,9 @@ public partial class ConvertSettingViewModel : ViewModelBase
             AnimationQuality = coerced;
     }
 
+    /// <summary>
+    /// PNG 압축 레벨을 허용 범위로 보정합니다.
+    /// </summary>
     partial void OnStandardPngCompressionLevelChanged(int value)
     {
         int coerced = Math.Clamp(value, 0, 9);
@@ -188,6 +245,9 @@ public partial class ConvertSettingViewModel : ViewModelBase
             StandardPngCompressionLevel = coerced;
     }
 
+    /// <summary>
+    /// AVIF 인코딩 노력 값을 허용 범위로 보정합니다.
+    /// </summary>
     partial void OnStandardAvifEncodingEffortChanged(int value)
     {
         int coerced = Math.Clamp(value, 0, 9);
@@ -195,6 +255,9 @@ public partial class ConvertSettingViewModel : ViewModelBase
             StandardAvifEncodingEffort = coerced;
     }
 
+    /// <summary>
+    /// 애니메이션 WebP 인코딩 노력 값을 허용 범위로 보정합니다.
+    /// </summary>
     partial void OnAnimationWebpEncodingEffortChanged(int value)
     {
         int coerced = Math.Clamp(value, 0, 6);
@@ -202,6 +265,9 @@ public partial class ConvertSettingViewModel : ViewModelBase
             AnimationWebpEncodingEffort = coerced;
     }
 
+    /// <summary>
+    /// GIF 인코딩 노력 값을 허용 범위로 보정합니다.
+    /// </summary>
     partial void OnAnimationGifEncodingEffortChanged(int value)
     {
         int coerced = Math.Clamp(value, 0, 9);
@@ -209,6 +275,9 @@ public partial class ConvertSettingViewModel : ViewModelBase
             AnimationGifEncodingEffort = coerced;
     }
 
+    /// <summary>
+    /// GIF 프레임 간 오차 값을 정규화하고 바인딩된 텍스트와 동기화합니다.
+    /// </summary>
     partial void OnAnimationGifInterframeMaxErrorChanged(double value)
     {
         double coerced = CoerceGifErrorValue(value);
@@ -223,6 +292,9 @@ public partial class ConvertSettingViewModel : ViewModelBase
             AnimationGifInterframeMaxErrorText = formatted;
     }
 
+    /// <summary>
+    /// GIF 팔레트 간 오차 값을 정규화하고 바인딩된 텍스트와 동기화합니다.
+    /// </summary>
     partial void OnAnimationGifInterpaletteMaxErrorChanged(double value)
     {
         double coerced = CoerceGifErrorValue(value);
@@ -237,66 +309,195 @@ public partial class ConvertSettingViewModel : ViewModelBase
             AnimationGifInterpaletteMaxErrorText = formatted;
     }
 
+    /// <summary>
+    /// 사용자가 입력한 프레임 간 GIF 오차 텍스트를 파싱해 유효할 때 반영합니다.
+    /// </summary>
     partial void OnAnimationGifInterframeMaxErrorTextChanged(string value)
     {
         ApplyGifErrorText(value, true);
     }
 
+    /// <summary>
+    /// 사용자가 입력한 팔레트 간 GIF 오차 텍스트를 파싱해 유효할 때 반영합니다.
+    /// </summary>
     partial void OnAnimationGifInterpaletteMaxErrorTextChanged(string value)
     {
         ApplyGifErrorText(value, false);
     }
 
-    partial void OnStandardTargetFormatChanged(string value) => OnTargetFormatsChanged();
-    partial void OnAnimationTargetFormatChanged(string? value) => OnTargetFormatsChanged();
+    /// <summary>
+    /// 일반 대상 포맷이 바뀔 때 포맷 의존 UI 상태를 다시 계산합니다.
+    /// </summary>
+    partial void OnStandardTargetFormatChanged(string value) => RefreshTargetFormatDependentProperties();
 
+    /// <summary>
+    /// 애니메이션 대상 포맷이 바뀔 때 포맷 의존 UI 상태를 다시 계산합니다.
+    /// </summary>
+    partial void OnAnimationTargetFormatChanged(string? value) => RefreshTargetFormatDependentProperties();
+
+    /// <summary>
+    /// 일반 출력 옵션에서 무손실 여부에 따라 달라지는 UI 상태를 갱신합니다.
+    /// </summary>
     partial void OnStandardLosslessChanged(bool value)
     {
-        OnPropertyChanged(nameof(StandardShowAvifChromaSubsampling));
-        OnPropertyChanged(nameof(StandardShowQuality));
-        OnPropertyChanged(nameof(StandardCanEditAvifChromaSubsampling));
+        NotifyPropertiesChanged(StandardLosslessDependentProperties);
     }
 
+    /// <summary>
+    /// 애니메이션 출력 옵션에서 무손실 여부에 따라 달라지는 UI 상태를 갱신합니다.
+    /// </summary>
     partial void OnAnimationLosslessChanged(bool value)
     {
-        OnPropertyChanged(nameof(AnimationShowQuality));
-        OnPropertyChanged(nameof(AnimationShowWebpPreset));
-        OnPropertyChanged(nameof(AnimationShowWebpPreserveTransparentPixels));
+        NotifyPropertiesChanged(AnimationLosslessDependentProperties);
     }
 
+    /// <summary>
+    /// 일반 출력과 애니메이션 출력에 사용할 대상 포맷 태그를 생성합니다.
+    /// </summary>
     private void InitializeTags()
     {
-        string[] standardTargets = ["JPEG", "PNG", "BMP", "WEBP", "AVIF"];
-        string[] animationTargets = ["GIF", "WEBP"];
-
-        foreach (var format in standardTargets)
-        {
-            var tag = new FormatTagViewModel(format);
-            tag.PropertyChanged += (_, e) =>
-            {
-                if (e.PropertyName == nameof(FormatTagViewModel.IsSelected))
-                    HandleStandardTagSelectionChanged(tag);
-            };
-            StandardTargetTags.Add(tag);
-        }
-
-        foreach (var format in animationTargets)
-        {
-            var tag = new FormatTagViewModel(format);
-            tag.PropertyChanged += (_, e) =>
-            {
-                if (e.PropertyName == nameof(FormatTagViewModel.IsSelected))
-                    HandleAnimationTagSelectionChanged(tag);
-            };
-            AnimationTargetTags.Add(tag);
-        }
+        InitializeTagCollection(StandardTargetTags, StandardTargetFormats, HandleStandardTargetTagSelectionChanged);
+        InitializeTagCollection(AnimationTargetTags, AnimationTargetFormats, HandleAnimationTargetTagSelectionChanged);
     }
 
+    /// <summary>
+    /// 선택된 프리셋 설정을 일반, 애니메이션, 출력 편집 상태에 각각 불러옵니다.
+    /// </summary>
     private void LoadFromSettings(ConvertSettings settings)
     {
-        StandardTargetFormat = settings.StandardTargetFormat;
-        AnimationTargetFormat = settings.AnimationTargetFormat;
+        LoadStandardSettings(settings);
+        LoadAnimationSettings(settings);
+        LoadOutputSettings(settings);
+        SyncTargetTags();
+    }
 
+    /// <summary>
+    /// 현재 편집 상태를 선택된 프리셋 설정에 다시 기록합니다.
+    /// </summary>
+    public void SyncToSettings()
+    {
+        if (SelectedPreset == null)
+            return;
+
+        var settings = SelectedPreset.Settings;
+        SaveStandardSettings(settings);
+        SaveAnimationSettings(settings);
+        SaveOutputSettings(settings);
+    }
+
+    /// <summary>
+    /// 새 프리셋을 만들고 프리셋 목록에서 선택합니다.
+    /// </summary>
+    private void CreatePreset()
+    {
+        string newName = $"Preset_{Presets.Count + 1}";
+        _presetService.AddPreset(newName, new ConvertSettings());
+        RefreshPresetCollection(newName);
+    }
+
+    /// <summary>
+    /// 선택된 프리셋을 복사하고 복사본을 선택합니다.
+    /// </summary>
+    private void CopyPreset()
+    {
+        if (SelectedPreset == null)
+            return;
+
+        string newName = $"{SelectedPreset.Name}_Copy";
+        _presetService.CopyPreset(SelectedPreset.Name, newName);
+        RefreshPresetCollection(newName);
+    }
+
+    /// <summary>
+    /// 선택된 프리셋을 삭제하고 다음 사용 가능한 프리셋으로 이동합니다.
+    /// </summary>
+    private void RemovePreset()
+    {
+        if (SelectedPreset == null)
+            return;
+
+        _presetService.RemovePreset(SelectedPreset.Name);
+        RefreshPresetCollection();
+    }
+
+    /// <summary>
+    /// 선택된 프리셋 이름을 변경하고 변경된 프리셋을 계속 선택 상태로 유지합니다.
+    /// </summary>
+    private void RenamePreset()
+    {
+        if (SelectedPreset == null || string.IsNullOrWhiteSpace(PresetNameEdit))
+            return;
+
+        string oldName = SelectedPreset.Name;
+        _presetService.RenamePreset(oldName, PresetNameEdit);
+        RefreshPresetCollection(PresetNameEdit);
+    }
+
+    /// <summary>
+    /// 폴더 선택기를 열고 선택된 사용자 지정 출력 경로를 저장합니다.
+    /// </summary>
+    private void ChangeOutputPath()
+    {
+        string? path = _pathPickerService.PickFolder(_languageService.GetString("Dlg_Title_SelectOutputPath"));
+        if (!string.IsNullOrWhiteSpace(path))
+            CustomOutputPath = path;
+    }
+
+    /// <summary>
+    /// 대상 포맷 변경에 따라 태그 선택 상태와 관련 UI 속성을 다시 계산합니다.
+    /// </summary>
+    private void RefreshTargetFormatDependentProperties()
+    {
+        SyncTargetTags();
+        NotifyPropertiesChanged(StandardTargetDependentProperties);
+        NotifyPropertiesChanged(AnimationTargetDependentProperties);
+    }
+
+    /// <summary>
+    /// 일반 대상 포맷 태그 변경을 일반 포맷 속성에 반영합니다.
+    /// </summary>
+    private void HandleStandardTargetTagSelectionChanged(FormatTagViewModel tag)
+    {
+        HandleTargetTagSelectionChanged(
+            StandardTargetTags,
+            tag,
+            selectedTag => StandardTargetFormat = selectedTag.Format,
+            () => RestoreRequiredSelection(tag));
+    }
+
+    /// <summary>
+    /// 애니메이션 대상 포맷 태그 변경을 애니메이션 포맷 속성에 반영합니다.
+    /// </summary>
+    private void HandleAnimationTargetTagSelectionChanged(FormatTagViewModel tag)
+    {
+        HandleTargetTagSelectionChanged(
+            AnimationTargetTags,
+            tag,
+            selectedTag => AnimationTargetFormat = selectedTag.Format,
+            () => AnimationTargetFormat = null);
+    }
+
+    /// <summary>
+    /// 현재 대상 포맷 속성과 태그 선택 상태를 동기화합니다.
+    /// </summary>
+    private void SyncTargetTags()
+    {
+        if (_isSyncingTargetTags)
+            return;
+
+        WithTargetTagSync(() =>
+        {
+            SyncTagSelection(StandardTargetTags, StandardTargetFormat);
+            SyncTagSelection(AnimationTargetTags, AnimationTargetFormat);
+        });
+    }
+
+    /// <summary>
+    /// 프리셋의 일반 포맷 설정을 편집 필드에 불러옵니다.
+    /// </summary>
+    private void LoadStandardSettings(ConvertSettings settings)
+    {
+        StandardTargetFormat = settings.StandardTargetFormat;
         StandardQuality = settings.StandardQuality;
         StandardLossless = settings.StandardLossless;
         StandardJpegChromaSubsampling = settings.StandardJpegChromaSubsampling;
@@ -306,7 +507,14 @@ public partial class ConvertSettingViewModel : ViewModelBase
         StandardAvifBitDepth = settings.StandardAvifBitDepth;
         StandardCustomBackgroundColor = settings.StandardBackgroundColor;
         StandardBgColorOption = ParseBackgroundColorOption(StandardCustomBackgroundColor);
+    }
 
+    /// <summary>
+    /// 프리셋의 애니메이션 포맷 설정을 편집 필드에 불러옵니다.
+    /// </summary>
+    private void LoadAnimationSettings(ConvertSettings settings)
+    {
+        AnimationTargetFormat = settings.AnimationTargetFormat;
         AnimationQuality = settings.AnimationQuality;
         AnimationLossless = settings.AnimationLossless;
         AnimationWebpEncodingEffort = settings.AnimationWebpEncodingEffort;
@@ -318,26 +526,27 @@ public partial class ConvertSettingViewModel : ViewModelBase
         AnimationGifInterpaletteMaxError = settings.AnimationGifInterpaletteMaxError;
         AnimationGifInterframeMaxErrorText = FormatGifErrorValue(AnimationGifInterframeMaxError);
         AnimationGifInterpaletteMaxErrorText = FormatGifErrorValue(AnimationGifInterpaletteMaxError);
+    }
 
+    /// <summary>
+    /// 프리셋의 출력 경로와 덮어쓰기 설정을 편집 필드에 불러옵니다.
+    /// </summary>
+    private void LoadOutputSettings(ConvertSettings settings)
+    {
         OverwritePolicy = settings.OverwritePolicy;
         SaveLocation = settings.SaveLocation;
         FolderMethod = settings.FolderMethod;
         OutputSubFolderName = settings.OutputSubFolderName;
         CustomOutputPath = settings.CustomOutputPath;
         CpuUsage = settings.CpuUsage;
-
-        SyncTargetTags();
     }
 
-    public void SyncToSettings()
+    /// <summary>
+    /// 현재 일반 포맷 편집 값을 프리셋 설정에 저장합니다.
+    /// </summary>
+    private void SaveStandardSettings(ConvertSettings settings)
     {
-        if (SelectedPreset == null)
-            return;
-
-        var settings = SelectedPreset.Settings;
         settings.StandardTargetFormat = StandardTargetFormat;
-        settings.AnimationTargetFormat = AnimationTargetFormat;
-
         settings.StandardQuality = StandardQuality;
         settings.StandardLossless = StandardLossless;
         settings.StandardJpegChromaSubsampling = StandardJpegChromaSubsampling;
@@ -346,7 +555,14 @@ public partial class ConvertSettingViewModel : ViewModelBase
         settings.StandardAvifEncodingEffort = StandardAvifEncodingEffort;
         settings.StandardAvifBitDepth = StandardAvifBitDepth;
         settings.StandardBackgroundColor = ResolveBackgroundColor(StandardBgColorOption, StandardCustomBackgroundColor);
+    }
 
+    /// <summary>
+    /// 현재 애니메이션 포맷 편집 값을 프리셋 설정에 저장합니다.
+    /// </summary>
+    private void SaveAnimationSettings(ConvertSettings settings)
+    {
+        settings.AnimationTargetFormat = AnimationTargetFormat;
         settings.AnimationQuality = AnimationQuality;
         settings.AnimationLossless = AnimationLossless;
         settings.AnimationWebpEncodingEffort = AnimationWebpEncodingEffort;
@@ -356,7 +572,13 @@ public partial class ConvertSettingViewModel : ViewModelBase
         settings.AnimationGifEncodingEffort = AnimationGifEncodingEffort;
         settings.AnimationGifInterframeMaxError = AnimationGifInterframeMaxError;
         settings.AnimationGifInterpaletteMaxError = AnimationGifInterpaletteMaxError;
+    }
 
+    /// <summary>
+    /// 현재 출력 경로와 덮어쓰기 편집 값을 프리셋 설정에 저장합니다.
+    /// </summary>
+    private void SaveOutputSettings(ConvertSettings settings)
+    {
         settings.OverwritePolicy = OverwritePolicy;
         settings.SaveLocation = SaveLocation;
         settings.FolderMethod = FolderMethod;
@@ -365,153 +587,96 @@ public partial class ConvertSettingViewModel : ViewModelBase
         settings.CpuUsage = CpuUsage;
     }
 
-    private void CreatePreset()
+    /// <summary>
+    /// 프리셋 목록 바인딩을 새로고침하고 가능하면 원하는 프리셋을 다시 선택합니다.
+    /// </summary>
+    private void RefreshPresetCollection(string? preferredPresetName = null)
     {
-        string newName = $"Preset_{Presets.Count + 1}";
-        _presetService.AddPreset(newName, new ConvertSettings());
         OnPropertyChanged(nameof(Presets));
-        SelectedPreset = Presets.LastOrDefault();
+        SelectedPreset = string.IsNullOrWhiteSpace(preferredPresetName)
+            ? Presets.FirstOrDefault()
+            : Presets.FirstOrDefault(preset => preset.Name == preferredPresetName) ?? Presets.FirstOrDefault();
     }
 
-    private void CopyPreset()
+    /// <summary>
+    /// 포맷 태그 컬렉션을 초기화하고 선택 변경을 지정된 처리기에 연결합니다.
+    /// </summary>
+    private void InitializeTagCollection(
+        ObservableCollection<FormatTagViewModel> tags,
+        IEnumerable<string> formats,
+        Action<FormatTagViewModel> selectionChanged)
     {
-        if (SelectedPreset == null)
-            return;
-
-        string newName = $"{SelectedPreset.Name}_Copy";
-        _presetService.CopyPreset(SelectedPreset.Name, newName);
-        OnPropertyChanged(nameof(Presets));
-        SelectedPreset = Presets.FirstOrDefault(p => p.Name == newName);
+        foreach (var format in formats)
+        {
+            var tag = new FormatTagViewModel(format);
+            tag.PropertyChanged += (_, e) =>
+            {
+                if (e.PropertyName == nameof(FormatTagViewModel.IsSelected))
+                    selectionChanged(tag);
+            };
+            tags.Add(tag);
+        }
     }
 
-    private void RemovePreset()
-    {
-        if (SelectedPreset == null)
-            return;
-
-        _presetService.RemovePreset(SelectedPreset.Name);
-        OnPropertyChanged(nameof(Presets));
-        SelectedPreset = Presets.FirstOrDefault();
-    }
-
-    private void RenamePreset()
-    {
-        if (SelectedPreset == null || string.IsNullOrWhiteSpace(PresetNameEdit))
-            return;
-
-        string oldName = SelectedPreset.Name;
-        _presetService.RenamePreset(oldName, PresetNameEdit);
-        OnPropertyChanged(nameof(Presets));
-        SelectedPreset = Presets.FirstOrDefault(p => p.Name == PresetNameEdit);
-    }
-
-    private void ChangeOutputPath()
-    {
-        string? path = _pathPickerService.PickFolder(_languageService.GetString("Dlg_Title_SelectOutputPath"));
-        if (!string.IsNullOrWhiteSpace(path))
-            CustomOutputPath = path;
-    }
-
-    private void OnTargetFormatsChanged()
-    {
-        SyncTargetTags();
-
-        OnPropertyChanged(nameof(StandardShowLossless));
-        OnPropertyChanged(nameof(StandardShowQuality));
-        OnPropertyChanged(nameof(StandardShowBackgroundColor));
-        OnPropertyChanged(nameof(StandardShowJpegChromaSubsampling));
-        OnPropertyChanged(nameof(StandardShowPngCompression));
-        OnPropertyChanged(nameof(StandardShowAvifChromaSubsampling));
-        OnPropertyChanged(nameof(StandardCanEditAvifChromaSubsampling));
-        OnPropertyChanged(nameof(StandardShowAvifEncodingEffort));
-        OnPropertyChanged(nameof(StandardShowAvifBitDepth));
-        OnPropertyChanged(nameof(ShowAnimationOptionsSection));
-        OnPropertyChanged(nameof(AnimationShowLossless));
-        OnPropertyChanged(nameof(AnimationShowQuality));
-        OnPropertyChanged(nameof(AnimationShowGifPalettePreset));
-        OnPropertyChanged(nameof(AnimationShowGifEncodingEffort));
-        OnPropertyChanged(nameof(AnimationShowGifInterframeMaxError));
-        OnPropertyChanged(nameof(AnimationShowGifInterpaletteMaxError));
-        OnPropertyChanged(nameof(AnimationShowWebpEncodingEffort));
-        OnPropertyChanged(nameof(AnimationShowWebpPreset));
-        OnPropertyChanged(nameof(AnimationShowWebpPreserveTransparentPixels));
-    }
-
-    private void HandleStandardTagSelectionChanged(FormatTagViewModel tag)
+    /// <summary>
+    /// 대상 포맷 태그 그룹에 공통으로 적용되는 단일 선택 규칙을 처리합니다.
+    /// </summary>
+    private void HandleTargetTagSelectionChanged(
+        ObservableCollection<FormatTagViewModel> tags,
+        FormatTagViewModel changedTag,
+        Action<FormatTagViewModel> onSelected,
+        Action onAllDeselected)
     {
         if (_isSyncingTargetTags)
             return;
 
-        if (tag.IsSelected)
+        if (changedTag.IsSelected)
         {
-            _isSyncingTargetTags = true;
-            try
-            {
-                foreach (var other in StandardTargetTags.Where(t => t != tag))
-                    other.IsSelected = false;
-            }
-            finally
-            {
-                _isSyncingTargetTags = false;
-            }
-
-            StandardTargetFormat = tag.Format;
+            // 태그는 단일 선택만 허용하므로 선택된 태그 외에는 모두 해제한다.
+            ApplyExclusiveSelection(tags, changedTag);
+            onSelected(changedTag);
             return;
         }
 
-        if (StandardTargetTags.All(t => !t.IsSelected))
-        {
-            _isSyncingTargetTags = true;
-            try
-            {
-                tag.IsSelected = true;
-            }
-            finally
-            {
-                _isSyncingTargetTags = false;
-            }
-        }
+        if (tags.All(tag => !tag.IsSelected))
+            onAllDeselected();
     }
 
-    private void HandleAnimationTagSelectionChanged(FormatTagViewModel tag)
+    /// <summary>
+    /// 선택된 태그만 남기고 같은 그룹의 나머지 태그 선택을 해제합니다.
+    /// </summary>
+    private void ApplyExclusiveSelection(
+        ObservableCollection<FormatTagViewModel> tags,
+        FormatTagViewModel selectedTag)
     {
-        if (_isSyncingTargetTags)
-            return;
-
-        if (tag.IsSelected)
+        WithTargetTagSync(() =>
         {
-            _isSyncingTargetTags = true;
-            try
-            {
-                foreach (var other in AnimationTargetTags.Where(t => t != tag))
-                    other.IsSelected = false;
-            }
-            finally
-            {
-                _isSyncingTargetTags = false;
-            }
-
-            AnimationTargetFormat = tag.Format;
-            return;
-        }
-
-        if (AnimationTargetTags.All(t => !t.IsSelected))
-            AnimationTargetFormat = null;
+            foreach (var other in tags.Where(tag => tag != selectedTag))
+                other.IsSelected = false;
+        });
     }
 
-    private void SyncTargetTags()
+    /// <summary>
+    /// 빈 선택을 허용하지 않는 그룹에서 반드시 선택되어야 하는 태그를 복구합니다.
+    /// </summary>
+    private void RestoreRequiredSelection(FormatTagViewModel tag)
     {
-        if (_isSyncingTargetTags)
-            return;
+        WithTargetTagSync(() =>
+        {
+            tag.IsSelected = true;
+        });
+    }
 
+    /// <summary>
+    /// 재귀 동기화를 막는 보호 구간 안에서 태그 선택 갱신을 수행합니다.
+    /// </summary>
+    private void WithTargetTagSync(Action action)
+    {
+        // 태그 선택 변경이 다시 포맷 프로퍼티 변경을 유발하는 루프를 막는다.
         _isSyncingTargetTags = true;
         try
         {
-            foreach (var tag in StandardTargetTags)
-                tag.IsSelected = tag.Format == StandardTargetFormat;
-
-            foreach (var tag in AnimationTargetTags)
-                tag.IsSelected = tag.Format == AnimationTargetFormat;
+            action();
         }
         finally
         {
@@ -519,6 +684,27 @@ public partial class ConvertSettingViewModel : ViewModelBase
         }
     }
 
+    /// <summary>
+    /// 서로 연관된 UI 속성들에 대해 일괄적으로 변경 알림을 발생시킵니다.
+    /// </summary>
+    private void NotifyPropertiesChanged(IEnumerable<string> propertyNames)
+    {
+        foreach (var propertyName in propertyNames)
+            OnPropertyChanged(propertyName);
+    }
+
+    /// <summary>
+    /// 선택된 대상 포맷을 일치하는 태그 항목의 선택 상태에 반영합니다.
+    /// </summary>
+    private static void SyncTagSelection(IEnumerable<FormatTagViewModel> tags, string? targetFormat)
+    {
+        foreach (var tag in tags)
+            tag.IsSelected = tag.Format == targetFormat;
+    }
+
+    /// <summary>
+    /// 저장된 배경색 문자열을 프리셋 편집기의 배경색 옵션으로 변환합니다.
+    /// </summary>
     private static BackgroundColorOption ParseBackgroundColorOption(string value)
     {
         if (value.Equals("#FFFFFF", StringComparison.OrdinalIgnoreCase))
@@ -528,6 +714,9 @@ public partial class ConvertSettingViewModel : ViewModelBase
         return BackgroundColorOption.Custom;
     }
 
+    /// <summary>
+    /// 현재 배경색 옵션에 맞는 실제 저장 문자열을 결정합니다.
+    /// </summary>
     private static string ResolveBackgroundColor(BackgroundColorOption option, string customColor)
     {
         return option switch
@@ -538,12 +727,18 @@ public partial class ConvertSettingViewModel : ViewModelBase
         };
     }
 
+    /// <summary>
+    /// GIF 오차 값을 허용 범위로 보정하고 반올림합니다.
+    /// </summary>
     private static double CoerceGifErrorValue(double value)
     {
         double clamped = Math.Clamp(value, 0.0, 32.0);
         return Math.Round(clamped, 2, MidpointRounding.AwayFromZero);
     }
 
+    /// <summary>
+    /// 사용자가 입력한 GIF 오차 텍스트가 완전한 숫자일 때만 파싱합니다.
+    /// </summary>
     private static bool TryParseGifErrorText(string? value, out double parsed)
     {
         parsed = 0.0;
@@ -564,9 +759,15 @@ public partial class ConvertSettingViewModel : ViewModelBase
         return true;
     }
 
+    /// <summary>
+    /// GIF 오차 값을 텍스트 박스와 같은 고정 소수점 형식으로 변환합니다.
+    /// </summary>
     private static string FormatGifErrorValue(double value) =>
         CoerceGifErrorValue(value).ToString("0.##", CultureInfo.InvariantCulture);
 
+    /// <summary>
+    /// 검증된 GIF 오차 텍스트를 해당 숫자 속성과 정규화된 텍스트 필드에 반영합니다.
+    /// </summary>
     private void ApplyGifErrorText(string value, bool isInterframe)
     {
         if (!TryParseGifErrorText(value, out double parsed))
@@ -595,5 +796,8 @@ public partial class FormatTagViewModel : ObservableObject
     [ObservableProperty]
     private bool _isSelected;
 
+    /// <summary>
+    /// 지정한 포맷 이름으로 선택 가능한 대상 포맷 태그를 생성합니다.
+    /// </summary>
     public FormatTagViewModel(string format) => Format = format;
 }
