@@ -39,4 +39,12 @@ public class PresetServiceSelectionTests
 
         Assert.Equal(JpegChromaSubsamplingMode.Chroma444, settings.StandardJpegChromaSubsampling);
     }
+
+    [Fact]
+    public void ConvertSettings_DefaultOutputSubFolderName_ShouldUseMetadataValue()
+    {
+        var settings = new ConvertSettings();
+
+        Assert.Equal(AppMetadata.DefaultOutputSubFolderName, settings.OutputSubFolderName);
+    }
 }

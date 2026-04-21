@@ -53,7 +53,7 @@ internal static class OutputPathResolver
         {
             // 토큰 치환 없이 설정된 이름을 그대로 사용 (v3 단순화)
             string subFolderName = string.IsNullOrWhiteSpace(settings.OutputSubFolderName)
-                ? "PixConvert"
+                ? AppMetadata.DefaultOutputSubFolderName
                 : settings.OutputSubFolderName;
 
             outputDir = Path.Combine(baseDir, subFolderName);

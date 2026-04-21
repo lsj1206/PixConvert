@@ -10,6 +10,15 @@ namespace PixConvert.Tests;
 public class AppInfoServiceTests
 {
     [Fact]
+    public void Properties_ShouldUseMetadataBackedValues()
+    {
+        var service = CreateService(new HttpResponseMessage(HttpStatusCode.OK), "v1.0.0");
+
+        Assert.Equal(AppMetadata.RepositoryUrl, service.RepositoryUrl);
+        Assert.Equal(AppPaths.AppDataFolder, service.AppDataFolderPath);
+    }
+
+    [Fact]
     public async Task CheckLatestReleaseAsync_WhenLatestTagIsNewer_ShouldReturnUpdateAvailable()
     {
         var service = CreateService(
@@ -78,6 +87,22 @@ public class AppInfoServiceTests
         var result = await service.CheckLatestReleaseAsync(CancellationToken.None);
 
         Assert.Equal(UpdateCheckStatus.UpdateAvailable, result.Status);
+    }
+
+    [Fact]
+    public async Task CheckLatestReleaseAsync_ShouldRequestConfiguredMetadataUrl()
+    {
+        Uri? requestedUri = null;
+        var httpClient = new HttpClient(new DelegateHandler((request, _) =>
+        {
+            requestedUri = request.RequestUri;
+            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.NotFound));
+        }));
+        var service = new AppInfoService(httpClient, NullLogger<AppInfoService>.Instance, "v1.0.0");
+
+        await service.CheckLatestReleaseAsync(CancellationToken.None);
+
+        Assert.Equal(AppMetadata.LatestReleaseApiUrl, requestedUri?.ToString());
     }
 
     private static AppInfoService CreateService(HttpResponseMessage response, string currentVersion)

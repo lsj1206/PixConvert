@@ -23,7 +23,7 @@ public class SettingService : ISettingService
     public AppSettings Settings { get; private set; } = new();
 
     public SettingService(ILogger<SettingService> logger, ILanguageService languageService)
-        : this(logger, languageService, Path.Combine(AppPaths.AppDataFolder, "settings.json"), ensureDefaultAppDataFolder: true)
+        : this(logger, languageService, AppPaths.SettingsPath, ensureDefaultAppDataFolder: true)
     {
     }
 

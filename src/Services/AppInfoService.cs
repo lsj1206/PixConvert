@@ -10,13 +10,13 @@ namespace PixConvert.Services;
 
 public sealed class AppInfoService : IAppInfoService
 {
-    internal const string LatestReleaseApiUrl = "https://api.github.com/repos/lsj1206/PixConvert/releases/latest";
+    internal static string LatestReleaseApiUrl => AppMetadata.LatestReleaseApiUrl;
 
     private readonly HttpClient _httpClient;
     private readonly ILogger<AppInfoService> _logger;
     private readonly string _currentVersion;
 
-    public string RepositoryUrl => "https://github.com/lsj1206/PixConvert";
+    public string RepositoryUrl => AppMetadata.RepositoryUrl;
 
     public string AppDataFolderPath => AppPaths.AppDataFolder;
 

@@ -25,13 +25,29 @@ public class PresetService : IPresetService
     private readonly ILanguageService _languageService;
 
     public PresetService(ILogger<PresetService> logger, ILanguageService languageService)
+        : this(logger, languageService, AppPaths.PresetsPath, ensureDefaultAppDataFolder: true)
+    {
+    }
+
+    internal PresetService(ILogger<PresetService> logger, ILanguageService languageService, string configPath)
+        : this(logger, languageService, configPath, ensureDefaultAppDataFolder: false)
+    {
+    }
+
+    private PresetService(
+        ILogger<PresetService> logger,
+        ILanguageService languageService,
+        string configPath,
+        bool ensureDefaultAppDataFolder)
     {
         _logger = logger;
         _languageService = languageService;
+        _configPath = configPath;
 
-        // %AppData%/PixConvert/presets.json 경로 설정
-        AppPaths.EnsureAppDataFolder();
-        _configPath = Path.Combine(AppPaths.AppDataFolder, "presets.json");
+        if (ensureDefaultAppDataFolder)
+        {
+            AppPaths.EnsureAppDataFolder();
+        }
     }
 
     /// <summary>

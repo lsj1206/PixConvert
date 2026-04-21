@@ -133,4 +133,20 @@ public class OutputPathResolverTests
         // Assert
         Assert.Equal(@"C:\Photos\Pix_{yyyy}\Image.jpg", result);
     }
+
+    [Fact]
+    public void Resolve_WhenOutputSubFolderNameEmpty_ShouldUseMetadataDefaultFolderName()
+    {
+        var settings = new ConvertSettings
+        {
+            SaveLocation = SaveLocationType.SameAsOriginal,
+            FolderMethod = SaveFolderMethod.CreateFolder,
+            OutputSubFolderName = "",
+            StandardTargetFormat = "JPEG"
+        };
+
+        var result = OutputPathResolver.Resolve(_testFile, settings);
+
+        Assert.Equal($@"C:\Photos\{AppMetadata.DefaultOutputSubFolderName}\Image.jpg", result);
+    }
 }

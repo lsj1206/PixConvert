@@ -30,7 +30,7 @@ public partial class App : Application
     public App()
     {
         AppPaths.EnsureLogsFolder();
-        string logFilePath = System.IO.Path.Combine(AppPaths.LogsFolder, "pixconvert_log_.txt");
+        string logFilePath = AppPaths.LogFilePath;
 
         // 1. Serilog 전역 로거 구성 (DI 조립 전 발생하는 에러 체크)
         Log.Logger = new LoggerConfiguration()
@@ -100,7 +100,7 @@ public partial class App : Application
         services.AddSingleton(_ =>
         {
             var httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(8) };
-            httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("PixConvert");
+            httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(AppMetadata.HttpUserAgent);
             return httpClient;
         });
         services.AddSingleton<IExternalLauncher, ExternalLauncher>();
