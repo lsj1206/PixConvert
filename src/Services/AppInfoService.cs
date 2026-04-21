@@ -21,7 +21,7 @@ public sealed class AppInfoService : IAppInfoService
     public string AppDataFolderPath => AppPaths.AppDataFolder;
 
     public AppInfoService(HttpClient httpClient, ILogger<AppInfoService> logger)
-        : this(httpClient, logger, App.Version)
+        : this(httpClient, logger, AppMetadata.DisplayVersion)
     {
     }
 

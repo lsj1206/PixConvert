@@ -109,7 +109,7 @@
                                     <TextBlock
                                         Margin="0,0,6,0"
                                         VerticalAlignment="Bottom"
-                                        Text="{x:Static local:App.Version}" />
+                                        Text="{Binding Source={x:Static local:AppMetadata.DisplayVersion}, StringFormat=v{0}}" />
                                     <Button
                                         Width="32"
                                         Height="32"

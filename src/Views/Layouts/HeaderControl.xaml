@@ -127,7 +127,7 @@
                     FontSize="14"
                     FontWeight="Normal"
                     Foreground="{DynamicResource AppTextSecondaryBrush}"
-                    Text="{x:Static local:App.Version}" />
+                    Text="{Binding Source={x:Static local:AppMetadata.DisplayVersion}, StringFormat=v{0}}" />
 
                 <!-- Header : Settings_Button -->
                 <Button

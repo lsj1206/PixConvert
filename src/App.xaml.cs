@@ -18,9 +18,6 @@ namespace PixConvert;
 /// </summary>
 public partial class App : Application
 {
-    /// <summary>앱의 현재 버전 정보</summary>
-    public const string Version = "v.alpha";
-
     /// <summary>현재 활성화된 App 인스턴스에 대한 접근을 지원합니다.</summary>
     public new static App Current => (App)Application.Current;
 
