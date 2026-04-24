@@ -25,7 +25,13 @@
 
 ## 스크린샷
 
-스크린샷은 추후 `assets/screenshots/` 아래에 추가할 예정입니다.
+#### 변환 전
+
+![파일 목록 화면](data/readme_img/filelist.jpg)
+
+### 변환 진행중
+
+![변환 진행 화면](data/readme_img/convertinglist.jpg)
 
 ## 지원 포맷
 

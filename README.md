@@ -25,7 +25,13 @@
 
 ## Screenshots
 
-Screenshots will be added under `assets/screenshots/`.
+#### Before Conversion
+
+![File list view](data/readme_img/filelist.jpg)
+
+#### Converting
+
+![Conversion progress view](data/readme_img/convertinglist.jpg)
 
 ## Supported Formats
 
