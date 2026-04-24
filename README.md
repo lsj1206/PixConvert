@@ -56,7 +56,7 @@ PixConvert uses two conversion engines depending on the target workload.
 5. Configure or select a conversion preset.
 6. Start conversion and check the output files.
 
-The release folder is expected to keep `PixConvert.exe`, required `.dll` files, `LICENSE`, and `THIRD-PARTY-NOTICES.md` together.
+The release folder is expected to keep `PixConvert.exe`, the external `libvips-42.dll`, `LICENSE`, and `THIRD-PARTY-NOTICES.md` together. `libvips-42.dll` is intentionally shipped outside the single-file executable because it is the LGPL-related native library used by the NetVips path.
 
 ## Development
 
