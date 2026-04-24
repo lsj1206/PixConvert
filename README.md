@@ -25,17 +25,21 @@
   - 일반 이미지: `JPEG`, `PNG`, `BMP`, `WebP`, `AVIF`
   - 애니메이션 이미지: `GIF`, `WebP`
 
-### 설계 철학? (대체 용어 추천)
+### 변환 엔진 구성
 
-이미지 변환은 두 가지 엔진을 사용합니다.
+PixConvert는 변환 대상에 따라 두 가지 엔진을 나누어 사용합니다.
 
 [SkiaSharp](https://github.com/mono/skiasharp)는 Google의 2D 그래픽 엔진인 `Skia`를 기반으로 하는 `.NET` 그래픽 라이브러리입니다.
 
-> 간결하고 안정적이며 빠른 속도가 특징인 엔진으로, `JPEG`, `PNG`, `Webp`, `BMP(일부)` 포맷의 일반 이미지를 담당합니다.
+> 정지 이미지 처리에 적합한 엔진으로, `JPEG`, `PNG`, `BMP`, 정지 `WebP` 변환을 담당합니다.
+
+`BMP`는 SkiaSharp의 일반 인코딩 경로에서 직접 저장할 수 없어 내부 `BmpEncoder`를 사용합니다. 이 인코더는 변환된 픽셀을 무압축 24-bit 비트맵으로 기록하며, 투명도가 있는 이미지는 설정된 배경색으로 합성한 뒤 저장합니다.
 
 [NetVips](https://github.com/kleisauke/net-vips)는 고성능 이미지 처리용 C 라이브러리인 `libvips`의 `.NET` 바인딩 라이브러리입니다.
 
-> 큰 이미지와 배치 작업에 유리한 엔진으로, `GIF`, `WebP` 포맷의 애니메이션 이미지와 CPU사용량이 높은 `AVIF` 일반 이미지 포맷을 담당합니다.
+> 고압축 포맷과 멀티프레임 처리에 적합한 엔진으로, `AVIF`, 애니메이션 `GIF`, 애니메이션 `WebP` 변환을 담당합니다.
+
+`AVIF`와 애니메이션 이미지는 인코딩 옵션이 많고 처리 비용이 큰 편이라 NetVips 경로를 사용합니다. PixConvert는 NetVips를 통해 AVIF의 압축 옵션과 GIF/WebP 애니메이션의 프레임 기반 저장을 처리합니다.
 
 ## 시작하기
 
