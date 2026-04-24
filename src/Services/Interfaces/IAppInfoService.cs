@@ -6,7 +6,7 @@ public interface IAppInfoService
 {
     string RepositoryUrl { get; }
 
-    string AppDataFolderPath { get; }
+    string DataFolderPath { get; }
 
     Task<UpdateCheckResult> CheckLatestReleaseAsync(CancellationToken token);
 

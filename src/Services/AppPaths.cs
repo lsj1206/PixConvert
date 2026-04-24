@@ -5,24 +5,25 @@ namespace PixConvert.Services;
 
 public static class AppPaths
 {
-    public static string AppDataFolder =>
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), AppMetadata.AppDataFolderName);
+    public static string DataFolder =>
+        Path.TrimEndingDirectorySeparator(Path.GetFullPath(AppContext.BaseDirectory));
 
-    public static string LogsFolder => Path.Combine(AppDataFolder, AppMetadata.LogsFolderName);
+    public static string LogsFolder => Path.Combine(DataFolder, AppMetadata.LogsFolderName);
 
-    public static string SettingsPath => Path.Combine(AppDataFolder, AppMetadata.SettingsFileName);
+    public static string SettingsPath => Path.Combine(DataFolder, AppMetadata.SettingsFileName);
 
-    public static string PresetsPath => Path.Combine(AppDataFolder, AppMetadata.PresetsFileName);
+    public static string PresetsPath => Path.Combine(DataFolder, AppMetadata.PresetsFileName);
 
     public static string LogFilePath => Path.Combine(LogsFolder, $"{AppMetadata.LogFilePrefix}.txt");
 
-    public static void EnsureAppDataFolder()
+    public static void EnsureDataFolder()
     {
-        Directory.CreateDirectory(AppDataFolder);
+        Directory.CreateDirectory(DataFolder);
     }
 
     public static void EnsureLogsFolder()
     {
+        EnsureDataFolder();
         Directory.CreateDirectory(LogsFolder);
     }
 }

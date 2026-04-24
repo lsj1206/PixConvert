@@ -46,10 +46,10 @@ public class AppSettingViewModelTests
         var vm = CreateViewModel(appInfo: appInfo, launcher: launcher);
 
         vm.OpenGitHubCommand.Execute(null);
-        vm.OpenAppDataFolderCommand.Execute(null);
+        vm.OpenDataFolderCommand.Execute(null);
 
         launcher.Verify(service => service.OpenUrl("https://github.com/lsj1206/PixConvert"), Times.Once);
-        launcher.Verify(service => service.OpenFolder(@"C:\Users\Test\AppData\Roaming\PixConvert"), Times.Once);
+        launcher.Verify(service => service.OpenFolder(@"C:\Apps\PixConvert"), Times.Once);
     }
 
     [Fact]
@@ -152,7 +152,7 @@ public class AppSettingViewModelTests
     {
         var appInfo = new Mock<IAppInfoService>();
         appInfo.SetupGet(service => service.RepositoryUrl).Returns("https://github.com/lsj1206/PixConvert");
-        appInfo.SetupGet(service => service.AppDataFolderPath).Returns(@"C:\Users\Test\AppData\Roaming\PixConvert");
+        appInfo.SetupGet(service => service.DataFolderPath).Returns(@"C:\Apps\PixConvert");
         appInfo
             .Setup(service => service.GetEngineInfo())
             .Returns(new[]

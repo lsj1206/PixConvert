@@ -15,7 +15,7 @@ public class AppInfoServiceTests
         var service = CreateService(new HttpResponseMessage(HttpStatusCode.OK), "v1.0.0");
 
         Assert.Equal(AppMetadata.RepositoryUrl, service.RepositoryUrl);
-        Assert.Equal(AppPaths.AppDataFolder, service.AppDataFolderPath);
+        Assert.Equal(AppPaths.DataFolder, service.DataFolderPath);
     }
 
     [Fact]

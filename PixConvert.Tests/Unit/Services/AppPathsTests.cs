@@ -8,16 +8,14 @@ public class AppPathsTests
     [Fact]
     public void Paths_ShouldComposeMetadataDrivenLocations()
     {
-        string expectedAppData = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            AppMetadata.AppDataFolderName);
+        string expectedDataFolder = Path.TrimEndingDirectorySeparator(Path.GetFullPath(AppContext.BaseDirectory));
 
-        Assert.Equal(expectedAppData, AppPaths.AppDataFolder);
-        Assert.Equal(Path.Combine(expectedAppData, AppMetadata.LogsFolderName), AppPaths.LogsFolder);
-        Assert.Equal(Path.Combine(expectedAppData, AppMetadata.SettingsFileName), AppPaths.SettingsPath);
-        Assert.Equal(Path.Combine(expectedAppData, AppMetadata.PresetsFileName), AppPaths.PresetsPath);
+        Assert.Equal(expectedDataFolder, AppPaths.DataFolder);
+        Assert.Equal(Path.Combine(expectedDataFolder, AppMetadata.LogsFolderName), AppPaths.LogsFolder);
+        Assert.Equal(Path.Combine(expectedDataFolder, AppMetadata.SettingsFileName), AppPaths.SettingsPath);
+        Assert.Equal(Path.Combine(expectedDataFolder, AppMetadata.PresetsFileName), AppPaths.PresetsPath);
         Assert.Equal(
-            Path.Combine(expectedAppData, AppMetadata.LogsFolderName, $"{AppMetadata.LogFilePrefix}.txt"),
+            Path.Combine(expectedDataFolder, AppMetadata.LogsFolderName, $"{AppMetadata.LogFilePrefix}.txt"),
             AppPaths.LogFilePath);
     }
 }

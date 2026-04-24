@@ -22,10 +22,7 @@ public static class AppMetadata
         LatestReleaseApiUrlKey,
         "https://api.github.com/repos/lsj1206/PixConvert/releases/latest");
 
-    /// <summary>AppData 아래에 생성할 앱 데이터 폴더 이름입니다.</summary>
-    public static string AppDataFolderName => "PixConvert";
-
-    /// <summary>앱 데이터 폴더 아래에 생성할 로그 폴더 이름입니다.</summary>
+    /// <summary>앱 실행 폴더 아래에 생성할 로그 폴더 이름입니다.</summary>
     public static string LogsFolderName => "logs";
 
     /// <summary>설정 파일 이름입니다.</summary>

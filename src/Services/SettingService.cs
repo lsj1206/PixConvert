@@ -23,12 +23,12 @@ public class SettingService : ISettingService
     public AppSettings Settings { get; private set; } = new();
 
     public SettingService(ILogger<SettingService> logger, ILanguageService languageService)
-        : this(logger, languageService, AppPaths.SettingsPath, ensureDefaultAppDataFolder: true)
+        : this(logger, languageService, AppPaths.SettingsPath, ensureDefaultDataFolder: true)
     {
     }
 
     internal SettingService(ILogger<SettingService> logger, ILanguageService languageService, string configPath)
-        : this(logger, languageService, configPath, ensureDefaultAppDataFolder: false)
+        : this(logger, languageService, configPath, ensureDefaultDataFolder: false)
     {
     }
 
@@ -36,15 +36,15 @@ public class SettingService : ISettingService
         ILogger<SettingService> logger,
         ILanguageService languageService,
         string configPath,
-        bool ensureDefaultAppDataFolder)
+        bool ensureDefaultDataFolder)
     {
         _logger = logger;
         _languageService = languageService;
         _configPath = configPath;
 
-        if (ensureDefaultAppDataFolder)
+        if (ensureDefaultDataFolder)
         {
-            AppPaths.EnsureAppDataFolder();
+            AppPaths.EnsureDataFolder();
         }
     }
 

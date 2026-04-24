@@ -39,7 +39,6 @@ public class AppMetadataTests
     {
         Assert.Equal("https://github.com/lsj1206/PixConvert", AppMetadata.RepositoryUrl);
         Assert.Equal("https://api.github.com/repos/lsj1206/PixConvert/releases/latest", AppMetadata.LatestReleaseApiUrl);
-        Assert.Equal("PixConvert", AppMetadata.AppDataFolderName);
         Assert.Equal("logs", AppMetadata.LogsFolderName);
         Assert.Equal("settings.json", AppMetadata.SettingsFileName);
         Assert.Equal("presets.json", AppMetadata.PresetsFileName);

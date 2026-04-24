@@ -25,12 +25,12 @@ public class PresetService : IPresetService
     private readonly ILanguageService _languageService;
 
     public PresetService(ILogger<PresetService> logger, ILanguageService languageService)
-        : this(logger, languageService, AppPaths.PresetsPath, ensureDefaultAppDataFolder: true)
+        : this(logger, languageService, AppPaths.PresetsPath, ensureDefaultDataFolder: true)
     {
     }
 
     internal PresetService(ILogger<PresetService> logger, ILanguageService languageService, string configPath)
-        : this(logger, languageService, configPath, ensureDefaultAppDataFolder: false)
+        : this(logger, languageService, configPath, ensureDefaultDataFolder: false)
     {
     }
 
@@ -38,15 +38,15 @@ public class PresetService : IPresetService
         ILogger<PresetService> logger,
         ILanguageService languageService,
         string configPath,
-        bool ensureDefaultAppDataFolder)
+        bool ensureDefaultDataFolder)
     {
         _logger = logger;
         _languageService = languageService;
         _configPath = configPath;
 
-        if (ensureDefaultAppDataFolder)
+        if (ensureDefaultDataFolder)
         {
-            AppPaths.EnsureAppDataFolder();
+            AppPaths.EnsureDataFolder();
         }
     }
 

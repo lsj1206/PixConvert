@@ -116,9 +116,9 @@ public partial class AppSettingViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void OpenAppDataFolder()
+    private void OpenDataFolder()
     {
-        _externalLauncher.OpenFolder(_appInfoService.AppDataFolderPath);
+        _externalLauncher.OpenFolder(_appInfoService.DataFolderPath);
     }
 
     private bool CanCheckUpdate() => !IsCheckingUpdate;

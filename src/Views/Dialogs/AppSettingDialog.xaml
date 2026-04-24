@@ -166,7 +166,7 @@
                                     Height="32"
                                     Padding="0"
                                     ToolTip="{DynamicResource Setting_App_OpenDataFolder}"
-                                    Command="{Binding OpenAppDataFolderCommand}">
+                                    Command="{Binding OpenDataFolderCommand}">
                                     <ui:FontIcon FontSize="14" Glyph="&#xE8B7;" />
                                 </Button>
                             </DockPanel>
