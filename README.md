@@ -1,6 +1,9 @@
-# PixConvert
+[![Language English](https://img.shields.io/badge/Language-English-0969da?style=flat-square)](README.md)
+[![Language Korean](https://img.shields.io/badge/Language-%ED%95%9C%EA%B5%AD%EC%96%B4-da3633?style=flat-square)](README.ko.md)
 
-[English](README.md) | [한국어](README.ko.md)
+---
+
+# PixConvert
 
 > A Windows image converter for batch conversion, presets, and mixed static/animated image workflows.
 
@@ -56,7 +59,7 @@ PixConvert uses two conversion engines depending on the target workload.
 5. Configure or select a conversion preset.
 6. Start conversion and check the output files.
 
-The release folder is expected to keep `PixConvert.exe`, the external `libvips-42.dll`, `LICENSE`, and `THIRD-PARTY-NOTICES.md` together. `libvips-42.dll` is intentionally shipped outside the single-file executable because it is the LGPL-related native library used by the NetVips path.
+For runtime use, keep `PixConvert.exe` and `libvips-42.dll` in the same folder. The release zip also includes `LICENSE` and `THIRD-PARTY-NOTICES.md` for license and redistribution notices.
 
 ## Development
 
@@ -64,6 +67,8 @@ The release folder is expected to keep `PixConvert.exe`, the external `libvips-4
 - Framework: .NET 10.0
 - UI: WPF with [ModernWPF](https://github.com/Kinnara/ModernWPF)
 - Core libraries: SkiaSharp, NetVips, CommunityToolkit.Mvvm, Serilog
+- Tools: Antigravity, VS Code, Visual Studio, Claude Desktop
+- AI: Gemini, Codex, Claude
 
 Build from source:
 
