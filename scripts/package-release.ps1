@@ -79,6 +79,12 @@ try {
         }
     }
 
+    dotnet clean $testProjectPath -v minimal
+    Assert-CommandSucceeded "dotnet clean"
+
+    dotnet clean $projectPath -c Release -v minimal
+    Assert-CommandSucceeded "dotnet clean"
+
     if (-not $SkipTests) {
         dotnet test $testProjectPath -v minimal
         Assert-CommandSucceeded "dotnet test"
