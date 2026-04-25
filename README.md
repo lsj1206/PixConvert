@@ -12,6 +12,17 @@
 ![Language](https://img.shields.io/badge/language-English-blue?style=for-the-badge)
 ![Language](https://img.shields.io/badge/language-Korean-blue?style=for-the-badge)
 
+## Quick Start
+
+1. Download the latest zip package from [GitHub Releases](https://github.com/lsj1206/PixConvert/releases).
+2. Extract the zip file to a writable folder.
+3. Run `PixConvert.exe`.
+4. Add files or folders to the list.
+5. Configure or select a conversion preset.
+6. Start conversion and check the output files.
+
+For runtime use, keep `PixConvert.exe` and `libvips-42.dll` in the same folder. The release zip also includes `LICENSE` and `THIRD-PARTY-NOTICES.md` for license and redistribution notices.
+
 ## Highlights
 
 - Batch convert up to `10,000` image files.
@@ -55,17 +66,6 @@ PixConvert uses two conversion engines depending on the target workload.
 > PixConvert uses NetVips for high-compression and multi-frame workloads: `AVIF`, animated `GIF`, and animated `WebP`.
 
 `AVIF` and animated images have more encoding options and higher processing cost, so they are routed through NetVips. PixConvert uses it for AVIF compression options and frame-based GIF/WebP animation output.
-
-## Quick Start
-
-1. Download the latest zip package from [GitHub Releases](https://github.com/lsj1206/PixConvert/releases).
-2. Extract the zip file to a writable folder.
-3. Run `PixConvert.exe`.
-4. Add files or folders to the list.
-5. Configure or select a conversion preset.
-6. Start conversion and check the output files.
-
-For runtime use, keep `PixConvert.exe` and `libvips-42.dll` in the same folder. The release zip also includes `LICENSE` and `THIRD-PARTY-NOTICES.md` for license and redistribution notices.
 
 ## Development
 
