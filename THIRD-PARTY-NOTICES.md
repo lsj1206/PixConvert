@@ -1,6 +1,6 @@
 # Third-Party Notices
 
-This file covers the PixConvert `v1.0.0` Windows `win-x64` release package.
+This file covers the PixConvert `v1.0.1` Windows `win-x64` release package.
 
 PixConvert itself is licensed under the MIT License. See [LICENSE](LICENSE).
 
