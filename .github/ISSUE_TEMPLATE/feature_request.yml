@@ -1,0 +1,34 @@
+name: Feature request
+description: Suggest an improvement or new capability for PixConvert.
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or use case
+      description: What workflow or limitation would this feature improve?
+    validations:
+      required: true
+  - type: textarea
+    id: requested-behavior
+    attributes:
+      label: Requested behavior
+      description: Describe the behavior you want PixConvert to support.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Describe any workaround or alternative design you considered.
+    validations:
+      required: false
+  - type: textarea
+    id: scenario
+    attributes:
+      label: Example scenario
+      description: Provide a concrete example of how you would use this feature.
+    validations:
+      required: false
