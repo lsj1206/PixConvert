@@ -7,9 +7,14 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <Version>1.0.0</Version>
+    <ApplicationIcon>Assets\AppIcon.ico</ApplicationIcon>
     <RepositoryUrl>https://github.com/lsj1206/PixConvert</RepositoryUrl>
     <LatestReleaseApiUrl>https://api.github.com/repos/lsj1206/PixConvert/releases/latest</LatestReleaseApiUrl>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\AppIcon.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">

@@ -14,6 +14,8 @@
     Height="600"
     MinWidth="720"
     MinHeight="540"
+    Icon="/Assets/AppIcon.ico"
+    ui:TitleBar.IsIconVisible="True"
     ui:WindowHelper.UseModernWindowStyle="True"
     WindowStartupLocation="CenterScreen">
 
