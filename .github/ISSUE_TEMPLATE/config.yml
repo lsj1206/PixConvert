@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/lsj1206/PixConvert/security/policy
+    about: Please review the security policy before reporting sensitive issues.
+  - name: GitHub Releases
+    url: https://github.com/lsj1206/PixConvert/releases
+    about: Download the latest release package before reporting issues fixed in newer versions.
