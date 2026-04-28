@@ -75,6 +75,7 @@ PixConvert uses two conversion engines depending on the target workload.
 - Core libraries: SkiaSharp, NetVips, CommunityToolkit.Mvvm, Serilog
 - Tools: Antigravity, VS Code, Visual Studio, Claude Desktop
 - AI: Gemini, Codex, Claude
+- Devlog: [Shortcut](https://lsj1206.github.io/post/05/)
 
 Build from source:
 
